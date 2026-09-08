@@ -16,7 +16,7 @@ What was your score in the counting game? Which photos were hard for **you** (sm
 
 ## Question 2
 
-Which class does the model find most reliably and which one does it miss most often (give the recall numbers)? Look at the missed objects in Step 2d: what do they have in common (size, distance, lighting, overlap, rarity in the training data)?
+Labelling: how long did you need per photo, and how many of your boxes agreed with the dataset labels? Which objects or classes were hard to decide? At your speed, how many hours would the whole training set take, and what does that mean for anyone who wants a detector for their own site?
 
 *Your answer:*
 
@@ -24,7 +24,7 @@ Which class does the model find most reliably and which one does it miss most of
 
 ## Question 3
 
-Set the threshold to 0.2 and to 0.8. What happens to the number of missed objects and to the number of false alarms? Which threshold would you choose for an automatic site alarm, and which for a weekly report? Explain the difference.
+Which class does the model find most reliably and which one does it miss most often (give the recall numbers)? Look at the missed objects in Step 2d: what do they have in common (size, distance, lighting, overlap, rarity in the training data)?
 
 *Your answer:*
 
@@ -32,7 +32,7 @@ Set the threshold to 0.2 and to 0.8. What happens to the number of missed object
 
 ## Question 4
 
-List three photos (tricky gallery, sliders, or your own) where the detector missed something or invented something. For each, say what it found, what it should have found, and what you think confused it.
+Set the threshold to 0.2 and to 0.8. What happens to the number of missed objects and to the number of false alarms? Which threshold would you choose for an automatic site alarm, and which for a weekly report? Explain the difference.
 
 *Your answer:*
 
@@ -40,7 +40,7 @@ List three photos (tricky gallery, sliders, or your own) where the detector miss
 
 ## Question 5
 
-In Step 3c, what does the general-purpose YOLO see in a site photo, and what does the fine-tuned course model add? In Step 3d, what happens when a model gets photos from the other dataset? What does this tell you about buying an 'AI camera' for your own site?
+List three photos (tricky gallery, sliders, or your own) where the detector missed something or invented something. For each, say what it found, what it should have found, and what you think confused it.
 
 *Your answer:*
 
@@ -48,7 +48,7 @@ In Step 3c, what does the general-purpose YOLO see in a site photo, and what doe
 
 ## Question 6
 
-From the dashboard: what compliance rate does the AI report and what do the labels say? How many photos would be flagged wrongly, and how many flags would be missed? Run it at threshold 0.3 and 0.7 and explain which one you would use for (a) an instant alarm on site and (b) a monthly safety statistic.
+In Step 3c, what does the general-purpose YOLO see in a site photo, and what does the fine-tuned course model add? In Step 3d, what happens when a model gets photos from the other dataset? What does this tell you about buying an 'AI camera' for your own site?
 
 *Your answer:*
 
@@ -56,13 +56,21 @@ From the dashboard: what compliance rate does the AI report and what do the labe
 
 ## Question 7
 
-Copy your leaderboard. How did the quality score change with more photos and more passes? What happened with a random start? Why does a detector need far more training than the classifier in MP2 to reach a useful score?
+From the dashboard: what compliance rate does the AI report and what do the labels say? How many photos would be flagged wrongly, and how many flags would be missed? Run it at threshold 0.3 and 0.7 and explain which one you would use for (a) an instant alarm on site and (b) a monthly safety statistic.
 
 *Your answer:*
 
 
 
 ## Question 8
+
+Copy your leaderboard. How did the quality score change with more photos and more passes? What happened with a random start? Why does a detector need far more training than the classifier in MP2 to reach a useful score?
+
+*Your answer:*
+
+
+
+## Question 9
 
 Imagine this detector running on a site camera. Where would you place the camera, what would you do with each alarm, and what could go wrong (technically and for the people being filmed)? What data would you need to collect to make it work on your own site?
 

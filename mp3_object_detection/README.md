@@ -24,8 +24,10 @@ docs/             report templates, instructor guide with answer key
 build/            instructor-side scripts to rebuild data, models, galleries and notebooks
 ```
 
-The notebook clones this repository into the Colab session and installs `ultralytics` (pinned).
-The only other runtime download is the Gradio package for the upload app.
+The notebook clones this repository into the Colab session and installs three pinned packages: `ultralytics`
+(the detector), `gradio` (the two-tab photo / live-camera app in Step 3e) and `jupyter-bbox-widget` (the
+box-drawing tool of the labelling exercise in Step 1c). The opener points students to the public Ultralytics
+browser demo at https://www.ultralytics.com/yolo, which needs no account.
 
 ## Rebuilding (instructors only)
 

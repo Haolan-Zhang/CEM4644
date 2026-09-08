@@ -19,6 +19,8 @@ from .models import Detector, get_device
 from .train import LEADERBOARD, add_to_leaderboard, leaderboard_table, quick_train
 
 ULTRALYTICS_PIN = "ultralytics==8.4.143"
+GRADIO_PIN = "gradio==6.26.0"
+BBOX_PIN = "jupyter-bbox-widget>=0.7.0"
 
 
 class DetLab:
@@ -41,7 +43,12 @@ class DetLab:
     def setup(self, dataset: str = "construction_safety", install: bool = True):
         t0 = time.time()
         if install:
-            self._install_missing({"ultralytics": ULTRALYTICS_PIN, "gradio": "gradio"})
+            self._install_missing({"ultralytics": ULTRALYTICS_PIN, "gradio": GRADIO_PIN, "jupyter_bbox_widget": BBOX_PIN})
+        try:  # Colab needs this for third-party widgets such as the box-drawing tool in Step 1c
+            from google.colab import output as _colab_output
+            _colab_output.enable_custom_widget_manager()
+        except Exception:
+            pass
         self.spec = spec = DETSETS[dataset]
         unz = self.root / "_unzipped"
         folder = unzip_dataset(self.root / "data" / spec.zip_name, unz)
@@ -108,6 +115,20 @@ class DetLab:
     def count_game(self, rounds=5):
         self._need()
         ui.count_game(self.test, self.spec, int(rounds))
+
+    def label_yourself(self, how_many=3):
+        """Students draw the boxes themselves on a few test photos and are scored against the dataset labels."""
+        self._need()
+        from .labeling import LabelExercise
+        import json
+        n_train, per_photo = None, None
+        log = self.root / "models" / f"{self.spec.key}_training_log.json"
+        if log.exists():
+            n_train = json.loads(log.read_text()).get("n_train")
+        if len(self.train_pool):
+            per_photo = sum(len(it.cls) for it in self.train_pool.items) / len(self.train_pool)
+        self._label = LabelExercise(self.test, self.spec, int(how_many), est_train_photos=n_train, est_boxes_per_photo=per_photo)
+        self._label.start()
 
     # ------------------------------------------------------------------ Part 2
     def pick_and_detect(self):

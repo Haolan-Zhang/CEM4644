@@ -14,7 +14,7 @@ GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
 
 VARIANTS = {
     "workshop": dict(
-        file="MP3_Workshop_Object_Detection.ipynb", label="Workshop (in class)", minutes=80, dataset="construction_safety",
+        file="MP3_Workshop_Object_Detection.ipynb", label="Workshop (in class)", minutes=90, dataset="construction_safety",
         own_photos=1,
         intro_extra="Every worker is boxed as *person*, with a second box for the head (*helmet* or *NO helmet*) and a third for the torso (*vest* or *NO vest*).",
         own_photo_hint="a photo of people wearing (or not wearing) helmets and high-visibility vests, or any photo at all",
@@ -71,7 +71,7 @@ def build(variant):
 **No coding needed.** Each grey box below is one *step*: click the ▶ (play) button at its left, wait until it finishes, look at the result, then answer the report question that follows. Run the steps **from top to bottom**.
 
 **What you will do (about {v['minutes']} minutes)**
-1. Look at labelled photos and try counting objects yourself.
+1. Look at labelled photos, count objects yourself, and label a few photos by hand.
 2. Run a trained detector, read its confidence, and move the confidence threshold.
 3. Measure how many objects it finds and how many false alarms it raises; look at its mistakes.
 4. Try to break it: tricky photos, edited photos, a general-purpose detector, photos from another world, your own photos.
@@ -93,6 +93,16 @@ lab.setup(dataset="{spec.key}")""",
         notes=["Click ▶ and wait for the green ✅ line. This downloads the photos and the course model and installs the detection library.",
                "If Colab asks whether to run a notebook that was not authored by Google, choose *Run anyway*."],
     ))
+
+    cells.append(md("""
+### ☕ While Step 0 runs: try a general-purpose detector in your browser
+
+Open **https://www.ultralytics.com/yolo** in a new tab (no account needed). Use the *webcam* option, or upload a photo, and move the **confidence** slider.
+
+- Point the camera at the room: it will find *person*, *chair*, *laptop*, *bottle*... These are the 80 everyday classes it was trained on.
+- Now think about a construction site: it has no idea what a *helmet*, a *vest* or an *excavator* is. That is the gap this notebook closes with **fine-tuning** (Part 3, Step 3c).
+- Notice how the number of boxes changes when you move the confidence slider. You will measure exactly that in Part 2.
+"""))
 
     # ---------------------------------------------------------------- Part 1
     cells.append(md(f"""
@@ -118,6 +128,19 @@ Boxes drawn with a **dashed** line are labels made by people; boxes with a **sol
     ))
     questions.append((1, f"What was your score in the counting game? Which photos were hard for **you** ({', '.join(['small or distant objects', 'objects partly hidden', 'unclear cases'])}), and would you have drawn the boxes the same way as the labellers?"))
     cells.append(q(*questions[-1]))
+    cells.append(form(
+        "▶ Step 1c · Label a few photos yourself",
+        "lab.label_yourself(how_many)",
+        notes=["Every box in the dataset was drawn by a person. Now it is your turn: draw a box around **every** object of every class, "
+               "pick the class under the photo, then *Submit*. After each photo you see how your boxes compare with the dataset labels, "
+               "and at the end how long the whole training set would take at your speed.",
+               "If the drawing tool does not appear, run Step 0 again and then this cell."],
+        params=['how_many = 3 #@param [2, 3, 5] {type:"raw"}'],
+    ))
+    questions.append((2, "Labelling: how long did you need per photo, and how many of your boxes agreed with the dataset labels? "
+                         "Which objects or classes were hard to decide? At your speed, how many hours would the whole training set take, "
+                         "and what does that mean for anyone who wants a detector for their own site?"))
+    cells.append(q(*questions[-1]))
 
     # ---------------------------------------------------------------- Part 2
     cells.append(md(f"""
@@ -139,9 +162,9 @@ To score a detector we compare its boxes with the labelled boxes on unseen test 
                       notes=["The table and the two curves update as you move the slider. Recall and precision pull in opposite directions."]))
     cells.append(form("▶ Step 2d · Look at the mistakes", "lab.error_explorer()",
                       notes=["Green = correct, orange = false alarm, red dashed = missed object. Choose the kind of mistake and the class; the worst photos come first."]))
-    questions.append((2, "Which class does the model find most reliably and which one does it miss most often (give the recall numbers)? Look at the missed objects in Step 2d: what do they have in common (size, distance, lighting, overlap, rarity in the training data)?"))
+    questions.append((3, "Which class does the model find most reliably and which one does it miss most often (give the recall numbers)? Look at the missed objects in Step 2d: what do they have in common (size, distance, lighting, overlap, rarity in the training data)?"))
     cells.append(q(*questions[-1]))
-    questions.append((3, "Set the threshold to 0.2 and to 0.8. What happens to the number of missed objects and to the number of false alarms? Which threshold would you choose for an automatic site alarm, and which for a weekly report? Explain the difference."))
+    questions.append((4, "Set the threshold to 0.2 and to 0.8. What happens to the number of missed objects and to the number of false alarms? Which threshold would you choose for an automatic site alarm, and which for a weekly report? Explain the difference."))
     cells.append(q(*questions[-1]))
 
     # ---------------------------------------------------------------- Part 3
@@ -165,11 +188,11 @@ A detector only knows the kind of photos it was trained on. Let's find its limit
                           notes=[f"Photos from **{other.title}** are given to the course model and to a model trained on that other dataset. Each model can only answer with its own classes."],
                           params=['how_many = 3 #@param {type:"slider", min:1, max:6, step:1}', 'threshold = 0.4 #@param {type:"slider", min:0.1, max:0.9, step:0.1}']))
     cells.append(form("▶ Step 3e · Your own photo", "lab.upload_app()",
-                      notes=["A small app appears (also as a public link for your phone camera). Upload " + v["own_photo_hint"] + ". Move the threshold slider inside the app.",
+                      notes=["A small app appears with two tabs. *Photo*: upload " + v["own_photo_hint"] + ". *Live camera*: open the public link on your phone, allow the camera and point it at the room or the site; boxes update about once or twice a second. The confidence slider works in both tabs.",
                              f"Test at least {v['own_photos']} photo(s) of your own and take screenshots for your report."]))
-    questions.append((4, "List three photos (tricky gallery, sliders, or your own) where the detector missed something or invented something. For each, say what it found, what it should have found, and what you think confused it."))
+    questions.append((5, "List three photos (tricky gallery, sliders, or your own) where the detector missed something or invented something. For each, say what it found, what it should have found, and what you think confused it."))
     cells.append(q(*questions[-1]))
-    questions.append((5, "In Step 3c, what does the general-purpose YOLO see in a site photo, and what does the fine-tuned course model add? In Step 3d, what happens when a model gets photos from the other dataset? What does this tell you about buying an 'AI camera' for your own site?"))
+    questions.append((6, "In Step 3c, what does the general-purpose YOLO see in a site photo, and what does the fine-tuned course model add? In Step 3d, what happens when a model gets photos from the other dataset? What does this tell you about buying an 'AI camera' for your own site?"))
     cells.append(q(*questions[-1]))
 
     # ---------------------------------------------------------------- Part 4
@@ -183,7 +206,7 @@ A detector only knows the kind of photos it was trained on. Let's find its limit
     cells.append(form("▶ Step 4a · Dashboard", "lab.dashboard(threshold)",
                       notes=["Run it several times with different thresholds and compare the numbers."],
                       params=['threshold = 0.5 #@param {type:"slider", min:0.1, max:0.9, step:0.1}']))
-    questions.append((6, q6))
+    questions.append((7, q6))
     cells.append(q(*questions[-1]))
 
     # ---------------------------------------------------------------- Part 5
@@ -206,10 +229,10 @@ lab.train_my_model(n, passes, start, run_name)""",
     cells.append(form("▶ Step 5c · Your model vs. the course model on the tricky photos", "lab.compare_my_model(group, threshold)",
                       params=['group = "all" #@param ["all", "hard_real", "crowded", "synthetic", "other_domain", "out_of_scope"]',
                               'threshold = 0.5 #@param {type:"slider", min:0.1, max:0.9, step:0.1}']))
-    questions.append((7, "Copy your leaderboard. How did the quality score change with more photos and more passes? What happened with a random start? Why does a detector need far more training than the classifier in MP2 to reach a useful score?"))
+    questions.append((8, "Copy your leaderboard. How did the quality score change with more photos and more passes? What happened with a random start? Why does a detector need far more training than the classifier in MP2 to reach a useful score?"))
     cells.append(q(*questions[-1]))
     if v["own_photos"] > 1:
-        questions.append((8, f"Test {v['own_photos']} photos of your own in Step 3e ({v['own_photo_hint']}). Include screenshots. Which detections were right, which were wrong, and what made the wrong ones hard?"))
+        questions.append((9, f"Test {v['own_photos']} photos of your own in Step 3e ({v['own_photo_hint']}). Include screenshots. Which detections were right, which were wrong, and what made the wrong ones hard?"))
         cells.append(q(*questions[-1]))
     questions.append((len(questions) + 1, "Imagine this detector running on a site camera. Where would you place the camera, what would you do with each alarm, and what could go wrong (technically and for the people being filmed)? What data would you need to collect to make it work on your own site?"))
     cells.append(q(*questions[-1]))
