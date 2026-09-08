@@ -1,0 +1,9 @@
+_unzipped/
+_runs/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+work/
+*.log
+yolo11n.pt
+!models/yolo11n.pt

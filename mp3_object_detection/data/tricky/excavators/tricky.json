@@ -1,0 +1,178 @@
+[
+  {
+    "id": 1,
+    "file": "01_hard_real.jpg",
+    "caption": "a real test photo where the model misses 6 object(s)",
+    "group": "hard_real",
+    "expected": "dump truck \u00d77",
+    "source": "te0122.jpg"
+  },
+  {
+    "id": 2,
+    "file": "02_hard_real.jpg",
+    "caption": "a real test photo where the model misses 4 object(s)",
+    "group": "hard_real",
+    "expected": "dump truck \u00d75",
+    "source": "te0137.jpg"
+  },
+  {
+    "id": 3,
+    "file": "03_hard_real.jpg",
+    "caption": "a real test photo where the model misses 2 object(s)",
+    "group": "hard_real",
+    "expected": "dump truck \u00d72",
+    "source": "te0061.jpg"
+  },
+  {
+    "id": 4,
+    "file": "04_hard_real.jpg",
+    "caption": "a real test photo with 2 false alarm(s)",
+    "group": "hard_real",
+    "expected": "dump truck \u00d71",
+    "source": "te0046.jpg"
+  },
+  {
+    "id": 5,
+    "file": "05_hard_real.jpg",
+    "caption": "a real test photo with 2 false alarm(s)",
+    "group": "hard_real",
+    "expected": "excavator \u00d71",
+    "source": "te0244.jpg"
+  },
+  {
+    "id": 6,
+    "file": "06_crowded.jpg",
+    "caption": "a crowded photo with 7 labelled objects",
+    "group": "crowded",
+    "expected": "dump truck \u00d77",
+    "source": "te0122.jpg"
+  },
+  {
+    "id": 7,
+    "file": "07_crowded.jpg",
+    "caption": "a crowded photo with 5 labelled objects",
+    "group": "crowded",
+    "expected": "dump truck \u00d75",
+    "source": "te0137.jpg"
+  },
+  {
+    "id": 8,
+    "file": "08_synthetic.jpg",
+    "caption": "the same photo 'moved away' (everything 4x smaller)",
+    "group": "synthetic",
+    "expected": "wheel loader \u00d71, dump truck \u00d71",
+    "source": "te0002.jpg"
+  },
+  {
+    "id": 9,
+    "file": "09_synthetic.jpg",
+    "caption": "the same photo, very dark",
+    "group": "synthetic",
+    "expected": "wheel loader \u00d71, dump truck \u00d71",
+    "source": "te0002.jpg"
+  },
+  {
+    "id": 10,
+    "file": "10_synthetic.jpg",
+    "caption": "the same photo, blurred (shaky camera)",
+    "group": "synthetic",
+    "expected": "wheel loader \u00d71, dump truck \u00d71",
+    "source": "te0002.jpg"
+  },
+  {
+    "id": 11,
+    "file": "11_synthetic.jpg",
+    "caption": "the same photo rotated 90\u00b0",
+    "group": "synthetic",
+    "expected": "wheel loader \u00d71, dump truck \u00d71",
+    "source": "te0002.jpg"
+  },
+  {
+    "id": 12,
+    "file": "12_synthetic.jpg",
+    "caption": "the same photo with a strong shadow",
+    "group": "synthetic",
+    "expected": "wheel loader \u00d71, dump truck \u00d71",
+    "source": "te0002.jpg"
+  },
+  {
+    "id": 13,
+    "file": "13_synthetic.jpg",
+    "caption": "the same photo in black & white",
+    "group": "synthetic",
+    "expected": "wheel loader \u00d71, dump truck \u00d71",
+    "source": "te0002.jpg"
+  },
+  {
+    "id": 14,
+    "file": "14_synthetic.jpg",
+    "caption": "the original photo (the model gets this one right)",
+    "group": "synthetic",
+    "expected": "wheel loader \u00d71, dump truck \u00d71",
+    "source": "te0002.jpg"
+  },
+  {
+    "id": 15,
+    "file": "15_other_domain.jpg",
+    "caption": "a photo from another dataset (Workers and PPE on construction sites)",
+    "group": "other_domain",
+    "expected": "(other dataset's labels) helmet \u00d71, person \u00d71, NO vest \u00d71",
+    "source": "construction_safety:te0167.jpg"
+  },
+  {
+    "id": 16,
+    "file": "16_other_domain.jpg",
+    "caption": "a photo from another dataset (Workers and PPE on construction sites)",
+    "group": "other_domain",
+    "expected": "(other dataset's labels) NO vest \u00d71, person \u00d71, helmet \u00d71",
+    "source": "construction_safety:te0138.jpg"
+  },
+  {
+    "id": 17,
+    "file": "17_other_domain.jpg",
+    "caption": "a photo from another dataset (Workers and PPE on construction sites)",
+    "group": "other_domain",
+    "expected": "(other dataset's labels) person \u00d71, vest \u00d71, helmet \u00d71",
+    "source": "construction_safety:te0004.jpg"
+  },
+  {
+    "id": 18,
+    "file": "18_out_of_scope.jpg",
+    "caption": "an astronaut (a person, with a helmet of a very different kind)",
+    "group": "out_of_scope",
+    "expected": "",
+    "source": "skimage:person"
+  },
+  {
+    "id": 19,
+    "file": "19_out_of_scope.jpg",
+    "caption": "a cat",
+    "group": "out_of_scope",
+    "expected": "",
+    "source": "skimage:cat"
+  },
+  {
+    "id": 20,
+    "file": "20_out_of_scope.jpg",
+    "caption": "a cup of coffee",
+    "group": "out_of_scope",
+    "expected": "",
+    "source": "skimage:coffee"
+  },
+  {
+    "id": 21,
+    "file": "21_out_of_scope.jpg",
+    "caption": "a floor-plan drawing",
+    "group": "out_of_scope",
+    "expected": "",
+    "source": "synthetic"
+  },
+  {
+    "id": 22,
+    "file": "22_out_of_scope.jpg",
+    "caption": "a blank grey image",
+    "group": "out_of_scope",
+    "expected": "",
+    "source": "synthetic"
+  }
+]
