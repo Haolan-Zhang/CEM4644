@@ -1,0 +1,6 @@
+_unzipped/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+work/
+*.log

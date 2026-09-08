@@ -1,0 +1,150 @@
+{
+  "job": "facade_multiclass",
+  "dataset": "facade_defects",
+  "task": "multiclass",
+  "base_model": "facebook/convnextv2-femto-1k-224",
+  "n_train": 3172,
+  "n_test": 793,
+  "epochs": 12,
+  "lr": 0.0003,
+  "batch": 64,
+  "label_smoothing": 0.1,
+  "history": [
+    {
+      "pass": 1,
+      "train_loss": 1.2791897150938027,
+      "test_accuracy": 0.8915510718789408
+    },
+    {
+      "pass": 2,
+      "train_loss": 0.8812586281068088,
+      "test_accuracy": 0.8738965952080706
+    },
+    {
+      "pass": 3,
+      "train_loss": 0.6840859266728501,
+      "test_accuracy": 0.8965952080706179
+    },
+    {
+      "pass": 4,
+      "train_loss": 0.6419937431737123,
+      "test_accuracy": 0.905422446406053
+    },
+    {
+      "pass": 5,
+      "train_loss": 0.5811630261199923,
+      "test_accuracy": 0.9306431273644389
+    },
+    {
+      "pass": 6,
+      "train_loss": 0.5454766728538283,
+      "test_accuracy": 0.9218158890290038
+    },
+    {
+      "pass": 7,
+      "train_loss": 0.5268372176273775,
+      "test_accuracy": 0.9508196721311475
+    },
+    {
+      "pass": 8,
+      "train_loss": 0.5143654504309386,
+      "test_accuracy": 0.9432534678436317
+    },
+    {
+      "pass": 9,
+      "train_loss": 0.4981287190923174,
+      "test_accuracy": 0.9419924337957125
+    },
+    {
+      "pass": 10,
+      "train_loss": 0.4901134117704923,
+      "test_accuracy": 0.9432534678436317
+    },
+    {
+      "pass": 11,
+      "train_loss": 0.48559450220039485,
+      "test_accuracy": 0.9432534678436317
+    },
+    {
+      "pass": 12,
+      "train_loss": 0.4829666818977154,
+      "test_accuracy": 0.9470365699873896
+    }
+  ],
+  "test_accuracy": 0.9470365699873896,
+  "confusion": [
+    [
+      123,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      112,
+      5,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      13,
+      98,
+      2,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      2,
+      94,
+      2,
+      1,
+      1
+    ],
+    [
+      0,
+      0,
+      2,
+      1,
+      97,
+      5,
+      0
+    ],
+    [
+      1,
+      2,
+      0,
+      2,
+      1,
+      104,
+      2
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      123
+    ]
+  ],
+  "classes": [
+    "plain wall (no defect)",
+    "minor crack",
+    "major crack",
+    "spalling",
+    "peeling paint / plaster",
+    "stain",
+    "algae / biological growth"
+  ],
+  "seconds": 58
+}

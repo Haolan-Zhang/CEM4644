@@ -1,0 +1,244 @@
+[
+  {
+    "id": 1,
+    "file": "01_borderline.jpg",
+    "caption": "borderline 'crack' (model barely sure)",
+    "group": "borderline",
+    "expected": {
+      "binary": "crack",
+      "multiclass": null
+    },
+    "source": "crack_0074.jpg"
+  },
+  {
+    "id": 2,
+    "file": "02_borderline.jpg",
+    "caption": "borderline 'crack' (model barely sure)",
+    "group": "borderline",
+    "expected": {
+      "binary": "crack",
+      "multiclass": null
+    },
+    "source": "crack_0236.jpg"
+  },
+  {
+    "id": 3,
+    "file": "03_synthetic.jpg",
+    "caption": "a dark line DRAWN on a 'no crack' photo",
+    "group": "synthetic",
+    "expected": {
+      "binary": "no crack",
+      "multiclass": null
+    },
+    "source": "no_crack_0003.jpg"
+  },
+  {
+    "id": 4,
+    "file": "04_synthetic.jpg",
+    "caption": "a strong shadow added to a 'no crack' photo",
+    "group": "synthetic",
+    "expected": {
+      "binary": "no crack",
+      "multiclass": null
+    },
+    "source": "no_crack_0003.jpg"
+  },
+  {
+    "id": 5,
+    "file": "05_synthetic.jpg",
+    "caption": "a real 'crack', blurred (shaky camera)",
+    "group": "synthetic",
+    "expected": {
+      "binary": "crack",
+      "multiclass": null
+    },
+    "source": "crack_0323.jpg"
+  },
+  {
+    "id": 6,
+    "file": "06_synthetic.jpg",
+    "caption": "a real 'crack', very dark",
+    "group": "synthetic",
+    "expected": {
+      "binary": "crack",
+      "multiclass": null
+    },
+    "source": "crack_0323.jpg"
+  },
+  {
+    "id": 7,
+    "file": "07_synthetic.jpg",
+    "caption": "a real 'crack', rotated 90\u00b0",
+    "group": "synthetic",
+    "expected": {
+      "binary": "crack",
+      "multiclass": null
+    },
+    "source": "crack_0323.jpg"
+  },
+  {
+    "id": 8,
+    "file": "08_synthetic.jpg",
+    "caption": "a 'crack' photo shrunk into the middle of a 'no crack' photo",
+    "group": "synthetic",
+    "expected": {
+      "binary": "crack",
+      "multiclass": "?"
+    },
+    "source": "crack_0323.jpg"
+  },
+  {
+    "id": 9,
+    "file": "09_synthetic.jpg",
+    "caption": "a real 'crack', zoomed in 4x",
+    "group": "synthetic",
+    "expected": {
+      "binary": "?",
+      "multiclass": "?"
+    },
+    "source": "crack_0323.jpg"
+  },
+  {
+    "id": 10,
+    "file": "10_other_domain.jpg",
+    "caption": "'plain wall (no defect)' photo from another dataset (Building fa\u00e7ade)",
+    "group": "other_domain",
+    "expected": {
+      "binary": "no crack",
+      "multiclass": null
+    },
+    "source": "facade_defects:plain_0100.jpg"
+  },
+  {
+    "id": 11,
+    "file": "11_other_domain.jpg",
+    "caption": "'minor crack' photo from another dataset (Building fa\u00e7ade)",
+    "group": "other_domain",
+    "expected": {
+      "binary": "crack",
+      "multiclass": null
+    },
+    "source": "facade_defects:minor_crack_0011.jpg"
+  },
+  {
+    "id": 12,
+    "file": "12_other_domain.jpg",
+    "caption": "'major crack' photo from another dataset (Building fa\u00e7ade)",
+    "group": "other_domain",
+    "expected": {
+      "binary": "crack",
+      "multiclass": null
+    },
+    "source": "facade_defects:major_crack_0021.jpg"
+  },
+  {
+    "id": 13,
+    "file": "13_other_domain.jpg",
+    "caption": "'spalling' photo from another dataset (Building fa\u00e7ade)",
+    "group": "other_domain",
+    "expected": {
+      "binary": "crack",
+      "multiclass": null
+    },
+    "source": "facade_defects:spalling_0024.jpg"
+  },
+  {
+    "id": 14,
+    "file": "14_out_of_scope.jpg",
+    "caption": "a cat (not a wall!)",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "skimage:cat"
+  },
+  {
+    "id": 15,
+    "file": "15_out_of_scope.jpg",
+    "caption": "a person",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "skimage:person"
+  },
+  {
+    "id": 16,
+    "file": "16_out_of_scope.jpg",
+    "caption": "a cup of coffee",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "skimage:coffee"
+  },
+  {
+    "id": 17,
+    "file": "17_out_of_scope.jpg",
+    "caption": "brick texture (skimage sample)",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "skimage:brick"
+  },
+  {
+    "id": 18,
+    "file": "18_out_of_scope.jpg",
+    "caption": "gravel texture (skimage sample)",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "skimage:gravel"
+  },
+  {
+    "id": 19,
+    "file": "19_out_of_scope.jpg",
+    "caption": "grass texture (skimage sample)",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "skimage:grass"
+  },
+  {
+    "id": 20,
+    "file": "20_out_of_scope.jpg",
+    "caption": "a blank grey image",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "synthetic"
+  },
+  {
+    "id": 21,
+    "file": "21_out_of_scope.jpg",
+    "caption": "pure random noise",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "synthetic"
+  },
+  {
+    "id": 22,
+    "file": "22_out_of_scope.jpg",
+    "caption": "a floor-plan drawing",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "synthetic"
+  }
+]

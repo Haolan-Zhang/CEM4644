@@ -1,0 +1,45 @@
+{
+  "job": "concrete_binary",
+  "dataset": "concrete_cracks",
+  "task": "binary",
+  "base_model": "facebook/convnextv2-femto-1k-224",
+  "n_train": 8000,
+  "n_test": 1000,
+  "epochs": 3,
+  "lr": 0.0003,
+  "batch": 64,
+  "label_smoothing": 0.0,
+  "history": [
+    {
+      "pass": 1,
+      "train_loss": 0.12454803778231144,
+      "test_accuracy": 0.996
+    },
+    {
+      "pass": 2,
+      "train_loss": 0.011957699596881867,
+      "test_accuracy": 1.0
+    },
+    {
+      "pass": 3,
+      "train_loss": 0.0067596670389175415,
+      "test_accuracy": 1.0
+    }
+  ],
+  "test_accuracy": 1.0,
+  "confusion": [
+    [
+      500,
+      0
+    ],
+    [
+      0,
+      500
+    ]
+  ],
+  "classes": [
+    "no crack",
+    "crack"
+  ],
+  "seconds": 25
+}

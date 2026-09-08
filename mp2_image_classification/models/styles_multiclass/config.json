@@ -1,0 +1,65 @@
+{
+  "architectures": [
+    "ConvNextV2ForImageClassification"
+  ],
+  "depths": [
+    2,
+    2,
+    6,
+    2
+  ],
+  "drop_path_rate": 0.0,
+  "dtype": "float16",
+  "hidden_act": "gelu",
+  "hidden_sizes": [
+    48,
+    96,
+    192,
+    384
+  ],
+  "id2label": {
+    "0": "Bauhaus International",
+    "1": "Brutalist",
+    "2": "Art Deco",
+    "3": "Neoclassical",
+    "4": "Gothic Revival",
+    "5": "Georgian",
+    "6": "Victorian Terrace",
+    "7": "Mid-century Modern",
+    "8": "Contemporary Curtain Wall",
+    "9": "Industrial Warehouse"
+  },
+  "image_size": 224,
+  "initializer_range": 0.02,
+  "label2id": {
+    "Art Deco": 2,
+    "Bauhaus International": 0,
+    "Brutalist": 1,
+    "Contemporary Curtain Wall": 8,
+    "Georgian": 5,
+    "Gothic Revival": 4,
+    "Industrial Warehouse": 9,
+    "Mid-century Modern": 7,
+    "Neoclassical": 3,
+    "Victorian Terrace": 6
+  },
+  "layer_norm_eps": 1e-12,
+  "model_type": "convnextv2",
+  "num_channels": 3,
+  "num_stages": 4,
+  "out_features": [
+    "stage4"
+  ],
+  "out_indices": [
+    4
+  ],
+  "patch_size": 4,
+  "stage_names": [
+    "stem",
+    "stage1",
+    "stage2",
+    "stage3",
+    "stage4"
+  ],
+  "transformers_version": "5.16.1"
+}

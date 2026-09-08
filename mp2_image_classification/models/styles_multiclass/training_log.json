@@ -1,0 +1,250 @@
+{
+  "job": "styles_multiclass",
+  "dataset": "facade_styles",
+  "task": "multiclass",
+  "base_model": "facebook/convnextv2-femto-1k-224",
+  "n_train": 380,
+  "n_test": 120,
+  "epochs": 20,
+  "lr": 0.0003,
+  "batch": 32,
+  "label_smoothing": 0.1,
+  "history": [
+    {
+      "pass": 1,
+      "train_loss": 2.0658003355327406,
+      "test_accuracy": 0.8083333333333333
+    },
+    {
+      "pass": 2,
+      "train_loss": 1.0002625816746762,
+      "test_accuracy": 0.95
+    },
+    {
+      "pass": 3,
+      "train_loss": 0.720205733650609,
+      "test_accuracy": 0.9333333333333333
+    },
+    {
+      "pass": 4,
+      "train_loss": 0.5815842691220735,
+      "test_accuracy": 0.9916666666666667
+    },
+    {
+      "pass": 5,
+      "train_loss": 0.5444211263405649,
+      "test_accuracy": 0.9833333333333333
+    },
+    {
+      "pass": 6,
+      "train_loss": 0.5163923426678306,
+      "test_accuracy": 0.9833333333333333
+    },
+    {
+      "pass": 7,
+      "train_loss": 0.5101908771615279,
+      "test_accuracy": 0.9916666666666667
+    },
+    {
+      "pass": 8,
+      "train_loss": 0.506194197504144,
+      "test_accuracy": 0.9833333333333333
+    },
+    {
+      "pass": 9,
+      "train_loss": 0.5047013897644846,
+      "test_accuracy": 0.9916666666666667
+    },
+    {
+      "pass": 10,
+      "train_loss": 0.5041523230703253,
+      "test_accuracy": 0.9916666666666667
+    },
+    {
+      "pass": 11,
+      "train_loss": 0.5028572496614958,
+      "test_accuracy": 0.9916666666666667
+    },
+    {
+      "pass": 12,
+      "train_loss": 0.5027972233922858,
+      "test_accuracy": 0.9916666666666667
+    },
+    {
+      "pass": 13,
+      "train_loss": 0.5030627225574694,
+      "test_accuracy": 0.9916666666666667
+    },
+    {
+      "pass": 14,
+      "train_loss": 0.5024674145798934,
+      "test_accuracy": 0.9916666666666667
+    },
+    {
+      "pass": 15,
+      "train_loss": 0.5027735264677751,
+      "test_accuracy": 0.9916666666666667
+    },
+    {
+      "pass": 16,
+      "train_loss": 0.5024838378554897,
+      "test_accuracy": 0.9916666666666667
+    },
+    {
+      "pass": 17,
+      "train_loss": 0.5023385298879524,
+      "test_accuracy": 0.9916666666666667
+    },
+    {
+      "pass": 18,
+      "train_loss": 0.5023402000728406,
+      "test_accuracy": 0.9916666666666667
+    },
+    {
+      "pass": 19,
+      "train_loss": 0.5024680187827663,
+      "test_accuracy": 0.9916666666666667
+    },
+    {
+      "pass": 20,
+      "train_loss": 0.5023261038880599,
+      "test_accuracy": 0.9916666666666667
+    }
+  ],
+  "test_accuracy": 0.9916666666666667,
+  "confusion": [
+    [
+      12,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      12,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      12,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      12,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      12,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      11,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      12,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      12,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      12,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      12
+    ]
+  ],
+  "classes": [
+    "Bauhaus International",
+    "Brutalist",
+    "Art Deco",
+    "Neoclassical",
+    "Gothic Revival",
+    "Georgian",
+    "Victorian Terrace",
+    "Mid-century Modern",
+    "Contemporary Curtain Wall",
+    "Industrial Warehouse"
+  ],
+  "seconds": 20
+}

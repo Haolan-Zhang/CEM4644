@@ -1,0 +1,266 @@
+[
+  {
+    "id": 1,
+    "file": "01_hard_real.jpg",
+    "caption": "a real 'Georgian' the model gets wrong",
+    "group": "hard_real",
+    "expected": {
+      "binary": null,
+      "multiclass": "Georgian"
+    },
+    "source": "georgian_0002.jpg"
+  },
+  {
+    "id": 2,
+    "file": "02_borderline.jpg",
+    "caption": "borderline 'Georgian' (model barely sure)",
+    "group": "borderline",
+    "expected": {
+      "binary": null,
+      "multiclass": "Georgian"
+    },
+    "source": "georgian_0001.jpg"
+  },
+  {
+    "id": 3,
+    "file": "03_borderline.jpg",
+    "caption": "borderline 'Georgian' (model barely sure)",
+    "group": "borderline",
+    "expected": {
+      "binary": null,
+      "multiclass": "Georgian"
+    },
+    "source": "georgian_0008.jpg"
+  },
+  {
+    "id": 4,
+    "file": "04_synthetic.jpg",
+    "caption": "a real 'Art Deco', blurred",
+    "group": "synthetic",
+    "expected": {
+      "binary": null,
+      "multiclass": "Art Deco"
+    },
+    "source": "art_deco_0012.jpg"
+  },
+  {
+    "id": 5,
+    "file": "05_synthetic.jpg",
+    "caption": "a real 'Art Deco', black & white",
+    "group": "synthetic",
+    "expected": {
+      "binary": null,
+      "multiclass": "Art Deco"
+    },
+    "source": "art_deco_0012.jpg"
+  },
+  {
+    "id": 6,
+    "file": "06_synthetic.jpg",
+    "caption": "a real 'Art Deco', zoomed in 3x",
+    "group": "synthetic",
+    "expected": {
+      "binary": null,
+      "multiclass": "?"
+    },
+    "source": "art_deco_0012.jpg"
+  },
+  {
+    "id": 7,
+    "file": "07_synthetic.jpg",
+    "caption": "a real 'Gothic Revival', blurred",
+    "group": "synthetic",
+    "expected": {
+      "binary": null,
+      "multiclass": "Gothic Revival"
+    },
+    "source": "gothic_revival_0001.jpg"
+  },
+  {
+    "id": 8,
+    "file": "08_synthetic.jpg",
+    "caption": "a real 'Gothic Revival', black & white",
+    "group": "synthetic",
+    "expected": {
+      "binary": null,
+      "multiclass": "Gothic Revival"
+    },
+    "source": "gothic_revival_0001.jpg"
+  },
+  {
+    "id": 9,
+    "file": "09_synthetic.jpg",
+    "caption": "a real 'Gothic Revival', zoomed in 3x",
+    "group": "synthetic",
+    "expected": {
+      "binary": null,
+      "multiclass": "?"
+    },
+    "source": "gothic_revival_0001.jpg"
+  },
+  {
+    "id": 10,
+    "file": "10_synthetic.jpg",
+    "caption": "a real 'Mid-century Modern', blurred",
+    "group": "synthetic",
+    "expected": {
+      "binary": null,
+      "multiclass": "Mid-century Modern"
+    },
+    "source": "mid_century_modern_0010.jpg"
+  },
+  {
+    "id": 11,
+    "file": "11_synthetic.jpg",
+    "caption": "a real 'Mid-century Modern', black & white",
+    "group": "synthetic",
+    "expected": {
+      "binary": null,
+      "multiclass": "Mid-century Modern"
+    },
+    "source": "mid_century_modern_0010.jpg"
+  },
+  {
+    "id": 12,
+    "file": "12_synthetic.jpg",
+    "caption": "a real 'Mid-century Modern', zoomed in 3x",
+    "group": "synthetic",
+    "expected": {
+      "binary": null,
+      "multiclass": "?"
+    },
+    "source": "mid_century_modern_0010.jpg"
+  },
+  {
+    "id": 13,
+    "file": "13_other_domain.jpg",
+    "caption": "'plain wall (no defect)' photo from another dataset",
+    "group": "other_domain",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "facade_defects:plain_0100.jpg"
+  },
+  {
+    "id": 14,
+    "file": "14_other_domain.jpg",
+    "caption": "'minor crack' photo from another dataset",
+    "group": "other_domain",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "facade_defects:minor_crack_0011.jpg"
+  },
+  {
+    "id": 15,
+    "file": "15_other_domain.jpg",
+    "caption": "'major crack' photo from another dataset",
+    "group": "other_domain",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "facade_defects:major_crack_0021.jpg"
+  },
+  {
+    "id": 16,
+    "file": "16_out_of_scope.jpg",
+    "caption": "a cat",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "skimage:cat"
+  },
+  {
+    "id": 17,
+    "file": "17_out_of_scope.jpg",
+    "caption": "a person",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "skimage:person"
+  },
+  {
+    "id": 18,
+    "file": "18_out_of_scope.jpg",
+    "caption": "a cup of coffee",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "skimage:coffee"
+  },
+  {
+    "id": 19,
+    "file": "19_out_of_scope.jpg",
+    "caption": "brick texture (skimage sample)",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "skimage:brick"
+  },
+  {
+    "id": 20,
+    "file": "20_out_of_scope.jpg",
+    "caption": "gravel texture (skimage sample)",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "skimage:gravel"
+  },
+  {
+    "id": 21,
+    "file": "21_out_of_scope.jpg",
+    "caption": "grass texture (skimage sample)",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "skimage:grass"
+  },
+  {
+    "id": 22,
+    "file": "22_out_of_scope.jpg",
+    "caption": "a blank grey image",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "synthetic"
+  },
+  {
+    "id": 23,
+    "file": "23_out_of_scope.jpg",
+    "caption": "pure random noise",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "synthetic"
+  },
+  {
+    "id": 24,
+    "file": "24_out_of_scope.jpg",
+    "caption": "a floor-plan drawing",
+    "group": "out_of_scope",
+    "expected": {
+      "binary": null,
+      "multiclass": null
+    },
+    "source": "synthetic"
+  }
+]

@@ -1,0 +1,59 @@
+{
+  "architectures": [
+    "ConvNextV2ForImageClassification"
+  ],
+  "depths": [
+    2,
+    2,
+    6,
+    2
+  ],
+  "drop_path_rate": 0.0,
+  "dtype": "float16",
+  "hidden_act": "gelu",
+  "hidden_sizes": [
+    48,
+    96,
+    192,
+    384
+  ],
+  "id2label": {
+    "0": "plain wall (no defect)",
+    "1": "minor crack",
+    "2": "major crack",
+    "3": "spalling",
+    "4": "peeling paint / plaster",
+    "5": "stain",
+    "6": "algae / biological growth"
+  },
+  "image_size": 224,
+  "initializer_range": 0.02,
+  "label2id": {
+    "algae / biological growth": 6,
+    "major crack": 2,
+    "minor crack": 1,
+    "peeling paint / plaster": 4,
+    "plain wall (no defect)": 0,
+    "spalling": 3,
+    "stain": 5
+  },
+  "layer_norm_eps": 1e-12,
+  "model_type": "convnextv2",
+  "num_channels": 3,
+  "num_stages": 4,
+  "out_features": [
+    "stage4"
+  ],
+  "out_indices": [
+    4
+  ],
+  "patch_size": 4,
+  "stage_names": [
+    "stem",
+    "stage1",
+    "stage2",
+    "stage3",
+    "stage4"
+  ],
+  "transformers_version": "5.16.1"
+}

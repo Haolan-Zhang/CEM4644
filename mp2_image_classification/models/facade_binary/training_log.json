@@ -1,0 +1,70 @@
+{
+  "job": "facade_binary",
+  "dataset": "facade_defects",
+  "task": "binary",
+  "base_model": "facebook/convnextv2-femto-1k-224",
+  "n_train": 3172,
+  "n_test": 793,
+  "epochs": 8,
+  "lr": 0.0003,
+  "batch": 64,
+  "label_smoothing": 0.05,
+  "history": [
+    {
+      "pass": 1,
+      "train_loss": 0.25709772470770087,
+      "test_accuracy": 0.9747793190416141
+    },
+    {
+      "pass": 2,
+      "train_loss": 0.19540145980079118,
+      "test_accuracy": 0.9773013871374527
+    },
+    {
+      "pass": 3,
+      "train_loss": 0.148760148022244,
+      "test_accuracy": 0.9861286254728878
+    },
+    {
+      "pass": 4,
+      "train_loss": 0.1329990333183416,
+      "test_accuracy": 0.9974779319041615
+    },
+    {
+      "pass": 5,
+      "train_loss": 0.13130081689260045,
+      "test_accuracy": 0.9962168978562421
+    },
+    {
+      "pass": 6,
+      "train_loss": 0.12110442057496211,
+      "test_accuracy": 0.9949558638083228
+    },
+    {
+      "pass": 7,
+      "train_loss": 0.12196367015077969,
+      "test_accuracy": 0.9962168978562421
+    },
+    {
+      "pass": 8,
+      "train_loss": 0.12071714013777345,
+      "test_accuracy": 0.9974779319041615
+    }
+  ],
+  "test_accuracy": 0.9974779319041615,
+  "confusion": [
+    [
+      122,
+      1
+    ],
+    [
+      1,
+      669
+    ]
+  ],
+  "classes": [
+    "no defect",
+    "defect"
+  ],
+  "seconds": 34
+}
