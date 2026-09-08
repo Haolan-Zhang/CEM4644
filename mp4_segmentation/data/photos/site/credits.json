@@ -1,0 +1,415 @@
+[
+  {
+    "id": "site_01",
+    "file": "site_01.jpg",
+    "title": "Formwork and rebar before a concrete pour, East Approach, New York, 2017",
+    "author": "MTA Capital Construction Mega Projects",
+    "license": "CC BY 2.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/6/67/Formwork_and_rebar_in_advance_of_a_concrete_pour_at_the_East_Approach_for_the_planned_Amtrak_Westbound_Bypass_Tunnel_which_will_send_trains_below_the_existing_LIRR_tracks._%28CH057A%2C_9-13-2017%29_%2836406383744%29.jpg",
+    "note": "formwork, rebar",
+    "size": [
+      1280,
+      960
+    ]
+  },
+  {
+    "id": "site_02",
+    "file": "site_02.jpg",
+    "title": "Setting a rebar cage for a foundation, Queens, 2018",
+    "author": "MTA Capital Construction Mega Projects",
+    "license": "CC BY 2.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/9/94/Setting_a_rebar_cage_for_a_foundation_east_of_Queens_Blvd._%28CQ033%2C_10-17-2018%29_%2845378839502%29.jpg",
+    "note": "rebar cage, crane",
+    "size": [
+      1280,
+      960
+    ]
+  },
+  {
+    "id": "site_03",
+    "file": "site_03.jpg",
+    "title": "Rebar on a building site, Hölzla",
+    "author": "Ermell",
+    "license": "CC BY-SA 4.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Baustelle-H%C3%B6lzla-Rebar-4141399.jpg",
+    "note": "rebar",
+    "size": [
+      1280,
+      1203
+    ]
+  },
+  {
+    "id": "site_04",
+    "file": "site_04.jpg",
+    "title": "Rebar on a building site, Hölzla (2)",
+    "author": "Ermell",
+    "license": "CC BY-SA 4.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Baustelle-H%C3%B6lzla-Rebar-6228085.jpg",
+    "note": "rebar",
+    "size": [
+      1280,
+      960
+    ]
+  },
+  {
+    "id": "site_05",
+    "file": "site_05.jpg",
+    "title": "Rebar for bridge foundation piling",
+    "author": "NPS Photo",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/4/43/Rebar_for_Bridge_Foundation_Piling_%2875e8f25b-9308-4e22-9ab4-fdf4bb4adaf2%29.JPG",
+    "note": "rebar cage",
+    "size": [
+      853,
+      1280
+    ]
+  },
+  {
+    "id": "site_06",
+    "file": "site_06.jpg",
+    "title": "Builders tie a rebar cage together",
+    "author": "U.S. Navy",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/0/07/US_Navy_080929-N-8816D-009_Builder_3rd_Class_Christopher_Dutra_and_Utilitiesman_3rd_Class_Thomas_E._Hanson_tie_a_rebar_cage_together.jpg",
+    "note": "rebar cage, workers",
+    "size": [
+      1280,
+      914
+    ]
+  },
+  {
+    "id": "site_07",
+    "file": "site_07.jpg",
+    "title": "Pouring concrete footings, Trimingham, 8 Jan 2021",
+    "author": "Kolforn",
+    "license": "CC BY-SA 4.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/56/-2021-01-08_Men_pouring_concrete_footings%2C_Trimingham%2C_Norfolk.JPG",
+    "note": "series A day 1: concrete footings being poured",
+    "size": [
+      944,
+      1280
+    ]
+  },
+  {
+    "id": "site_08",
+    "file": "site_08.jpg",
+    "title": "Brick and block footings, Trimingham, 13 Jan 2021",
+    "author": "Kolforn",
+    "license": "CC BY-SA 4.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/6/62/-2021-01-13_Brick_and_block_footings%2C_Trimingham%2C_Norfolk_%281%29.JPG",
+    "note": "series A day 6: blockwork on the footings",
+    "size": [
+      1280,
+      960
+    ]
+  },
+  {
+    "id": "site_09",
+    "file": "site_09.jpg",
+    "title": "Foundations and concrete oversite, Trimingham, 18 Jan 2021",
+    "author": "Kolforn",
+    "license": "CC BY-SA 4.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/51/-2021-01-18_Foundations_and_concrete_oversite%2C_Trimingham%2C_Norfolk_%281%29.JPG",
+    "note": "series A day 11: concrete oversite poured",
+    "size": [
+      1280,
+      960
+    ]
+  },
+  {
+    "id": "site_10",
+    "file": "site_10.jpg",
+    "title": "Foundations and concrete oversite, Trimingham, 18 Jan 2021 (3)",
+    "author": "Kolforn",
+    "license": "CC BY-SA 4.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/57/-2021-01-18_Foundations_and_concrete_oversite%2C_Trimingham%2C_Norfolk_%283%29.JPG",
+    "note": "series A day 11, other view",
+    "size": [
+      1280,
+      960
+    ]
+  },
+  {
+    "id": "site_11",
+    "file": "site_11.jpg",
+    "title": "Concrete pouring for a new school, Spangdahlem",
+    "author": "U.S. Air Force / Airman Sydney Franklin",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/0/0e/Concrete_pouring_for_the_new_Spangdahlem_Elementary_School_%288062807%29.jpg",
+    "note": "concrete pour, workers",
+    "size": [
+      1280,
+      854
+    ]
+  },
+  {
+    "id": "site_12",
+    "file": "site_12.jpg",
+    "title": "Concrete pouring for a new school, Spangdahlem (2)",
+    "author": "U.S. Air Force / Airman Sydney Franklin",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/8/87/Concrete_pouring_for_the_new_Spangdahlem_Elementary_School_%288062808%29.jpg",
+    "note": "concrete pour, workers",
+    "size": [
+      1280,
+      854
+    ]
+  },
+  {
+    "id": "site_13",
+    "file": "site_13.jpg",
+    "title": "Construction site with a concrete pump truck",
+    "author": "Steve Pivnick, U.S. Air Force",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Construction_site_with_concrete_pump_truck.JPG",
+    "note": "concrete pump",
+    "size": [
+      1280,
+      867
+    ]
+  },
+  {
+    "id": "site_14",
+    "file": "site_14.jpg",
+    "title": "Seabees pour concrete at a project site, Senegal",
+    "author": "U.S. Navy / MC1 Ryan G. Wilber",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/c/c5/US_Navy_110520-N-AW868-082_Seabees_assigned_to_Naval_Mobile_Construction_Battalion_%28NMCB%29_74%2C_Detachment_Senegal%2C_pour_concrete_at_a_project_site_a.jpg",
+    "note": "concrete pour, formwork",
+    "size": [
+      1280,
+      914
+    ]
+  },
+  {
+    "id": "site_15",
+    "file": "site_15.jpg",
+    "title": "Workers pouring concrete from a boom pump",
+    "author": "Grendelkhan",
+    "license": "CC BY-SA 3.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/1/19/Workers_pouring_concrete_from_a_boom_pump.jpg",
+    "note": "concrete pour",
+    "size": [
+      1280,
+      960
+    ]
+  },
+  {
+    "id": "site_16",
+    "file": "site_16.jpg",
+    "title": "Construction of a new supermarket, Biddulph, 2010",
+    "author": "Jonathan Kington",
+    "license": "CC BY-SA 2.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/3/34/-2010-09-10_Construction_of_New_Sainsbury%E2%80%99s_supermarket%2C_Biddulph%2C_Staffordshire.jpg",
+    "note": "steel frame, site",
+    "size": [
+      1280,
+      933
+    ]
+  },
+  {
+    "id": "site_18",
+    "file": "site_18.jpg",
+    "title": "Constructions and scaffolding at the Oosterdokseiland, Amsterdam",
+    "author": "Fons Heijnsbroek",
+    "license": "CC0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/7/79/Constructions_and_scaffolding_at_the_Oosterdokseiland%2C_Amsterdam-Centrum.jpg",
+    "note": "scaffolding, concrete frame",
+    "size": [
+      1280,
+      960
+    ]
+  },
+  {
+    "id": "site_19",
+    "file": "site_19.jpg",
+    "title": "A building frame with scaffolding at a construction site",
+    "author": "Shixart1985",
+    "license": "CC BY 2.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/3/3c/A_building_frame_with_scaffolding_at_a_construction_site_with_blue_sky_in_background.jpg",
+    "note": "scaffolding, frame",
+    "size": [
+      960,
+      1280
+    ]
+  },
+  {
+    "id": "site_20",
+    "file": "site_20.jpg",
+    "title": "The Milliners apartment building under construction, September 2025",
+    "author": "Captain Galaxy",
+    "license": "CC BY 4.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/d/d5/The_Milliners_apartment_building_under_construction_-_September_2025.jpg",
+    "note": "concrete frame, crane",
+    "size": [
+      1280,
+      591
+    ]
+  },
+  {
+    "id": "site_21",
+    "file": "site_21.jpg",
+    "title": "High-rise construction with scaffolding and protective netting, Makati",
+    "author": "Marek Ślusarczyk",
+    "license": "CC BY 3.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/1/1a/11_Manila_Makati_-_high_rise_construction_scaffolding_and_protective_netting.jpg",
+    "note": "scaffolding, netting",
+    "size": [
+      853,
+      1280
+    ]
+  },
+  {
+    "id": "site_22",
+    "file": "site_22.jpg",
+    "title": "Hay Street parking deck under construction",
+    "author": "jalexartis",
+    "license": "CC BY 2.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Hay_Street_Parking_Deck_82.jpg",
+    "note": "concrete deck",
+    "size": [
+      934,
+      1280
+    ]
+  },
+  {
+    "id": "site_23",
+    "file": "site_23.jpg",
+    "title": "Belchertown administration building: foundation, 30 Aug 1937",
+    "author": "Metropolitan District Water Supply Commission (S. D. Pike)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Contract_No._56%2C_Administration_Buildings%2C_Main_Dam%2C_Belchertown%2C_foundation_for_main_building%2C_Belchertown%2C_Mass.%2C_Aug._30%2C_1937_-_DPLA_-_126d5ba09bd2d1c414908ad76b64bed7.jpg",
+    "note": "series B 1: foundation excavation",
+    "size": [
+      1107,
+      642
+    ],
+    "cropped": true
+  },
+  {
+    "id": "site_24",
+    "file": "site_24.jpg",
+    "title": "Belchertown: forms and reinforcing for the foundation, 10 Sep 1937",
+    "author": "Metropolitan District Water Supply Commission (S. D. Pike)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/4/42/Contract_No._56%2C_Administration_Buildings%2C_Main_Dam%2C_Belchertown%2C_forms_and_reinforcing_for_administration_building_foundation%2C_Belchertown%2C_Mass.%2C_Sep._10%2C_1937_-_DPLA_-_d58279d71e9b65bc5f9295a0fdc44151.jpg",
+    "note": "series B 2: formwork and rebar",
+    "size": [
+      1107,
+      644
+    ],
+    "cropped": true
+  },
+  {
+    "id": "site_25",
+    "file": "site_25.jpg",
+    "title": "Belchertown: foundation, 11 Oct 1937",
+    "author": "Metropolitan District Water Supply Commission (S. D. Pike)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Contract_No._56%2C_Administration_Buildings%2C_Main_Dam%2C_Belchertown%2C_looking_southerly_at_foundation_for_administration_building%2C_Belchertown%2C_Mass.%2C_Oct._11%2C_1937_-_DPLA_-_626b8177a92e3f5680f0c7ea34a92c81.jpg",
+    "note": "series B 3: concrete foundation walls",
+    "size": [
+      1107,
+      633
+    ],
+    "cropped": true
+  },
+  {
+    "id": "site_26",
+    "file": "site_26.jpg",
+    "title": "Belchertown: general view, 2 Nov 1937",
+    "author": "Metropolitan District Water Supply Commission (S. D. Pike)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/2/25/Contract_No._56%2C_Administration_Buildings%2C_Main_Dam%2C_Belchertown%2C_general_view_of_administration_building%2C_looking_southerly%2C_Belchertown%2C_Mass.%2C_Nov._2%2C_1937_-_DPLA_-_c68db5273969b21025a6a117e7526b47.jpg",
+    "note": "series B 4",
+    "size": [
+      1107,
+      643
+    ],
+    "cropped": true
+  },
+  {
+    "id": "site_27",
+    "file": "site_27.jpg",
+    "title": "Belchertown: steel for the main building, 30 Nov 1937",
+    "author": "Metropolitan District Water Supply Commission (S. D. Pike)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Contract_No._56%2C_Administration_Buildings%2C_Main_Dam%2C_Belchertown%2C_steel_for_main_building%2C_Belchertown%2C_Mass.%2C_Nov._30%2C_1937_-_DPLA_-_dc4e81029ec11a601679993fba9999ab.jpg",
+    "note": "series B 5: steel frame",
+    "size": [
+      1107,
+      649
+    ],
+    "cropped": true
+  },
+  {
+    "id": "site_28",
+    "file": "site_28.jpg",
+    "title": "Belchertown: laying brick, 20 Dec 1937",
+    "author": "Metropolitan District Water Supply Commission (S. D. Pike)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Contract_No._56%2C_Administration_Buildings%2C_Main_Dam%2C_Belchertown%2C_laying_brick_on_north_wall_of_second_floor_of_the_administration_building%2C_Belchertown%2C_Mass.%2C_Dec._20%2C_1937_-_DPLA_-_c00980a59b473b66ab715104f6b099cd.jpg",
+    "note": "series B 6: brickwork",
+    "size": [
+      1107,
+      638
+    ],
+    "cropped": true
+  },
+  {
+    "id": "site_29",
+    "file": "site_29.jpg",
+    "title": "Belchertown: looking south-east at the main building, 27 Jan 1938",
+    "author": "Metropolitan District Water Supply Commission (S. D. Pike)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Contract_No._56%2C_Administration_Buildings%2C_Main_Dam%2C_Belchertown%2C_looking_southeast_at_main_building%2C_Belchertown%2C_Mass.%2C_Jan._27%2C_1938_-_DPLA_-_257591addc10b53b5a509e170b0e11ad.jpg",
+    "note": "series B 7",
+    "size": [
+      1107,
+      636
+    ],
+    "cropped": true
+  },
+  {
+    "id": "site_30",
+    "file": "site_30.jpg",
+    "title": "Belchertown: main building, 12 May 1938",
+    "author": "Metropolitan District Water Supply Commission (S. D. Pike)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/4/40/Contract_No._56%2C_Administration_Buildings%2C_Main_Dam%2C_Belchertown%2C_looking_northerly_at_Main_Building%2C_Belchertown%2C_Mass.%2C_May_12%2C_1938_-_DPLA_-_b8338b3f2860757149eb9036744b4a57.jpg",
+    "note": "series B 8",
+    "size": [
+      1107,
+      646
+    ],
+    "cropped": true
+  },
+  {
+    "id": "site_31",
+    "file": "site_31.jpg",
+    "title": "Belchertown: administration buildings, 10 Aug 1938",
+    "author": "Metropolitan District Water Supply Commission (S. D. Pike)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Contract_No._56%2C_Administration_Buildings%2C_Main_Dam%2C_Belchertown%2C_looking_westerly_at_administration_buildings%2C_Belchertown%2C_Mass.%2C_Aug.10%2C_1938_-_DPLA_-_7546b18738eb6ca10d5dff0b37e9e4ed.jpg",
+    "note": "series B 9",
+    "size": [
+      1107,
+      639
+    ],
+    "cropped": true
+  },
+  {
+    "id": "site_32",
+    "file": "site_32.jpg",
+    "title": "Belchertown: finished administration building, 14 Sep 1939",
+    "author": "Metropolitan District Water Supply Commission (S. D. Pike)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Contract_No._56%2C_Administration_Buildings%2C_Main_Dam%2C_Belchertown%2C_looking_southerly_at_Administration_Building%2C_Belchertown%2C_Mass.%2C_Sep._14%2C_1939_-_DPLA_-_24f996e7120a86174147c1f30567e15b.jpg",
+    "note": "series B 10: finished",
+    "size": [
+      1107,
+      643
+    ],
+    "cropped": true
+  }
+]

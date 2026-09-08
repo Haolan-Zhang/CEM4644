@@ -1,0 +1,28 @@
+[
+  {
+    "id": "plan_01",
+    "file": "plan_01.png",
+    "title": "Structural plan 1 (footings)",
+    "author": "CEM4644 course material",
+    "license": "course material",
+    "source": "https://raw.githubusercontent.com/Haolan-Zhang/SAM_Example_Image/master/test_fp.png",
+    "note": "plan drawing",
+    "size": [
+      1280,
+      770
+    ]
+  },
+  {
+    "id": "plan_02",
+    "file": "plan_02.png",
+    "title": "Structural plan 2 (footings, elevator shaft)",
+    "author": "CEM4644 course material",
+    "license": "course material",
+    "source": "https://raw.githubusercontent.com/Haolan-Zhang/SAM_Example_Image/master/test_fp_2.png",
+    "note": "plan drawing",
+    "size": [
+      1280,
+      509
+    ]
+  }
+]

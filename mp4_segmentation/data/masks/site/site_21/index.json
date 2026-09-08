@@ -1,0 +1,162 @@
+{
+ "concrete": {
+  "prompt": "concrete",
+  "scores": [
+   0.7563,
+   0.2639,
+   0.226
+  ],
+  "boxes": [
+   [
+    -0.8,
+    809.5,
+    167.9,
+    1280.0
+   ],
+   [
+    -0.9,
+    470.5,
+    133.0,
+    847.0
+   ],
+   [
+    63.2,
+    862.0,
+    111.3,
+    900.5
+   ]
+  ],
+  "area_pct": 8.09,
+  "n": 3
+ },
+ "steel_reinforcement_bars": {
+  "prompt": "steel reinforcement bars",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "wooden_formwork": {
+  "prompt": "wooden formwork",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "scaffolding": {
+  "prompt": "scaffolding",
+  "scores": [
+   0.3994,
+   0.3931,
+   0.3767,
+   0.314,
+   0.2673,
+   0.2491,
+   0.2446
+  ],
+  "boxes": [
+   [
+    -1.5,
+    472.8,
+    131.9,
+    844.0
+   ],
+   [
+    106.0,
+    80.9,
+    853.0,
+    1245.0
+   ],
+   [
+    242.4,
+    113.4,
+    850.5,
+    1222.0
+   ],
+   [
+    155.4,
+    89.1,
+    335.8,
+    1166.0
+   ],
+   [
+    664.5,
+    427.5,
+    856.5,
+    1029.0
+   ],
+   [
+    207.4,
+    1071.0,
+    371.5,
+    1210.0
+   ],
+   [
+    -1.3,
+    327.0,
+    121.8,
+    393.8
+   ]
+  ],
+  "area_pct": 53.85,
+  "n": 7
+ },
+ "steel_beam": {
+  "prompt": "steel beam",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "brick_wall": {
+  "prompt": "brick wall",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "soil": {
+  "prompt": "soil",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "wood": {
+  "prompt": "wood",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "worker": {
+  "prompt": "worker",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "construction_machine": {
+  "prompt": "construction machine",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "sky": {
+  "prompt": "sky",
+  "scores": [
+   0.9756
+  ],
+  "boxes": [
+   [
+    2.1,
+    0.3,
+    852.5,
+    914.0
+   ]
+  ],
+  "area_pct": 28.07,
+  "n": 1
+ }
+}

@@ -1,0 +1,157 @@
+{
+ "concrete": {
+  "prompt": "concrete",
+  "scores": [
+   0.2854
+  ],
+  "boxes": [
+   [
+    236.5,
+    514.5,
+    1284.0,
+    591.5
+   ]
+  ],
+  "area_pct": 5.64,
+  "n": 1
+ },
+ "steel_reinforcement_bars": {
+  "prompt": "steel reinforcement bars",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "wooden_formwork": {
+  "prompt": "wooden formwork",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "scaffolding": {
+  "prompt": "scaffolding",
+  "scores": [
+   0.8687,
+   0.6035,
+   0.2874,
+   0.2686
+  ],
+  "boxes": [
+   [
+    102.5,
+    -2.3,
+    1285.0,
+    527.5
+   ],
+   [
+    30.3,
+    193.9,
+    123.1,
+    369.5
+   ],
+   [
+    135.0,
+    35.8,
+    246.9,
+    170.0
+   ],
+   [
+    28.7,
+    261.5,
+    122.4,
+    369.5
+   ]
+  ],
+  "area_pct": 66.04,
+  "n": 4
+ },
+ "steel_beam": {
+  "prompt": "steel beam",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "brick_wall": {
+  "prompt": "brick wall",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "soil": {
+  "prompt": "soil",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "wood": {
+  "prompt": "wood",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "worker": {
+  "prompt": "worker",
+  "scores": [
+   0.2573,
+   0.2198
+  ],
+  "boxes": [
+   [
+    739.5,
+    -0.2,
+    750.5,
+    8.4
+   ],
+   [
+    191.1,
+    491.2,
+    213.2,
+    510.2
+   ]
+  ],
+  "area_pct": 0.06,
+  "n": 2
+ },
+ "construction_machine": {
+  "prompt": "construction machine",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "sky": {
+  "prompt": "sky",
+  "scores": [
+   0.8945,
+   0.4968,
+   0.2402
+  ],
+  "boxes": [
+   [
+    -1.7,
+    0.6,
+    369.5,
+    312.2
+   ],
+   [
+    -3.1,
+    -1.0,
+    939.0,
+    314.0
+   ],
+   [
+    -3.1,
+    -0.3,
+    816.0,
+    316.0
+   ]
+  ],
+  "area_pct": 6.05,
+  "n": 3
+ }
+}

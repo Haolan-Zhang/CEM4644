@@ -1,0 +1,201 @@
+{
+ "concrete": {
+  "prompt": "concrete",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "steel_reinforcement_bars": {
+  "prompt": "steel reinforcement bars",
+  "scores": [
+   0.8105
+  ],
+  "boxes": [
+   [
+    -0.3,
+    0.7,
+    1278.0,
+    958.0
+   ]
+  ],
+  "area_pct": 89.56,
+  "n": 1
+ },
+ "wooden_formwork": {
+  "prompt": "wooden formwork",
+  "scores": [
+   0.3145
+  ],
+  "boxes": [
+   [
+    0.0,
+    2.3,
+    1278.0,
+    958.5
+   ]
+  ],
+  "area_pct": 79.45,
+  "n": 1
+ },
+ "scaffolding": {
+  "prompt": "scaffolding",
+  "scores": [
+   0.5181
+  ],
+  "boxes": [
+   [
+    0.3,
+    1.4,
+    1279.0,
+    958.0
+   ]
+  ],
+  "area_pct": 78.02,
+  "n": 1
+ },
+ "steel_beam": {
+  "prompt": "steel beam",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "brick_wall": {
+  "prompt": "brick wall",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "soil": {
+  "prompt": "soil",
+  "scores": [
+   0.5479,
+   0.5405,
+   0.47,
+   0.4492,
+   0.4177,
+   0.356,
+   0.3411,
+   0.333,
+   0.3169,
+   0.2998,
+   0.2334,
+   0.2169
+  ],
+  "boxes": [
+   [
+    -1.2,
+    600.0,
+    430.5,
+    737.0
+   ],
+   [
+    956.0,
+    601.0,
+    1284.0,
+    699.5
+   ],
+   [
+    -2.0,
+    497.8,
+    111.9,
+    563.5
+   ],
+   [
+    820.5,
+    579.5,
+    1282.0,
+    700.5
+   ],
+   [
+    1.2,
+    591.0,
+    1278.0,
+    945.5
+   ],
+   [
+    -2.0,
+    598.0,
+    455.5,
+    859.5
+   ],
+   [
+    5.6,
+    591.0,
+    1277.0,
+    746.0
+   ],
+   [
+    3.4,
+    591.0,
+    1276.0,
+    844.0
+   ],
+   [
+    10.0,
+    576.5,
+    1275.0,
+    739.0
+   ],
+   [
+    -0.4,
+    806.0,
+    68.8,
+    860.0
+   ],
+   [
+    864.5,
+    584.5,
+    1012.0,
+    618.5
+   ],
+   [
+    834.0,
+    583.0,
+    1282.0,
+    953.5
+   ]
+  ],
+  "area_pct": 3.29,
+  "n": 12
+ },
+ "wood": {
+  "prompt": "wood",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "worker": {
+  "prompt": "worker",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "construction_machine": {
+  "prompt": "construction machine",
+  "scores": [],
+  "boxes": [],
+  "area_pct": 0.0,
+  "n": 0
+ },
+ "sky": {
+  "prompt": "sky",
+  "scores": [
+   0.9185
+  ],
+  "boxes": [
+   [
+    0.0,
+    -0.7,
+    1277.0,
+    538.0
+   ]
+  ],
+  "area_pct": 20.36,
+  "n": 1
+ }
+}

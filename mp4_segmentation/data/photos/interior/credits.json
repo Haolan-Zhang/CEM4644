@@ -1,0 +1,252 @@
+[
+  {
+    "id": "int_01",
+    "file": "int_01.jpg",
+    "title": "Drywall crane and workers",
+    "author": "NIOSH",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Drywall_Crane_Workers.jpg",
+    "note": "drywall panels being installed",
+    "size": [
+      1280,
+      708
+    ]
+  },
+  {
+    "id": "int_06",
+    "file": "int_06.jpg",
+    "title": "Gypsum board interior wall, Elm Place",
+    "author": "Marina-Shehata",
+    "license": "CC0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/6/61/Elm-Place-Dry-Wall-Gypsum-Board-Interior-wall.jpg",
+    "note": "drywall",
+    "size": [
+      960,
+      1280
+    ]
+  },
+  {
+    "id": "int_07",
+    "file": "int_07.jpg",
+    "title": "House ready for drywall (studs and insulation)",
+    "author": "Riverview Homes Inc",
+    "license": "CC BY-SA 3.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/6/62/Pine_Grove_Homes_Ready_For_Drywall.jpg",
+    "note": "studs, insulation",
+    "size": [
+      1280,
+      853
+    ]
+  },
+  {
+    "id": "int_09",
+    "file": "int_09.jpg",
+    "title": "Drywall penetrations in an industrial building",
+    "author": "Achim Hering",
+    "license": "CC BY 3.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Texaco_nanticoke_drywall_penetrations.jpg",
+    "note": "drywall, pipes",
+    "size": [
+      1280,
+      864
+    ]
+  },
+  {
+    "id": "int_10",
+    "file": "int_10.jpg",
+    "title": "Drywall firestop detail",
+    "author": "Achim Hering",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Drywall_firestop_problem4.jpg",
+    "note": "drywall, steel",
+    "size": [
+      1280,
+      850
+    ]
+  },
+  {
+    "id": "int_11",
+    "file": "int_11.jpg",
+    "title": "Belchertown: boiler room, 14 Jan 1938",
+    "author": "Metropolitan District Water Supply Commission (S. D. Pike)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Contract_No._56%2C_Administration_Buildings%2C_Main_Dam%2C_Belchertown%2C_boiler_room%2C_main_building%2C_Belchertown%2C_Mass.%2C_Jan._14%2C_1938_-_DPLA_-_2474faa3cb0b84d7eb3802ecc65868fc.jpg",
+    "note": "boilers, pipes",
+    "size": [
+      1107,
+      638
+    ],
+    "cropped": true
+  },
+  {
+    "id": "int_12",
+    "file": "int_12.jpg",
+    "title": "Belchertown: plumbing in the basement toilet, 10 Mar 1938",
+    "author": "Metropolitan District Water Supply Commission (S. D. Pike)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Contract_No._56%2C_Administration_Buildings%2C_Main_Dam%2C_Belchertown%2C_plumbing_in_basement_toilet%2C_main_administration_building%2C_Belchertown%2C_Mass.%2C_Mar._10%2C_1938_-_DPLA_-_711b6912716efa071420b48aa914e072.jpg",
+    "note": "pipes, walls",
+    "size": [
+      1107,
+      638
+    ],
+    "cropped": true
+  },
+  {
+    "id": "int_13",
+    "file": "int_13.jpg",
+    "title": "Belchertown: tiling in the first-floor toilet, 10 Jun 1938",
+    "author": "Metropolitan District Water Supply Commission (S. D. Pike)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/4/43/Contract_No._56%2C_Administration_Buildings%2C_Main_Dam%2C_Belchertown%2C_tiling_in_first_floor_toilet%2C_main_building%2C_administration_buildings%2C_Belchertown%2C_Mass.%2C_Jun._10%2C_1938_-_DPLA_-_6ae65bb7afd31a33e2d8de918b327836.jpg",
+    "note": "tiles",
+    "size": [
+      1107,
+      633
+    ],
+    "cropped": true
+  },
+  {
+    "id": "int_15",
+    "file": "int_15.jpg",
+    "title": "Drywall shaft damage",
+    "author": "Achim Hering",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/55/Drywall_shaft_damage.jpg",
+    "note": "damaged drywall",
+    "size": [
+      1280,
+      834
+    ]
+  },
+  {
+    "id": "int_16",
+    "file": "int_16.jpg",
+    "title": "Hanging drywall",
+    "author": "Thomas Depippo (U.S. Navy)",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Hanging_Drywall_%289020064%29.jpg",
+    "note": "drywall being hung on a stud wall",
+    "size": [
+      853,
+      1280
+    ]
+  },
+  {
+    "id": "int_17",
+    "file": "int_17.jpg",
+    "title": "Carpenters installing sheetrock, LIRR Concourse, 2019",
+    "author": "MTA Capital Construction Mega Projects",
+    "license": "CC BY 2.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/51/Carpenters_installing_sheetrock_in_the_back_of_house_area_in_the_future_LIRR_Concourse._10-30-2019_%2848997634792%29.jpg",
+    "note": "drywall, metal studs",
+    "size": [
+      1280,
+      960
+    ]
+  },
+  {
+    "id": "int_18",
+    "file": "int_18.jpg",
+    "title": "Drywall installed in an office hallway, Canaan Valley",
+    "author": "U.S. Fish and Wildlife Service",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/57/Canaan_Valley_National_Wildlife_Refuge_Drywall_installed_in_private_office_hallway_%2849204773016%29.jpg",
+    "note": "drywall hallway",
+    "size": [
+      622,
+      1280
+    ]
+  },
+  {
+    "id": "int_19",
+    "file": "int_19.jpg",
+    "title": "Seabees renovate office spaces, Osan (1)",
+    "author": "U.S. Navy / PO1 Justin Rayburn",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/f/f7/NMCB_4_Seabees_Rennovate_Office_Spaces%2C_Osan%2C_South_Korea_%289391388%29.jpg",
+    "note": "interior renovation",
+    "size": [
+      1280,
+      853
+    ]
+  },
+  {
+    "id": "int_20",
+    "file": "int_20.jpg",
+    "title": "Seabees renovate office spaces, Osan (2)",
+    "author": "U.S. Navy / PO1 Justin Rayburn",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/e/e1/NMCB_4_Seabees_Rennovate_Office_Spaces%2C_Osan%2C_South_Korea_%289391396%29.jpg",
+    "note": "interior renovation",
+    "size": [
+      1280,
+      853
+    ]
+  },
+  {
+    "id": "int_21",
+    "file": "int_21.jpg",
+    "title": "A builder marks sheetrock",
+    "author": "U.S. Navy / MC3 Patrick W. Mullen III",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/56/US_Navy_070911-N-8547M-027_Builder_3rd_Class_Tabitha_E._Ball%2C_of_Naval_Mobile_Construction_Battalion_%28NMCB%29_5%27s_air_detachment%2C_marks_sheetrock_during_a_construction_project_that_battalion_Seabees_volunteered_to_carry_out.jpg",
+    "note": "sheetrock",
+    "size": [
+      914,
+      1280
+    ]
+  },
+  {
+    "id": "int_22",
+    "file": "int_22.jpg",
+    "title": "Builders cut sheetrock",
+    "author": "U.S. Navy / MC3 Patrick W. Mullen III",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/6/6f/US_Navy_070911-N-8547M-044_Lt._Song_Hwang%2C_chaplain_of_Naval_Mobile_Construction_Battalion_%28NMCB%29_5%2C_left%2C_and_Builder_Constructionman_Robert_L._Dynda%2C_of_the_battalion%27s_air_detachment%2C_cut_sheetrock_during_a_constructio.jpg",
+    "note": "sheetrock",
+    "size": [
+      1280,
+      914
+    ]
+  },
+  {
+    "id": "int_23",
+    "file": "int_23.jpg",
+    "title": "Piping insulation on ventilation pipes, LIRR Concourse, 2019",
+    "author": "MTA Capital Construction Mega Projects",
+    "license": "CC BY 2.0",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/57/Piping_insulation_installed_on_ventilation_pipes_in_the_back_of_house_area_of_the_concourse._%28CM0914B%2C_03-14-2019%29_%2847387054911%29.jpg",
+    "note": "pipes, insulation",
+    "size": [
+      1280,
+      960
+    ]
+  },
+  {
+    "id": "int_24",
+    "file": "int_24.jpg",
+    "title": "Seabees small-scale construction project, Jamaica, 2024 (1)",
+    "author": "U.S. Navy / PO2 Adriones Johnson",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Seabees_conduct_small-scale_construction_project_in_Jamaica_as_part_of_Continuing_Promise_2024_%288527372%29.jpg",
+    "note": "construction",
+    "size": [
+      1280,
+      853
+    ]
+  },
+  {
+    "id": "int_25",
+    "file": "int_25.jpg",
+    "title": "Seabees small-scale construction project, Jamaica, 2024 (2)",
+    "author": "U.S. Navy / PO2 Adriones Johnson",
+    "license": "Public domain",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/c/c6/Seabees_conduct_small-scale_construction_project_in_Jamaica_as_part_of_Continuing_Promise_2024_%288527368%29.jpg",
+    "note": "construction",
+    "size": [
+      1280,
+      853
+    ]
+  }
+]
