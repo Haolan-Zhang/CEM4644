@@ -202,8 +202,9 @@ A model only knows the kind of photos it was trained on. Let's look for its limi
         cells.append(form(
             "▶ Step 3b · Break it yourself",
             f'lab.playground_app("{B}")',
-            notes=["An app appears below (give it a few seconds). **Sliders tab:** rotate, zoom, blur, darken, cast a shadow, add noise, draw a dark line; the model re-runs every time you let go of a slider. Try to flip its answer with the *smallest* possible change.",
-                   "**Draw on it tab:** paint a crack, a stain or a shadow on the photo with the brush and watch the verdict change. You can also upload or photograph your own wall and draw on that."],
+            notes=["An app appears below (give it 10–20 seconds; a *public URL* is printed above it, which you can open in a new tab or on your phone).",
+                   "**Sliders tab:** rotate, zoom, blur, darken, cast a shadow, add noise, draw a dark line; the model re-runs on every change. Try to flip its answer with the *smallest* possible change.",
+                   "**Draw on it tab:** paint a crack, a stain or a shadow on the photo with the brush, then click *Classify my drawing*. You can also upload or photograph your own wall and draw on that."],
         ))
     else:
         cells.append(form(
@@ -254,7 +255,7 @@ A model only knows the kind of photos it was trained on. Let's look for its limi
         cells.append(form(
             "▶ Step 5a · Type your own classes",
             'lab.zero_shot_app(class_names, how_many)',
-            notes=["An app appears below. Type class names separated by commas and click **Classify**. The photos stay the same until you click *New photos*, so change the wording and click again to see exactly what your words changed. Try short and descriptive names (*a brick wall*, *a cracked wall*, ...).",
+            notes=["An app appears below (give it 10–20 seconds; a *public URL* is printed above it). Type class names separated by commas and click **Classify**. The photos stay the same until you click *New photos*, so change the wording and click again to see exactly what your words changed. Try short and descriptive names (*a brick wall*, *a cracked wall*, ...).",
                    "Second tab: classify your own photo with your own class names. The first click loads CLIP (about a minute)."],
             params=[f'class_names = "{v["zero_shot_default"]}" #@param {{type:"string"}}',
                     'how_many = 8 #@param {type:"slider", min:4, max:16, step:4}'],

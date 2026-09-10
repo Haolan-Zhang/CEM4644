@@ -25,7 +25,7 @@ Course model accuracies on the unseen test sets (`models/*/training_log.json`):
 
 **Gradio copies.** `MP2_Workshop_Image_Classification_gradio.ipynb` and
 `MP2_Homework_Image_Classification_gradio.ipynb` are the same notebooks with two steps replaced by
-small Gradio apps that render inside the cell (no public link needed):
+small Gradio apps that render inside the cell:
 
 - *Step 3b · Break it yourself*: the sliders now update the photo and the confidence bars live, and
   a second tab is a drawing pad where students paint a crack, a stain or a shadow with a brush (or
@@ -37,7 +37,9 @@ small Gradio apps that render inside the cell (no public link needed):
 
 The report questions are unchanged, so the two versions can be mixed in one class. The copies pin
 `gradio==6.26.0` (the version they were tested with) and install it without touching torch, numpy
-or pillow. Use the originals if Gradio cannot be installed on the network.
+or pillow. Each app prints a temporary public link (the same mechanism as Step 3d) and is embedded
+through it; on Colab that is required, because the alternative kernel-proxy embedding loses its
+connection to the server. Use the originals if Gradio cannot be installed or the link is blocked.
 
 The binary models are almost perfect on their own test sets. That is deliberate and is itself a
 teaching point (Part 3): the test photos come from the same buildings and cameras as the training
@@ -90,7 +92,7 @@ correct run produces, with small variation because some steps sample photos at r
 - **Step 3d share link fails.** The app still works inside the notebook (upload from the computer). The public link is only needed for phones.
 - **CLIP download is slow.** About 600 MB from the Hugging Face Hub; first run only.
 - **Step 0 fails to clone.** GitHub is unreachable from the network; try again or download the repository zip and upload the folder to the Colab file browser.
-- **Gradio copies: the app area stays blank.** Give it a few seconds; if it stays blank, re-run the cell (the old server is closed and a new one started). The apps do not need the public share link, so a blocked tunnel does not affect them.
+- **Gradio copies: the app area stays blank or says "Connection to the server was lost".** Give it 10–20 seconds first. On Colab each app is served through Gradio's temporary public link (printed above the app, and usable on a phone), so if the link cannot be created the app will not work; re-run the cell, and if it still fails use the non-Gradio version of the notebook. Steps 3b and 5a are the only steps affected.
 - **Gradio copies: the drawing pad shows no photo.** Click *Another photo*; the pad is reloaded with the new photo.
 - **Session reset.** Colab discards everything after about 90 minutes of inactivity. Students re-run Step 0 and continue; the leaderboard starts empty again.
 

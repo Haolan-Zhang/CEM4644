@@ -301,13 +301,13 @@ class Lab:
                       f"{r['start']} start -> {r['test accuracy']}% ({r['note']})")
 
     # ------------------------------------------------------------------ Gradio variants (used by the *_gradio notebooks only)
-    def playground_app(self, task="binary", share=False):
+    def playground_app(self, task="binary", share=None):
         """Step 3b as an inline Gradio app: live sliders plus a drawing pad."""
         task = self._task(task); self._need(task)
         from . import apps
         self.apps["playground"] = apps.playground_app(self.clf[task], self.sets[task]["test"], share=share)
 
-    def zero_shot_app(self, class_names: str = "", how_many: int = 8, task="multiclass", share=False):
+    def zero_shot_app(self, class_names: str = "", how_many: int = 8, task="multiclass", share=None):
         """Step 5a as an inline Gradio app: same photos, new class names, one click."""
         self._need()
         from . import apps

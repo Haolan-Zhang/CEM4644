@@ -3,7 +3,8 @@
 * playground_app  -> Step 3b "Break it yourself": live sliders + a drawing pad.
 * zero_shot_app   -> Step 5a "Type your own classes": re-classify the SAME photos with new names.
 
-Both render inline in Colab (no public link needed) and keep all code hidden from students.
+Both render inline in the notebook and keep all code hidden from students. On Colab, Gradio serves
+them through its temporary public link (see _launch); that link is what makes the app work there.
 """
 import os
 from typing import Callable, Dict, List, Optional, Sequence
@@ -37,15 +38,23 @@ def _blocks(title: str):
     return gr.Blocks(title=title) if _major() >= 6 else gr.Blocks(title=title, css=CSS)
 
 
-def _launch(demo, key: str, share: bool, height: int):
-    """Start (or restart) the app inline. Returns the Blocks object."""
+def _launch(demo, key: str, share: Optional[bool], height: int):
+    """Start (or restart) the app inline. Returns the Blocks object.
+
+    `share=None` (the default) lets Gradio decide: on Colab it creates the temporary
+    public link, which is the ONLY way the app works there — with share=False Gradio falls
+    back to the Colab kernel proxy and the app loses its connection to the server.
+    """
     if os.environ.get(NO_APP):
         print(f"({key}: app built but not started because {NO_APP} is set)")
         return demo
     old = _OPEN.pop(key, None)
     if old is not None:
         try:
-            old.close()
+            import contextlib
+            import io
+            with contextlib.redirect_stdout(io.StringIO()):   # hide "Closing server running on port ..."
+                old.close()
         except Exception:
             pass
     kw = dict(inline=True, share=share, quiet=True, show_error=True, prevent_thread_lock=True, height=height)
@@ -94,7 +103,7 @@ def _editor_image(value) -> Optional[Image.Image]:
 
 
 # --------------------------------------------------------------------------- Step 3b
-def playground_app(clf, image_set, seed: Optional[int] = None, share: bool = False, height: int = 820,
+def playground_app(clf, image_set, seed: Optional[int] = None, share: Optional[bool] = None, height: int = 820,
                    key: str = "playground"):
     """Sliders that modify a test photo; the classifier re-runs on every change.
     Tab 2 is a drawing pad: paint a crack, a stain or a shadow yourself."""
@@ -207,7 +216,7 @@ def playground_app(clf, image_set, seed: Optional[int] = None, share: bool = Fal
 
 # --------------------------------------------------------------------------- Step 5a
 def zero_shot_app(get_zs: Callable, image_set, tricky_items: Sequence[dict], default_names: str,
-                  how_many: int = 8, share: bool = False, height: int = 820, key: str = "zero_shot"):
+                  how_many: int = 8, share: Optional[bool] = None, height: int = 820, key: str = "zero_shot"):
     """Type class names -> CLIP picks one for each photo. The photos stay the same until the
     student asks for new ones, so changing the wording shows its effect directly."""
     import gradio as gr
