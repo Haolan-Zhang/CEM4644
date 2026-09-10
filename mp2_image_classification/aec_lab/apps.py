@@ -12,6 +12,7 @@ from typing import Callable, Dict, List, Optional, Sequence
 import numpy as np
 from PIL import Image
 
+from .adversarial import attack as adversarial_attack
 from .tricky import DEFAULTS, PERTURB_LABELS, perturb
 from .ui import GREEN, RED
 
@@ -158,6 +159,37 @@ def playground_app(clf, image_set, seed: Optional[int] = None, share: Optional[b
         im = perturb(state["img"], **kw)
         return gr.update(value=_editor_value(im)), "<div class='aec-note'>Loaded the photo with your slider changes. Now draw on it.</div>", {}
 
+    def _top(p):
+        k = max(p, key=p.get)
+        return k, p[k]
+
+    def run_attack(state, strength, steps, target, show_truth):
+        target = None if not target or target.startswith("anything") else target
+        r = adversarial_attack(clf, state["img"], eps_255=float(strength), steps=int(steps), target=target)
+        (kb, pb), (ka, pa), (kj, pj) = _top(r["before"]), _top(r["after"]), _top(r["after_jpeg"])
+        flipped = ka != kb
+        survived = flipped and kj != kb
+        truth = f" (really: {state['truth']})" if show_truth else ""
+        lines = [f"<b>Before:</b> {kb} ({pb * 100:.0f} %){truth}.",
+                 f"<b>After adding noise no larger than {r['eps_255']:.0f}/255 per pixel"
+                 f" ({'one step, FGSM' if r['steps'] == 1 else str(r['steps']) + ' steps, PGD'}):</b> {ka} ({pa * 100:.0f} %) "
+                 + (f'<span style="color:{RED}">→ verdict flipped</span>' if flipped else f'<span style="color:{GREEN}">→ verdict held; try more strength or steps</span>') + ".",
+                 f"<b>Saved as JPEG (quality {r['jpeg_quality']}) and classified again:</b> {kj} ({pj * 100:.0f} %) "
+                 + ("→ the attack survived compression." if survived else
+                    ("→ compression destroyed the attack." if flipped else
+                     ("→ the noise alone did not flip it, but it left the model so unsure that the JPEG re-save tipped it over." if kj != kb else ""))),
+                 f"<span class='aec-note'>Largest pixel change: {r['linf_255']:.0f}/255 · noise panel amplified ×{r['amplification']:.0f}"
+                 f" · {'target: ' + r['target'] if r['target'] else 'untargeted (away from its own answer)'}</span>"]
+        cap_b = f"before: {kb} ({pb * 100:.0f} %)"
+        cap_a = f"after: {ka} ({pa * 100:.0f} %)"
+        return (gr.update(value=r["original"], label=cap_b), gr.update(value=r["adversarial"], label=cap_a),
+                gr.update(value=r["noise"], label=f"the noise, amplified ×{r['amplification']:.0f}"),
+                "<div class='aec-verdict'>" + "<br>".join(lines) + "</div>", r["after"])
+
+    def clear_attack():
+        return (gr.update(value=None, label="before"), gr.update(value=None, label="after"),
+                gr.update(value=None, label="the noise, amplified"), "", {})
+
     state0 = pick("any class")
     with _blocks("Break it yourself") as demo:
         st = gr.State(state0)
@@ -192,6 +224,27 @@ def playground_app(clf, image_set, seed: Optional[int] = None, share: Optional[b
                     with gr.Column(scale=4):
                         draw_verdict = gr.HTML()
                         draw_label = gr.Label(num_top_classes=7, label="confidence")
+            with gr.Tab("🎯 Invisible noise"):
+                gr.HTML("<div class='aec-note'>An <b>adversarial attack</b>: the app asks the model for the gradient of its own loss with respect to "
+                        "the pixels, then nudges every pixel a tiny amount in the direction that hurts the model most. No training, no new photos. "
+                        "The change is bounded per pixel (a few steps out of 255) so you cannot see it. Then the result is saved as a JPEG "
+                        "and classified again, to see whether the attack survives a real file.</div>")
+                with gr.Row():
+                    with gr.Column(scale=6):
+                        with gr.Row():
+                            adv_before = gr.Image(type="pil", label="before", interactive=False, height=230, buttons=[])
+                            adv_after = gr.Image(type="pil", label="after", interactive=False, height=230, buttons=[])
+                            adv_noise = gr.Image(type="pil", label="the noise, amplified", interactive=False, height=230, buttons=[])
+                        adv_summary = gr.HTML()
+                        adv_label = gr.Label(num_top_classes=7, label="confidence after the attack")
+                    with gr.Column(scale=3):
+                        adv_strength = gr.Slider(1, 16, value=4, step=1, label="noise strength (max change per pixel, out of 255)")
+                        adv_steps = gr.Slider(1, 30, value=10, step=1, label="attack steps (1 = one-shot FGSM, more = PGD)")
+                        adv_target = gr.Dropdown(["anything else (flip the verdict)"] + list(clf.classes),
+                                                 value="anything else (flip the verdict)", label="make the model say")
+                        adv_btn = gr.Button("🎯 Attack the current photo", variant="primary")
+                        gr.HTML("<div class='aec-note'>Start with strength 4 and 10 steps. Then try strength 1–2, or 1 step, "
+                                "and see when the attack stops working. Compare with the sliders tab: how big a <i>visible</i> change did you need there?</div>")
 
         controls = sliders + checks
         render_in = [st, show_truth, *controls]
@@ -200,8 +253,11 @@ def playground_app(clf, image_set, seed: Optional[int] = None, share: Optional[b
         # always_last keeps only the newest request while one is running
         gr.on(triggers=[s.change for s in sliders] + [c.input for c in checks] + [show_truth.input],
               fn=render, inputs=render_in, outputs=render_out, api_name="render", trigger_mode="always_last")
+        adv_out = [adv_before, adv_after, adv_noise, adv_summary, adv_label]
+        adv_btn.click(run_attack, inputs=[st, adv_strength, adv_steps, adv_target, show_truth], outputs=adv_out, api_name="attack")
         another_btn.click(another, inputs=[pick_dd, show_truth, *controls],
-                          outputs=[st, *render_out, pad, draw_verdict, draw_label], api_name="another")
+                          outputs=[st, *render_out, pad, draw_verdict, draw_label], api_name="another"
+                          ).then(clear_attack, inputs=None, outputs=adv_out, api_name="clear_attack")
         reset_btn.click(reset, inputs=[st, show_truth], outputs=[*controls, *render_out], api_name="reset")
         pad.change(classify_drawing, inputs=[pad, st, show_truth], outputs=[draw_label, draw_verdict],
                    trigger_mode="always_last", api_name="draw")
@@ -210,7 +266,8 @@ def playground_app(clf, image_set, seed: Optional[int] = None, share: Optional[b
         demo.load(render, inputs=render_in, outputs=render_out, api_name="first_render")
 
     demo._aec = {"render": render, "another": another, "reset": reset, "classify_drawing": classify_drawing,
-                 "load_current": load_current, "state0": state0, "names": names}  # for tests
+                 "load_current": load_current, "run_attack": run_attack, "clear_attack": clear_attack,
+                 "state0": state0, "names": names}  # for tests
     return _launch(demo, key, share, height)
 
 

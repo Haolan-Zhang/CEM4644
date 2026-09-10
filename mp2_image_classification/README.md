@@ -17,7 +17,8 @@ task names and two report questions.
 
 Same notebooks, same questions, but Step 3b (*Break it yourself*) and Step 5a (*Type your own
 classes*) are small Gradio apps rendered inside the cell instead of slider widgets and a re-run
-form. Step 3b gains a drawing pad (paint a crack or a stain with a brush); Step 5a keeps the same
+form. Step 3b gains a drawing pad (paint a crack or a stain with a brush) and an adversarial-attack
+tab (invisible pixel noise computed from the model's own gradient); Step 5a keeps the same
 photos while the student changes the class names, and classifies the student's own photo too.
 Everything else is identical, so the two versions can be swapped without changing the report.
 

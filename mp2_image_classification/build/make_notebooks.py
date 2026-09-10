@@ -204,7 +204,8 @@ A model only knows the kind of photos it was trained on. Let's look for its limi
             f'lab.playground_app("{B}")',
             notes=["An app appears below (give it 10–20 seconds; a *public URL* is printed above it, which you can open in a new tab or on your phone).",
                    "**Sliders tab:** rotate, zoom, blur, darken, cast a shadow, add noise, draw a dark line; the model re-runs on every change. Try to flip its answer with the *smallest* possible change.",
-                   "**Draw on it tab:** paint a crack, a stain or a shadow on the photo with the brush, then click *Classify my drawing*. You can also upload or photograph your own wall and draw on that."],
+                   "**Draw on it tab:** paint a crack, a stain or a shadow on the photo with the brush, then click *Classify my drawing*. You can also upload or photograph your own wall and draw on that.",
+                   "**Invisible noise tab:** an *adversarial attack*. The app uses the model's own gradient to compute a pattern of tiny pixel changes (a few steps out of 255, invisible to you) that flips the verdict, then saves the result as a JPEG and checks whether the attack survives. Try fewer steps and lower strength and see when it stops working."],
         ))
     else:
         cells.append(form(

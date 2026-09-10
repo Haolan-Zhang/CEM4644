@@ -31,6 +31,24 @@ small Gradio apps that render inside the cell:
   a second tab is a drawing pad where students paint a crack, a stain or a shadow with a brush (or
   upload a wall of their own and draw on it). "Load the photo with my slider changes" copies the
   current slider result into the pad.
+- *Step 3b, third tab · Invisible noise*: a white-box adversarial attack on the course model
+  (FGSM for one step, PGD with a random start for more; `aec_lab/adversarial.py`). The student
+  picks the strength (maximum change per pixel, out of 255), the number of steps and optionally a
+  target class, and gets before / after / amplified-noise panels, the confidences, and a JPEG
+  re-test. Measured on 20 façade test photos with the course model:
+
+  | strength | steps | verdict flipped | still flipped after JPEG 75 |
+  |---|---|---|---|
+  | 2 | 10 | 14 / 20 | 0 / 20 |
+  | 4 | 1 (FGSM) | 3 / 20 | 1 / 20 |
+  | 4 | 10 | 18 / 20 | 3 / 20 |
+  | 8 | 10 | 20 / 20 | 10 / 20 |
+
+  Talking points: no training and no data are needed, only the model's gradient (a *white-box*
+  attack); the change is invisible while the sliders tab needed large visible changes; one step is
+  much weaker than ten; and saving the file as JPEG usually destroys the attack, so lab attacks and
+  attacks on a real inspection pipeline are different problems. Each attack takes well under a
+  second on a GPU and a few seconds on CPU.
 - *Step 5a · Type your own classes*: one text box and a *Classify* button. The photos stay the
   same until *New photos* is clicked, so changing the wording shows its effect directly. A second
   tab classifies the student's own photo with the same class names.
