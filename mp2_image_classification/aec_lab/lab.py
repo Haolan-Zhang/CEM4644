@@ -117,7 +117,7 @@ class Lab:
             importlib.invalidate_caches()
             importlib.import_module(pkg)
         except Exception:
-            print(f"⚠️ {pkg} could not be installed without changing core packages. The app steps (3b, 5a) will not work "
+            print(f"⚠️ {pkg} could not be installed without changing core packages. The app step (3b) will not work "
                   f"in this notebook; use the non-Gradio version of the notebook instead. Everything else works.")
 
     def _need(self, task=None):

@@ -29,7 +29,6 @@ VARIANTS = {
         multiclass_intro=(
             "So far the question was *is there a defect?* Now we ask *which kind of defect?* The same photos "
             "are labelled with seven classes, and a second course model was trained on them."),
-        zero_shot_default="a brick wall, a concrete wall, a painted wall, a stone wall, a window",
     ),
     "homework": dict(
         file="MP2_Homework_Image_Classification.ipynb",
@@ -43,7 +42,6 @@ VARIANTS = {
             "Classification is not only about defects. In this part the question is *which architectural style is "
             "this façade?* The images are computer-generated reference façades in ten styles, and a course model was "
             "trained on them. Keep in mind while you work: none of these images is a real building."),
-        zero_shot_default="a glass office tower, a stone church, a brick warehouse, a concrete apartment block, a wooden house",
     ),
 }
 
@@ -80,7 +78,7 @@ def jlist(items):
 
 
 def build(variant: str, gradio: bool = False):
-    """gradio=True writes the *_gradio copy: Steps 3b and 5a become inline Gradio apps, everything else is identical."""
+    """gradio=True writes the *_gradio copy: Step 3b becomes an inline Gradio app, everything else is identical."""
     v = VARIANTS[variant]
     sb, sm = DATASETS[v["binary"]], DATASETS[v["multiclass"]]
     B, M = v["task_names"]["binary"], v["task_names"]["multiclass"]
@@ -105,10 +103,9 @@ def build(variant: str, gradio: bool = False):
 2. Run a trained classifier, read its confidence, and measure how often it is right.
 3. Try to break it: tricky photos, edited photos, photos from another world, your own photos.
 4. Do the same with more than two classes.
-5. Invent your own classes and classify with no training at all.
-6. Train your own model and compare it with the course model.
+5. Train your own model and compare it with the course model.
 
-**Before you start (optional, makes training faster):** menu *Runtime → Change runtime type → T4 GPU → Save*. Everything also works without a GPU.
+**Before you start (required):** in the menu choose *Runtime → Change runtime type → T4 GPU → Save*, then come back here. The notebook expects a GPU; without one the training steps are very slow.
 
 **Datasets:** {sb.title} · {sm.title}. Sources and licences are listed at the bottom.
 """))
@@ -246,37 +243,9 @@ A model only knows the kind of photos it was trained on. Let's look for its limi
     questions.append((6, f"For *{M}*: what is the accuracy, and which two classes are confused most often? Look at a few examples of that confusion. Would a person make the same mistake? Is accuracy alone a fair summary of this model?"))
     cells.append(q(*questions[-1]))
 
-    # ------------------------------------------------------------------ part 5
+    # ------------------------------------------------------------------ part 5 (training)
     cells.append(md("""
-## Part 5 · Classes you invent (no training at all)
-
-**CLIP** is a model trained on hundreds of millions of internet photos *together with their captions*. It can compare a photo with any sentence you type. That means you can invent classes on the spot, with no labelled photos: type the class names, and CLIP picks the closest one for each image. This is called **zero-shot** classification.
-"""))
-    if gradio:
-        cells.append(form(
-            "▶ Step 5a · Type your own classes",
-            'lab.zero_shot_app(class_names, how_many)',
-            notes=["An app appears below (give it 10–20 seconds; a *public URL* is printed above it). Type class names separated by commas and click **Classify**. The photos stay the same until you click *New photos*, so change the wording and click again to see exactly what your words changed. Try short and descriptive names (*a brick wall*, *a cracked wall*, ...).",
-                   "Second tab: classify your own photo with your own class names. The first click loads CLIP (about a minute)."],
-            params=[f'class_names = "{v["zero_shot_default"]}" #@param {{type:"string"}}',
-                    'how_many = 8 #@param {type:"slider", min:4, max:16, step:4}'],
-        ))
-    else:
-        cells.append(form(
-            "▶ Step 5a · Type your own classes",
-            "lab.zero_shot(class_names, how_many, source)",
-            notes=["Separate the class names with commas. Try short and descriptive names (*a brick wall*, *a cracked wall*, ...). Run it several times with different names.",
-                   "The first run downloads CLIP (about a minute)."],
-            params=[f'class_names = "{v["zero_shot_default"]}" #@param {{type:"string"}}',
-                    'how_many = 8 #@param {type:"slider", min:4, max:16, step:4}',
-                    'source = "test photos" #@param ["test photos", "tricky photos"]'],
-        ))
-    questions.append((7, "Which class names did you try, and did CLIP's answers make sense? Give one construction task where inventing classes like this would be good enough, and one where you would rather train a model on labelled photos. Explain the difference."))
-    cells.append(q(*questions[-1]))
-
-    # ------------------------------------------------------------------ part 6
-    cells.append(md("""
-## Part 6 · Train your own model
+## Part 5 · Train your own model
 
 **Training** means showing the model labelled photos, letting it guess, and nudging it a little each time it is wrong. One pass over all the training photos is called an **epoch**.
 
@@ -285,7 +254,7 @@ The course models did not start from zero: they started from a network **pretrai
 Suggested experiments (each run takes one to three minutes): 20 photos · 1 pass → 100 photos · 2 passes → 300 photos · 3 passes → then the best setting with a *random* start.
 """))
     cells.append(form(
-        "▶ Step 6a · Train",
+        "▶ Step 5a · Train",
         f"""n = 10**9 if training_photos == "all" else int(training_photos)
 lab.train_my_model(task, n, passes, start, run_name)""",
         notes=["Choose the settings, give the run a name, click ▶. Every run is added to the leaderboard in the next step."],
@@ -295,21 +264,21 @@ lab.train_my_model(task, n, passes, start, run_name)""",
                 'start = "pretrained" #@param ["pretrained", "random"]',
                 'run_name = "run 1" #@param {type:"string"}'],
     ))
-    cells.append(form("▶ Step 6b · Leaderboard", "lab.leaderboard()",
+    cells.append(form("▶ Step 5b · Leaderboard", "lab.leaderboard()",
                       notes=["All your runs, best first. Copy this table into your report."]))
-    cells.append(form("▶ Step 6c · Your model vs. the course model on the tricky photos", f'lab.compare_my_model("{B}")',
+    cells.append(form("▶ Step 5c · Your model vs. the course model on the tricky photos", f'lab.compare_my_model("{B}")',
                       notes=["Each photo shows the verdict of the course model and of your latest model for this task."]))
-    questions.append((8, "Copy your leaderboard. How did accuracy change with more training photos and more passes? What happened with a *random* start compared with a *pretrained* start, and why do you think that is?"))
+    questions.append((len(questions) + 1, "Copy your leaderboard. How did accuracy change with more training photos and more passes? What happened with a *random* start compared with a *pretrained* start, and why do you think that is?"))
     cells.append(q(*questions[-1]))
     if v["own_photos"] > 1:
-        questions.append((9, f"Photograph {v['own_photos']} surfaces yourself (walls, floors, pavements, façades) and test them in Step 3d. Include the screenshots. Which verdicts were right? For the wrong ones, what made the photo hard?"))
+        questions.append((len(questions) + 1, f"Photograph {v['own_photos']} surfaces yourself (walls, floors, pavements, façades) and test them in Step 3d. Include the screenshots. Which verdicts were right? For the wrong ones, what made the photo hard?"))
         cells.append(q(*questions[-1]))
     questions.append((len(questions) + 1, "Name one place in a construction project where a classifier like this could be useful. What photos would you need to collect to train it, who would label them, and what could go wrong?"))
     cells.append(q(*questions[-1]))
 
     # ------------------------------------------------------------------ wrap-up
     cells.append(md("## Wrap-up"))
-    cells.append(form("▶ Step 7 · Numbers for your report", "lab.report_summary()",
+    cells.append(form("▶ Step 6 · Numbers for your report", "lab.report_summary()",
                       notes=["Prints the accuracies and your training runs in one place."]))
     src_lines = []
     for s in {sb.key: sb, sm.key: sm}.values():
@@ -319,7 +288,6 @@ lab.train_my_model(task, n, passes, start, run_name)""",
         src_lines.append(f"- **{o.title}** (used in Step 3c) — {o.description}")
     cells.append(md("### Data and model sources\n" + "\n".join(src_lines) + """
 - Course models: ConvNeXt V2 (femto), pretrained on ImageNet-1k by Meta AI (Apache-2.0), fine-tuned for this course.
-- Zero-shot model: CLIP ViT-B/32 by OpenAI (MIT).
 - Out-of-scope sample images: scikit-image data (public domain / CC0).
 - Lab code: https://github.com/Haolan-Zhang/CEM4644 (folder `mp2_image_classification`).
 """))
@@ -343,7 +311,7 @@ def write_report_template(variant, v, questions, B, M):
              "Name: ______________________    Date: ____________", "",
              f"Notebook: `{v['file']}` — tasks: *{B}* and *{M}*.", "",
              "Answer every question in a few sentences. Paste screenshots where the question asks for photos or tables. "
-             "Numbers must come from **your** run of the notebook (Step 7 prints them).", ""]
+             "Numbers must come from **your** run of the notebook (Step 6 prints them).", ""]
     for n, text in questions:
         lines += [f"## Question {n}", "", text, "", "*Your answer:*", "", "", ""]
     p = REPO / "docs" / f"MP2_{variant.capitalize()}_Report_Template.md"

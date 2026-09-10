@@ -4,7 +4,7 @@ Name: ______________________    Date: ____________
 
 Notebook: `MP2_Workshop_Image_Classification.ipynb` — tasks: *defect vs. no defect* and *defect type*.
 
-Answer every question in a few sentences. Paste screenshots where the question asks for photos or tables. Numbers must come from **your** run of the notebook (Step 7 prints them).
+Answer every question in a few sentences. Paste screenshots where the question asks for photos or tables. Numbers must come from **your** run of the notebook (Step 6 prints them).
 
 ## Question 1
 
@@ -56,21 +56,13 @@ For *defect type*: what is the accuracy, and which two classes are confused most
 
 ## Question 7
 
-Which class names did you try, and did CLIP's answers make sense? Give one construction task where inventing classes like this would be good enough, and one where you would rather train a model on labelled photos. Explain the difference.
-
-*Your answer:*
-
-
-
-## Question 8
-
 Copy your leaderboard. How did accuracy change with more training photos and more passes? What happened with a *random* start compared with a *pretrained* start, and why do you think that is?
 
 *Your answer:*
 
 
 
-## Question 9
+## Question 8
 
 Name one place in a construction project where a classifier like this could be useful. What photos would you need to collect to train it, who would label them, and what could go wrong?
 
