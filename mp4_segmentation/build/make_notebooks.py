@@ -13,9 +13,17 @@ from aec_seg.config import SETS  # noqa: E402
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
 
 VARIANTS = {
-    "workshop": dict(file="MP4_Workshop_Segmentation.ipynb", label="Workshop (in class)", minutes=80, dataset="site", plans=False,
+    "workshop": dict(file="MP4_Workshop_Segmentation.ipynb", label="Workshop (in class)", minutes=90, dataset="site",
+                     plans=["plan_dormitory", "plan_mess_hall"],
+                     plan_questions=[
+                         "Plan *plan_dormitory* (Step 5a and 5b): which words found the footings and which found nothing? Give the scale you got from the 19'-4\" bay (feet per pixel), the measured area of one F2 and one F3 footing, and compare with the footing schedule on the drawing (4'-6\" and 5'-0\" square). Where does the error come from: your box, the mask edge, or the drawing?",
+                         "Plan *plan_mess_hall*: with the 24'-0\" bay as reference, measure one column footing (the detail says 6'-0\" square) and then use *find_all* to count the column footings. How many did SAM 3 find, what total area, and what should the answer be (14 footings of 36 sq ft)? List what it missed and what it added that is not a footing, and say which confidence worked best."],
                      own_photos=1, compare_default=("site_07", "site_09"), series_default="A", default_photo="site_01"),
-    "homework": dict(file="MP4_Homework_Segmentation.ipynb", label="Homework (individual)", minutes=120, dataset="interior", plans=True,
+    "homework": dict(file="MP4_Homework_Segmentation.ipynb", label="Homework (individual)", minutes=120, dataset="interior",
+                     plans=["plan_whittier", "plan_mill"],
+                     plan_questions=[
+                         "Plan *plan_whittier*: take the scale from a 12'-0\" bay on the bottom dimension line. Measure the footing of column 7 (or 11, 15, 19), which the detail gives as 5'-4\" across (an octagon of about 23.6 sq ft), and one footing of columns 6-10-14-18. Did *find_all* pick up the octagonal footings? Which columns did it miss and why (look at what is drawn on top of them)?",
+                         "Plan *plan_mill*: use the scale bar (0 to 50 feet) as the reference. Which word finds the two circular tanks in Step 5a? Give their diameter and area in square feet from Step 5b, and explain how you checked the scale (measure the bar twice, or measure a wall whose length you can read)."],
                      own_photos=5, compare_default=("int_16", "int_18"), series_default="C", default_photo="int_19"),
 }
 
@@ -80,7 +88,7 @@ if not os.path.isdir("CEM4644/mp4_segmentation"):
     subprocess.run(["git", "clone", "--depth", "1", "-q", "{GITHUB_URL}"], check=True)
 sys.path.insert(0, os.path.abspath("CEM4644/mp4_segmentation"))
 from aec_seg import lab
-lab.setup(dataset="{spec.key}", load_model=load_model, plans={v['plans']})""",
+lab.setup(dataset="{spec.key}", load_model=load_model, plans={json.dumps(v['plans'])})""",
         notes=["Click ▶ and wait for the green ✅ line. This downloads the photos with their precomputed results and loads SAM 3 (about 3 GB).",
                "Untick *load_model* only if you have no GPU and want to skip the live steps."],
         params=['load_model = True #@param {type:"boolean"}'],
@@ -159,23 +167,32 @@ Three kinds of error to look for: the **words** you use (the model was trained o
 
     # ------------------------------------------------------------------ Part 5
     if v["plans"]:
-        plans = SETS["plans"].plans
-        plan_labels = [f"{p['id']}" for p in plans]
+        plans = [p for p in SETS["plans"].plans if p["id"] in v["plans"]]
+        plan_labels = [p["id"] for p in plans]
+        bullets = "\n".join(f"- **{p['id']}** — {p['short']}. Scale reference: {p['reference']} ({p['reference_width_ft']} ft). "
+                            f"Measure: {'; '.join(p['targets'])}." for p in plans)
         cells.append(md(f"""
-## Part 5 · Quantity take-off on a structural plan
+## Part 5 · Quantity take-off on a real foundation plan
 
-On a drawing, words do not help: SAM 3 finds nothing for *footing*. A **box** does. Draw a box around a footing and SAM 3 cuts out its exact outline; the number of pixels inside is its area in pixels. To turn pixels into square feet you need a **scale**: one footing whose real width you know. On plan 1 the reference is **{plans[0]['reference']}** ({plans[0]['reference_width_ft']} ft wide); on plan 2 it is **{plans[1]['reference']}** ({plans[1]['reference_width_ft']} ft).
+These are real drawings (public domain; credits at the bottom). On a drawing the model does not know what a *footing* is: it sees **shapes**. So there are two ways to get quantities out of it: words that describe the shape (*small square*, *circle*) and **boxes** you draw yourself. A box does two things: SAM 3 cuts out the exact outline of what is inside it (its area in pixels), and it can look for **everything else that looks like it** (a count). To turn pixels into square feet you need a **scale**: one box whose real width you know, drawn across a dimensioned bay or along the scale bar.
 
-Label one box *reference*, the others *footing* or *opening*, then *Submit*. Members to measure on plan 2: {', '.join(plans[1]['targets'])}.
+{bullets}
 """))
-        cells.append(form("▶ Step 5a · Draw boxes, get areas", "lab.takeoff(plan)",
-                          notes=["Needs the live model. Tight boxes give clean masks; if a mask spills, redraw the box tighter and submit again."],
-                          params=[f'plan = "{plan_labels[0]}" #@param {jlist(plan_labels)}']))
-        questions.append((5, "Plan 1: what scale did you get (feet per pixel) and what area for the reference footing? A 12 ft square footing should measure 144 sq ft: how far off is SAM 3, and where does the error come from (the box, the mask edge, the drawing)?"))
-        cells.append(q(*questions[-1]))
-        questions.append((6, "Plan 2: give the scale and the areas of F4.0, E4-6, E4-10, E5-0 and the elevator shaft opening, with the overlay screenshot. Which one was hardest for the model and why? How would you check these numbers before using them in a cost estimate?"))
-        cells.append(q(*questions[-1]))
-        nxt = 7
+        cells.append(form("▶ Step 5a · Words on a drawing", "lab.plan_phrase(plan, phrase, confidence)",
+                          notes=["Start with *footing*: nothing. Then try *small square* or *circle* and look at what was found: the model sees shapes, not building parts. Count the hits and the misses. Needs the live model."],
+                          params=[f'plan = "{plan_labels[0]}" #@param {jlist(plan_labels)}',
+                                  f'phrase = "{plans[0]["phrase_default"]}" #@param {{type:"string"}}',
+                                  'confidence = 0.4 #@param {type:"slider", min:0.1, max:0.9, step:0.05}']))
+        cells.append(form("▶ Step 5b · Draw boxes, get areas and counts", "lab.takeoff(plan, find_all, confidence)",
+                          notes=["Draw the *reference* box first (its width is the scale), then tight boxes labelled *footing*, then *Submit*. "
+                                 "With *find_all* ticked, SAM 3 also looks for every element like your first footing box and totals them (blue boxes). Needs the live model."],
+                          params=[f'plan = "{plan_labels[0]}" #@param {jlist(plan_labels)}',
+                                  'find_all = True #@param {type:"boolean"}',
+                                  'confidence = 0.3 #@param {type:"slider", min:0.1, max:0.9, step:0.05}']))
+        for text in v["plan_questions"]:
+            questions.append((len(questions) + 1, text))
+            cells.append(q(*questions[-1]))
+        nxt = len(questions) + 1
     else:
         nxt = 5
 
@@ -191,9 +208,14 @@ Label one box *reference*, the others *footing* or *opening*, then *Submit*. Mem
 
     cells.append(md("## Wrap-up"))
     cells.append(form("▶ Numbers for your report", "lab.report_summary()"))
+    plan_credits = ""
+    if v["plans"]:
+        pc = json.loads((REPO / SETS["plans"].folder / "credits.json").read_text())
+        plan_credits = "Plan drawings (Part 5), all public domain:\n" + "\n".join(
+            f"- **{c['id']}**: {c['title']}. {c['author']}. {c['license']}. {c['source']}" for c in pc if c["id"] in v["plans"]) + "\n\n"
     cells.append(md("### Photo credits and model\n"
                     "All photos are from Wikimedia Commons under the licence shown with each photo in Step 1a (public domain, CC0, CC BY or CC BY-SA; "
-                    "credits are also in `data/photos/*/credits.json`). Plan drawings are course material.\n\n"
+                    "credits are also in `data/photos/*/credits.json`).\n\n" + plan_credits +
                     "- Model: SAM 3 by Meta AI (SAM License), loaded from a public mirror of the official checkpoint; a copy of the licence is in `docs/SAM_LICENSE.txt`.\n"
                     "- Lab code: https://github.com/Haolan-Zhang/CEM4644 (folder `mp4_segmentation`).\n"))
 

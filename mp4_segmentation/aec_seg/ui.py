@@ -291,65 +291,144 @@ def live_phrase(lab, photo_id: str, phrase: str, threshold: float):
 
 
 # --------------------------------------------------------------------------- plans
-def takeoff(lab, plan_id: str):
-    """Box prompts on a plan drawing -> masks -> pixel areas -> real areas via a known footing width."""
+def _plan(lab, plan_id: str):
+    photo = lab.plans[plan_id]
+    spec = next(p for p in lab.plan_specs if p["id"] == plan_id)
+    return photo, spec, photo.load()
+
+
+def plan_phrase(lab, plan_id: str, phrase: str, threshold: float):
+    """A phrase on a drawing: every instance found, drawn and counted."""
+    if lab.engine is None:
+        print("SAM 3 is not loaded. This step needs the live model (GPU runtime recommended)."); return
+    photo, spec, img = _plan(lab, plan_id)
+    res = lab.engine.segment(img, phrase, threshold=0.1)
+    keep = res.scores >= threshold
+    n = int(keep.sum())
+    over = viz.instances_image(img, res, min_score=threshold)
+    from PIL import ImageDraw
+    d = ImageDraw.Draw(over)
+    for b in res.boxes[keep]:
+        d.rectangle(list(map(float, b)), outline="#e63946", width=2)
+    viz.show_image(over, 1000)
+    if n == 0:
+        hint = ("Try a shape word instead: 'small square', 'circle', 'rectangle'." if len(res) == 0
+                else f"({len(res)} weak candidate(s) below this confidence; lower it to see them.)")
+        print(f"'{phrase}' at confidence {threshold:.2f}: nothing found on {photo.id}. {hint}")
+    else:
+        px = int(res.union(threshold).sum())
+        print(f"'{phrase}' at confidence {threshold:.2f}: {n} region(s) on {photo.id}, {px:,} pixels in total "
+              f"({px / (img.width * img.height) * 100:.2f} % of the drawing). Best confidence {res.scores[keep].max():.2f}, "
+              f"weakest kept {res.scores[keep].min():.2f}.")
+    print(f"(SAM 3 took {res.seconds:.1f} s)")
+
+
+def takeoff_compute(lab, plan_id: str, boxes, ref_width_ft: float, find_all: bool = True, threshold: float = 0.3):
+    """boxes: list of (label, [x1, y1, x2, y2]) in full-image pixels.
+    Returns (overlay, rows, lines, found, ft_per_px). The scale is the WIDTH of the 'reference' box."""
+    from PIL import ImageDraw
+    photo, spec, img = _plan(lab, plan_id)
+    ref = [b for lab_, b in boxes if lab_ == "reference"]
+    ft_per_px = ref_width_ft / (ref[0][2] - ref[0][0]) if ref and ref[0][2] - ref[0][0] > 1 else None
+    lines = []
+    if ft_per_px:
+        lines.append(f"Scale from the reference box: {ref[0][2] - ref[0][0]:.0f} px wide = {ref_width_ft} ft  ->  "
+                     f"{ft_per_px:.4f} ft per pixel (1 px\u00b2 = {ft_per_px ** 2:.5f} sq ft)")
+    else:
+        lines.append("No box labelled 'reference': pixel areas only.")
+    colors = ["#e63946", "#4cc9f0", "#ffd166", "#06d6a0", "#7b2cbf", "#f4a261"]
+    rows, layers = [], []
+    for label, box in boxes:
+        if label == "reference":
+            continue
+        r = lab.engine.segment_box(img, box)
+        mask = r.union() if len(r) else np.zeros((img.height, img.width), bool)
+        k = len(rows) + 1
+        px = int(mask.sum())
+        box_px = max(1.0, (box[2] - box[0]) * (box[3] - box[1]))
+        rows.append({"n": k, "label": label, "px": px, "score": float(r.scores[0]) if len(r) else 0.0,
+                     "sqft": px * ft_per_px ** 2 if ft_per_px else None, "box": box, "fill": px / box_px})
+        layers.append((f"{label} {k}", mask, colors[(k - 1) % len(colors)]))
+    over = viz.multi_overlay(img, layers, alpha=0.6) if layers else img.copy()
+    d = ImageDraw.Draw(over)
+    if ref:
+        d.rectangle(ref[0], outline="black", width=3); d.text((ref[0][0] + 3, ref[0][1] + 3), "ref", fill="black")
+    for row in rows:
+        d.rectangle(row["box"], outline="black", width=2); d.text((row["box"][0] + 3, row["box"][1] + 3), str(row["n"]), fill="black")
+    found = None
+    first = [(b, row) for (lab_, b), row in zip([x for x in boxes if x[0] != "reference"], rows) if lab_ == "footing"]
+    if find_all and first:
+        box1, row1 = first[0]
+        like = lab.engine.segment_like(img, box1, threshold=threshold)
+        px_list = [int(m.sum()) for m in like.masks]
+        ref_px = max(row1["px"], 1)
+        similar = [0.4 * ref_px <= a <= 2.5 * ref_px for a in px_list]      # same size class as box 1
+        found = {"n": len(like), "n_similar": int(sum(similar)), "px": px_list, "similar": similar,
+                 "scores": [float(v) for v in like.scores],
+                 "sqft": [a * ft_per_px ** 2 for a in px_list] if ft_per_px else None, "boxes": like.boxes.tolist()}
+        for b, sim in zip(like.boxes, similar):
+            d.rectangle(list(map(float, b)), outline="#0057ff" if sim else "#9e9e9e", width=2 if sim else 1)
+    return over, rows, lines, found, ft_per_px
+
+
+def print_takeoff(rows, found, ft_per_px):
+    if rows:
+        print(f"{'#':>2} {'label':10s} {'mask pixels':>12s} {'confidence':>10s} {'area (sq ft)':>13s}  note")
+        for r in rows:
+            area = f"{r['sqft']:.1f}" if r["sqft"] is not None else "-"
+            note = "⚠ the mask fills almost the whole box: draw a tighter box" if r["fill"] > 0.85 else ""
+            print(f"{r['n']:>2} {r['label']:10s} {r['px']:>12,d} {r['score'] * 100:>9.0f}% {area:>13s}  {note}")
+    if found is not None:
+        if found["n"] == 0:
+            print("Find-all: nothing like box 1 at this confidence. Lower the confidence and submit again.")
+        else:
+            sim = [i for i, s in enumerate(found["similar"]) if s]
+            tot = sum(found["px"][i] for i in sim)
+            line = (f"Find-all: {found['n']} region(s) look like box 1 at this confidence; {len(sim)} of them are about the same size "
+                    f"(blue boxes; grey = a different size). Those {len(sim)}: {tot:,} pixels in total")
+            if found["sqft"] and sim:
+                line += f" = {sum(found['sqft'][i] for i in sim):.1f} sq ft (mean {sum(found['sqft'][i] for i in sim) / len(sim):.1f} sq ft each)"
+            print(line + ".")
+            print("Count them yourself on the drawing: which ones did it miss, and what did it add that is not a footing?")
+
+
+def takeoff(lab, plan_id: str, find_all: bool = True, threshold: float = 0.3):
+    """Box prompts on a plan drawing -> masks -> pixel areas -> square feet via a reference box of known width,
+    plus an optional 'find everything like box 1' count."""
     import ipywidgets as w
     from IPython.display import display
     from jupyter_bbox_widget import BBoxWidget
     import io
-    photo = lab.plans[plan_id]
-    plan = next(p for p in lab.plan_specs if p["id"] == plan_id)
-    img = photo.load()
+    photo, spec, img = _plan(lab, plan_id)
     disp = img.copy(); disp.thumbnail((1100, 1100)); scale = img.width / disp.width
     buf = io.BytesIO(); disp.save(buf, "PNG")
-    widget = BBoxWidget(classes=["reference", "footing", "opening", "other"])
+    widget = BBoxWidget(classes=["reference", "footing", "other"])
     widget.image_bytes = buf.getvalue()
-    ref_w = w.FloatText(value=plan["reference_width_ft"], description="ref. width (ft)", style={"description_width": "110px"})
-    msg = w.HTML(f"Draw a box around one <b>{plan['reference']}</b> footing and label it <b>reference</b> (its real width is {plan['reference_width_ft']} ft). "
-                 "Then draw boxes around the members you want to measure (label them footing / opening / other) and click <b>Submit</b>.")
+    ref_w = w.FloatText(value=spec["reference_width_ft"], description="ref. width (ft)", style={"description_width": "100px"})
+    find = w.Checkbox(value=find_all, description="find all like box 1")
+    thr = w.FloatSlider(value=threshold, min=0.1, max=0.9, step=0.05, description="find-all confidence",
+                        style={"description_width": "140px"}, continuous_update=False)
+    msg = w.HTML(f"<b>1.</b> Scale: draw a box on <b>{spec['reference']}</b> and label it <b>reference</b> "
+                 f"({spec['reference_hint']}; real width {spec['reference_width_ft']} ft). "
+                 f"<b>2.</b> Draw a tight box around each member to measure and label it <b>footing</b> (or <i>other</i>). "
+                 f"<b>3.</b> Click <b>Submit</b>.")
     out = w.Output()
-    state = {"masks": []}
 
     @widget.on_submit
     def _go():
         if lab.engine is None:
             msg.value = "SAM 3 is not loaded. This step needs the live model (GPU runtime recommended)."; return
-        boxes = [(b.get("label", "other"), [b["x"] * scale, b["y"] * scale, (b["x"] + b["width"]) * scale, (b["y"] + b["height"]) * scale]) for b in widget.bboxes]
+        boxes = [(b.get("label", "other"), [b["x"] * scale, b["y"] * scale, (b["x"] + b["width"]) * scale, (b["y"] + b["height"]) * scale])
+                 for b in widget.bboxes]
         if not boxes:
             msg.value = "Draw at least one box."; return
-        results = []
-        for label, box in boxes:
-            r = lab.engine.segment_box(img, box)
-            mask = r.union() if len(r) else np.zeros((img.height, img.width), bool)
-            results.append((label, box, mask, float(r.scores[0]) if len(r) else 0.0))
-        ref = [r for r in results if r[0] == "reference"]
+        over, rows, lines, found, ft_per_px = takeoff_compute(lab, plan_id, boxes, float(ref_w.value), bool(find.value), float(thr.value))
         with out:
             out.clear_output(wait=True)
-            layers = [(f"{lab_} {k + 1}", mask, ["#e63946", "#4cc9f0", "#ffd166", "#06d6a0", "#7b2cbf", "#f4a261"][k % 6]) for k, (lab_, box, mask, sc) in enumerate(results)]
-            over = viz.multi_overlay(img, layers, alpha=0.6)
-            from PIL import ImageDraw
-            d = ImageDraw.Draw(over)
-            for k, (lab_, box, mask, sc) in enumerate(results):
-                d.rectangle(box, outline="black", width=2); d.text((box[0] + 3, box[1] + 3), f"{k + 1}", fill="black")
             viz.show_image(over, 1000)
-            if not ref:
-                print("No box labelled 'reference': pixel areas only.")
-                ft_per_px = None
-            else:
-                lab_, box, mask, sc = ref[0]
-                ys, xs = np.where(mask)
-                px_w = (xs.max() - xs.min() + 1) if len(xs) else (box[2] - box[0])
-                ft_per_px = ref_w.value / px_w
-                print(f"Scale from the reference footing: {px_w:.0f} px wide = {ref_w.value} ft  ->  {ft_per_px:.4f} ft per pixel "
-                      f"(1 px² = {ft_per_px ** 2:.5f} sq ft)")
-            print(f"{'#':>2} {'label':10s} {'mask pixels':>12s} {'confidence':>10s} {'area (sq ft)':>13s}")
-            for k, (lab_, box, mask, sc) in enumerate(results):
-                px = int(mask.sum())
-                area = f"{px * ft_per_px ** 2:.1f}" if ft_per_px else "-"
-                print(f"{k + 1:>2} {lab_:10s} {px:>12d} {sc * 100:>9.0f}% {area:>13s}")
-            if ref:
-                lab_, box, mask, sc = ref[0]
-                print(f"Check: the reference footing should be about {ref_w.value ** 2:.0f} sq ft if it is square; SAM 3 measured {int(mask.sum()) * ft_per_px ** 2:.1f} sq ft.")
-        msg.value = "Done. Adjust boxes and submit again to refine; a tight box gives a cleaner mask."
+            for line in lines:
+                print(line)
+            print_takeoff(rows, found, ft_per_px)
+        msg.value = "Done. Adjust the boxes or the confidence and submit again; a tight box gives a cleaner mask."
 
-    display(w.VBox([msg, ref_w, widget, out]))
+    display(w.VBox([msg, w.HBox([ref_w, find, thr]), widget, out]))

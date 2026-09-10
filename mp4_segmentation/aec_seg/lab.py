@@ -30,7 +30,8 @@ class SegLab:
         self.notes = {}
 
     # ------------------------------------------------------------------ setup
-    def setup(self, dataset: str = "site", load_model: bool = True, plans: bool = False, install: bool = True):
+    def setup(self, dataset: str = "site", load_model: bool = True, plans=False, install: bool = True):
+        """plans: False, True (all plan drawings) or a list of plan ids."""
         t0 = time.time()
         if install and not self._ensure_packages():
             return
@@ -44,7 +45,8 @@ class SegLab:
         self.store = MaskStore(self.root / self.spec.masks)
         if plans:
             self.plans = PhotoSet(self.root / SETS["plans"].folder, "plans")
-            self.plan_specs = SETS["plans"].plans
+            ids = [p["id"] for p in SETS["plans"].plans] if plans is True else [str(x) for x in plans]
+            self.plan_specs = [p for p in SETS["plans"].plans if p["id"] in ids]
         if load_model:
             try:
                 self.engine = Sam3Engine(log=print)
@@ -93,7 +95,9 @@ class SegLab:
             for k, v in s.series.items():
                 print(f"  Time series {k}: {v['title']} ({len(v['photos'])} photos)")
         if self.plans is not None:
-            print(f"  Plans for quantity take-off: {', '.join(p.id for p in self.plans.photos)}")
+            print("  Plans for quantity take-off (real drawings, public domain):")
+            for p in self.plan_specs:
+                print(f"    {p['id']}: {p['short']}")
         print(f"  SAM 3 live model: {'loaded' if self.engine else 'not loaded (precomputed results only)'}")
 
     # ------------------------------------------------------------------ results
@@ -166,11 +170,19 @@ class SegLab:
         self._need()
         ui.live_phrase(self, self._pid(photo), phrase, float(threshold))
 
-    def takeoff(self, plan):
+    def plan_phrase(self, plan, phrase, confidence=0.4):
+        """Step 5a: a phrase on a drawing (live model)."""
         self._need()
         if self.plans is None:
             print("This notebook has no plan drawings."); return
-        ui.takeoff(self, self.plans[plan].id)
+        ui.plan_phrase(self, self.plans[plan].id, str(phrase), float(confidence))
+
+    def takeoff(self, plan, find_all=True, confidence=0.3):
+        """Step 5b: boxes -> areas in sq ft, and optionally everything like the first footing box."""
+        self._need()
+        if self.plans is None:
+            print("This notebook has no plan drawings."); return
+        ui.takeoff(self, self.plans[plan].id, bool(find_all), float(confidence))
 
     def upload_app(self):
         self._need()

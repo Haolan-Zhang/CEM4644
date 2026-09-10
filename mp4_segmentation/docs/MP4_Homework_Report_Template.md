@@ -40,7 +40,7 @@ Describe one mistake you found in Step 4b or 4c (what was included or missed, at
 
 ## Question 5
 
-Plan 1: what scale did you get (feet per pixel) and what area for the reference footing? A 12 ft square footing should measure 144 sq ft: how far off is SAM 3, and where does the error come from (the box, the mask edge, the drawing)?
+Plan *plan_whittier*: take the scale from a 12'-0" bay on the bottom dimension line. Measure the footing of column 7 (or 11, 15, 19), which the detail gives as 5'-4" across (an octagon of about 23.6 sq ft), and one footing of columns 6-10-14-18. Did *find_all* pick up the octagonal footings? Which columns did it miss and why (look at what is drawn on top of them)?
 
 *Your answer:*
 
@@ -48,7 +48,7 @@ Plan 1: what scale did you get (feet per pixel) and what area for the reference 
 
 ## Question 6
 
-Plan 2: give the scale and the areas of F4.0, E4-6, E4-10, E5-0 and the elevator shaft opening, with the overlay screenshot. Which one was hardest for the model and why? How would you check these numbers before using them in a cost estimate?
+Plan *plan_mill*: use the scale bar (0 to 50 feet) as the reference. Which word finds the two circular tanks in Step 5a? Give their diameter and area in square feet from Step 5b, and explain how you checked the scale (measure the bar twice, or measure a wall whose length you can read).
 
 *Your answer:*
 

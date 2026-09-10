@@ -1,28 +1,54 @@
 [
   {
-    "id": "plan_01",
-    "file": "plan_01.png",
-    "title": "Structural plan 1 (footings)",
-    "author": "CEM4644 course material",
-    "license": "course material",
-    "source": "https://raw.githubusercontent.com/Haolan-Zhang/SAM_Example_Image/master/test_fp.png",
-    "note": "plan drawing",
+    "id": "plan_dormitory",
+    "file": "plan_dormitory.jpg",
+    "title": "Airmen's dormitory, three-storey concrete frame: foundation plan and details (US Army standard drawing 21-01-78, sheet 09, 1956)",
+    "author": "U.S. Army Corps of Engineers (Wikimedia Commons file '0021-01-78 sheet 09 - USACE-p16021coll10-14314.jpeg')",
+    "license": "Public domain (work of the US federal government)",
+    "source": "https://commons.wikimedia.org/wiki/File:0021-01-78_sheet_09_-_USACE-p16021coll10-14314.jpeg",
+    "note": "left part of the foundation plan (column lines 1 to 9) at the scan's native resolution; contrast stretched",
     "size": [
-      1280,
-      770
+      1389,
+      803
     ]
   },
   {
-    "id": "plan_02",
-    "file": "plan_02.png",
-    "title": "Structural plan 2 (footings, elevator shaft)",
-    "author": "CEM4644 course material",
-    "license": "course material",
-    "source": "https://raw.githubusercontent.com/Haolan-Zhang/SAM_Example_Image/master/test_fp_2.png",
-    "note": "plan drawing",
+    "id": "plan_mess_hall",
+    "file": "plan_mess_hall.jpg",
+    "title": "Barracks for 450 enlisted men, kitchen and mess hall: foundation plan (US Army standard drawing 21-01-30, sheet 040, 1956)",
+    "author": "U.S. Army Corps of Engineers (Wikimedia Commons file '0021-01-30 sheet 040 - USACE-p16021coll10-13955.jpeg')",
+    "license": "Public domain (work of the US federal government)",
+    "source": "https://commons.wikimedia.org/wiki/File:0021-01-30_sheet_040_-_USACE-p16021coll10-13955.jpeg",
+    "note": "plan-view region cropped from the full sheet; contrast stretched",
     "size": [
-      1280,
-      509
+      1845,
+      1393
+    ]
+  },
+  {
+    "id": "plan_whittier",
+    "file": "plan_whittier.jpg",
+    "title": "Whittier State School, Hospital and Receiving Building: foundation plan and details of footings (drawing S1, 1930s)",
+    "author": "Historic American Buildings Survey (HABS), Library of Congress, copy of original drawing (via Wikimedia Commons)",
+    "license": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Foundation_Plan_-_Foundation_Plan_and_Details_of_Footing_(drawing_S1)_-_Whittier_State_School,_Hospital_and_Receiving_Building,_11850_East_Whittier_Boulevard,_Whittier,_Los_HABS_CAL,19-WHIT,3-34.tif",
+    "note": "plan-view region cropped from the full sheet; contrast stretched",
+    "size": [
+      2000,
+      957
+    ]
+  },
+  {
+    "id": "plan_mill",
+    "file": "plan_mill.jpg",
+    "title": "Shenandoah-Dives Mill, Silverton, Colorado: foundation plan (HAER CO-91, measured drawing, 1990s)",
+    "author": "Historic American Engineering Record (HAER), Library of Congress, delineated for HAER (via Wikimedia Commons)",
+    "license": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Foundation_Plan_-_Shenandoah-Dives_Mill,_135_County_Road_2,_Silverton,_San_Juan_County,_CO_HAER_CO-91_(sheet_7_of_27).png",
+    "note": "plan-view region cropped from the full sheet; contrast stretched",
+    "size": [
+      2000,
+      1370
     ]
   }
 ]

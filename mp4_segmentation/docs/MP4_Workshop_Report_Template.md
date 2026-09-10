@@ -40,13 +40,29 @@ Describe one mistake you found in Step 4b or 4c (what was included or missed, at
 
 ## Question 5
 
-Test 1 photo(s) of your own (walls, floors, a site, a street). For each: the phrase you used, the share measured, and whether the mask is right. What kind of surface or wording failed?
+Plan *plan_dormitory* (Step 5a and 5b): which words found the footings and which found nothing? Give the scale you got from the 19'-4" bay (feet per pixel), the measured area of one F2 and one F3 footing, and compare with the footing schedule on the drawing (4'-6" and 5'-0" square). Where does the error come from: your box, the mask edge, or the drawing?
 
 *Your answer:*
 
 
 
 ## Question 6
+
+Plan *plan_mess_hall*: with the 24'-0" bay as reference, measure one column footing (the detail says 6'-0" square) and then use *find_all* to count the column footings. How many did SAM 3 find, what total area, and what should the answer be (14 footings of 36 sq ft)? List what it missed and what it added that is not a footing, and say which confidence worked best.
+
+*Your answer:*
+
+
+
+## Question 7
+
+Test 1 photo(s) of your own (walls, floors, a site, a street). For each: the phrase you used, the share measured, and whether the mask is right. What kind of surface or wording failed?
+
+*Your answer:*
+
+
+
+## Question 8
 
 Where on a project would a measurement like *share of the photo covered by X* be useful, and where would it mislead? What would you need (camera position, reference lengths, drawings, several photos) to turn it into a real quantity?
 

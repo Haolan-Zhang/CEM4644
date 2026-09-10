@@ -7,7 +7,8 @@ from typing import List, Optional, Sequence
 import numpy as np
 from PIL import Image
 
-MIRROR = "jetjodh/sam3"          # public mirror of facebook/sam3 (same weights, SAM License, no gating)
+MIRROR = os.environ.get("AEC_SEG_MODEL_ID", "jetjodh/sam3")   # public mirror of facebook/sam3 (same weights, SAM License,
+                                                             # no gating); the env var lets tests point at a local copy
 MAX_SIDE = 1280
 
 
@@ -114,6 +115,12 @@ class Sam3Engine:
             packed = SegResult(packed.prompt, packed.masks[best:best + 1], packed.scores[best:best + 1], packed.boxes[best:best + 1],
                                packed.size, packed.seconds)
         return packed
+
+    def segment_like(self, image: Image.Image, box_xyxy: Sequence[float], threshold: float = 0.3) -> SegResult:
+        """Every object that looks like the one inside the box: the box is a visual example, not a phrase."""
+        t0 = time.time()
+        res = self._run(image, threshold, input_boxes=[[list(map(float, box_xyxy))]], input_boxes_labels=[[1]])
+        return self._pack(f"like box {[int(v) for v in box_xyxy]}", res, image.size, time.time() - t0)
 
     @staticmethod
     def _pack(prompt, res, size, seconds) -> SegResult:
