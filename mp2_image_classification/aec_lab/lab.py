@@ -35,6 +35,7 @@ class Lab:
         self.other_spec: Optional[DatasetSpec] = None
         self._zs = None
         self.notes = {}
+        self.apps = {}                                       # running Gradio apps of the *_gradio notebooks
 
     # ------------------------------------------------------------------ setup
     def _task(self, name: str) -> str:
@@ -48,11 +49,15 @@ class Lab:
         return "binary" if ("vs" in n or "no " in n) else "multiclass"
 
     def setup(self, binary: str = "facade_defects", multiclass: str = "facade_defects", install: bool = True,
-              task_names: Optional[Dict[str, str]] = None):
+              task_names: Optional[Dict[str, str]] = None, gradio: Optional[str] = None):
+        """gradio: optional exact version to install (the *_gradio notebooks pin it); None keeps the old
+        behaviour (install whatever pip picks, only if gradio is missing)."""
         t0 = time.time()
         if task_names:
             self.task_names.update(task_names)
-        if install:
+        if install and gradio:
+            self._ensure_version("gradio", gradio)
+        elif install:
             self._install_missing(["gradio"])
         self.specs = {"binary": DATASETS[binary], "multiclass": DATASETS[multiclass]}
         unz = self.root / "_unzipped"
@@ -86,6 +91,34 @@ class Lab:
             except ImportError:
                 print(f"Installing {p} (about a minute)...")
                 subprocess.run([sys.executable, "-m", "pip", "install", "-q", p], check=False)
+
+    def _ensure_version(self, pkg: str, version: str):
+        """Install pkg==version unless exactly that version is already importable. Only pip's own
+        dependency rules apply; torch, numpy and pillow are left alone (constraints file)."""
+        import importlib
+        import tempfile
+        try:
+            have = importlib.import_module(pkg).__version__
+        except Exception:
+            have = None
+        if have == version:
+            return
+        print(f"Installing {pkg} {version} (about a minute)...")
+        keep = []
+        for name in ("torch", "torchvision", "numpy", "pillow", "pandas"):
+            try:
+                keep.append(f"{name}=={importlib.import_module('PIL' if name == 'pillow' else name).__version__}")
+            except Exception:
+                pass
+        with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as f:
+            f.write("\n".join(keep) + "\n")
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-c", f.name, f"{pkg}=={version}"], check=False)
+        try:
+            importlib.invalidate_caches()
+            importlib.import_module(pkg)
+        except Exception:
+            print(f"⚠️ {pkg} could not be installed without changing core packages. The app steps (3b, 5a) will not work "
+                  f"in this notebook; use the non-Gradio version of the notebook instead. Everything else works.")
 
     def _need(self, task=None):
         if not self.ready:
@@ -266,6 +299,30 @@ class Lab:
             for r in LEADERBOARD:
                 print(f"    run {r['run']}: {r['name']} — {r['training photos']} photos, {r['passes']} pass(es), "
                       f"{r['start']} start -> {r['test accuracy']}% ({r['note']})")
+
+    # ------------------------------------------------------------------ Gradio variants (used by the *_gradio notebooks only)
+    def playground_app(self, task="binary", share=False):
+        """Step 3b as an inline Gradio app: live sliders plus a drawing pad."""
+        task = self._task(task); self._need(task)
+        from . import apps
+        self.apps["playground"] = apps.playground_app(self.clf[task], self.sets[task]["test"], share=share)
+
+    def zero_shot_app(self, class_names: str = "", how_many: int = 8, task="multiclass", share=False):
+        """Step 5a as an inline Gradio app: same photos, new class names, one click."""
+        self._need()
+        from . import apps
+        from .zeroshot import ZeroShot
+        task = self._task(task)
+
+        def get_zs():
+            if self._zs is None:
+                print("Loading CLIP (a model that understands both images and text) — about a minute the first time...")
+                self._zs = ZeroShot()
+            return self._zs
+
+        tricky_items = tk.load_tricky(self.root / self.specs[task].tricky_dir) if self.specs[task].tricky_dir else []
+        self.apps["zero_shot"] = apps.zero_shot_app(get_zs, self.sets[task]["test"], tricky_items, class_names,
+                                                    how_many=how_many, share=share)
 
 
 lab = Lab()

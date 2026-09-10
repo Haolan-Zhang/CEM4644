@@ -23,6 +23,22 @@ Course model accuracies on the unseen test sets (`models/*/training_log.json`):
 | concrete crack binary | 1,000 | 100 % |
 | architectural style (10 classes) | 120 | 99.2 % |
 
+**Gradio copies.** `MP2_Workshop_Image_Classification_gradio.ipynb` and
+`MP2_Homework_Image_Classification_gradio.ipynb` are the same notebooks with two steps replaced by
+small Gradio apps that render inside the cell (no public link needed):
+
+- *Step 3b · Break it yourself*: the sliders now update the photo and the confidence bars live, and
+  a second tab is a drawing pad where students paint a crack, a stain or a shadow with a brush (or
+  upload a wall of their own and draw on it). "Load the photo with my slider changes" copies the
+  current slider result into the pad.
+- *Step 5a · Type your own classes*: one text box and a *Classify* button. The photos stay the
+  same until *New photos* is clicked, so changing the wording shows its effect directly. A second
+  tab classifies the student's own photo with the same class names.
+
+The report questions are unchanged, so the two versions can be mixed in one class. The copies pin
+`gradio==6.26.0` (the version they were tested with) and install it without touching torch, numpy
+or pillow. Use the originals if Gradio cannot be installed on the network.
+
 The binary models are almost perfect on their own test sets. That is deliberate and is itself a
 teaching point (Part 3): the test photos come from the same buildings and cameras as the training
 photos, and the model falls apart on photos that look different.
@@ -74,13 +90,15 @@ correct run produces, with small variation because some steps sample photos at r
 - **Step 3d share link fails.** The app still works inside the notebook (upload from the computer). The public link is only needed for phones.
 - **CLIP download is slow.** About 600 MB from the Hugging Face Hub; first run only.
 - **Step 0 fails to clone.** GitHub is unreachable from the network; try again or download the repository zip and upload the folder to the Colab file browser.
+- **Gradio copies: the app area stays blank.** Give it a few seconds; if it stays blank, re-run the cell (the old server is closed and a new one started). The apps do not need the public share link, so a blocked tunnel does not affect them.
+- **Gradio copies: the drawing pad shows no photo.** Click *Another photo*; the pad is reloaded with the new photo.
 - **Session reset.** Colab discards everything after about 90 minutes of inactivity. Students re-run Step 0 and continue; the leaderboard starts empty again.
 
 ## 5. Rebuilding or changing the material
 
 See `README.md` in this folder for the four build scripts. Common changes:
 
-- **Different questions or wording**: edit `build/make_notebooks.py`, run it, commit both notebooks and the report templates.
+- **Different questions or wording**: edit `build/make_notebooks.py`, run it (and once more with `--gradio` for the copies), commit the notebooks and the report templates.
 - **A new dataset**: add a `DatasetSpec` in `aec_lab/config.py`, extend `build/prepare_datasets.py` to produce `data/<key>.zip`, add a job in `build/train_course_models.py`, run `build/make_tricky.py`, then point a variant in `build/make_notebooks.py` at it.
 - **A bigger model**: change `base_convnextv2_femto` to another Hugging Face image-classification checkpoint (saved with `save_pretrained`). Femto was chosen because four fine-tuned copies fit in the repository at 10 MB each and train in a minute on CPU.
 

@@ -13,11 +13,25 @@ code is hidden.
 Both notebooks are generated from the same template; they differ only in the datasets, the
 task names and two report questions.
 
+### Alternative copies with two Gradio steps
+
+Same notebooks, same questions, but Step 3b (*Break it yourself*) and Step 5a (*Type your own
+classes*) are small Gradio apps rendered inside the cell instead of slider widgets and a re-run
+form. Step 3b gains a drawing pad (paint a crack or a stain with a brush); Step 5a keeps the same
+photos while the student changes the class names, and classifies the student's own photo too.
+Everything else is identical, so the two versions can be swapped without changing the report.
+
+| Notebook | Open |
+|---|---|
+| `MP2_Workshop_Image_Classification_gradio.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp2_image_classification/MP2_Workshop_Image_Classification_gradio.ipynb) |
+| `MP2_Homework_Image_Classification_gradio.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp2_image_classification/MP2_Homework_Image_Classification_gradio.ipynb) |
+
 ## What is in this folder
 
 ```
 MP2_Workshop_Image_Classification.ipynb   student notebook (generated)
 MP2_Homework_Image_Classification.ipynb   student notebook (generated)
+MP2_*_Image_Classification_gradio.ipynb   the same notebooks with Gradio apps in Steps 3b and 5a (generated)
 aec_lab/          all the code the notebooks call (hidden from students)
 data/             small image sets shipped as zips + the "tricky photos" galleries
 models/           course models (ConvNeXt V2 femto, fp16) + the base model for the training exercise
@@ -38,6 +52,7 @@ python build/prepare_datasets.py --hf-cache <hf_cache> --work <work> --styles-pl
 python build/train_course_models.py --work <work>          # a few minutes on a GPU
 python build/make_tricky.py --work <work>
 python build/make_notebooks.py                              # regenerates both notebooks + report templates
+python build/make_notebooks.py --gradio                     # regenerates the two *_gradio copies
 ```
 
 To swap a dataset: add a `DatasetSpec` in `aec_lab/config.py`, produce `data/<key>.zip` with the

@@ -14,6 +14,7 @@ sys.path.insert(0, str(REPO))
 from aec_lab.config import DATASETS  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
+GRADIO_VERSION = "6.26.0"   # the version the *_gradio copies were tested with (same pin as MP3/MP4)
 GITHUB_BLOB = "https://github.com/Haolan-Zhang/CEM4644/blob/master/mp2_image_classification/"
 
 VARIANTS = {
@@ -78,7 +79,8 @@ def jlist(items):
     return json.dumps(list(items), ensure_ascii=False)
 
 
-def build(variant: str):
+def build(variant: str, gradio: bool = False):
+    """gradio=True writes the *_gradio copy: Steps 3b and 5a become inline Gradio apps, everything else is identical."""
     v = VARIANTS[variant]
     sb, sm = DATASETS[v["binary"]], DATASETS[v["multiclass"]]
     B, M = v["task_names"]["binary"], v["task_names"]["multiclass"]
@@ -118,7 +120,7 @@ if not os.path.isdir("CEM4644/mp2_image_classification"):
     subprocess.run(["git", "clone", "--depth", "1", "-q", "{GITHUB_URL}"], check=True)
 sys.path.insert(0, os.path.abspath("CEM4644/mp2_image_classification"))
 from aec_lab import lab
-lab.setup(binary="{v['binary']}", multiclass="{v['multiclass']}", task_names={json.dumps(v['task_names'], ensure_ascii=False)})""",
+lab.setup(binary="{v['binary']}", multiclass="{v['multiclass']}", task_names={json.dumps(v['task_names'], ensure_ascii=False)}{', gradio="' + GRADIO_VERSION + '"' if gradio else ''})""",
         notes=["Click ▶ and wait for the green ✅ line. This downloads the photos and the course models. Nothing else to do here.",
                "If Colab asks whether to run a notebook that was not authored by Google, choose *Run anyway*."],
     ))
@@ -196,11 +198,19 @@ A model only knows the kind of photos it was trained on. Let's look for its limi
         notes=["*hard_real*: real test photos the model gets wrong · *borderline*: real photos it is barely sure about · *synthetic*: real photos we edited · *other_domain*: photos from a different dataset · *out_of_scope*: not walls at all."],
         params=['group = "all" #@param ["all", "hard_real", "borderline", "synthetic", "other_domain", "out_of_scope"]'],
     ))
-    cells.append(form(
-        "▶ Step 3b · Break it yourself",
-        f'lab.playground("{B}")',
-        notes=["Move the sliders: rotate, zoom, blur, darken, cast a shadow, add noise, draw a dark line. The model re-runs after every change. Try to flip its answer with the *smallest* possible change."],
-    ))
+    if gradio:
+        cells.append(form(
+            "▶ Step 3b · Break it yourself",
+            f'lab.playground_app("{B}")',
+            notes=["An app appears below (give it a few seconds). **Sliders tab:** rotate, zoom, blur, darken, cast a shadow, add noise, draw a dark line; the model re-runs every time you let go of a slider. Try to flip its answer with the *smallest* possible change.",
+                   "**Draw on it tab:** paint a crack, a stain or a shadow on the photo with the brush and watch the verdict change. You can also upload or photograph your own wall and draw on that."],
+        ))
+    else:
+        cells.append(form(
+            "▶ Step 3b · Break it yourself",
+            f'lab.playground("{B}")',
+            notes=["Move the sliders: rotate, zoom, blur, darken, cast a shadow, add noise, draw a dark line. The model re-runs after every change. Try to flip its answer with the *smallest* possible change."],
+        ))
     cells.append(form(
         "▶ Step 3c · A model from a different world",
         "lab.domain_shift()",
@@ -240,15 +250,25 @@ A model only knows the kind of photos it was trained on. Let's look for its limi
 
 **CLIP** is a model trained on hundreds of millions of internet photos *together with their captions*. It can compare a photo with any sentence you type. That means you can invent classes on the spot, with no labelled photos: type the class names, and CLIP picks the closest one for each image. This is called **zero-shot** classification.
 """))
-    cells.append(form(
-        "▶ Step 5a · Type your own classes",
-        "lab.zero_shot(class_names, how_many, source)",
-        notes=["Separate the class names with commas. Try short and descriptive names (*a brick wall*, *a cracked wall*, ...). Run it several times with different names.",
-               "The first run downloads CLIP (about a minute)."],
-        params=[f'class_names = "{v["zero_shot_default"]}" #@param {{type:"string"}}',
-                'how_many = 8 #@param {type:"slider", min:4, max:16, step:4}',
-                'source = "test photos" #@param ["test photos", "tricky photos"]'],
-    ))
+    if gradio:
+        cells.append(form(
+            "▶ Step 5a · Type your own classes",
+            'lab.zero_shot_app(class_names, how_many)',
+            notes=["An app appears below. Type class names separated by commas and click **Classify**. The photos stay the same until you click *New photos*, so change the wording and click again to see exactly what your words changed. Try short and descriptive names (*a brick wall*, *a cracked wall*, ...).",
+                   "Second tab: classify your own photo with your own class names. The first click loads CLIP (about a minute)."],
+            params=[f'class_names = "{v["zero_shot_default"]}" #@param {{type:"string"}}',
+                    'how_many = 8 #@param {type:"slider", min:4, max:16, step:4}'],
+        ))
+    else:
+        cells.append(form(
+            "▶ Step 5a · Type your own classes",
+            "lab.zero_shot(class_names, how_many, source)",
+            notes=["Separate the class names with commas. Try short and descriptive names (*a brick wall*, *a cracked wall*, ...). Run it several times with different names.",
+                   "The first run downloads CLIP (about a minute)."],
+            params=[f'class_names = "{v["zero_shot_default"]}" #@param {{type:"string"}}',
+                    'how_many = 8 #@param {type:"slider", min:4, max:16, step:4}',
+                    'source = "test photos" #@param ["test photos", "tricky photos"]'],
+        ))
     questions.append((7, "Which class names did you try, and did CLIP's answers make sense? Give one construction task where inventing classes like this would be good enough, and one where you would rather train a model on labelled photos. Explain the difference."))
     cells.append(q(*questions[-1]))
 
@@ -309,10 +329,11 @@ lab.train_my_model(task, n, passes, start, run_name)""",
         "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
         "language_info": {"name": "python"},
     })
-    out = REPO / v["file"]
+    out = REPO / (v["file"].replace(".ipynb", "_gradio.ipynb") if gradio else v["file"])
     nbformat.write(nb, str(out))
     print("wrote", out)
-    write_report_template(variant, v, questions, B, M)
+    if not gradio:  # the copies share the originals' report templates (same questions)
+        write_report_template(variant, v, questions, B, M)
 
 
 def write_report_template(variant, v, questions, B, M):
@@ -330,5 +351,7 @@ def write_report_template(variant, v, questions, B, M):
 
 
 if __name__ == "__main__":
-    for variant in (sys.argv[1:] or VARIANTS):
-        build(variant)
+    args = sys.argv[1:]
+    gradio = "--gradio" in args
+    for variant in ([a for a in args if not a.startswith("--")] or VARIANTS):
+        build(variant, gradio=gradio)
