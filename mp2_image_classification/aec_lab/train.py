@@ -86,7 +86,8 @@ def quick_train(train_set: ImageSet, test_set: ImageSet, base_model_dir, *, n_tr
     scaler = torch.amp.GradScaler("cuda", enabled=device.type == "cuda")
     clf = Classifier(model, train_set.pretty_classes, name=name, device=device)
     history = []
-    log(f"Training '{name}' on {len(sub)} {('pretrained' if pretrained else 'randomly initialised')} "
+    log(f"Training '{name}' on {len(sub)} photos, starting from a "
+        f"{'pretrained' if pretrained else 'randomly initialised'} network, "
         f"for {epochs} pass(es) over the data, on {'GPU' if device.type == 'cuda' else 'CPU'}.")
     t0 = time.time()
     for ep in range(1, epochs + 1):
@@ -107,7 +108,8 @@ def quick_train(train_set: ImageSet, test_set: ImageSet, base_model_dir, *, n_tr
         model.eval()
         acc, n_test = accuracy(clf, test_set, max_test, seed)
         history.append({"pass": ep, "train_loss": tot / max(1, n), "test_accuracy": acc})
-        log(f"  pass {ep}: training loss {tot / max(1, n):.3f}  |  accuracy on {n_test} unseen test photos: {acc * 100:.1f}%")
+        # the loss is kept in `history` for the instructor-side logs, but not shown to students
+        log(f"  pass {ep}: accuracy on {n_test} unseen test photos: {acc * 100:.1f}%")
     log(f"Done in {time.time() - t0:.0f} s.")
     return clf, history
 
