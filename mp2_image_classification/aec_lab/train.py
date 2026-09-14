@@ -120,8 +120,14 @@ def add_to_leaderboard(name: str, n_train: int, epochs: int, pretrained: bool, a
                         "time (s)": round(seconds), "note": note})
 
 
+# columns shown to students; "start" (pretrained / random) stays in LEADERBOARD and is printed by
+# lab.report_summary(), it is only left out of the table to keep it readable
+LEADERBOARD_COLUMNS = ["run", "name", "training photos", "passes", "test accuracy", "time (s)", "note"]
+
+
 def leaderboard_table():
     import pandas as pd
     if not LEADERBOARD:
-        return pd.DataFrame(columns=["run", "name", "training photos", "passes", "start", "test accuracy", "time (s)"])
-    return pd.DataFrame(LEADERBOARD).sort_values("test accuracy", ascending=False).reset_index(drop=True)
+        return pd.DataFrame(columns=LEADERBOARD_COLUMNS)
+    df = pd.DataFrame(LEADERBOARD).sort_values("test accuracy", ascending=False).reset_index(drop=True)
+    return df[[c for c in LEADERBOARD_COLUMNS if c in df.columns]]

@@ -112,10 +112,22 @@ def build(variant: str, gradio: bool = False):
 
     cells.append(form(
         "▶ Step 0 · Run me first (1–2 minutes)",
-        f"""import os, sys, subprocess
-if not os.path.isdir("CEM4644/mp2_image_classification"):
-    subprocess.run(["git", "clone", "--depth", "1", "-q", "{GITHUB_URL}"], check=True)
-sys.path.insert(0, os.path.abspath("CEM4644/mp2_image_classification"))
+        f"""import importlib, os, shutil, subprocess, sys
+REPO, FOLDER, PKG = "CEM4644", "mp2_image_classification", "aec_lab"
+
+def _git(*args):
+    return subprocess.run(["git", "-C", REPO, *args], capture_output=True, text=True).returncode == 0
+
+if os.path.isdir(REPO):                      # a copy is already here: pull the newest course code over it
+    if not (_git("fetch", "-q", "--depth", "1", "origin", "master")
+            and _git("reset", "-q", "--hard", "FETCH_HEAD") and _git("clean", "-qfd")):
+        shutil.rmtree(REPO, ignore_errors=True)          # broken copy: start again from scratch
+if not os.path.isdir(REPO):
+    subprocess.run(["git", "clone", "--depth", "1", "-q", "{GITHUB_URL}", REPO], check=True)
+for _m in [m for m in list(sys.modules) if m == PKG or m.startswith(PKG + ".")]:
+    del sys.modules[_m]                      # Python caches imported code: drop it, or this cell keeps the old version
+importlib.invalidate_caches()
+sys.path.insert(0, os.path.abspath(os.path.join(REPO, FOLDER)))
 from aec_lab import lab
 lab.setup(binary="{v['binary']}", multiclass="{v['multiclass']}", task_names={json.dumps(v['task_names'], ensure_ascii=False)}{', gradio="' + GRADIO_VERSION + '"' if gradio else ''})""",
         notes=["Click ▶ and wait for the green ✅ line. This downloads the photos and the course models. Nothing else to do here.",
@@ -265,7 +277,8 @@ lab.train_my_model(task, n, passes, start, run_name)""",
                 'run_name = "run 1" #@param {type:"string"}'],
     ))
     cells.append(form("▶ Step 5b · Leaderboard", "lab.leaderboard()",
-                      notes=["All your runs, best first. Copy this table into your report."]))
+                      notes=["All your runs, best first. Copy this table into your report.",
+                             "The last step of the notebook also lists which runs started from a *pretrained* and which from a *random* network."]))
     cells.append(form("▶ Step 5c · Your model vs. the course model on the tricky photos", f'lab.compare_my_model("{B}")',
                       notes=["Each photo shows the verdict of the course model and of your latest model for this task."]))
     questions.append((len(questions) + 1, "Copy your leaderboard. How did accuracy change with more training photos and more passes? What happened with a *random* start compared with a *pretrained* start, and why do you think that is?"))

@@ -83,10 +83,22 @@ def build(variant):
 """))
     cells.append(form(
         "▶ Step 0 · Run me first (2–3 minutes)",
-        f"""import os, sys, subprocess
-if not os.path.isdir("CEM4644/mp4_segmentation"):
-    subprocess.run(["git", "clone", "--depth", "1", "-q", "{GITHUB_URL}"], check=True)
-sys.path.insert(0, os.path.abspath("CEM4644/mp4_segmentation"))
+        f"""import importlib, os, shutil, subprocess, sys
+REPO, FOLDER, PKG = "CEM4644", "mp4_segmentation", "aec_seg"
+
+def _git(*args):
+    return subprocess.run(["git", "-C", REPO, *args], capture_output=True, text=True).returncode == 0
+
+if os.path.isdir(REPO):                      # a copy is already here: pull the newest course code over it
+    if not (_git("fetch", "-q", "--depth", "1", "origin", "master")
+            and _git("reset", "-q", "--hard", "FETCH_HEAD") and _git("clean", "-qfd")):
+        shutil.rmtree(REPO, ignore_errors=True)          # broken copy: start again from scratch
+if not os.path.isdir(REPO):
+    subprocess.run(["git", "clone", "--depth", "1", "-q", "{GITHUB_URL}", REPO], check=True)
+for _m in [m for m in list(sys.modules) if m == PKG or m.startswith(PKG + ".")]:
+    del sys.modules[_m]                      # Python caches imported code: drop it, or this cell keeps the old version
+importlib.invalidate_caches()
+sys.path.insert(0, os.path.abspath(os.path.join(REPO, FOLDER)))
 from aec_seg import lab
 lab.setup(dataset="{spec.key}", load_model=load_model, plans={json.dumps(v['plans'])})""",
         notes=["Click ▶ and wait for the green ✅ line. This downloads the photos with their precomputed results and loads SAM 3 (about 3 GB).",
