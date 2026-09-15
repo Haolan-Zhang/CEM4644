@@ -1,147 +1,127 @@
-"""Photo sets, material vocabulary (the phrases sent to SAM 3), time series and plan facts."""
+"""Plan sets and the vocabulary (the phrases sent to SAM 3) of the floor-plan take-off lab."""
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
+
+CUBICASA = {
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+}
 
 
 @dataclass
-class Material:
+class Thing:
+    """Something students can ask SAM 3 for on a plan.
+    kind: room (an area), fixture (a symbol), opening (door / window), structure (walls).
+    truth: how to look it up in the answer key: ("rooms", <type>) / ("rooms", None) / ("fixtures", <type>) /
+           ("doors", None) / ("windows", None) / ("walls", None) / None (no ground truth)."""
     key: str
-    name: str                     # what students see
-    prompt: str                   # phrase sent to SAM 3 (the wording that works best)
-    alternatives: List[str]       # other wordings, for the "does the phrase matter?" exercise
+    name: str
+    prompt: str
+    alternatives: List[str]
     color: str
+    kind: str = "room"
+    truth: Optional[Tuple[str, Optional[str]]] = None
+
+
+THINGS: List[Thing] = [
+    Thing("room", "room (any)", "room", ["a room", "space", "floor area"], "#9aa5b1", "room", ("rooms", None)),
+    Thing("bedroom", "bedroom", "bedroom", ["bed", "sleeping room"], "#457b9d", "room", ("rooms", "bedroom")),
+    Thing("bathroom", "bathroom", "bathroom", ["shower room", "wc", "toilet room"], "#4cc9f0", "room", ("rooms", "bathroom")),
+    Thing("kitchen", "kitchen", "kitchen", ["kitchen counter", "cooker", "kitchen cabinets"], "#f4a261", "room", ("rooms", "kitchen")),
+    Thing("living", "living room", "living room", ["lounge", "sofa", "living area"], "#e9c46a", "room", ("rooms", "living room")),
+    Thing("balcony", "balcony / terrace", "balcony", ["terrace", "outdoor area", "patio"], "#06d6a0", "room", ("rooms", "balcony / terrace")),
+    Thing("toilet", "toilet", "toilet", ["wc", "lavatory", "toilet bowl"], "#7b2cbf", "fixture", ("fixtures", "toilet")),
+    Thing("sink", "sink", "sink", ["wash basin", "basin", "washbasin"], "#2a9d8f", "fixture", ("fixtures", "sink")),
+    Thing("bathtub", "bathtub", "bathtub", ["bath", "tub", "shower"], "#e63946", "fixture", ("fixtures", "bathtub")),
+    Thing("stairs", "stairs", "stairs", ["staircase", "steps", "stairway"], "#8d6e63", "fixture", ("fixtures", "stairs")),
+    Thing("door", "door", "door", ["door swing", "doorway", "door arc"], "#ffd166", "opening", ("doors", None)),
+    Thing("window", "window", "window", ["window opening", "glass", "window in a wall"], "#bde0fe", "opening", ("windows", None)),
+    Thing("wall", "wall", "wall", ["black wall", "thick black line", "walls"], "#333333", "structure", ("walls", None)),
+]
+
+# Plan-language legend: the drawings come from Finland (and one from Sweden). Room labels are abbreviations.
+LEGEND = {
+    "OH": "olohuone = living room", "MH": "makuuhuone = bedroom", "K / KT / KEITTIÖ": "keittiö = kitchen",
+    "KH / KPH": "kylpyhuone = bathroom", "WC": "toilet", "S": "sauna", "ET": "eteinen = entrance hall",
+    "VH": "vaatehuone = walk-in closet", "PH": "pesuhuone = washroom", "KHH": "kodinhoitohuone = utility room",
+    "VAR": "varasto = storage", "TK": "tekninen tila = technical room", "PARVEKE / PARV": "balcony", "TERASSI": "terrace",
+    "AT / AUTOTALLI": "garage", "RT": "ruokailutila = dining area", "TUPA": "farmhouse living room",
+    "SOVR / KÖK / BAD / HALL": "Swedish: bedroom / kitchen / bathroom / hall", "m²": "square metres (printed on some plans)",
+}
 
 
 @dataclass
-class SetSpec:
+class PlanSet:
     key: str
     title: str
-    folder: str                   # repo-relative photo folder
-    masks: str                    # repo-relative precomputed-mask folder
+    folder: str
+    masks: str
     description: str
-    materials: List[Material]
-    series: Dict[str, dict] = field(default_factory=dict)   # name -> {"title", "photos": [ids], "labels": [..]}
-    phrase_lab_photos: List[str] = field(default_factory=list)  # photos with all alternative phrasings precomputed
-    guess_photos: List[str] = field(default_factory=list)
-    plans: List[dict] = field(default_factory=list)
+    plans: Dict[str, dict]                    # id -> {"factor", "title", "note"} (factor: resampling of the 1 px = 1 cm source)
+    default_plan: str
+    compare_default: Tuple[str, str]
+    things: List[Thing] = field(default_factory=lambda: list(THINGS))
 
-    def material(self, name_or_key: str) -> Material:
-        for m in self.materials:
-            if name_or_key in (m.key, m.name, m.prompt):
-                return m
+    def thing(self, name_or_key: str) -> Thing:
+        for t in self.things:
+            if name_or_key in (t.key, t.name, t.prompt):
+                return t
         raise KeyError(name_or_key)
 
     @property
     def names(self) -> List[str]:
-        return [m.name for m in self.materials]
+        return [t.name for t in self.things]
+
+    @property
+    def ids(self) -> List[str]:
+        return list(self.plans)
 
 
-SETS: Dict[str, SetSpec] = {}
+SETS: Dict[str, PlanSet] = {}
 
 
-def register(spec: SetSpec):
+def register(spec: PlanSet):
     SETS[spec.key] = spec
     return spec
 
 
-register(SetSpec(
-    key="site",
-    title="Structural work on site: concrete, rebar, formwork, steel, scaffolding",
-    folder="data/photos/site",
-    masks="data/masks/site",
-    description=("Photos of foundations, frames and concrete pours, from a 1937 public-domain project record to sites of the 2020s. "
-                 "All from Wikimedia Commons under open licences (credits at the bottom of the notebook)."),
-    materials=[
-        Material("concrete", "concrete", "concrete", ["wet concrete", "cement", "concrete wall", "concrete floor"], "#9aa5b1"),
-        Material("rebar", "rebar (reinforcing steel)", "steel reinforcement bars", ["rebar", "reinforcing steel", "metal rods", "rebar mesh"], "#e63946"),
-        Material("formwork", "formwork", "wooden formwork", ["formwork", "wooden boards", "timber shuttering", "plywood panels"], "#f4a261"),
-        Material("scaffolding", "scaffolding", "scaffolding", ["scaffold", "metal scaffolding", "scaffold poles"], "#ffd166"),
-        Material("steel", "structural steel", "steel beam", ["steel frame", "structural steel", "steel column", "girder"], "#4cc9f0"),
-        Material("brick", "brick / blockwork", "brick wall", ["bricks", "masonry", "concrete blocks", "block wall"], "#b5651d"),
-        Material("soil", "soil / ground", "soil", ["dirt", "ground", "gravel", "mud"], "#8d6e63"),
-        Material("wood", "timber", "wood", ["timber", "wooden planks", "lumber"], "#c9a227"),
-        Material("worker", "worker", "worker", ["person", "construction worker", "man"], "#06d6a0"),
-        Material("machine", "machine / vehicle", "construction machine", ["excavator", "crane", "truck", "concrete pump"], "#7b2cbf"),
-        Material("sky", "sky", "sky", ["clouds"], "#bde0fe"),
-    ],
-    series={
-        "A": {"title": "House footings, Trimingham (UK), January 2021", "photos": ["site_07", "site_08", "site_09"],
-              "labels": ["8 Jan: pouring footings", "13 Jan: blockwork on footings", "18 Jan: concrete oversite"]},
-        "B": {"title": "Administration building, Belchertown (USA), 1937-1939", "photos": ["site_23", "site_24", "site_25", "site_26", "site_27", "site_28", "site_29", "site_30", "site_31", "site_32"],
-              "labels": ["Aug 1937: foundation", "Sep 1937: forms + rebar", "Oct 1937: foundation walls", "Nov 2 1937", "Nov 30 1937: steel", "Dec 1937: brickwork", "Jan 1938", "May 1938", "Aug 1938", "Sep 1939: finished"]},
+register(PlanSet(
+    key="homes_a",
+    title="Residential floor plans, set A",
+    folder="data/plans/homes_a",
+    masks="data/masks/homes_a",
+    description=("Six real architectural floor plans of Finnish homes from the CubiCasa5K dataset (CC BY-NC-SA 4.0), redrawn at a known scale "
+                 "with a 5 m scale bar. Each plan comes with an answer key (every room's real area, every door, window and fixture) that the "
+                 "notebook uses to check your measurements."),
+    plans={
+        "13828": {"factor": 0.55, "title": "detached house with furniture, 8 rooms", "note": "CAD plan, furniture and dimension strings"},
+        "9493": {"factor": 0.70, "title": "detached house with garage and terrace", "note": "CAD plan with furniture; printed room areas"},
+        "14466": {"factor": 0.85, "title": "apartment with balcony (bold walls)", "note": "simple bold-wall plan"},
+        "11032": {"factor": 0.75, "title": "detached house with terrace", "note": "CAD plan with furniture"},
+        "548": {"factor": 0.90, "title": "apartment next to a stair core", "note": "bold walls, few symbols"},
+        "1902": {"factor": 1.20, "title": "studio flat, 24 m² (bold walls)", "note": "small plan with printed areas"},
     },
-    phrase_lab_photos=["site_01", "site_07", "site_11", "site_14", "site_18", "site_27"],
-    guess_photos=["site_01", "site_04", "site_09", "site_12", "site_18", "site_19", "site_28"],
+    default_plan="13828",
+    compare_default=("13828", "9493"),
 ))
 
-register(SetSpec(
-    key="interior",
-    title="Interior finishing: drywall, studs, insulation, pipes, tiles",
-    folder="data/photos/interior",
-    masks="data/masks/interior",
-    description=("Photos of interior fit-out: drywall (plasterboard) being installed, stud walls, insulation, services and tiling, "
-                 "plus three 1938 interiors from the Belchertown project record. All from Wikimedia Commons under open licences."),
-    materials=[
-        Material("drywall", "drywall (plasterboard)", "drywall panel", ["drywall", "sheetrock", "plasterboard sheet", "gypsum board"], "#e9ecef"),
-        Material("stud", "studs / framing", "metal framing", ["metal stud", "wooden stud", "wall framing", "steel frame"], "#c9a227"),
-        Material("insulation", "insulation", "insulation", ["fiberglass insulation", "pink insulation", "mineral wool"], "#ff70a6"),
-        Material("pipe", "pipes / ducts", "pipe", ["plumbing pipes", "duct", "metal pipe", "conduit"], "#4cc9f0"),
-        Material("tile", "tiles", "tile", ["wall tiles", "ceramic tiles", "floor tiles"], "#06d6a0"),
-        Material("concrete", "concrete", "concrete", ["concrete floor", "concrete wall", "cement"], "#9aa5b1"),
-        Material("ceiling", "ceiling", "ceiling", ["ceiling panels", "roof"], "#bde0fe"),
-        Material("floor", "floor", "floor", ["ground", "flooring"], "#8d6e63"),
-        Material("window", "windows / openings", "window", ["window frame", "door", "opening"], "#ffd166"),
-        Material("worker", "worker", "worker", ["person", "man"], "#7b2cbf"),
-    ],
-    series={
-        "C": {"title": "Belchertown interiors, 1938", "photos": ["int_11", "int_12", "int_13"],
-              "labels": ["Jan 1938: boiler room", "Mar 1938: plumbing", "Jun 1938: tiling"]},
+register(PlanSet(
+    key="homes_b",
+    title="Residential floor plans, set B",
+    folder="data/plans/homes_b",
+    masks="data/masks/homes_b",
+    description=("Seven other real floor plans from CubiCasa5K (CC BY-NC-SA 4.0): larger houses, two-storey plans with both floors on one sheet, "
+                 "a Swedish-labelled plan and a small flat with printed room areas. Same scale bar, same answer keys."),
+    plans={
+        "14341": {"factor": 0.60, "title": "long single-storey house, 20 rooms", "note": "CAD plan with furniture"},
+        "5018": {"factor": 0.45, "title": "two-storey house: ground floor (left) and upper floor (right)", "note": "both floors on one sheet; printed floor areas"},
+        "1217": {"factor": 0.50, "title": "two-storey villa, Swedish labels", "note": "both floors on one sheet"},
+        "8138": {"factor": 0.80, "title": "apartment with bold walls and furniture", "note": "clean plan, clear symbols"},
+        "9136": {"factor": 0.85, "title": "two-storey house, both floors stacked on the sheet", "note": "CAD plan, ground floor on top"},
+        "11615": {"factor": 1.30, "title": "small flat A3 with printed room areas", "note": "printed m² next to the room names"},
+        "10715": {"factor": 0.90, "title": "apartment (bold walls)", "note": "bold-wall plan"},
     },
-    phrase_lab_photos=["int_07", "int_13", "int_17", "int_21"],
-    guess_photos=["int_06", "int_07", "int_09", "int_16", "int_19", "int_23"],
-))
-
-register(SetSpec(
-    key="plans",
-    title="Real foundation plans: quantity take-off of footings",
-    folder="data/photos/plans",
-    masks="data/masks/plans",
-    description=("Plan-view regions of real foundation plans: two 1956 US Army standard drawings (US Army Corps of Engineers) and two "
-                 "Library of Congress HABS/HAER sheets, all public domain, via Wikimedia Commons. Construction words find nothing on a "
-                 "drawing; shape words ('small square', 'circle') and boxes do."),
-    materials=[],
-    plans=[
-        {"id": "plan_dormitory",
-         "short": "Airmen's dormitory (US Army, 1956): a grid of square footings F1–F6 with a footing schedule",
-         "reference": "the 19'-4\" bay between column lines 1 and 2 (top dimension line)", "reference_width_ft": 19.33,
-         "reference_hint": "draw the box from column line 1 to column line 2; only its WIDTH is used for the scale",
-         "targets": ["one F2 footing on the top row (schedule: 4'-6\" square = 20.25 sq ft; it is only about 30 px wide here, so the box must sit exactly on its outline)",
-                     "one footing of the middle row (read its mark and look it up in the schedule)",
-                     "then tick find_all to count every footing like your box"],
-         "phrases": ["footing", "small square", "circle"], "phrase_default": "footing",
-         "expected": {"F2 footing": 20.25, "F3 footing": 25.0}},
-        {"id": "plan_mess_hall",
-         "short": "Kitchen and mess hall (US Army, 1956): 14 column footings, each 6'-0\" square, on 24'-0\" bays",
-         "reference": "the 24'-0\" bay between column lines E and F (bottom dimension line)", "reference_width_ft": 24.0,
-         "reference_hint": "box from bubble E to bubble F along the bottom; only its WIDTH is used",
-         "targets": ["one column footing (detail: 6'-0\" square = 36 sq ft)", "find_all: 14 footings, 504 sq ft in total"],
-         "phrases": ["footing", "small square", "circle"], "phrase_default": "footing",
-         "expected": {"column footing": 36.0, "all 14 column footings": 504.0}},
-        {"id": "plan_whittier",
-         "short": "Whittier State School hospital (HABS, 1930s): 36 numbered columns on octagonal footings of six sizes",
-         "reference": "one of the two 12'-0\" bays in the middle of the bottom dimension line", "reference_width_ft": 12.0,
-         "reference_hint": "box between the two ticks of a 12'-0\" bay; only its WIDTH is used",
-         "targets": ["the footing of column 7, 11, 15 or 19 (detail: 5'-4\" across, octagonal, about 23.6 sq ft)",
-                     "the footing of column 6, 10, 14 or 18 (the other interior size)", "find_all: which columns does it miss?"],
-         "phrases": ["footing", "small square", "circle", "octagon"], "phrase_default": "footing",
-         "expected": {"footing of columns 7-11-15-19": 23.6}},
-        {"id": "plan_mill",
-         "short": "Shenandoah-Dives Mill (HAER, CAD drawing): foundation walls, two circular tanks and a graphic scale bar",
-         "reference": "the graphic scale bar, from 0 to 50 FEET", "reference_width_ft": 50.0,
-         "reference_hint": "box exactly from the 0 tick to the 50 tick of the FEET bar; only its WIDTH is used",
-         "targets": ["one of the two circular tanks at the bottom left", "the hatched circle next to them",
-                     "try the word 'circle' in Step 5a first"],
-         "phrases": ["tank", "circle", "wall", "small square"], "phrase_default": "tank",
-         "expected": {}},
-    ],
+    default_plan="14341",
+    compare_default=("14341", "1217"),
 ))

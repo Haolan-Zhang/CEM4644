@@ -2,13 +2,13 @@
 
 Name: ______________________    Date: ____________
 
-Notebook: `MP4_Workshop_Segmentation.ipynb` — photos: *Structural work on site: concrete, rebar, formwork, steel, scaffolding*.
+Notebook: `MP4_Workshop_Segmentation.ipynb` — plans: *Residential floor plans, set A*.
 
-Answer every question in a few sentences. Paste screenshots where the question asks for photos or overlays. Numbers must come from **your** run of the notebook.
+Answer every question in a few sentences. Paste screenshots where the question asks for overlays or tables. Numbers must come from **your** run of the notebook.
 
 ## Question 1
 
-What was your score in the estimation game? Pick one photo and give its material mix at confidence 0.5 (the numbers from Step 2b). Then move the threshold to 0.3 and 0.8 for one material: how much does the share change, and why?
+From Step 2a and 2b: which words found what they should (rooms? toilets? windows? doors?), and which found nothing or something else? Give the found / missed / extra counts for two things on one plan at confidence 0.3, and say what the misses have in common.
 
 *Your answer:*
 
@@ -16,7 +16,7 @@ What was your score in the estimation game? Pick one photo and give its material
 
 ## Question 2
 
-From Step 3b: which materials rise and which fall over the series, and does that match what a site manager would expect? Give one example where the number changes for a reason that has nothing to do with progress (camera position, sky, an old black-and-white photo...).
+From Step 2c: for one plan, copy the table of square metres per room type (SAM 3 vs the drawing). Which room type is measured best and which worst, and why (merged rooms, furniture, open-plan kitchen and living room)? Then move the confidence to 0.2 and 0.7: what changes? Also give your score in the estimation game.
 
 *Your answer:*
 
@@ -24,7 +24,7 @@ From Step 3b: which materials rise and which fall over the series, and does that
 
 ## Question 3
 
-From Step 4a: which wording gave the most sensible mask for the material you chose, and how far apart were the shares? Why would *rebar* and *steel reinforcement bars* give different answers?
+From Step 3b: which rooms did you measure, what did you get, and what does the drawing say? Give the error in percent for each and explain where it comes from (your box, the mask stopping at furniture or a door opening, the scale).
 
 *Your answer:*
 
@@ -32,7 +32,7 @@ From Step 4a: which wording gave the most sensible mask for the material you cho
 
 ## Question 4
 
-Describe one mistake you found in Step 4b or 4c (what was included or missed, at which confidence). Did the negative box fix it? What would you tell a colleague who wants to use these percentages in a progress report?
+From Step 3b with *find_all* on a window: how many windows does the drawing have, how many did SAM 3 find, how many did it miss and how many were extra? Which confidence worked best, and what did the extras have in common?
 
 *Your answer:*
 
@@ -40,7 +40,7 @@ Describe one mistake you found in Step 4b or 4c (what was included or missed, at
 
 ## Question 5
 
-Plan *plan_dormitory* (Step 5a and 5b): which words found the footings and which found nothing? Give the scale you got from the 19'-4" bay (feet per pixel), the measured area of one F2 and one F3 footing, and compare with the footing schedule on the drawing (4'-6" and 5'-0" square). Where does the error come from: your box, the mask edge, or the drawing?
+From Step 4a: which plan has more bedroom area and more bathroom area according to SAM 3, and does the drawing agree? From Step 4b: which wording worked best for the thing you chose, and how different were the areas?
 
 *Your answer:*
 
@@ -48,7 +48,7 @@ Plan *plan_dormitory* (Step 5a and 5b): which words found the footings and which
 
 ## Question 6
 
-Plan *plan_mess_hall*: with the 24'-0" bay as reference, measure one column footing (the detail says 6'-0" square) and then use *find_all* to count the column footings. How many did SAM 3 find, what total area, and what should the answer be (14 footings of 36 sq ft)? List what it missed and what it added that is not a footing, and say which confidence worked best.
+Describe one mistake you found in Step 4c or 4d (what was included or missed, at which confidence). Did the negative box fix it? What would you tell a colleague who wants to use these square metres in a cost estimate?
 
 *Your answer:*
 
@@ -56,7 +56,7 @@ Plan *plan_mess_hall*: with the 24'-0" bay as reference, measure one column foot
 
 ## Question 7
 
-Test 1 photo(s) of your own (walls, floors, a site, a street). For each: the phrase you used, the share measured, and whether the mask is right. What kind of surface or wording failed?
+Test 1 plan(s) of your own (any floor plan from the internet or a course). For each: the phrase you used, the count and area measured, and whether the mask is right. What kind of drawing or wording failed?
 
 *Your answer:*
 
@@ -64,7 +64,7 @@ Test 1 photo(s) of your own (walls, floors, a site, a street). For each: the phr
 
 ## Question 8
 
-Where on a project would a measurement like *share of the photo covered by X* be useful, and where would it mislead? What would you need (camera position, reference lengths, drawings, several photos) to turn it into a real quantity?
+Where in a project would a take-off like this be useful, and where would it mislead? What would you need (clean drawings, a scale, a room schedule, a person checking) to turn it into numbers you would put in an estimate?
 
 *Your answer:*
 

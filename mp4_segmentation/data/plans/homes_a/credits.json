@@ -1,0 +1,80 @@
+[
+  {
+    "id": "13828",
+    "file": "13828.png",
+    "title": "detached house with furniture, 8 rooms",
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+    "note": "CubiCasa5K sample 13828; CAD plan, furniture and dimension strings",
+    "size": [
+      1540,
+      1122
+    ]
+  },
+  {
+    "id": "9493",
+    "file": "9493.png",
+    "title": "detached house with garage and terrace",
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+    "note": "CubiCasa5K sample 9493; CAD plan with furniture; printed room areas",
+    "size": [
+      1558,
+      1124
+    ]
+  },
+  {
+    "id": "14466",
+    "file": "14466.png",
+    "title": "apartment with balcony (bold walls)",
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+    "note": "CubiCasa5K sample 14466; simple bold-wall plan",
+    "size": [
+      948,
+      993
+    ]
+  },
+  {
+    "id": "11032",
+    "file": "11032.png",
+    "title": "detached house with terrace",
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+    "note": "CubiCasa5K sample 11032; CAD plan with furniture",
+    "size": [
+      1578,
+      1215
+    ]
+  },
+  {
+    "id": "548",
+    "file": "548.png",
+    "title": "apartment next to a stair core",
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+    "note": "CubiCasa5K sample 548; bold walls, few symbols",
+    "size": [
+      890,
+      901
+    ]
+  },
+  {
+    "id": "1902",
+    "file": "1902.png",
+    "title": "studio flat, 24 m² (bold walls)",
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+    "note": "CubiCasa5K sample 1902; small plan with printed areas",
+    "size": [
+      715,
+      1060
+    ]
+  }
+]

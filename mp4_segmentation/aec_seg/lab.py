@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from . import ui, viz
-from .config import SETS, Material, SetSpec
-from .data import MaskStore, PhotoSet
+from .config import SETS, PlanSet as PlanSpec, Thing
+from .data import MaskStore, PlanSet
 from .engine import SegResult, Sam3Engine
 
 TRANSFORMERS_MIN = "4.57.2"
@@ -20,18 +20,15 @@ class SegLab:
     def __init__(self):
         self.root = Path(__file__).resolve().parents[1]
         self.ready = False
-        self.spec: Optional[SetSpec] = None
-        self.photos: Optional[PhotoSet] = None
+        self.spec: Optional[PlanSpec] = None
+        self.plans: Optional[PlanSet] = None
         self.store: Optional[MaskStore] = None
         self.engine: Optional[Sam3Engine] = None
-        self.plans: Optional[PhotoSet] = None
-        self.plan_specs = []
         self._cache: Dict[tuple, SegResult] = {}
-        self.notes = {}
+        self.apps = {}
 
     # ------------------------------------------------------------------ setup
-    def setup(self, dataset: str = "site", load_model: bool = True, plans=False, install: bool = True):
-        """plans: False, True (all plan drawings) or a list of plan ids."""
+    def setup(self, dataset: str = "homes_a", load_model: bool = True, install: bool = True):
         t0 = time.time()
         if install and not self._ensure_packages():
             return
@@ -41,12 +38,8 @@ class SegLab:
         except Exception:
             pass
         self.spec = SETS[dataset]
-        self.photos = PhotoSet(self.root / self.spec.folder, dataset)
+        self.plans = PlanSet(self.root / self.spec.folder, dataset)
         self.store = MaskStore(self.root / self.spec.masks)
-        if plans:
-            self.plans = PhotoSet(self.root / SETS["plans"].folder, "plans")
-            ids = [p["id"] for p in SETS["plans"].plans] if plans is True else [str(x) for x in plans]
-            self.plan_specs = [p for p in SETS["plans"].plans if p["id"] in ids]
         if load_model:
             try:
                 self.engine = Sam3Engine(log=print)
@@ -88,101 +81,86 @@ class SegLab:
     def intro(self):
         self._need()
         s = self.spec
-        print(f"\n■ Photos: {s.title}")
+        print(f"\n■ Plans: {s.title}")
         print(f"  {s.description}")
-        print(f"  {len(self.photos)} photos. Materials you can ask for: " + ", ".join(m.name for m in s.materials))
-        if s.series:
-            for k, v in s.series.items():
-                print(f"  Time series {k}: {v['title']} ({len(v['photos'])} photos)")
-        if self.plans is not None:
-            print("  Plans for quantity take-off (real drawings, public domain):")
-            for p in self.plan_specs:
-                print(f"    {p['id']}: {p['short']}")
+        for p in self.plans.plans:
+            print(f"  {p.id}: {p.title} — {p.facts()}")
+        print("  Things you can ask for by name: " + ", ".join(t.name for t in s.things))
         print(f"  SAM 3 live model: {'loaded' if self.engine else 'not loaded (precomputed results only)'}")
 
     # ------------------------------------------------------------------ results
-    def get_phrase(self, photo_id: str, phrase: str, threshold: float = 0.2) -> SegResult:
-        key = (photo_id, phrase.strip().lower())
+    def get_phrase(self, plan_id: str, phrase: str, threshold: float = 0.1) -> SegResult:
+        key = (plan_id, phrase.strip().lower())
         if key in self._cache:
             return self._cache[key]
-        res = self.store.load(photo_id, phrase) if self.store else None
+        res = self.store.load(plan_id, phrase) if self.store else None
         if res is None:
             if self.engine is None:
-                raise RuntimeError(f"No precomputed result for '{phrase}' on {photo_id} and SAM 3 is not loaded.")
-            res = self.engine.segment(self.photos[photo_id].load(), phrase, threshold=threshold)
+                raise RuntimeError(f"No precomputed result for '{phrase}' on {plan_id} and SAM 3 is not loaded.")
+            res = self.engine.segment(self.plans[plan_id].load(), phrase, threshold=threshold)
         self._cache[key] = res
         return res
 
-    def get(self, photo_id: str, material: Material) -> SegResult:
-        return self.get_phrase(photo_id, material.prompt)
+    def get(self, plan_id: str, thing: Thing) -> SegResult:
+        return self.get_phrase(plan_id, thing.prompt)
 
     def _pid(self, label: str) -> str:
-        return self.photos[label].id
+        return self.plans[str(label)].id
 
     # ------------------------------------------------------------------ notebook steps
-    def show_photos(self, which="all"):
+    def show_plans(self, which="all"):
         self._need()
-        if which in ("all", None):
-            ui.gallery(self.photos, ncols=4, size=3.4, title=self.spec.title)
-        elif which in self.spec.series:
-            s = self.spec.series[which]
-            ui.gallery(self.photos, s["photos"], ncols=5, size=3.0, title=s["title"])
+        if which in ("all", None, "all plans"):
+            ui.gallery(self, ncols=2, size=5.2, title=self.spec.title)
         else:
-            ui.gallery(self.photos, [self._pid(which)], ncols=1, size=7)
+            ui.gallery(self, [self._pid(which)], ncols=1, size=9)
 
-    def segment(self, photo, material, threshold=0.5):
-        self._need()
-        ui.segment_view(self, self._pid(photo), material, float(threshold))
+    def legend(self):
+        ui.legend()
 
-    def material_mix(self, photo, threshold=0.5):
+    def segment(self, plan, thing, confidence=0.4):
         self._need()
-        ui.material_mix(self, self._pid(photo), float(threshold))
+        ui.segment_view(self, self._pid(plan), thing, float(confidence))
+
+    def count(self, plan, thing, confidence=0.4):
+        self._need()
+        ui.count_view(self, self._pid(plan), thing, float(confidence))
+
+    def mix(self, plan, confidence=0.4):
+        self._need()
+        ui.mix(self, self._pid(plan), float(confidence))
 
     def guess_game(self, rounds=4):
         self._need()
         ui.guess_game(self, int(rounds))
 
-    def compare(self, photo_a, photo_b, threshold=0.5):
+    def compare(self, plan_a, plan_b, confidence=0.4):
         self._need()
-        ui.compare(self, self._pid(photo_a), self._pid(photo_b), float(threshold))
+        ui.compare(self, self._pid(plan_a), self._pid(plan_b), float(confidence))
 
-    def series(self, name, threshold=0.5, materials=None):
+    def phrase_lab(self, plan, thing, confidence=0.4):
         self._need()
-        ui.series_view(self, name, float(threshold), materials)
+        ui.phrase_lab(self, self._pid(plan), thing, float(confidence))
 
-    def phrase_lab(self, photo, material, threshold=0.5):
+    def inspect(self, plan, thing):
         self._need()
-        pid = self._pid(photo)
-        if pid not in self.spec.phrase_lab_photos and self.engine is None:
-            print(f"Alternative wordings are precomputed for {', '.join(self.spec.phrase_lab_photos)}; pick one of those (or load SAM 3).")
-            return
-        ui.phrase_lab(self, pid, material, float(threshold))
+        ui.inspector(self, self._pid(plan), thing)
 
-    def inspect(self, photo, material):
+    def fix(self, plan, thing, confidence=0.4):
         self._need()
-        ui.inspector(self, self._pid(photo), material)
+        ui.fix_with_box(self, self._pid(plan), thing, float(confidence))
 
-    def fix(self, photo, material, threshold=0.5):
+    def your_phrase(self, plan, phrase, confidence=0.4):
         self._need()
-        ui.fix_with_box(self, self._pid(photo), material, float(threshold))
+        ui.live_phrase(self, self._pid(plan), str(phrase), float(confidence))
 
-    def your_phrase(self, photo, phrase, threshold=0.5):
+    def scale_check(self, plan):
         self._need()
-        ui.live_phrase(self, self._pid(photo), phrase, float(threshold))
-
-    def plan_phrase(self, plan, phrase, confidence=0.4):
-        """Step 5a: a phrase on a drawing (live model)."""
-        self._need()
-        if self.plans is None:
-            print("This notebook has no plan drawings."); return
-        ui.plan_phrase(self, self.plans[plan].id, str(phrase), float(confidence))
+        ui.scale_check(self, self._pid(plan))
 
     def takeoff(self, plan, find_all=True, confidence=0.3):
-        """Step 5b: boxes -> areas in sq ft, and optionally everything like the first footing box."""
         self._need()
-        if self.plans is None:
-            print("This notebook has no plan drawings."); return
-        ui.takeoff(self, self.plans[plan].id, bool(find_all), float(confidence))
+        ui.takeoff(self, self._pid(plan), bool(find_all), float(confidence))
 
     def upload_app(self):
         self._need()
@@ -191,12 +169,14 @@ class SegLab:
         if self.engine is None:
             print("SAM 3 is not loaded; the upload app needs the live model."); return
         from . import app
-        return app.launch(self)
+        self.apps["upload"] = app.launch(self)
 
     def report_summary(self):
         self._need()
         print("Numbers for your report: the notebook prints every measurement under its step; copy the ones you used.")
-        print(f"Photos: {self.spec.title}. Materials: {', '.join(m.name for m in self.spec.materials)}.")
+        print(f"Plans: {self.spec.title}.")
+        for p in self.plans.plans:
+            print(f"  {p.id}: {p.title} — {p.facts()}")
 
 
 lab = SegLab()

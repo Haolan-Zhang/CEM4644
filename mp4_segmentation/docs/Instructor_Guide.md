@@ -3,60 +3,112 @@
 ## 1. What the students get
 
 Two Colab notebooks built from one template. Students never write code: each cell is a form with a
-▶ button; outputs are three-panel views (photo, mask, overlay), material-mix charts, comparison and
-time-series charts, a region inspector, a box-drawing tool and a small upload app.
+▶ button; outputs are three-panel views (plan, mask, overlay), hit/miss/extra overlays, tables of
+square metres next to the drawing's own numbers, a box-drawing tool and a small upload app.
 
 | | Workshop | Homework |
 |---|---|---|
-| Photos | structural work on site (31 photos) + 2 foundation plans | interior finishing (19 photos) + 2 foundation plans |
-| Materials | concrete, rebar, formwork, scaffolding, structural steel, brick, soil, timber, worker, machine, sky | drywall, studs, insulation, pipes, tiles, concrete, ceiling, floor, windows, worker |
-| Time series | A: house footings, 3 photos over 10 days (2021); B: one building 1937–1939, 10 photos | C: three 1938 interiors |
-| Take-off (Part 5) | US Army 1956 dormitory (grid of square footings F1–F6, footing schedule, 19'-4" bays) and mess hall (14 column footings of 6'-0" on 24'-0" bays) | HABS Whittier hospital (36 columns on octagonal footings, dimension strings) and HAER Shenandoah-Dives Mill (CAD plan with a 50-ft scale bar and two circular tanks) |
-| Own photos | 1 (optional) | 5 (required) |
+| Plans | set A: 6 homes (13828, 9493, 14466, 11032, 548, 1902) | set B: 7 homes (14341, 5018, 1217, 8138, 9136, 11615, 10715), two of them with both storeys on one sheet, one Swedish |
+| Steps start with | room (any), window, bathroom, kitchen | bedroom, toilet, stairs, living room |
+| Take-off targets | two rooms, one window, one door | every bedroom of a plan, the stairs, a toilet, a bathtub; the four rooms of plan 5018 |
+| Own plans | 1 | 3 |
 | Time | about 90 min | about 2 h |
 
-The model is SAM 3 used as is: no training. Everything the students see for the built-in photos is
-precomputed and instant. Only five steps run the model live (own words, negative-box correction, words on a
-drawing, plan take-off, own photo); on a T4 each request takes about a second, on CPU about a minute.
+The plans are from **CubiCasa5K** (CC BY-NC-SA 4.0). Its `F1_scaled.png` images are drawn at exactly
+1 px = 1 cm and its vector annotations give every room's polygon and real size, every door, window
+and fixture. `build/prepare_plans.py` resamples each plan by its own factor (so students cannot guess
+the scale), adds a 5 m scale bar and writes the answer key. That key is what every "the drawing
+says..." line in the notebook comes from.
 
-## 2. Suggested workshop timing (90 min)
+Everything the students see for the built-in plans and phrases is precomputed and instant. Only the
+live steps run SAM 3 (Step 3a and 3b boxes, Step 4d, 4e, Part 5); on a T4 each request takes well
+under a second, on CPU about a minute.
+
+## 2. What SAM 3 actually does on these plans (measured)
+
+Instances at confidence ≥ 0.3, best score in brackets, on the workshop plans:
+
+| plan | room | bedroom | bathroom | kitchen | living room | toilet | sink | stairs | door / window / wall |
+|---|---|---|---|---|---|---|---|---|---|
+| 13828 | 13 (0.57) | 2 (0.41) | 1 (0.72) | 0 | 0 | 2 (0.52) | 2 (0.57) | 1 (0.30) | nothing |
+| 9493 | 8 (0.61) | 5 (0.38) | 0 | 0 | 0 | 0 | 1 (0.34) | 3 (0.65) | nothing |
+| 14466 | 7 (0.79) | 6 (0.48) | 3 (0.85) | 0 | 0 | 2 (0.68) | 5 (0.44) | 1 (0.30) | nothing |
+| 11032 | 13 (0.63) | 5 (0.56) | 5 (0.60) | 0 | 0 | 2 (0.55) | 4 (0.52) | 0 | nothing |
+| 548 | 6 (0.65) | 1 (0.42) | 2 (0.57) | 0 | 0 | 0 | 0 | 6 (0.80) | nothing |
+| 1902 | 1 (0.31) | 0 | 2 (0.57) | 0 | 0 | 1 (0.69) | 1 (0.40) | 0 | nothing |
+
+The same pattern holds on set B. Read it to the class like this:
+
+- **Words for enclosed spaces work**: *room* finds half to four fifths of the rooms and merges open-plan
+  spaces; *bedroom* and *bathroom* find some. Words for functions without walls do not: *kitchen*,
+  *living room* and *balcony* find nothing on any plan, whatever the confidence.
+- **Symbol words work when the symbol is a picture of the thing**: *toilet* (a toilet bowl seen from
+  above), *sink*, *stairs*. *Bathtub* rarely.
+- **Drawing conventions are not in the model's vocabulary**: *door* (an arc), *window* (a gap with a
+  line) and *wall* (a thick black line) find nothing by name. That is why Step 3b counts them from a
+  box example instead.
+- **The confidence slider matters**: the useful range on drawings is 0.2–0.5, much lower than on photos.
+  The notebooks default to 0.3.
+
+**Boxes (Step 3b).** A tight box around a room: SAM 3 cuts out the space, the notebook clips the mask to
+the box and fills the holes left by furniture symbols. On 65 rooms (the five largest indoor rooms of
+every plan, boxes drawn on the answer key's outline) the error is 8.5 % (median) and 12.9 % (mean).
+Errors above 25 % come from three cases the students should recognise: an **open-plan kitchen** with no
+wall on one side (the model returns the counter; the notebook prints "the mask covers only N % of your
+box... the box itself is X m²"), an **L-shaped room** (a rectangle cannot fit it: the box includes the
+neighbour), and a living room that **continues into a dining area**.
+
+**Find-all (Step 3b, box example).** One box around a window finds windows with good recall but many
+extras (workshop plans: 15/19 found with 22 extra, 8/8 with 16 extra, 6/7 with 4 extra, 6/17 with 56
+extra, 3/3 with 4, 1/1 with 4); the extras are other short line segments and text. One box around a
+door finds almost nothing (1–3 of 8–20): the door arc is too thin and varied. One box around a
+fixture (a toilet or sink) finds most of the same symbols with few extras (11/16 with 1 extra, 6/6,
+4/6, 9/15 with 0 extra). Doors are the honest failure case; ask students why a symbol that every
+architect reads instantly is invisible to the model (it was trained on photographs of doors, not on the
+convention that stands for one).
+
+## 3. Suggested workshop timing (90 min)
 
 | Min | Part | What to say / do |
 |---|---|---|
-| 0–5 | Step 0 | Everyone runs Step 0 (clones the repo, loads SAM 3: 2–3 min) while you explain detection (boxes) vs. segmentation (pixels) and why pixels can be counted. Choose *Run anyway* on Colab's author warning. |
-| 5–12 | Part 1 | Browse the photos. Point out the 1937 series: one building from excavation to completion. |
-| 12–30 | Part 2 | Original → mask → overlay. Move the confidence slider and watch the share change. Material mix of one photo. Play the estimation game; ask for scores. Key message: the number is *share of the photo*, and the model's confidence threshold is a choice. |
-| 30–45 | Part 3 | Compare the day-1 and day-11 footing photos (rebar and formwork down, concrete and blockwork up). Then series B: brick and sky over two years. Ask what changed for reasons that are not progress (camera position, black-and-white film, weather). |
-| 45–65 | Part 4 | Wording: *rebar* finds nothing, *steel reinforcement bars* finds the cage; *steel beam* vs *steel frame*. Region inspector: weak regions with 20–40 % confidence. Negative box: draw over the wrong region and see the share drop. Then let them type their own phrases. |
-| 65–83 | Part 5 | Real foundation plans. Step 5a: *footing* finds nothing; *small square* finds the footings on the dormitory and the *columns* (16" squares) on the mess hall; *circle* finds the grid bubbles. Say it out loud: the model sees shapes, the engineer supplies the meaning. Step 5b on the mess hall: reference box across the 24'-0" bay E–F, a tight box on one column footing (6'-0" square = 36 sq ft; they get 37–39), then *find_all*: about 22–24 similar regions for 14 real footings. Have them count on the drawing and name the extras (boiler-room squares, detail boxes). |
-| 83–90 | Part 6 + wrap-up | Own photos on the phone through the public link if time allows. Report template: `docs/MP4_Workshop_Report_Template.md`. |
+| 0–5 | Step 0 | Everyone switches the runtime to T4 GPU and runs Step 0 (clone, SAM 3 load: 2–3 min) while you explain detection (boxes) vs. segmentation (pixels) and why pixels can be counted. Choose *Run anyway* on Colab's author warning. |
+| 5–12 | Part 1 | Browse the plans. Point out the scale bar, the Finnish labels (legend in the notebook), the printed m² on some plans, and that the notebook knows every room's real area from the dataset's annotations. |
+| 12–35 | Part 2 | *room* on 13828: 13 regions, merged living/dining, missed small rooms. Then *toilet*, *sink*. Then *kitchen* and *window*: nothing, and the hit/miss overlay shows 19 red windows. Step 2c: the m² table per room type against the drawing. Play the estimation game; ask for scores. Key message: the number is only as good as the word, and the drawing's answer key is how you find out. |
+| 35–60 | Part 3 | Step 3a: box the scale bar (zoom in); a 1 % scale error is a 2 % area error. Step 3b: tight boxes on two rooms, read the "+4 %" / "−29 %" lines, then one box on a window with *find_all*: count the green, red and blue boxes on the plan. Then a door: nothing. Discuss what a take-off needs that the model does not have (the convention). |
+| 60–78 | Part 4 | Compare 13828 and 9493. Wording: *bathroom* vs *shower room* vs *wc*. Inspector: weak regions with 20–40 % confidence and the room they sit on. Negative box on a merged region. Own words: *bed*, *small square*, *thick line*. |
+| 78–90 | Part 5 + wrap-up | Own plan through the upload app if time allows (a photo of any plan works). Report template: `docs/MP4_Workshop_Report_Template.md`. |
 
-## 3. Answer key and marking notes (100 points)
+## 4. Answer key and marking notes (100 points)
 
-1. **Estimation game and threshold (12).** Any score. The material mix at 0.5 must be quoted. Lowering the threshold to 0.3 adds weak regions and raises the share; 0.8 keeps only the model's surest regions. Good answers say that neither is "the truth": the threshold is a choice that trades misses against false regions.
-2. **Progress over a series (14).** Series A: rebar and formwork shares fall, concrete (oversite) and brick/blockwork rise; series B: soil and formwork give way to brick and finished building, sky share changes with the camera position. Full marks for one clear non-progress cause (viewpoint, zoom, black-and-white photo, weather, people in front).
-3. **Wording (12).** *steel reinforcement bars* finds the rebar cage (site_01: 33 %); *rebar*, *steel bars*, *reinforcing steel* find nothing; *metal rods* works. The model learned everyday language, not trade jargon; a descriptive phrase beats a technical term. Good answers also mention that different wordings can give different region counts and shares.
-4. **Errors and correction (14).** Expect: a rebar cage labelled *scaffolding* (site_04), sheetrock on a table missed as *drywall* (int_21), concrete pours where wet concrete is not recognised as *concrete*, weak regions at 20–40 %. The negative box removes the wrong region and the share drops. Advice for the colleague: state the phrase and threshold used, check the overlay, do not compare shares across photos taken from different positions.
-5. **Plan take-off A (12).** *Workshop, plan_dormitory:* *footing* finds nothing, *small square* finds most footings (about 45 at confidence 0.4, with extras), *circle* finds the 9 grid bubbles. Scale from the 19'-4" bay between bubbles 1 and 2: about 126 px, so 0.15 ft per pixel (6.5 px per foot). The footings are small on this drawing (an F2 of 4'-6" is only about 30 px), and on a line drawing the mask follows the box more than the outline, so a box drawn exactly on the outline gives 20–22 sq ft for F2 and a loose box gives 40–50 sq ft with the ⚠ note. Full marks for reading the mark, looking it up in the schedule, and naming the box as the main error source. *Homework, plan_whittier:* scale from the two 12'-0" bays on the bottom dimension line (about 14.3 px per foot at this size). The octagonal footing of columns 7/11/15/19 is 5'-4" across, i.e. about 23.6 sq ft; a tight box gives 25–27 sq ft. *find_all* from one octagon finds about 14 similar regions (the interior octagons) and misses the wall footings, which are drawn cut by the wall lines.
-6. **Plan take-off B (14).** *Workshop, plan_mess_hall:* reference across the 24'-0" bay E–F (about 225 px, 0.107 ft per pixel); one column footing (dashed 6'-0" square) measures 37–39 sq ft against 36; *find_all* at confidence 0.3 returns about 22–24 regions of similar size for 14 real column footings (two rows of seven in the mess hall basement): the extras are the boiler-room and transformer-vault squares and detail boxes; at 0.4 it drops to about 17. Expect the count, the total (14 × 36 = 504 sq ft) and a list of extras. *Homework, plan_mill:* *tank* finds nothing, *circle* finds the two tanks and the hatched circle at confidence 0.9. Reference along the 0–50 FEET scale bar (about 158 px, 0.32 ft per pixel); one tank is about 52 ft across, so a circle of 2,100 sq ft; the mask gives about 1,880 sq ft because it stops at the internal lines. Checking the scale: measure the bar twice, or measure the METERS bar (15 m = 49.2 ft) and compare.
-7. **Own photos (10; 6 in the workshop).** Phrase, share and a judgement per photo; which surfaces or wordings failed (reflective floors, cluttered walls, jargon).
-8. **Reflection (12; 18 in the workshop).** Useful: progress photos from a fixed camera, PPE or housekeeping checks, quick material inventories; misleading: any comparison across different viewpoints, a share mistaken for a quantity. Turning it into a quantity needs a fixed camera or drawings with a scale, a reference length in the photo, and several photos per area.
+Points are suggestions. Accept any well-argued answer; the numbers below are what a correct run
+produces, with small variation because boxes are drawn by hand.
 
-## 4. Known failure modes
+1. **Words that work and words that do not (10).** Rooms, toilets, sinks and stairs: found (with misses); kitchen, living room, door, window, wall: nothing. Found/missed/extra for two things at 0.3, e.g. 13828 *toilet* 2 found of 2, *window* 0 of 19. Misses have in common: symbols drawn thin, small, or merged with furniture; a room with no closed wall.
+2. **Square metres per room type and the game (12).** The Step 2c table; bedrooms usually within 10–30 % (merged pairs of bedrooms or a missed one), bathrooms often under (one of two found), kitchen and living room 0 vs the drawing. At 0.2 more regions and merged areas; at 0.7 almost nothing survives. Any game score.
+3. **Room take-off (14, workshop) / plan 5018 (14, homework).** Two rooms with SAM 3's m², the drawing's m² and the error; typical errors 2–15 %, up to 50 % on open-plan or L-shaped rooms, with the reason named. Homework: on 5018 the ground-floor living room (OH) and kitchen (K) and two upstairs bedrooms (MH); the sheet prints KERROSALA 121 / 74 m² (gross floor area per storey) and HUONEISTOALA 98 / 68 m² (net apartment area): the sum of the students' rooms is a part of the net area, not the gross.
+4. **Counting with find-all (14).** Workshop: windows on their plan, found/missed/extra at the best confidence (see section 2), extras are short line segments and text. Homework: toilets and bathtubs (fixtures work well: most found, few extras), windows on 1217 (30 windows: about 11 found at 0.3 with many extras), and the observation that the easiest symbol is the one that looks like the object.
+5. **Compare plans and wording (12).** Step 4a: SAM 3's bedroom and bathroom m² for the two plans against the drawing's totals; the drawing decides. Step 4b: the wording that gave the most sensible mask and how far apart the areas were (e.g. *bathroom* vs *wc* vs *shower room*).
+6. **A mistake and the negative box (10).** Any documented region: what was included or missed, at which confidence; whether the negative box fixed it; the advice to a colleague (check every number against the drawing, use boxes for the take-off, never trust a phrase count).
+7. **Own plans (10; 16 in the homework).** Phrase, count, area and a judgement per plan; what failed (hand-drawn plans, photos at an angle, plans with colour fills, drawings where the scale is unknown).
+8. **Reflection (18; 12 in the homework).** Useful: a first pass over many plans, counting repeated symbols, checking a room schedule; misleading: open-plan spaces, drawing conventions, anything without a scale. Needs: clean drawings, a scale bar or a known dimension, a room schedule to check against, a person who signs off.
+
+## 5. Known failure modes
 
 - **Step 0 is slow.** SAM 3 is 3.4 GB; on Colab it downloads in one to two minutes. If the runtime has no GPU the precomputed steps still work; live steps take about a minute each on CPU.
 - **Step 0 asks for a restart.** Colab shipped an older `transformers` without SAM 3: Step 0 installs a newer one and asks for *Runtime → Restart session*; after the restart, run Step 0 again (the install is kept).
-- **Box-drawing tool missing** (Steps 4c and 5b). It is a third-party widget; Step 0 enables Colab's custom widget manager. Re-run Step 0, then the step.
+- **Box-drawing tool missing** (Steps 3a, 3b, 4d). It is a third-party widget; Step 0 enables Colab's custom widget manager. Re-run Step 0, then the step.
+- **"The mask covers only N % of your box."** An open-plan space: the model has no wall to stop at. The box area printed with the note is the better estimate; that is the point of the note.
+- **"The mask fills the whole box: draw a tighter box"** (windows, doors, fixtures). A loose box returns roughly the box contents. Zoom in and redraw.
+- **A phrase finds nothing at all.** Expected for kitchen, living room, balcony, door, window, wall. Send the students to Step 3b.
 - **A cell looks stuck.** *Runtime → Interrupt execution*, run the cell again. Nothing is lost.
 - **Share link in the upload app fails.** The app still works inside the notebook; the link is only needed for phones.
-- **Words on a drawing find nothing.** Expected: construction words (*footing*, *column*, *pile*, *tank*) find nothing on a line drawing; shape words (*small square*, *circle*, *rectangle*) do. On the mess hall *small square* finds the 16" columns, not the 6-ft footings around them.
-- **The take-off area follows the box.** On a drawing SAM 3 snaps to a clear closed outline (dashed footing square, octagon, tank circle) but on small or faint symbols it returns roughly the box contents; the ⚠ note fires when the mask fills more than 85 % of the box. Tighter box, or measure a bigger element.
-- **find_all over-counts.** It returns every region that looks like the example; the size filter keeps the same size class, but schedule boxes, detail drawings and room outlines of similar size get in. That is the error analysis the question asks for. Full sheets (title block, sections, schedules) confuse it completely, which is why only plan-view regions are used.
-- **Wikimedia photos.** All are open-licence and credited; CC BY-SA photos require the same licence for derived overlays, which is fine for teaching material.
+- **Licence.** CubiCasa5K is CC BY-NC-SA 4.0: teaching use is fine, commercial use is not, and derived overlays fall under the same licence.
 
-## 5. Rebuilding or changing the material
+## 6. Rebuilding or changing the material
 
-See `README.md`. Materials and their wordings live in `aec_seg/config.py`; after a change run
-`build/precompute_masks.py` (only new phrases are computed) and `build/make_notebooks.py`. The four plans
-and their crop regions are defined in `build/curate_plans.py`; their references, targets and expected values in
-the `plans` set of `aec_seg/config.py`; which plans each notebook gets, in `VARIANTS` of `build/make_notebooks.py`.
+See `README.md`. The plans are chosen in `aec_seg/config.py` (`plans` of each set: CubiCasa sample id,
+resampling factor, title); after a change run `build/prepare_plans.py --zip cubicasa5k.zip`,
+`build/precompute_masks.py` (only new plans and phrases are computed) and `build/make_notebooks.py`.
+The vocabulary is `THINGS` in `aec_seg/config.py`; each entry says what to look up in the answer key.
+Plans where nothing works (for instance CubiCasa 11653, 20102) exist; check a candidate with
+`Sam3Engine.segment(img, "room")` before adding it.

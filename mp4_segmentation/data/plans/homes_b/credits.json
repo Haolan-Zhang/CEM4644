@@ -1,0 +1,93 @@
+[
+  {
+    "id": "14341",
+    "file": "14341.png",
+    "title": "long single-storey house, 20 rooms",
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+    "note": "CubiCasa5K sample 14341; CAD plan with furniture",
+    "size": [
+      1657,
+      900
+    ]
+  },
+  {
+    "id": "5018",
+    "file": "5018.png",
+    "title": "two-storey house: ground floor (left) and upper floor (right)",
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+    "note": "CubiCasa5K sample 5018; both floors on one sheet; printed floor areas",
+    "size": [
+      1665,
+      832
+    ]
+  },
+  {
+    "id": "1217",
+    "file": "1217.png",
+    "title": "two-storey villa, Swedish labels",
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+    "note": "CubiCasa5K sample 1217; both floors on one sheet",
+    "size": [
+      1623,
+      925
+    ]
+  },
+  {
+    "id": "8138",
+    "file": "8138.png",
+    "title": "apartment with bold walls and furniture",
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+    "note": "CubiCasa5K sample 8138; clean plan, clear symbols",
+    "size": [
+      1451,
+      978
+    ]
+  },
+  {
+    "id": "9136",
+    "file": "9136.png",
+    "title": "two-storey house, both floors stacked on the sheet",
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+    "note": "CubiCasa5K sample 9136; CAD plan, ground floor on top",
+    "size": [
+      944,
+      1543
+    ]
+  },
+  {
+    "id": "11615",
+    "file": "11615.png",
+    "title": "small flat A3 with printed room areas",
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+    "note": "CubiCasa5K sample 11615; printed m² next to the room names",
+    "size": [
+      914,
+      1226
+    ]
+  },
+  {
+    "id": "10715",
+    "file": "10715.png",
+    "title": "apartment (bold walls)",
+    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
+    "license": "CC BY-NC-SA 4.0",
+    "source": "https://zenodo.org/records/2613548",
+    "note": "CubiCasa5K sample 10715; bold-wall plan",
+    "size": [
+      1022,
+      988
+    ]
+  }
+]
