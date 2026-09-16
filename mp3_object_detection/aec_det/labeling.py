@@ -11,7 +11,7 @@ from .evaluate import iou_matrix
 
 
 def score_boxes(student_xyxy: np.ndarray, student_cls: np.ndarray, gt_xyxy: np.ndarray, gt_cls: np.ndarray, iou_thr: float = 0.5) -> Dict:
-    """Greedy matching of student boxes to labelled boxes. Returns counts and the mean IoU of the matched pairs."""
+    """Greedy matching of student boxes to labeled boxes. Returns counts and the mean IoU of the matched pairs."""
     n_s, n_g = len(student_xyxy), len(gt_xyxy)
     if n_s == 0 or n_g == 0:
         return {"matched": 0, "wrong_class": 0, "extra": n_s, "missed": n_g, "mean_iou": float("nan")}
@@ -98,7 +98,7 @@ class LabelExercise:
         item = self.det_set[self.order[self.i]]
         sx, sc = self._student_boxes()
         res = score_boxes(sx, sc, item.xyxy(), item.cls)
-        res.update({"seconds": elapsed, "drawn": len(sx), "labelled": len(item.cls)})
+        res.update({"seconds": elapsed, "drawn": len(sx), "labeled": len(item.cls)})
         self.results.append(res)
         with self.out:
             self.out.clear_output(wait=True)
@@ -108,13 +108,13 @@ class LabelExercise:
             im = draw.draw_boxes(im, sx, ["you: " + l for l in labels], [self.colors.get(l, "#ffffff") for l in labels])
             ui.show(ui.image_grid([im], [f"your boxes (solid) vs. the dataset labels (dashed)"], ncols=1, size=6.5))
             iou_txt = f", overlap of the matching pairs {res['mean_iou'] * 100:.0f}%" if not np.isnan(res["mean_iou"]) else ""
-            print(f"Photo {self.i + 1}: {elapsed:.0f} s. You drew {res['drawn']} boxes; the dataset has {res['labelled']}. "
+            print(f"Photo {self.i + 1}: {elapsed:.0f} s. You drew {res['drawn']} boxes; the dataset has {res['labeled']}. "
                   f"Matching box and class: {res['matched']}; right place, different class: {res['wrong_class']}; "
-                  f"extra boxes: {res['extra']}; labelled objects you did not box: {res['missed']}{iou_txt}.")
+                  f"extra boxes: {res['extra']}; labeled objects you did not box: {res['missed']}{iou_txt}.")
         self._next()
 
     def _on_skip(self):
-        self.results.append({"seconds": time.time() - self.t0, "drawn": 0, "labelled": len(self.det_set[self.order[self.i]].cls),
+        self.results.append({"seconds": time.time() - self.t0, "drawn": 0, "labeled": len(self.det_set[self.order[self.i]].cls),
                              "matched": 0, "wrong_class": 0, "extra": 0, "missed": len(self.det_set[self.order[self.i]].cls),
                              "mean_iou": float("nan"), "skipped": True})
         self._next()
@@ -129,10 +129,10 @@ class LabelExercise:
         self.widget.hide_buttons = True
         done = [r for r in self.results if not r.get("skipped")]
         secs = sum(r["seconds"] for r in self.results)
-        drawn = sum(r["drawn"] for r in done); labelled = sum(r["labelled"] for r in self.results)
+        drawn = sum(r["drawn"] for r in done); labeled = sum(r["labeled"] for r in self.results)
         matched = sum(r["matched"] for r in done); wrong = sum(r["wrong_class"] for r in done)
         extra = sum(r["extra"] for r in done); missed = sum(r["missed"] for r in self.results)
-        lines = [f"<b>Done.</b> {len(self.results)} photos in {secs / 60:.1f} min: you drew {drawn} boxes for {labelled} labelled objects; "
+        lines = [f"<b>Done.</b> {len(self.results)} photos in {secs / 60:.1f} min: you drew {drawn} boxes for {labeled} labeled objects; "
                  f"{matched} agree with the labels, {wrong} have the right place but another class, {extra} are extra, {missed} were not boxed."]
         if drawn and secs > 0:
             per_min = drawn / (secs / 60)

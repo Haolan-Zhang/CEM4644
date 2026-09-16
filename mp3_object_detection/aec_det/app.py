@@ -62,5 +62,12 @@ def build(detectors: Dict[str, object], colors: Dict[str, str], title: str, desc
 def launch(detectors: Dict[str, object], colors: Dict[str, str], title: str = "Test the detector on your own photo",
            description: str = "", share: bool = True):
     demo = build(detectors, colors, title, description)
-    demo.launch(share=share, inline=True, debug=False, quiet=True, show_error=True)
+    import contextlib
+    import io
+    sink = io.StringIO()
+    with contextlib.redirect_stdout(sink), contextlib.redirect_stderr(sink):
+        demo.launch(share=share, inline=True, debug=False, quiet=True, show_error=True)
+    url = getattr(demo, "share_url", None)
+    if url:
+        print(f"Public link (open it on your phone for the live camera): {url}")
     return demo

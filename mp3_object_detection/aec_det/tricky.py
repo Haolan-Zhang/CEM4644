@@ -86,7 +86,7 @@ def playground(detector, det_set, spec, seed: Optional[int] = None):
             ui.show_image(draw.draw_predictions(im, det, detector.classes, pretty_colors, conf=conf.value), 760)
             print(f"changes: {', '.join(changed) if changed else 'none'}")
             print(f"{detector.name} (≥ {conf.value * 100:.0f}%): {ui.det_summary(det, detector.classes, conf.value)}")
-            print(f"labelled truth for the original photo: {state['truth']}")
+            print(f"labeled truth for the original photo: {state['truth']}")
 
     def new_photo(*_):
         k = int(rng.integers(len(det_set)))

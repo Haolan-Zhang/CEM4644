@@ -71,7 +71,7 @@ def build(variant):
 **No coding needed.** Each grey box below is one *step*: click the ▶ (play) button at its left, wait until it finishes, look at the result, then answer the report question that follows. Run the steps **from top to bottom**.
 
 **What you will do (about {v['minutes']} minutes)**
-1. Look at labelled photos, count objects yourself, and label a few photos by hand.
+1. Look at labeled photos, count objects yourself, and label a few photos by hand.
 2. Run a trained detector, read its confidence, and move the confidence threshold.
 3. Measure how many objects it finds and how many false alarms it raises; look at its mistakes.
 4. Try to break it: tricky photos, edited photos, a general-purpose detector, photos from another world, your own photos.
@@ -125,7 +125,7 @@ Classification (MP2) answers *what is in this photo?* **Object detection** answe
 Boxes drawn with a **dashed** line are labels made by people; boxes with a **solid** line (later) are the model's detections.
 """))
     cells.append(form(
-        "▶ Step 1a · Browse the labelled photos",
+        "▶ Step 1a · Browse the labeled photos",
         "lab.show_gallery(category, how_many, with_boxes)",
         notes=["Pick a class to see photos that contain it. Untick *with_boxes* to see the raw photos. Click ▶ again for a new selection."],
         params=[f'category = "all" #@param {jlist(["all"] + classes)}',
@@ -158,9 +158,9 @@ Boxes drawn with a **dashed** line are labels made by people; boxes with a **sol
     cells.append(md(f"""
 ## Part 2 · Run a trained detector
 
-The **course model** is a YOLO detector that was fine-tuned on {n_train(spec)} labelled photos. For every box it proposes it also gives a **confidence** (0–100 %). A **confidence threshold** decides which boxes you keep: everything below it is thrown away.
+The **course model** is a detector that was fine-tuned on {n_train(spec)} labeled photos. For every box it proposes it also gives a **confidence** (0–100 %). A **confidence threshold** decides which boxes you keep: everything below it is thrown away.
 
-To score a detector we compare its boxes with the labelled boxes on unseen test photos. A detection is **correct** when it has the right class and overlaps the true box by at least half. From that we count, per class:
+To score a detector we compare its boxes with the labeled boxes on unseen test photos. A detection is **correct** when it has the right class and overlaps the true box by at least half. From that we count, per class:
 - **recall** = share of the true objects that were found (100 % = nothing missed);
 - **precision** = share of the detections that were right (100 % = no false alarms);
 - **mAP50** = one overall quality score (0–100) that summarises precision and recall over all thresholds.
@@ -187,13 +187,13 @@ A detector only knows the kind of photos it was trained on. Let's find its limit
 """))
     cells.append(form("▶ Step 3a · Tricky photos", "lab.tricky(group, threshold)",
                       notes=["*hard_real*: test photos with the most mistakes · *synthetic*: real photos we edited (far away, dark, blurred, rotated) · *other_domain*: photos from a different dataset · *out_of_scope*: not a site at all.",
-                             "The caption gives the labelled truth where there is one; the line below it is what the model found."],
+                             "The caption gives the labeled truth where there is one; the line below it is what the model found."],
                       params=['group = "all" #@param ["all", "hard_real", "crowded", "synthetic", "other_domain", "out_of_scope"]',
                               'threshold = 0.5 #@param {type:"slider", min:0.1, max:0.9, step:0.1}']))
     cells.append(form("▶ Step 3b · Break it yourself", "lab.playground()",
                       notes=["Move the sliders: rotate, zoom, *move away* (everything becomes small), blur, darken, shadow, noise. The detector re-runs after every change. Find the smallest change that makes it lose an object."]))
     cells.append(form("▶ Step 3c · A general-purpose detector vs. the course model", "lab.compare_pretrained(how_many, threshold)",
-                      notes=["Left: YOLO exactly as downloaded, trained on 80 everyday classes (person, car, truck...). Right: the same network after fine-tuning on our photos. Same photos, same threshold."],
+                      notes=["Left: the pretrained model exactly as downloaded, trained on 80 everyday classes (person, car, truck...). Right: the same pretrained model after fine-tuning on our photos. Same photos, same threshold."],
                       params=['how_many = 3 #@param {type:"slider", min:1, max:6, step:1}', 'threshold = 0.4 #@param {type:"slider", min:0.1, max:0.9, step:0.1}']))
     if other is not None:
         cells.append(form("▶ Step 3d · Photos from a different world", "lab.domain_shift(how_many, threshold)",
@@ -204,15 +204,15 @@ A detector only knows the kind of photos it was trained on. Let's find its limit
                              f"Test at least {v['own_photos']} photo(s) of your own and take screenshots for your report."]))
     questions.append((5, "List three photos (tricky gallery, sliders, or your own) where the detector missed something or invented something. For each, say what it found, what it should have found, and what you think confused it."))
     cells.append(q(*questions[-1]))
-    questions.append((6, "In Step 3c, what does the general-purpose YOLO see in a site photo, and what does the fine-tuned course model add? In Step 3d, what happens when a model gets photos from the other dataset? What does this tell you about buying an 'AI camera' for your own site?"))
+    questions.append((6, "In Step 3c, what does the general-purpose pretrained model see in a site photo, and what does the fine-tuned course model add? In Step 3d, what happens when a model gets photos from the other dataset? What does this tell you about buying an 'AI camera' for your own site?"))
     cells.append(q(*questions[-1]))
 
     # ---------------------------------------------------------------- Part 4
     if spec.dashboard and spec.dashboard["kind"] == "ppe":
-        p4 = "Boxes alone are not a decision. A safety officer wants **numbers**: how many heads without a helmet, which photos need a follow-up. The dashboard below counts the model's boxes over all test photos and compares them with the labelled truth."
+        p4 = "Boxes alone are not a decision. A safety officer wants **numbers**: how many heads without a helmet, which photos need a follow-up. The dashboard below counts the model's boxes over all test photos and compares them with the labeled truth."
         q6 = "From the dashboard: what compliance rate does the AI report and what do the labels say? How many photos would be flagged wrongly, and how many flags would be missed? Run it at threshold 0.3 and 0.7 and explain which one you would use for (a) an instant alarm on site and (b) a monthly safety statistic."
     else:
-        p4 = "Boxes alone are not a decision. A site manager wants **numbers**: how many machines are on site in each photo, and of which type. The dashboard below counts the model's boxes over all test photos and compares them with the labelled truth."
+        p4 = "Boxes alone are not a decision. A site manager wants **numbers**: how many machines are on site in each photo, and of which type. The dashboard below counts the model's boxes over all test photos and compares them with the labeled truth."
         q6 = "From the dashboard: how many machines does the AI count in total and how many do the labels contain? On how many photos is the count exactly right? Run it at threshold 0.3 and 0.7 and explain which one you would use for (a) an automatic equipment log and (b) a quick check by a person."
     cells.append(md(f"## Part 4 · From boxes to decisions\n\n{p4}"))
     cells.append(form("▶ Step 4a · Dashboard", "lab.dashboard(threshold)",
@@ -225,7 +225,7 @@ A detector only knows the kind of photos it was trained on. Let's find its limit
     cells.append(md("""
 ## Part 5 · Train your own detector
 
-**Training** shows the network labelled photos, lets it predict boxes, and nudges it every time it is wrong. One pass over the training photos is one **epoch**. The course model started from a network **pretrained** on 120,000 everyday photos (COCO) and was then **fine-tuned** on our site photos. You can start from that pretrained network or from a **random** one.
+**Training** shows the model labeled photos, lets it predict boxes, and nudges it every time it is wrong. One pass over the training photos is one **epoch**. The course model started from a model **pretrained** on 120,000 everyday photos and was then **fine-tuned** on our site photos. You can start from that pretrained model or from a **random** one.
 
 A detector needs many more training steps than the classifier in MP2, so the runs here are longer. Suggested ladder (on a GPU each run takes one to two minutes): 60 photos · 10 passes → 120 · 15 → all · 12 → the best setting with a *random* start. Without a GPU stay with 60 photos and 10 passes (about five minutes).
 """))

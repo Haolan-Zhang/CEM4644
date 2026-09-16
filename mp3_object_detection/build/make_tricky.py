@@ -66,10 +66,10 @@ def build(key: str, work: Path):
         g.add(test[i].load(), f"a real test photo where the model misses {n_fn} object(s)", "hard_real", truth(test[i]), test[i].path.name)
     for i, n_fn, n_fp, n_tp, _, _ in sorted(errs, key=lambda r: -r[2])[:2]:
         g.add(test[i].load(), f"a real test photo with {n_fp} false alarm(s)", "hard_real", truth(test[i]), test[i].path.name)
-    # (b) crowded: most labelled objects
+    # (b) crowded: most labeled objects
     crowded = sorted(range(len(test)), key=lambda i: -len(test[i].cls))[:2]
     for i in crowded:
-        g.add(test[i].load(), f"a crowded photo with {len(test[i].cls)} labelled objects", "crowded", truth(test[i]), test[i].path.name)
+        g.add(test[i].load(), f"a crowded photo with {len(test[i].cls)} labeled objects", "crowded", truth(test[i]), test[i].path.name)
     # (c) synthetic edits of a photo the model gets fully right
     clean = [i for i, n_fn, n_fp, n_tp, _, _ in errs if n_fn == 0 and n_fp == 0 and 2 <= n_tp <= 6]
     base_i = clean[0] if clean else 0

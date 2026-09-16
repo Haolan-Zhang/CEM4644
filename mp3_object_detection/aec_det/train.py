@@ -26,6 +26,7 @@ def quick_train(train_set: DetSet, val_set: DetSet, base_weights, *, n_train: Op
     yaml = write_data_yaml(run_dir, train_set.classes)
     model = YOLO(str(base_weights) if pretrained else arch_yaml)
     history: List[dict] = []
+    say = lambda msg: log(msg)   # noqa: E731  (rebound below so the progress lines bypass the silenced streams)
 
     def on_epoch_end(trainer):
         if len(history) >= epochs:  # Ultralytics fires this once more after its final validation pass
@@ -36,7 +37,7 @@ def quick_train(train_set: DetSet, val_set: DetSet, base_weights, *, n_train: Op
                "precision": float(m.get("metrics/precision(B)", float("nan"))),
                "recall": float(m.get("metrics/recall(B)", float("nan")))}
         history.append(rec)
-        log(f"  pass {rec['pass']}/{epochs}: quality score (mAP50) {rec['mAP50'] * 100:.1f}   "
+        say(f"  pass {rec['pass']}/{epochs}: quality score (mAP50) {rec['mAP50'] * 100:.1f}   "
             f"precision {rec['precision'] * 100:.0f}%   recall {rec['recall'] * 100:.0f}%   (on {len(val_set)} validation photos)")
 
     model.add_callback("on_fit_epoch_end", on_epoch_end)
@@ -47,10 +48,26 @@ def quick_train(train_set: DetSet, val_set: DetSet, base_weights, *, n_train: Op
               exist_ok=True, verbose=False, plots=False, workers=2, seed=seed, pretrained=pretrained, val=True,
               amp=device != "cpu", warmup_epochs=0.5, mosaic=0.0, close_mosaic=0, patience=100, deterministic=False)
     kw.update(extra or {})
+    import contextlib
+    import io
+    import logging
+    import sys
     import warnings
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        model.train(**kw)
+    # Ultralytics prints its own lines (font and weight downloads, checks) while training; the students only see our
+    # progress lines, written to the real stream while stdout / stderr are parked in a buffer
+    real_out = sys.stdout
+    if log is print:
+        say = lambda msg: (real_out.write(msg + "\n"), real_out.flush())   # noqa: E731
+    ulog = logging.getLogger("ultralytics")
+    level = ulog.level
+    ulog.setLevel(logging.ERROR)
+    sink = io.StringIO()
+    try:
+        with warnings.catch_warnings(), contextlib.redirect_stdout(sink), contextlib.redirect_stderr(sink):
+            warnings.simplefilter("ignore")
+            model.train(**kw)
+    finally:
+        ulog.setLevel(level)
     save_dir = Path(getattr(model.trainer, "save_dir", run_dir / "train"))
     best = save_dir / "weights" / "best.pt"
     if not best.exists():

@@ -63,7 +63,7 @@ class DetLab:
         self.det = Detector(self.root / spec.course_model, name="course model", classes=[spec.pretty(c) for c in spec.classes])
         base = self.root / "models" / "yolo11n.pt"
         if base.exists():
-            self.base = Detector(base, name="YOLO trained on everyday photos (COCO)")
+            self.base = Detector(base, name="the pretrained model (everyday photos)")
             if not Path("yolo11n.pt").exists():  # lets Ultralytics skip a download when it checks mixed precision
                 try:
                     shutil.copy2(base, "yolo11n.pt")
@@ -106,7 +106,7 @@ class DetLab:
         print(f"  {s.description}")
         print(f"  Classes ({len(s.classes)}): " + ", ".join(s.pretty(c) for c in s.classes))
         print(f"  Photos for training: {len(self.train_pool)} (+{len(self.val_pool)} kept for checking)   |   unseen test photos: {len(self.test)}")
-        print("  Labelled boxes in the test photos: " + ", ".join(f"{k}: {v}" for k, v in self.test.box_counts().items()))
+        print("  Labeled boxes in the test photos: " + ", ".join(f"{k}: {v}" for k, v in self.test.box_counts().items()))
 
     def show_gallery(self, category="all", how_many=6, with_boxes=True):
         self._need()
@@ -166,16 +166,16 @@ class DetLab:
         tk.playground(self.det, self.test, self.spec)
 
     def compare_pretrained(self, how_many=3, threshold=0.4):
-        """The same photos through the everyday-object YOLO (80 COCO classes) and through the course model."""
+        """The same photos through the pretrained everyday-object model (80 classes) and through the course model."""
         self._need()
         if self.base is None:
             print("Base model not available."); return
         rng = np.random.default_rng(int(time.time()) % 100000)
         idx = rng.choice(len(self.test), size=min(int(how_many), len(self.test)), replace=False)
-        print("Left: YOLO as downloaded (80 everyday classes such as person, truck, car). Right: the same network after fine-tuning on our photos.")
+        print("Left: the pretrained model as downloaded (80 everyday classes such as person, truck, car). Right: the same pretrained model after fine-tuning on our photos.")
         for i in idx:
             it = self.test[int(i)]
-            ui.compare_detectors([self.base, self.det], it.load(), self._pretty_colors, float(threshold), caption=f"labelled truth: {ui.gt_summary(it, self.test.pretty_classes)}")
+            ui.compare_detectors([self.base, self.det], it.load(), self._pretty_colors, float(threshold), caption=f"labeled truth: {ui.gt_summary(it, self.test.pretty_classes)}")
 
     def domain_shift(self, how_many=3, threshold=0.4):
         self._need()
@@ -186,7 +186,7 @@ class DetLab:
         print(f"Photos from '{self.other_spec.title}' given to BOTH models. Each model can only answer with the classes it was trained on.")
         for i in rng.choice(len(self.other_test), size=min(int(how_many), len(self.other_test)), replace=False):
             it = self.other_test[int(i)]
-            ui.compare_detectors([self.det, self.other], it.load(), colors, float(threshold), caption=f"labelled truth: {ui.gt_summary(it, self.other_test.pretty_classes)}")
+            ui.compare_detectors([self.det, self.other], it.load(), colors, float(threshold), caption=f"labeled truth: {ui.gt_summary(it, self.other_test.pretty_classes)}")
 
     def upload_app(self):
         self._need()
@@ -195,7 +195,7 @@ class DetLab:
         from . import app
         dets = {"course model": self.det}
         if self.base is not None:
-            dets["YOLO (everyday objects)"] = self.base
+            dets["pretrained model (everyday objects)"] = self.base
         if self.my is not None:
             dets["my model"] = self.my
         colors = dict(self._pretty_colors)
@@ -227,7 +227,7 @@ class DetLab:
             fig, ax = plt.subplots(figsize=(10, 3.2))
             order = np.argsort(-(true_b + pred_b))[:40]
             x = np.arange(len(order))
-            ax.bar(x - 0.2, true_b[order], 0.4, label="labelled: workers without helmet", color=ui.GREY)
+            ax.bar(x - 0.2, true_b[order], 0.4, label="labeled: workers without helmet", color=ui.GREY)
             ax.bar(x + 0.2, pred_b[order], 0.4, label="AI: workers without helmet", color=ui.RED)
             ax.set_xlabel("test photos (the 40 with most bare heads)"); ax.set_ylabel("count"); ax.legend(fontsize=8); ax.set_xticks([])
             fig.tight_layout(); ui.show(fig)

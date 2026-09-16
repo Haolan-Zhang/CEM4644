@@ -48,7 +48,7 @@ List three photos (tricky gallery, sliders, or your own) where the detector miss
 
 ## Question 6
 
-In Step 3c, what does the general-purpose YOLO see in a site photo, and what does the fine-tuned course model add? In Step 3d, what happens when a model gets photos from the other dataset? What does this tell you about buying an 'AI camera' for your own site?
+In Step 3c, what does the general-purpose pretrained model see in a site photo, and what does the fine-tuned course model add? In Step 3d, what happens when a model gets photos from the other dataset? What does this tell you about buying an 'AI camera' for your own site?
 
 *Your answer:*
 

@@ -81,7 +81,7 @@ def det_summary(det, class_names: Sequence[str], conf: float) -> str:
 
 def gt_summary(item, class_names: Sequence[str]) -> str:
     if len(item.cls) == 0:
-        return "no objects labelled"
+        return "no objects labeled"
     counts: Dict[str, int] = {}
     for c in item.cls:
         counts[class_names[int(c)]] = counts.get(class_names[int(c)], 0) + 1
@@ -99,13 +99,13 @@ def gallery(det_set, spec, category: str = "all", n: int = 6, seed: Optional[int
         im = it.load()
         if with_boxes:
             im = draw.draw_ground_truth(im, it, sub.pretty_classes, {spec.pretty(c): v for c, v in spec.colors.items()})
-        images.append(im); titles.append(f"{it.path.name[:28]}\nlabelled: {gt_summary(it, sub.pretty_classes)}")
+        images.append(im); titles.append(f"{it.path.name[:28]}\nlabeled: {gt_summary(it, sub.pretty_classes)}")
     show(image_grid(images, titles, ncols=3 if n > 2 else n, size=3.8,
-                    suptitle=f"{len(sub)} random {'labelled ' if with_boxes else ''}photos" + (f" containing '{category}'" if category not in ('all', 'any', None) else "")))
+                    suptitle=f"{len(sub)} random {'labeled ' if with_boxes else ''}photos" + (f" containing '{category}'" if category not in ('all', 'any', None) else "")))
 
 
 def count_game(det_set, spec, rounds: int = 5, seed: Optional[int] = None):
-    """Show a photo without boxes, student picks a count, reveal the labelled boxes."""
+    """Show a photo without boxes, student picks a count, reveal the labeled boxes."""
     import ipywidgets as w
     from IPython.display import display
     rng = np.random.default_rng(seed)
@@ -150,7 +150,7 @@ def count_game(det_set, spec, rounds: int = 5, seed: Optional[int] = None):
         im = draw.draw_ground_truth(it.load(), it, det_set.pretty_classes, pretty_colors)
         with img_out:
             img_out.clear_output(wait=True)
-            show(image_grid([im], [f"labelled answer: {t}   ({gt_summary(it, det_set.pretty_classes)})"], ncols=1, size=6.5))
+            show(image_grid([im], [f"labeled answer: {t}   ({gt_summary(it, det_set.pretty_classes)})"], ncols=1, size=6.5))
         msg.value = (f"<b style='color:{GREEN}'>Correct!</b>" if ok else f"<b style='color:{RED}'>Not quite.</b> The labels say <b>{t}</b>.") + \
                     f" &nbsp; Score: {state['score']} / {state['i'] + 1}"
 
@@ -198,7 +198,7 @@ def pick_and_detect(detector, det_set, spec, seed: Optional[int] = None):
             out.clear_output(wait=True)
             show_image(im, 820)
             print(f"{detector.name} (confidence ≥ {conf.value * 100:.0f}%): {det_summary(det, detector.classes, conf.value)}")
-            print(f"labelled truth: {gt_summary(it, det_set.pretty_classes)}")
+            print(f"labeled truth: {gt_summary(it, det_set.pretty_classes)}")
             hidden = int(((det.conf < conf.value) & (det.conf >= 0.05)).sum())
             if hidden:
                 print(f"({hidden} weaker detection(s) between 5% and {conf.value * 100:.0f}% are hidden by the threshold)")
