@@ -37,6 +37,7 @@ class DetLab:
         self.other_spec: Optional[DetSpec] = None
         self.other_test: Optional[DetSet] = None
         self.my: Optional[Detector] = None
+        self.apps: Dict[str, object] = {}
         self.results: Dict[str, ev.EvalResult] = {}
 
     # ------------------------------------------------------------------ setup
@@ -193,15 +194,11 @@ class DetLab:
         if os.environ.get("AEC_LAB_NO_APP"):
             print("(upload app skipped: AEC_LAB_NO_APP is set)"); return
         from . import app
-        dets = {"course model": self.det}
-        if self.base is not None:
-            dets["pretrained model (everyday objects)"] = self.base
-        if self.my is not None:
-            dets["my model"] = self.my
         colors = dict(self._pretty_colors)
-        return app.launch(dets, colors, title=f"Try the detector on your own photo: {self.spec.title}",
-                          description="Upload a site photo (or any photo) and move the confidence slider. "
-                                      "Boxes are drawn for every detection above the threshold.")
+        # kept on the lab object rather than returned, so the cell shows the link and nothing else
+        self.apps["photo"] = app.launch(self.det, colors, title=f"Try the detector on your own photo: {self.spec.title}",
+                                        description="Upload a site photo (or any photo) and move the confidence slider. "
+                                                    "Boxes are drawn for every detection above the threshold.")
 
     # ------------------------------------------------------------------ Part 4: from boxes to decisions
     def dashboard(self, threshold=0.5):
