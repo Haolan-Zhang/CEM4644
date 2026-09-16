@@ -9,6 +9,8 @@ from nbformat.v4 import new_code_cell, new_markdown_cell, new_notebook
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 from aec_seg.config import SETS, LEGEND, CUBICASA  # noqa: E402
+from aec_seg.data import IntroPhotos  # noqa: E402
+from aec_seg.ui import INTRO_PHRASES  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
 
@@ -79,7 +81,7 @@ def build(variant):
 **No coding needed.** Each grey box below is one *step*: click the ▶ (play) button at its left, wait until it finishes, look at the result, then answer the report question that follows. Run the steps **from top to bottom**.
 
 **What you will do (about {v['minutes']} minutes)**
-1. Look at real floor plans and what is drawn on them.
+1. Meet SAM 3 on an ordinary site photo: ask by name, draw a box, tap an object. Then look at real floor plans and what is drawn on them.
 2. Ask a segmentation model, by name, for rooms, fixtures and openings: see the mask, the overlay, the count and the area, and compare with the drawing's own numbers.
 3. Do a quantity take-off with boxes: check the scale, measure rooms in square metres, count windows and doors.
 4. Compare two plans, and examine where the model goes wrong: wording, weak regions, and how to correct it.
@@ -113,17 +115,37 @@ lab.setup(dataset="{spec.key}", load_model=load_model)""",
     ))
 
     # ------------------------------------------------------------------ Part 1
+    intro = IntroPhotos(REPO / "data" / "intro")
+    intro_labels = intro.labels()
     legend_items = [(k, val) for k, val in LEGEND.items() if not (spec.render and (k.startswith("SOVR") or k == "m²"))]
     legend_rows = "\n".join(f"| {k} | {val} |" for k, val in legend_items)
     labels_note = "Room labels are abbreviations in Finnish:" if spec.render else "Room labels are abbreviations in Finnish (one plan is Swedish):"
+    cells.append(md("""
+## Part 1 · Meet SAM 3
+
+Detection (MP3) draws a **box** around an object. **Segmentation** goes one step further: it decides, *pixel by pixel*, what belongs to the object. Count the pixels and you have an area; know the scale and you have square metres. That is what makes it useful for **quantity take-off** later in this notebook.
+
+The model is **SAM 3** (Segment Anything Model 3, Meta 2025). You do not train it, and it has no fixed list of classes. You tell it *what* or *where*, in one of three ways:
+
+- a **phrase**, such as *helmet* or *wet concrete*: it returns every region that matches, each with a **confidence**;
+- a **box** around one object: it cuts out that object's exact outline;
+- a **click** on one object: same thing, from a single point.
+
+Two steps on an ordinary site photo first, so you see what the model does before it meets a drawing.
+"""))
+    cells.append(form("▶ Step 1a · Ask by name", "lab.intro_phrase(photo, phrase, own_phrase, confidence)",
+                      notes=["Pick a phrase, or type your own in *own_phrase* (it wins when it is not empty). Three panels: the photo, the mask (white = the model says *this is it*), the overlay. "
+                             "Try a thing (*helmet*), a material (*wet concrete*), a part (*hand*), and something that is not there. Watch the confidences and move the slider."],
+                      params=[f'photo = "{intro_labels[0]}" #@param {jlist(intro_labels)}', f'phrase = "person" #@param {jlist(INTRO_PHRASES)}',
+                              'own_phrase = "" #@param {type:"string"}', conf]))
+    cells.append(form("▶ Step 1b · Box it, or tap it", "lab.intro_draw(photo)",
+                      notes=["Draw a box around an object and label it *box*; or draw a tiny box on an object and label it *point* (its centre is the click). Draw several, click *Submit*: "
+                             "SAM 3 cuts out one object per box or click, no words needed. Needs the live model."],
+                      params=[f'photo = "{intro_labels[0]}" #@param {jlist(intro_labels)}']))
     cells.append(md(f"""
-## Part 1 · Meet the plans
+### The plans
 
-Detection (MP3) draws a **box** around an object. **Segmentation** goes one step further: it decides, *pixel by pixel*, what belongs to the object. On a drawing that is what makes it useful for **quantity take-off**: count the pixels of a room and you have its area in pixels; know the scale and you have square metres.
-
-The model is **SAM 3** (Segment Anything Model 3, Meta 2025). You do not train it. You type a short phrase, such as *room* or *toilet*, and it returns every region of the drawing that matches, each with a **confidence**. You can also draw a **box** around something: SAM 3 cuts out its outline, and can look for everything else that looks like it.
-
-{spec.description}
+On a drawing the same three prompts work, and the answer key lets us check every result. {spec.description}
 
 Every plan has a **5 m scale bar** at the bottom left. {labels_note}
 
@@ -131,7 +153,7 @@ Every plan has a **5 m scale bar** at the bottom left. {labels_note}
 |---|---|
 {legend_rows}
 """))
-    cells.append(form("▶ Step 1a · Browse the plans", "lab.show_plans(which)",
+    cells.append(form("▶ Step 1c · Browse the plans", "lab.show_plans(which)",
                       notes=["*all plans* shows every plan with what the drawing contains (rooms, floor area, doors, windows). These facts come from the plans' own annotations and are the answer key the notebook checks you against."],
                       params=[f'which = "all plans" #@param {jlist(["all plans"] + labels)}']))
 
@@ -218,6 +240,7 @@ Two plans side by side: square metres per room type from SAM 3, and the drawings
     cells.append(md("## Wrap-up"))
     cells.append(form("▶ Numbers for your report", "lab.report_summary()"))
     cells.append(md("### Plan credits and model\n"
+                    f"- Site photos in Part 1: " + "; ".join(f"{p.title} ({p.author}, {p.license}, {p.source})" for p in intro.photos) + ".\n"
                     f"- Floor plans: {CUBICASA['author']}, licence {CUBICASA['license']}, {CUBICASA['source']}. "
                     f"Sample ids in this notebook: {', '.join(ids)} (folder `data/plans/{spec.key}`, credits in `credits.json`). "
                     "The plans were resampled to a plan-specific scale and given a scale bar; the answer keys come from the dataset's vector annotations.\n"

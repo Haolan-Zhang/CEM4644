@@ -15,7 +15,7 @@ There is no training exercise in MP4 (SAM 3 is used as is).
 
 ## What the students do
 
-1. **Meet the plans**: browse six plans with their facts (rooms, floor area, doors, windows) and a legend of the Finnish room labels.
+1. **Meet SAM 3**: on an ordinary site photo, ask by phrase (a dropdown or their own words), draw a box, tap an object; then browse the six plans with their facts (rooms, floor area, doors, windows) and a legend of the Finnish room labels.
 2. **Ask by name**: original → mask → overlay for *room*, *bedroom*, *toilet*, *window*...; count, pixels, square metres; hits, misses and extras drawn against the answer key; square metres per room type next to the drawing's; an area-estimation game.
 3. **Take-off with boxes**: check the scale on the 5 m bar; draw tight boxes around rooms (the notebook asks SAM 3 for *empty room* with the box as the example, fills the symbol holes, removes the walls and prints the area next to the drawing's) and around a window or door, then *find_all* counts every look-alike (found / missed / extra).
 4. **Compare and examine errors**: two plans side by side; wording; region inspector; correction with a negative box; own words.
@@ -27,6 +27,7 @@ There is no training exercise in MP4 (SAM 3 is used as is).
 MP4_Workshop_Segmentation.ipynb   student notebook (generated)
 MP4_Homework_Segmentation.ipynb   student notebook (generated)
 aec_seg/          all the code the notebooks call (hidden from students)
+data/intro/       two site photos (Wikimedia Commons) for the opening steps + credits.json
 data/plans/       the plans (PNG with a scale bar; set A rendered from the vector drawing, set B the scanned image)
                   and their answer keys (<id>.key.json: rooms with real areas and polygons, doors, windows,
                   fixtures, walls, scale) + credits.json

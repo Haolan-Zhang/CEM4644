@@ -164,3 +164,40 @@ class MaskStore:
                   "boxes": [[round(float(v), 1) for v in b] for b in res.boxes], "area_pct": round(res.area_pct(), 2),
                   "n": int(len(res))}
         (d / "index.json").write_text(json.dumps(idx, indent=1))
+
+
+@dataclass
+class IntroPhoto:
+    """A photo for the first steps (what SAM 3 does before the plans), with its credit."""
+    id: str
+    path: Path
+    title: str
+    author: str
+    license: str
+    source: str
+
+    def load(self) -> Image.Image:
+        return Image.open(self.path).convert("RGB")
+
+    @property
+    def label(self) -> str:
+        return f"{self.id}: {self.title}"
+
+
+class IntroPhotos:
+    def __init__(self, folder: Path):
+        self.folder = Path(folder)
+        cred = json.loads((self.folder / "credits.json").read_text())
+        self.photos: List[IntroPhoto] = [IntroPhoto(c["id"], self.folder / c["file"], c["title"], c["author"], c["license"], c["source"]) for c in cred]
+
+    def __getitem__(self, key) -> IntroPhoto:
+        for p in self.photos:
+            if key in (p.id, p.label) or str(key).startswith(p.id + ":"):
+                return p
+        raise KeyError(key)
+
+    def labels(self) -> List[str]:
+        return [p.label for p in self.photos]
+
+    def credits_text(self) -> str:
+        return "\n".join(f"- {p.id}: {p.title}. {p.author}, {p.license}. {p.source}" for p in self.photos)

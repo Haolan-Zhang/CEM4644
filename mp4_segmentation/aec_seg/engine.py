@@ -69,6 +69,8 @@ class Sam3Engine:
         from transformers import Sam3Model, Sam3Processor
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.dtype = torch.float16 if self.device == "cuda" else torch.float32
+        self.model_id = model_id
+        self._trk = None
         t0 = time.time()
         log(f"Loading SAM 3 ({'GPU' if self.device == 'cuda' else 'CPU: each phrase will take 10-30 s'})...")
         self.processor = Sam3Processor.from_pretrained(model_id)
@@ -157,3 +159,41 @@ class Sam3Engine:
         boxes = res["boxes"].float().cpu().numpy() if hasattr(res["boxes"], "cpu") else np.asarray(res["boxes"], dtype=float)
         order = np.argsort(-scores)
         return SegResult(prompt, masks[order], scores[order], boxes[order], size, seconds)
+
+    # ------------------------------------------------------------------ the tracker head: classic SAM prompts
+    def _tracker(self):
+        """SAM 3's second head (the one SAM 1 and 2 had): one object from a click or a box, no words. Same checkpoint."""
+        if self._trk is None:
+            import logging
+            logging.getLogger("transformers").setLevel(logging.ERROR)     # it warns about loading a part of the checkpoint
+            from transformers import Sam3TrackerModel, Sam3TrackerProcessor
+            self._trk_proc = Sam3TrackerProcessor.from_pretrained(self.model_id)
+            self._trk = Sam3TrackerModel.from_pretrained(self.model_id, dtype=self.dtype).to(self.device).eval()
+        return self._trk, self._trk_proc
+
+    def segment_visual(self, image: Image.Image, point: Optional[Sequence[float]] = None, box: Optional[Sequence[float]] = None) -> SegResult:
+        """One object from one click (x, y) or one box (x1, y1, x2, y2): the best of the three masks the head proposes."""
+        torch = self._torch
+        t0 = time.time()
+        model, proc = self._tracker()
+        kw = {}
+        if point is not None:
+            kw["input_points"] = [[[[float(point[0]), float(point[1])]]]]
+            kw["input_labels"] = [[[1]]]
+        if box is not None:
+            kw["input_boxes"] = [[[float(v) for v in box]]]
+        inputs = proc(images=image, return_tensors="pt", **kw).to(self.device)
+        inputs = {k: (v.to(self.dtype) if torch.is_floating_point(v) else v) for k, v in inputs.items()}
+        with torch.no_grad():
+            out = model(**inputs)
+        masks = proc.post_process_masks(out.pred_masks, inputs["original_sizes"])[0]       # [1, 3, H, W]
+        scores = out.iou_scores[0, 0].float().cpu().numpy()
+        best = int(scores.argmax())
+        m = np.asarray(masks[0, best].cpu().numpy()) > 0
+        if m.any():
+            ys, xs = np.where(m)
+            bx = [float(xs.min()), float(ys.min()), float(xs.max()), float(ys.max())]
+        else:
+            bx = [0.0, 0.0, 0.0, 0.0]
+        what = f"point {[int(v) for v in point]}" if point is not None else f"box {[int(v) for v in box]}"
+        return SegResult(what, m[None], np.array([float(scores[best])]), np.array([bx]), image.size, time.time() - t0)

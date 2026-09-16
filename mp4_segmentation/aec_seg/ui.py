@@ -107,6 +107,99 @@ def legend():
         print(f"  {k:26s} {v}")
 
 
+# --------------------------------------------------------------------------- Part 1: SAM 3 on a photo
+INTRO_PHRASES = ["person", "helmet", "safety vest", "boots", "hose", "rebar", "wet concrete", "hand", "truck", "wheel", "brick wall", "sky", "window"]
+INTRO_COLORS = ["#e63946", "#2a9d8f", "#f4a261", "#7b2cbf", "#457b9d", "#e9c46a", "#06d6a0", "#ff70a6"]
+
+
+def intro_phrase(lab, photo_id: str, phrase: str, threshold: float):
+    """SAM 3 asked by name on an ordinary photo: original | mask | overlay, and how sure it is."""
+    photo = lab.intro_photos[photo_id]
+    img = photo.load()
+    phrase = (phrase or "").strip()
+    if not phrase:
+        print("Type or pick a phrase first."); return
+    if lab.engine is None:
+        print("SAM 3 is not loaded (run Step 0 with load_model ticked)."); return
+    res = lab.engine.segment(img, phrase, threshold=0.1)
+    viz.show(viz.three_panel(img, res, "#e63946", f"'{phrase}' on {photo.id}", threshold))
+    keep = res.scores >= threshold
+    n = int(keep.sum())
+    top = ", ".join(f"{v:.2f}" for v in sorted(res.scores[keep], reverse=True)[:8])
+    if n:
+        print(f"'{phrase}': {n} region(s) at confidence ≥ {threshold:.2f} (confidences {top}), together {res.area_pct(threshold):.1f} % of the photo, "
+              f"in {res.seconds:.1f} s.")
+    else:
+        below = int((res.scores >= 0.1).sum())
+        print(f"'{phrase}': nothing at confidence ≥ {threshold:.2f}" + (f"; {below} weak region(s) between 0.10 and {threshold:.2f}: lower the slider to see them." if below else ". Try other words.")
+              + f" ({res.seconds:.1f} s)")
+    print(f"Photo: {photo.title}. {photo.author}, {photo.license}.")
+
+
+def intro_prompts_compute(lab, img, prompts):
+    """prompts: [(label, [x1, y1, x2, y2])] in full-image pixels; 'point' uses the centre of the drawn box as the click."""
+    layers, lines, marks = [], [], []
+    for i, (label, b) in enumerate(prompts):
+        color = INTRO_COLORS[i % len(INTRO_COLORS)]
+        if label == "point":
+            cx, cy = (b[0] + b[2]) / 2, (b[1] + b[3]) / 2
+            res = lab.engine.segment_visual(img, point=(cx, cy))
+            what = f"a click at ({cx:.0f}, {cy:.0f})"
+            marks.append(("point", (cx, cy), color))
+        else:
+            res = lab.engine.segment_visual(img, box=b)
+            what = f"a box {[int(v) for v in b]}"
+            marks.append(("box", b, color))
+        m = res.masks[0]
+        layers.append((str(i + 1), m, color))
+        lines.append(f"{i + 1}. {what}: one object of {int(m.sum()):,} px = {m.mean() * 100:.1f} % of the photo (the model's own confidence {res.scores[0]:.2f}).")
+    over = viz.multi_overlay(img, layers, alpha=0.55) if layers else img.copy()
+    d = ImageDraw.Draw(over)
+    for kind, g, color in marks:
+        if kind == "point":
+            cx, cy = g
+            r = max(6, img.width // 120)
+            d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
+        else:
+            d.rectangle(g, outline=color, width=3)
+    return over, lines
+
+
+def intro_draw(lab, photo_id: str):
+    """Draw boxes (label 'box') or tap objects (label 'point': the centre of a small box) on the photo; SAM 3 cuts each one out."""
+    import ipywidgets as w
+    from IPython.display import display
+    from jupyter_bbox_widget import BBoxWidget
+    photo = lab.intro_photos[photo_id]
+    img = photo.load()
+    if lab.engine is None:
+        print("SAM 3 is not loaded (run Step 0 with load_model ticked)."); return
+    disp = img.copy(); disp.thumbnail((1000, 1000))
+    scale = img.width / disp.width
+    buf = io.BytesIO(); disp.save(buf, "PNG")
+    widget = BBoxWidget(classes=["box", "point"])
+    widget.image_bytes = buf.getvalue()
+    msg = w.HTML("Draw a <b>box</b> around an object, or a tiny box on it labelled <b>point</b> (its centre is the click). Several are fine. Then <b>Submit</b>.")
+    out = w.Output()
+
+    @widget.on_submit
+    def _go():
+        prompts = [(b.get("label", "box"), [b["x"] * scale, b["y"] * scale, (b["x"] + b["width"]) * scale, (b["y"] + b["height"]) * scale])
+                   for b in widget.bboxes]
+        if not prompts:
+            msg.value = "Draw at least one box first."; return
+        msg.value = "Running SAM 3..."
+        over, lines = intro_prompts_compute(lab, img, prompts)
+        with out:
+            out.clear_output(wait=True)
+            viz.show_image(over, 900)
+            print("\n".join(lines))
+            print("No words were used: the model was given a place, and returned the object that a person would mean by it.")
+        msg.value = "Done. Draw more, or redraw, and submit again."
+
+    display(w.VBox([msg, widget, out]))
+
+
 # --------------------------------------------------------------------------- Part 2
 def segment_view(lab, plan_id: str, thing_name: str, threshold: float):
     """Original | mask | overlay for one thing on one plan, with a live confidence slider and the answer key."""

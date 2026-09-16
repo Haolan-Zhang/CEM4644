@@ -8,7 +8,7 @@ from typing import Dict, Optional
 
 from . import ui, viz
 from .config import SETS, PlanSet as PlanSpec, Thing
-from .data import MaskStore, PlanSet
+from .data import IntroPhotos, MaskStore, PlanSet
 from .engine import SegResult, Sam3Engine
 
 TRANSFORMERS_MIN = "4.57.2"
@@ -39,6 +39,7 @@ class SegLab:
             pass
         self.spec = SETS[dataset]
         self.plans = PlanSet(self.root / self.spec.folder, dataset)
+        self.intro_photos = IntroPhotos(self.root / "data" / "intro")
         self.store = MaskStore(self.root / self.spec.masks)
         if load_model:
             try:
@@ -108,6 +109,15 @@ class SegLab:
         return self.plans[str(label)].id
 
     # ------------------------------------------------------------------ notebook steps
+    # ------------------------------------------------------------------ Part 1: SAM 3 on a photo
+    def intro_phrase(self, photo: str, phrase: str = "person", own_phrase: str = "", confidence: float = 0.3):
+        self._need()
+        ui.intro_phrase(self, photo, own_phrase.strip() or phrase, float(confidence))
+
+    def intro_draw(self, photo: str):
+        self._need()
+        ui.intro_draw(self, photo)
+
     def show_plans(self, which="all"):
         self._need()
         if which in ("all", None, "all plans"):

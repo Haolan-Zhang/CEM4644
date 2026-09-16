@@ -26,8 +26,12 @@ the answer key: every room's polygon and real area, every door, window and fixtu
 transforms are composed, so the symbols land where they are drawn). That key is what every "the drawing
 says..." line in the notebook comes from.
 
+Part 1 opens on two ordinary site photos (Wikimedia Commons, public domain / CC BY-SA; `data/intro`) so that
+students see the three prompts (phrase, box, click) on a photo before the drawings; the click and the box use
+SAM 3's tracker head (the classic SAM prompt encoder, same checkpoint, loaded on first use).
+
 Everything the students see for the built-in plans and phrases is precomputed and instant. Only the
-live steps run SAM 3 (Step 3a and 3b boxes, Step 4d, 4e, Part 5); on a T4 each request takes well
+live steps run SAM 3 (Steps 1a and 1b, Step 3a and 3b boxes, Step 4d, 4e, Part 5); on a T4 each request takes well
 under a second, on CPU about a minute.
 
 ## 2. What SAM 3 actually does on these plans (measured)
@@ -99,8 +103,8 @@ the blue boxes, which takes a minute per plan, against half an hour of counting 
 | Min | Part | What to say / do |
 |---|---|---|
 | 0–5 | Step 0 | Everyone switches the runtime to T4 GPU and runs Step 0 (clone, SAM 3 load: 2–3 min) while you explain detection (boxes) vs. segmentation (pixels) and why pixels can be counted. Choose *Run anyway* on Colab's author warning. |
-| 5–12 | Part 1 | Browse the plans. Point out the scale bar, the Finnish labels (legend in the notebook), and that the notebook knows every room's real area from the dataset's annotations. |
-| 12–35 | Part 2 | *room* on 1293: 5 regions, 6/6 rooms found, 0 extra. Then *toilet*, *sink*. Then *kitchen*, *window* and *door*: nothing, and the hit/miss overlay shows the red windows. Then *curved line* (Step 4b wording, or 4e): every door swing. Step 2c: the m² table per room type against the drawing. Play the estimation game; ask for scores. Key message: the number is only as good as the word, and the drawing's answer key is how you find out. |
+| 5–15 | Part 1 | Step 1a on the concrete-pour photo: *person*, *helmet*, *wet concrete*, *hose*, then a word that is not there; the confidences and the slider. Step 1b: a box around a worker, a click on a helmet: one object each, no words. Then Step 1c: browse the plans; point out the scale bar, the Finnish labels (legend in the notebook), and that the notebook knows every room's real area from the dataset's annotations. |
+| 15–35 | Part 2 | *room* on 1293: 5 regions, 6/6 rooms found, 0 extra. Then *toilet*, *sink*. Then *kitchen*, *window* and *door*: nothing, and the hit/miss overlay shows the red windows. Then *curved line* (Step 4b wording, or 4e): every door swing. Step 2c: the m² table per room type against the drawing. Play the estimation game; ask for scores. Key message: the number is only as good as the word, and the drawing's answer key is how you find out. |
 | 35–60 | Part 3 | Step 3a: box the scale bar (zoom in); a 1 % scale error is a 2 % area error. Step 3b: tight boxes on two rooms, read the "−5 %" / "+42 %" lines and the open-plan note, then one box on a window with *find_all*: count the green, red and blue boxes on the plan. Then a door: found, with extras. Discuss what a take-off needs that the model does not have (the convention, and a person). |
 | 60–78 | Part 4 | Compare 1293 and 2536. Wording (Step 4b, *door*): *door* vs *door arc* vs *curved line* vs *arc*. Inspector: weak regions with 20–40 % confidence and the room they sit on. Negative box on a merged region (2090: living room + kitchen). Own words: *thick black line*, *circle*, *small rectangle*. |
 | 78–90 | Part 5 + wrap-up | Own plan through the upload app if time allows (a photo of any plan works). Report template: `docs/MP4_Workshop_Report_Template.md`. |
