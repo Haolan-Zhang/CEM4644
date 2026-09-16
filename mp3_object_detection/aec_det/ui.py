@@ -231,14 +231,24 @@ def threshold_explorer(res: EvalResult, spec):
                                 "false alarms": v["FP"], "recall %": round(v["recall"] * 100), "precision %": round(v["precision"] * 100)}
                                for k, v in c.items()])
             display(df.style.hide(axis="index") if hasattr(df, "style") else df)
-            fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
+            fig, axes = plt.subplots(1, 3, figsize=(14.5, 3.6))
             for name in res.classes:
                 col = spec.colors.get(next((k for k in spec.classes if spec.pretty(k) == name), name), None)
-                axes[0].plot(ths, [table[x][name]["recall"] * 100 for x in ths], label=name, color=col)
-                axes[1].plot(ths, [table[x][name]["precision"] * 100 for x in ths], label=name, color=col)
-            for ax, ttl in zip(axes, ("recall: % of true objects found", "precision: % of detections that are right")):
+                rec = [table[x][name]["recall"] * 100 for x in ths]
+                prec = [table[x][name]["precision"] * 100 for x in ths]
+                axes[0].plot(ths, rec, label=name, color=col)
+                axes[1].plot(ths, prec, label=name, color=col)
+                # precision-recall curve: one point per threshold (thresholds where nothing is detected have no precision and
+                # are left out), the dot is the threshold on the slider
+                has = [table[x][name]["TP"] + table[x][name]["FP"] > 0 for x in ths]
+                axes[2].plot([r for r, h in zip(rec, has) if h], [p for p, h in zip(prec, has) if h], marker=".", ms=4, label=name, color=col)
+                if table[t][name]["TP"] + table[t][name]["FP"] > 0:
+                    axes[2].plot([table[t][name]["recall"] * 100], [table[t][name]["precision"] * 100], "o", ms=9, color=col, mec="black")
+            for ax, ttl in zip(axes[:2], ("recall: % of true objects found", "precision: % of detections that are right")):
                 ax.axvline(t, color="black", ls="--"); ax.set_ylim(0, 102); ax.set_xlabel("confidence threshold"); ax.set_title(ttl, fontsize=10)
                 ax.grid(alpha=0.3)
+            axes[2].set_xlim(0, 102); axes[2].set_ylim(0, 102); axes[2].set_xlabel("recall %"); axes[2].set_ylabel("precision %")
+            axes[2].set_title(f"precision-recall curve (dot = threshold {t:.2f})", fontsize=10); axes[2].grid(alpha=0.3)
             axes[0].legend(fontsize=8)
             fig.tight_layout(); show(fig)
 

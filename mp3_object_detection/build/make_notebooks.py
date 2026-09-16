@@ -171,7 +171,9 @@ To score a detector we compare its boxes with the labeled boxes on unseen test p
                       notes=["Per class: how many true objects were found, how many were missed, how many detections were false alarms."],
                       params=['how_many = "all" #@param ["all", "100"]', 'threshold = 0.5 #@param {type:"slider", min:0.1, max:0.9, step:0.1}']))
     cells.append(form("▶ Step 2c · Move the threshold", "lab.threshold_explorer()",
-                      notes=["The table and the two curves update as you move the slider. Recall and precision pull in opposite directions."]))
+                      notes=["The table and the curves update as you move the slider. Recall and precision pull in opposite directions. "
+                             "The third panel is the **precision-recall curve**: every point is one threshold, the big dot is the one on the slider; "
+                             "the closer a class's curve stays to the top-right corner (everything found, nothing false), the better the detector is on that class."]))
     cells.append(form("▶ Step 2d · Look at the mistakes", "lab.error_explorer()",
                       notes=["Green = correct, orange = false alarm, red dashed = missed object. Choose the kind of mistake and the class; the worst photos come first."]))
     questions.append((3, "Which class does the model find most reliably and which one does it miss most often (give the recall numbers)? Look at the missed objects in Step 2d: what do they have in common (size, distance, lighting, overlap, rarity in the training data)?"))
