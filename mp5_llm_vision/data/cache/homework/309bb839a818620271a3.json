@@ -1,0 +1,1 @@
+{"text": "[\n  {\"label\": \"wheel loader\", \"box_2d\": [227, 0, 772, 856]}\n]", "data": [{"label": "wheel loader", "box_2d": [227, 0, 772, 856]}], "error": "", "seconds": 1.17, "tokens_in": 1220, "tokens_out": 36, "tokens_thought": 0, "model": "gemini-3.5-flash-lite", "cached": false, "schema": true}

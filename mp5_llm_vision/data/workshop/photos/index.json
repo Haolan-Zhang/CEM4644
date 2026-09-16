@@ -1,0 +1,126 @@
+{
+ "classes": [
+  "plain wall (no defect)",
+  "minor crack",
+  "major crack",
+  "spalling",
+  "peeling paint / plaster",
+  "stain",
+  "algae / biological growth"
+ ],
+ "specialist_name": "MP2 course model (ConvNeXt V2 femto trained on 1,400 photos)",
+ "items": [
+  {
+   "file": "plain_1.jpg",
+   "truth": "plain wall (no defect)",
+   "specialist": {
+    "label": "plain wall (no defect)",
+    "confidence": 0.922
+   }
+  },
+  {
+   "file": "plain_2.jpg",
+   "truth": "plain wall (no defect)",
+   "specialist": {
+    "label": "plain wall (no defect)",
+    "confidence": 0.908
+   }
+  },
+  {
+   "file": "minor_crack_1.jpg",
+   "truth": "minor crack",
+   "specialist": {
+    "label": "minor crack",
+    "confidence": 0.781
+   }
+  },
+  {
+   "file": "minor_crack_2.jpg",
+   "truth": "minor crack",
+   "specialist": {
+    "label": "minor crack",
+    "confidence": 0.905
+   }
+  },
+  {
+   "file": "major_crack_1.jpg",
+   "truth": "major crack",
+   "specialist": {
+    "label": "minor crack",
+    "confidence": 0.584
+   }
+  },
+  {
+   "file": "major_crack_2.jpg",
+   "truth": "major crack",
+   "specialist": {
+    "label": "major crack",
+    "confidence": 0.752
+   }
+  },
+  {
+   "file": "spalling_1.jpg",
+   "truth": "spalling",
+   "specialist": {
+    "label": "spalling",
+    "confidence": 0.923
+   }
+  },
+  {
+   "file": "spalling_2.jpg",
+   "truth": "spalling",
+   "specialist": {
+    "label": "spalling",
+    "confidence": 0.924
+   }
+  },
+  {
+   "file": "peeling_1.jpg",
+   "truth": "peeling paint / plaster",
+   "specialist": {
+    "label": "peeling paint / plaster",
+    "confidence": 0.927
+   }
+  },
+  {
+   "file": "peeling_2.jpg",
+   "truth": "peeling paint / plaster",
+   "specialist": {
+    "label": "peeling paint / plaster",
+    "confidence": 0.918
+   }
+  },
+  {
+   "file": "stain_1.jpg",
+   "truth": "stain",
+   "specialist": {
+    "label": "stain",
+    "confidence": 0.916
+   }
+  },
+  {
+   "file": "stain_2.jpg",
+   "truth": "stain",
+   "specialist": {
+    "label": "stain",
+    "confidence": 0.912
+   }
+  },
+  {
+   "file": "algae_1.jpg",
+   "truth": "algae / biological growth",
+   "specialist": {
+    "label": "algae / biological growth",
+    "confidence": 0.911
+   }
+  },
+  {
+   "file": "algae_2.jpg",
+   "truth": "algae / biological growth",
+   "specialist": {
+    "label": "algae / biological growth",
+    "confidence": 0.912
+   }
+  }
+ ]
+}

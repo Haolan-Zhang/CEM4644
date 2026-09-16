@@ -1,0 +1,152 @@
+{
+ "items": [
+  {
+   "id": "1293",
+   "file": "1293.png",
+   "key": "1293.key.json",
+   "title": "flat with four large rooms",
+   "specialist": {
+    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "rooms": [
+     {
+      "label": "ET",
+      "type": "hall",
+      "truth_m2": 4.3,
+      "sam_m2": 9.0
+     },
+     {
+      "label": "K",
+      "type": "kitchen",
+      "truth_m2": 7.56,
+      "sam_m2": 9.0
+     },
+     {
+      "label": "OH",
+      "type": "living room",
+      "truth_m2": 14.69,
+      "sam_m2": 13.79
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 10.64,
+      "sam_m2": 9.86
+     },
+     {
+      "label": "KH",
+      "type": "bathroom",
+      "truth_m2": 2.61,
+      "sam_m2": 1.99
+     }
+    ]
+   }
+  },
+  {
+   "id": "2536",
+   "file": "2536.png",
+   "key": "2536.key.json",
+   "title": "flat with three bedrooms",
+   "specialist": {
+    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "rooms": [
+     {
+      "label": "ET",
+      "type": "hall",
+      "truth_m2": 10.48,
+      "sam_m2": null
+     },
+     {
+      "label": "VH",
+      "type": "walk-in closet",
+      "truth_m2": 4.26,
+      "sam_m2": 4.33
+     },
+     {
+      "label": "OH",
+      "type": "living room",
+      "truth_m2": 23.5,
+      "sam_m2": 0.11
+     },
+     {
+      "label": "K",
+      "type": "kitchen",
+      "truth_m2": 12.12,
+      "sam_m2": 7.83
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 11.41,
+      "sam_m2": 10.58
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 9.37,
+      "sam_m2": 8.05
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 9.26,
+      "sam_m2": 8.7
+     },
+     {
+      "label": "KH",
+      "type": "bathroom",
+      "truth_m2": 2.69,
+      "sam_m2": 1.51
+     },
+     {
+      "label": "WC",
+      "type": "bathroom",
+      "truth_m2": 1.37,
+      "sam_m2": 1.37
+     }
+    ]
+   }
+  },
+  {
+   "id": "2090",
+   "file": "2090.png",
+   "key": "2090.key.json",
+   "title": "small flat with a balcony",
+   "specialist": {
+    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "rooms": [
+     {
+      "label": "OH",
+      "type": "living room",
+      "truth_m2": 13.45,
+      "sam_m2": 19.72
+     },
+     {
+      "label": "ET",
+      "type": "hall",
+      "truth_m2": 3.78,
+      "sam_m2": null
+     },
+     {
+      "label": "K",
+      "type": "kitchen",
+      "truth_m2": 9.4,
+      "sam_m2": 0.51
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 9.13,
+      "sam_m2": 7.41
+     },
+     {
+      "label": "PH",
+      "type": "bathroom",
+      "truth_m2": 4.77,
+      "sam_m2": 4.5
+     }
+    ]
+   }
+  }
+ ],
+ "credit": "- 1293: flat with four large rooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 2536: flat with three bedrooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 2090: small flat with a balcony. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 6457: house with a dining area and stairs. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 207: large house, 15 rooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 7696: studio flat. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548"
+}

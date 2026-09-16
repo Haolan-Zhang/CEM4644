@@ -1,0 +1,1 @@
+{"text": "```json\n[\n  {\"box_2d\": [0, 0, 1000, 990], \"label\": \"excavator\"}\n]\n```", "data": [{"box_2d": [0, 0, 1000, 990], "label": "excavator"}], "error": "", "seconds": 1.58, "tokens_in": 1220, "tokens_out": 41, "tokens_thought": 211, "model": "gemini-3.5-flash-lite", "cached": false, "schema": false}

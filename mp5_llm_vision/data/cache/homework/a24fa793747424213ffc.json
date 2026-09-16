@@ -1,0 +1,1 @@
+{"text": "```json\n[\n  {\"box_2d\": [169, 37, 769, 935], \"label\": \"wheel loader\"}\n]\n```", "data": [{"box_2d": [169, 37, 769, 935], "label": "wheel loader"}], "error": "", "seconds": 1.35, "tokens_in": 1220, "tokens_out": 42, "tokens_thought": 165, "model": "gemini-3.5-flash-lite", "cached": false, "schema": false}

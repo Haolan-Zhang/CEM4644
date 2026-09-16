@@ -1,0 +1,177 @@
+{
+ "classes": [
+  "Bauhaus International",
+  "Brutalist",
+  "Art Deco",
+  "Neoclassical",
+  "Gothic Revival",
+  "Georgian",
+  "Victorian Terrace",
+  "Mid-century Modern",
+  "Contemporary Curtain Wall",
+  "Industrial Warehouse"
+ ],
+ "specialist_name": "MP2 course model (ConvNeXt V2 femto trained on 380 photos)",
+ "items": [
+  {
+   "file": "bauhaus_international_1.jpg",
+   "truth": "Bauhaus International",
+   "specialist": {
+    "label": "Bauhaus International",
+    "confidence": 0.901
+   }
+  },
+  {
+   "file": "bauhaus_international_2.jpg",
+   "truth": "Bauhaus International",
+   "specialist": {
+    "label": "Bauhaus International",
+    "confidence": 0.879
+   }
+  },
+  {
+   "file": "brutalist_1.jpg",
+   "truth": "Brutalist",
+   "specialist": {
+    "label": "Brutalist",
+    "confidence": 0.909
+   }
+  },
+  {
+   "file": "brutalist_2.jpg",
+   "truth": "Brutalist",
+   "specialist": {
+    "label": "Brutalist",
+    "confidence": 0.916
+   }
+  },
+  {
+   "file": "art_deco_1.jpg",
+   "truth": "Art Deco",
+   "specialist": {
+    "label": "Art Deco",
+    "confidence": 0.922
+   }
+  },
+  {
+   "file": "art_deco_2.jpg",
+   "truth": "Art Deco",
+   "specialist": {
+    "label": "Art Deco",
+    "confidence": 0.915
+   }
+  },
+  {
+   "file": "neoclassical_1.jpg",
+   "truth": "Neoclassical",
+   "specialist": {
+    "label": "Neoclassical",
+    "confidence": 0.911
+   }
+  },
+  {
+   "file": "neoclassical_2.jpg",
+   "truth": "Neoclassical",
+   "specialist": {
+    "label": "Neoclassical",
+    "confidence": 0.918
+   }
+  },
+  {
+   "file": "gothic_revival_1.jpg",
+   "truth": "Gothic Revival",
+   "specialist": {
+    "label": "Gothic Revival",
+    "confidence": 0.925
+   }
+  },
+  {
+   "file": "gothic_revival_2.jpg",
+   "truth": "Gothic Revival",
+   "specialist": {
+    "label": "Gothic Revival",
+    "confidence": 0.913
+   }
+  },
+  {
+   "file": "georgian_1.jpg",
+   "truth": "Georgian",
+   "specialist": {
+    "label": "Georgian",
+    "confidence": 0.625
+   }
+  },
+  {
+   "file": "georgian_2.jpg",
+   "truth": "Georgian",
+   "specialist": {
+    "label": "Georgian",
+    "confidence": 0.906
+   }
+  },
+  {
+   "file": "victorian_terrace_1.jpg",
+   "truth": "Victorian Terrace",
+   "specialist": {
+    "label": "Victorian Terrace",
+    "confidence": 0.906
+   }
+  },
+  {
+   "file": "victorian_terrace_2.jpg",
+   "truth": "Victorian Terrace",
+   "specialist": {
+    "label": "Victorian Terrace",
+    "confidence": 0.924
+   }
+  },
+  {
+   "file": "mid_century_modern_1.jpg",
+   "truth": "Mid-century Modern",
+   "specialist": {
+    "label": "Mid-century Modern",
+    "confidence": 0.915
+   }
+  },
+  {
+   "file": "mid_century_modern_2.jpg",
+   "truth": "Mid-century Modern",
+   "specialist": {
+    "label": "Mid-century Modern",
+    "confidence": 0.899
+   }
+  },
+  {
+   "file": "contemporary_curtain_wall_1.jpg",
+   "truth": "Contemporary Curtain Wall",
+   "specialist": {
+    "label": "Contemporary Curtain Wall",
+    "confidence": 0.88
+   }
+  },
+  {
+   "file": "contemporary_curtain_wall_2.jpg",
+   "truth": "Contemporary Curtain Wall",
+   "specialist": {
+    "label": "Contemporary Curtain Wall",
+    "confidence": 0.912
+   }
+  },
+  {
+   "file": "industrial_warehouse_1.jpg",
+   "truth": "Industrial Warehouse",
+   "specialist": {
+    "label": "Industrial Warehouse",
+    "confidence": 0.769
+   }
+  },
+  {
+   "file": "industrial_warehouse_2.jpg",
+   "truth": "Industrial Warehouse",
+   "specialist": {
+    "label": "Industrial Warehouse",
+    "confidence": 0.888
+   }
+  }
+ ]
+}

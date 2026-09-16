@@ -1,0 +1,152 @@
+{
+ "items": [
+  {
+   "id": "8138",
+   "file": "8138.png",
+   "key": "8138.key.json",
+   "title": "apartment with bold walls and furniture",
+   "specialist": {
+    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "rooms": [
+     {
+      "label": "OH",
+      "type": "living room",
+      "truth_m2": 20.68,
+      "sam_m2": 20.17
+     },
+     {
+      "label": "AH",
+      "type": "room",
+      "truth_m2": 11.82,
+      "sam_m2": 10.45
+     },
+     {
+      "label": "K",
+      "type": "kitchen",
+      "truth_m2": 9.4,
+      "sam_m2": 6.76
+     },
+     {
+      "label": "ET",
+      "type": "hall",
+      "truth_m2": 7.63,
+      "sam_m2": 7.36
+     },
+     {
+      "label": "KPH",
+      "type": "bathroom",
+      "truth_m2": 2.57,
+      "sam_m2": 2.54
+     },
+     {
+      "label": "VH",
+      "type": "walk-in closet",
+      "truth_m2": 1.45,
+      "sam_m2": 1.4
+     }
+    ]
+   }
+  },
+  {
+   "id": "10715",
+   "file": "10715.png",
+   "key": "10715.key.json",
+   "title": "apartment (bold walls)",
+   "specialist": {
+    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "rooms": [
+     {
+      "label": "OH",
+      "type": "living room",
+      "truth_m2": 18.66,
+      "sam_m2": 25.72
+     },
+     {
+      "label": "ET",
+      "type": "hall",
+      "truth_m2": 2.78,
+      "sam_m2": null
+     },
+     {
+      "label": "K",
+      "type": "kitchen",
+      "truth_m2": 12.32,
+      "sam_m2": 25.72
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 10.42,
+      "sam_m2": 9.52
+     },
+     {
+      "label": "PH",
+      "type": "bathroom",
+      "truth_m2": 5.23,
+      "sam_m2": 4.65
+     },
+     {
+      "label": "VH",
+      "type": "walk-in closet",
+      "truth_m2": 2.81,
+      "sam_m2": null
+     },
+     {
+      "label": "",
+      "type": "other room",
+      "truth_m2": 2.11,
+      "sam_m2": null
+     }
+    ]
+   }
+  },
+  {
+   "id": "11615",
+   "file": "11615.png",
+   "key": "11615.key.json",
+   "title": "small flat A3 with printed room areas",
+   "specialist": {
+    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "rooms": [
+     {
+      "label": "ET",
+      "type": "hall",
+      "truth_m2": 2.6,
+      "sam_m2": 6.41
+     },
+     {
+      "label": "K",
+      "type": "kitchen",
+      "truth_m2": 6.81,
+      "sam_m2": 11.72
+     },
+     {
+      "label": "OH",
+      "type": "living room",
+      "truth_m2": 8.33,
+      "sam_m2": 11.72
+     },
+     {
+      "label": "KH",
+      "type": "bathroom",
+      "truth_m2": 4.68,
+      "sam_m2": 4.32
+     },
+     {
+      "label": "ALKOVI",
+      "type": "alcove",
+      "truth_m2": 3.82,
+      "sam_m2": 0.0
+     },
+     {
+      "label": "VH",
+      "type": "walk-in closet",
+      "truth_m2": 1.57,
+      "sam_m2": null
+     }
+    ]
+   }
+  }
+ ],
+ "credit": "- 14341: long single-storey house, 20 rooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 5018: two-storey house: ground floor (left) and upper floor (right). CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 1217: two-storey villa, Swedish labels. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 8138: apartment with bold walls and furniture. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 9136: two-storey house, both floors stacked on the sheet. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 11615: small flat A3 with printed room areas. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 10715: apartment (bold walls). CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548"
+}
