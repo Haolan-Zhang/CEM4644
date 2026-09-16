@@ -65,9 +65,14 @@ def launch(detectors: Dict[str, object], colors: Dict[str, str], title: str = "T
     import contextlib
     import io
     sink = io.StringIO()
+    # the app is not embedded in the cell (the embedded frame is unreliable in Colab): the cell prints a link instead
     with contextlib.redirect_stdout(sink), contextlib.redirect_stderr(sink):
-        demo.launch(share=share, inline=True, debug=False, quiet=True, show_error=True)
+        demo.launch(share=share, inline=False, debug=False, quiet=True, show_error=True)
     url = getattr(demo, "share_url", None)
     if url:
-        print(f"Public link (open it on your phone for the live camera): {url}")
+        print(f"Open the app in a new tab (works on a phone too): {url}")
+        print("The link stays alive while this notebook is running.")
+    else:
+        print("The public link could not be created (network hiccup). Run this cell again; "
+              f"the app is running at {getattr(demo, 'local_url', 'the local address')}, which only works from this machine.")
     return demo

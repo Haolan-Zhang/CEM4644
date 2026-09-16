@@ -202,7 +202,7 @@ A detector only knows the kind of photos it was trained on. Let's find its limit
                           notes=[f"Photos from **{other.title}** are given to the course model and to a model trained on that other dataset. Each model can only answer with its own classes."],
                           params=['how_many = 3 #@param {type:"slider", min:1, max:6, step:1}', 'threshold = 0.4 #@param {type:"slider", min:0.1, max:0.9, step:0.1}']))
     cells.append(form("▶ Step 3e · Your own photo", "lab.upload_app()",
-                      notes=["A small app appears with two tabs. *Photo*: upload " + v["own_photo_hint"] + ". *Live camera*: open the public link on your phone, allow the camera and point it at the room or the site; boxes update about once or twice a second. The confidence slider works in both tabs.",
+                      notes=["This cell prints a **link**: open it in a new tab (or on your phone). The app has two tabs. *Photo*: upload " + v["own_photo_hint"] + ". *Live camera*: allow the camera and point it at the room or the site; boxes update about once or twice a second. The confidence slider works in both tabs.",
                              f"Test at least {v['own_photos']} photo(s) of your own and take screenshots for your report."]))
     questions.append((5, "List three photos (tricky gallery, sliders, or your own) where the detector missed something or invented something. For each, say what it found, what it should have found, and what you think confused it."))
     cells.append(q(*questions[-1]))
