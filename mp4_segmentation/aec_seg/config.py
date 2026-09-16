@@ -35,18 +35,19 @@ THINGS: List[Thing] = [
     Thing("sink", "sink", "sink", ["wash basin", "basin", "washbasin"], "#2a9d8f", "fixture", ("fixtures", "sink")),
     Thing("bathtub", "bathtub", "bathtub", ["bath", "tub", "shower"], "#e63946", "fixture", ("fixtures", "bathtub")),
     Thing("stairs", "stairs", "stairs", ["staircase", "steps", "stairway"], "#8d6e63", "fixture", ("fixtures", "stairs")),
-    Thing("door", "door", "door", ["door swing", "doorway", "door arc"], "#ffd166", "opening", ("doors", None)),
+    Thing("door", "door", "door", ["door arc", "curved line", "arc"], "#ffd166", "opening", ("doors", None)),
     Thing("window", "window", "window", ["window opening", "glass", "window in a wall"], "#bde0fe", "opening", ("windows", None)),
-    Thing("wall", "wall", "wall", ["black wall", "thick black line", "walls"], "#333333", "structure", ("walls", None)),
+    Thing("wall", "wall", "wall", ["thick black line", "black bar", "black wall"], "#333333", "structure", ("walls", None)),
 ]
 
 # Plan-language legend: the drawings come from Finland (and one from Sweden). Room labels are abbreviations.
 LEGEND = {
-    "OH": "olohuone = living room", "MH": "makuuhuone = bedroom", "K / KT / KEITTIÖ": "keittiö = kitchen",
-    "KH / KPH": "kylpyhuone = bathroom", "WC": "toilet", "S": "sauna", "ET": "eteinen = entrance hall",
-    "VH": "vaatehuone = walk-in closet", "PH": "pesuhuone = washroom", "KHH": "kodinhoitohuone = utility room",
-    "VAR": "varasto = storage", "TK": "tekninen tila = technical room", "PARVEKE / PARV": "balcony", "TERASSI": "terrace",
-    "AT / AUTOTALLI": "garage", "RT": "ruokailutila = dining area", "TUPA": "farmhouse living room",
+    "OH": "olohuone = living room", "MH": "makuuhuone = bedroom", "H": "huone = room", "K / KT / KEITTIÖ": "keittiö = kitchen",
+    "KK": "keittokomero = kitchenette", "RT / RUOK": "ruokailutila = dining area", "KH / KPH": "kylpyhuone = bathroom",
+    "PH / PESUH": "pesuhuone = washroom", "WC": "toilet", "S": "sauna", "ET": "eteinen = entrance hall", "TK": "tuulikaappi = vestibule",
+    "KÄYTÄVÄ": "corridor", "VH": "vaatehuone = walk-in closet", "PUKUH": "pukuhuone = dressing room", "KHH": "kodinhoitohuone = utility room",
+    "VAR / VARASTO": "varasto = storage", "TEKN": "tekninen tila = technical room", "PARVEKE / PARV": "balcony", "TERASSI": "terrace",
+    "KUISTI": "porch", "ULKOTILA": "outdoor area", "AT / AUTOTALLI / AUTOKATOS": "garage / carport", "TUPA": "farmhouse living room",
     "SOVR / KÖK / BAD / HALL": "Swedish: bedroom / kitchen / bathroom / hall", "m²": "square metres (printed on some plans)",
 }
 
@@ -62,6 +63,7 @@ class PlanSet:
     default_plan: str
     compare_default: Tuple[str, str]
     things: List[Thing] = field(default_factory=lambda: list(THINGS))
+    render: bool = False                      # True: clean rendering of the vector drawing; False: the dataset's scanned image
 
     def thing(self, name_or_key: str) -> Thing:
         for t in self.things:
@@ -91,19 +93,21 @@ register(PlanSet(
     title="Residential floor plans, set A",
     folder="data/plans/homes_a",
     masks="data/masks/homes_a",
-    description=("Six real architectural floor plans of Finnish homes from the CubiCasa5K dataset (CC BY-NC-SA 4.0), redrawn at a known scale "
-                 "with a 5 m scale bar. Each plan comes with an answer key (every room's real area, every door, window and fixture) that the "
-                 "notebook uses to check your measurements."),
-    plans={
-        "13828": {"factor": 0.55, "title": "detached house with furniture, 8 rooms", "note": "CAD plan, furniture and dimension strings"},
-        "9493": {"factor": 0.70, "title": "detached house with garage and terrace", "note": "CAD plan with furniture; printed room areas"},
-        "14466": {"factor": 0.85, "title": "apartment with balcony (bold walls)", "note": "simple bold-wall plan"},
-        "11032": {"factor": 0.75, "title": "detached house with terrace", "note": "CAD plan with furniture"},
-        "548": {"factor": 0.90, "title": "apartment next to a stair core", "note": "bold walls, few symbols"},
-        "1902": {"factor": 1.20, "title": "studio flat, 24 m² (bold walls)", "note": "small plan with printed areas"},
+    description=("Six real floor plans of Finnish homes from the CubiCasa5K dataset (CC BY-NC-SA 4.0), drawn cleanly from the dataset's "
+                 "vector data (black walls, light-blue windows, door arcs, fixture symbols) at a known scale with a 5 m scale bar. Each plan "
+                 "comes with an answer key (every room's real area, every door, window and fixture) that the notebook uses to check your "
+                 "measurements."),
+    plans={   # CubiCasa5K sample id -> resampling factor (1 px = 1/factor cm) and title; 'idx' = position in the dataset's test split
+        "1293": {"factor": 1.15, "title": "flat with four large rooms", "note": "idx 58; living room, bedroom, kitchen, hall, bathroom"},
+        "2536": {"factor": 0.85, "title": "flat with three bedrooms", "note": "idx 01; kitchen, bathroom with bathtub, WC, walk-in closet"},
+        "2090": {"factor": 1.10, "title": "small flat with a balcony", "note": "idx 06; open kitchen, washroom"},
+        "6457": {"factor": 0.80, "title": "house with a dining area and stairs", "note": "idx 14; eight rooms, stairs, utility room"},
+        "207": {"factor": 0.60, "title": "large house, 15 rooms", "note": "idx 35; corridor, washroom, storage, five bedrooms, fireplace"},
+        "7696": {"factor": 1.30, "title": "studio flat", "note": "idx 79; one room, kitchenette, bathroom, hall"},
     },
-    default_plan="13828",
-    compare_default=("13828", "9493"),
+    default_plan="1293",
+    compare_default=("1293", "2536"),
+    render=True,
 ))
 
 register(PlanSet(

@@ -21,10 +21,23 @@ def box_iou(a, b) -> float:
     return inter / ua if ua > 0 else 0.0
 
 
-def match_boxes(pred: Sequence[Sequence[float]], truth: Sequence[Sequence[float]], iou: float = 0.3) -> Tuple[int, int, int]:
-    """(correct, missed, extra): a truth box is found if some prediction overlaps it (IoU >= iou); a prediction is extra if it overlaps nothing."""
-    found = [any(box_iou(t, p) >= iou for p in pred) for t in truth]
-    extra = [not any(box_iou(t, p) >= iou for t in truth) for p in pred]
+def box_near(p, t) -> bool:
+    """The centre of box p lies within one door-width of the truth box t (a door SWING sits next to the door OPENING)."""
+    w, h = t[2] - t[0], t[3] - t[1]
+    r = max(w, h)
+    cx, cy = (p[0] + p[2]) / 2, (p[1] + p[3]) / 2
+    return (t[0] - r <= cx <= t[2] + r) and (t[1] - r <= cy <= t[3] + r) and max(p[2] - p[0], p[3] - p[1]) <= 3 * r
+
+
+def box_hit(t, p, iou: float, near: bool) -> bool:
+    return box_iou(t, p) >= iou or (near and box_near(p, t))
+
+
+def match_boxes(pred: Sequence[Sequence[float]], truth: Sequence[Sequence[float]], iou: float = 0.3, near: bool = False) -> Tuple[int, int, int]:
+    """(correct, missed, extra): a truth box is found if some prediction overlaps it (IoU >= iou, or for doors: a swing next to the
+    opening); a prediction is extra if it matches nothing."""
+    found = [any(box_hit(t, p, iou, near) for p in pred) for t in truth]
+    extra = [not any(box_hit(t, p, iou, near) for t in truth) for p in pred]
     return int(sum(found)), int(len(truth) - sum(found)), int(sum(extra))
 
 
@@ -57,10 +70,11 @@ def truth_line(plan, thing: Thing, res: SegResult, threshold: float) -> str:
         return (f"The drawing says: {len(rooms)} {label}{'s' if len(rooms) != 1 else ''}, {true_area:.1f} m² in total. "
                 f"Regions that sit on a real {label}: {ok} of {len(rooms)} found, {missed} missed, {extra} extra.")
     truth = plan.truth_boxes(what, sub)
-    ok, missed, extra = match_boxes(pred_boxes, truth, iou=0.2)
+    ok, missed, extra = match_boxes(pred_boxes, truth, iou=0.2, near=(what == "doors"))
     label = sub or what.rstrip("s")
     if what == "walls":
-        return f"The drawing has {len(truth)} wall segments; SAM 3 has no notion of a wall, so read this one as an experiment."
+        return (f"The drawing has {len(truth)} wall segments: {ok} found, {missed} missed, {extra} extra region(s). "
+                "SAM 3 has no notion of a 'wall'; a shape word (thick black line) is what finds them.")
     return f"The drawing has {len(truth)} {label}{'s' if len(truth) != 1 else ''}: {ok} found, {missed} missed, {extra} extra region(s) that are not one."
 
 
@@ -88,7 +102,7 @@ def gallery(lab, ids: Optional[Sequence[str]] = None, ncols: int = 2, size: floa
 
 
 def legend():
-    print("Room labels on the plans (Finnish, one Swedish plan):")
+    print("Room labels on the plans (Finnish abbreviations; set B has one Swedish plan):")
     for k, v in LEGEND.items():
         print(f"  {k:26s} {v}")
 
@@ -131,16 +145,17 @@ def count_view(lab, plan_id: str, thing_name: str, threshold: float):
     keep = res.scores >= threshold
     pred = [list(map(float, b)) for b in res.boxes[keep]]
     iou = 0.3 if what == "rooms" else 0.2
+    near = what == "doors"          # a door is drawn as an opening in the wall plus a swing: a region on the swing counts
     img = viz.instances_image(plan.load(), res, threshold, alpha=0.35)
     d = ImageDraw.Draw(img)
     hits = misses = 0
     for tb in truth:
-        found = any(box_iou(tb, p) >= iou for p in pred)
+        found = any(box_hit(tb, p, iou, near) for p in pred)
         hits += found; misses += (not found)
         d.rectangle(tb, outline=GREEN if found else RED, width=4)
     extra = 0
     for p in pred:
-        if not any(box_iou(tb, p) >= iou for tb in truth):
+        if not any(box_hit(tb, p, iou, near) for tb in truth):
             extra += 1; d.rectangle(p, outline=BLUE, width=3)
     viz.show_image(img, 1000)
     label = sub or (what.rstrip("s") if what != "rooms" else "room")
@@ -190,7 +205,7 @@ def mix(lab, plan_id: str, threshold: float):
         what, sub = t.truth
         tr = plan.truth_boxes(what, sub)
         keep = res.scores >= threshold
-        ok, missed, extra = match_boxes([list(map(float, b)) for b in res.boxes[keep]], tr, iou=0.2)
+        ok, missed, extra = match_boxes([list(map(float, b)) for b in res.boxes[keep]], tr, iou=0.2, near=(what == "doors"))
         print(f"  {t.name:10s} SAM 3 {int(keep.sum()):3d}   drawing {len(tr):3d}   (found {ok}, missed {missed}, extra {extra})")
 
 
@@ -435,6 +450,13 @@ def scale_check(lab, plan_id: str):
     display(w.VBox([msg, widget, out]))
 
 
+def wall_pixels(img) -> np.ndarray:
+    """Thick dark strokes of a drawing (the walls), not thin lines or text: dark pixels that survive a 7x7 opening."""
+    from scipy import ndimage
+    dark = np.asarray(img.convert("L")) < 100
+    return ndimage.binary_opening(dark, structure=np.ones((7, 7)))
+
+
 def takeoff_compute(lab, plan_id: str, boxes, find_all: bool, threshold: float):
     """boxes: list of (label, [x1, y1, x2, y2]) in full-image pixels. Returns (overlay, rows, found, lines)."""
     plan = lab.plans[plan_id]
@@ -442,18 +464,26 @@ def takeoff_compute(lab, plan_id: str, boxes, find_all: bool, threshold: float):
     colors = ["#e63946", "#4cc9f0", "#ffd166", "#06d6a0", "#7b2cbf", "#f4a261", "#457b9d"]
     rows, layers = [], []
     from scipy import ndimage
+    thick_walls = None
     for label, box in boxes:
-        r = lab.engine.segment_box(img, box)
-        mask = r.union() if len(r) else np.zeros((img.height, img.width), bool)
+        if label == "room":
+            # a bare box on a drawing makes SAM 3 cut out the furniture symbols rather than the empty floor, so the
+            # room is asked for with a phrase AND the student's box as the example; the region that fits the box best
+            # is kept, clipped to the box (no leaking into the neighbour), holes left by symbols filled, walls removed
+            r = lab.engine.segment_room(img, box)
+            mask = r.masks[0].copy() if len(r) else np.zeros((img.height, img.width), bool)
+        else:
+            r = lab.engine.segment_box(img, box)
+            mask = r.union() if len(r) else np.zeros((img.height, img.width), bool)
         k = len(rows) + 1
         box_px = max(1.0, (box[2] - box[0]) * (box[3] - box[1]))
         note = ""
         if label == "room" and mask.any():
-            # a room is what is inside the student's box: clip the mask to the box (no leaking into the
-            # neighbour) and fill the holes left by furniture symbols
+            if thick_walls is None:
+                thick_walls = wall_pixels(img)
             x1, y1, x2, y2 = [int(round(v)) for v in box]
             clip = np.zeros_like(mask); clip[max(0, y1):y2 + 1, max(0, x1):x2 + 1] = True
-            mask = ndimage.binary_fill_holes(mask & clip)
+            mask = ndimage.binary_fill_holes(mask & clip) & ~thick_walls
             if mask.sum() < 0.6 * box_px:
                 note = f"the mask covers only {mask.sum() / box_px * 100:.0f} % of your box: no wall on one side (open plan)? The box itself is {plan.area_m2(box_px):.1f} m²."
         px = int(mask.sum()); m2 = plan.area_m2(px)
@@ -479,11 +509,11 @@ def takeoff_compute(lab, plan_id: str, boxes, find_all: bool, threshold: float):
     found = None
     first = next((row for row in rows if row["label"] in ("window", "door", "fixture", "room")), None)
     if find_all and first is not None:
-        like = lab.engine.segment_like(img, first["box"], threshold=threshold)
+        like = lab.engine.segment_like(img, first["box"], threshold=threshold, size_range=(0.2, 5.0))
         pred = [list(map(float, b)) for b in like.boxes]
         what = {"window": "windows", "door": "doors", "fixture": "fixtures", "room": "rooms"}[first["label"]]
         truth = plan.truth_boxes(what)
-        ok, missed, extra = match_boxes(pred, truth, iou=0.3 if what == "rooms" else 0.2)
+        ok, missed, extra = match_boxes(pred, truth, iou=0.3 if what == "rooms" else 0.2, near=(what == "doors"))
         found = {"label": first["label"], "n": len(like), "truth": len(truth), "ok": ok, "missed": missed, "extra": extra,
                  "m2": [plan.area_m2(m.sum()) for m in like.masks], "from": first["n"]}
         for b in like.boxes:

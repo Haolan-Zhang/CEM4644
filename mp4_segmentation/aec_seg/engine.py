@@ -116,11 +116,36 @@ class Sam3Engine:
                                packed.size, packed.seconds)
         return packed
 
-    def segment_like(self, image: Image.Image, box_xyxy: Sequence[float], threshold: float = 0.3) -> SegResult:
-        """Every object that looks like the one inside the box: the box is a visual example, not a phrase."""
+    def segment_like(self, image: Image.Image, box_xyxy: Sequence[float], threshold: float = 0.3,
+                     size_range: Optional[Sequence[float]] = None) -> SegResult:
+        """Every object that looks like the one inside the box: the box is a visual example, not a phrase.
+        `size_range` (lo, hi) keeps only instances whose box area is within lo..hi times the example's."""
         t0 = time.time()
         res = self._run(image, threshold, input_boxes=[[list(map(float, box_xyxy))]], input_boxes_labels=[[1]])
-        return self._pack(f"like box {[int(v) for v in box_xyxy]}", res, image.size, time.time() - t0)
+        packed = self._pack(f"like box {[int(v) for v in box_xyxy]}", res, image.size, time.time() - t0)
+        if size_range and len(packed):
+            a0 = max(1.0, (box_xyxy[2] - box_xyxy[0]) * (box_xyxy[3] - box_xyxy[1]))
+            bx = packed.boxes
+            a = (bx[:, 2] - bx[:, 0]) * (bx[:, 3] - bx[:, 1])
+            keep = (a >= size_range[0] * a0) & (a <= size_range[1] * a0)
+            packed = SegResult(packed.prompt, packed.masks[keep], packed.scores[keep], packed.boxes[keep], packed.size, packed.seconds)
+        return packed
+
+    def segment_room(self, image: Image.Image, box_xyxy: Sequence[float], threshold: float = 0.2, text: str = "empty room") -> SegResult:
+        """A room indicated by a box: the phrase and the box together (the box alone makes the model pick the furniture
+        symbols on a drawing); keeps the instance whose box fits the given box best."""
+        t0 = time.time()
+        res = self._run(image, threshold, text=text, input_boxes=[[list(map(float, box_xyxy))]], input_boxes_labels=[[1]])
+        packed = self._pack(f"{text} in box {[int(v) for v in box_xyxy]}", res, image.size, time.time() - t0)
+        if len(packed) > 1:
+            x1, y1, x2, y2 = box_xyxy
+            bx = packed.boxes
+            inter = np.maximum(0, np.minimum(bx[:, 2], x2) - np.maximum(bx[:, 0], x1)) * np.maximum(0, np.minimum(bx[:, 3], y2) - np.maximum(bx[:, 1], y1))
+            union = (bx[:, 2] - bx[:, 0]) * (bx[:, 3] - bx[:, 1]) + (x2 - x1) * (y2 - y1) - inter
+            best = int(np.argmax(inter / np.maximum(union, 1e-6)))
+            packed = SegResult(packed.prompt, packed.masks[best:best + 1], packed.scores[best:best + 1], packed.boxes[best:best + 1],
+                               packed.size, packed.seconds)
+        return packed
 
     @staticmethod
     def _pack(prompt, res, size, seconds) -> SegResult:

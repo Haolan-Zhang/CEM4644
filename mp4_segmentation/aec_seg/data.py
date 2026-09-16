@@ -72,6 +72,12 @@ class Plan:
             return [list(f["box"]) for f in self.key["fixtures"] if sub is None or f["type"] == sub]
         if what == "rooms":
             return [list(r["box"]) for r in self.rooms(sub)]
+        if what == "walls":
+            out = []
+            for poly in self.key["walls"]:
+                xs = [p[0] for p in poly]; ys = [p[1] for p in poly]
+                out.append([min(xs), min(ys), max(xs), max(ys)])
+            return out
         return []
 
     def truth_area_m2(self, what: str, sub: Optional[str] = None) -> Optional[float]:

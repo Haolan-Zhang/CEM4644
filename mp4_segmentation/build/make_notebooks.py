@@ -16,7 +16,7 @@ VARIANTS = {
     "workshop": dict(
         file="MP4_Workshop_Segmentation.ipynb", label="Workshop (in class)", minutes=90, dataset="homes_a", own_plans=1,
         # which things the steps start with
-        seg_thing="room (any)", count_thing="window", lab_thing="bathroom", inspect_thing="room (any)", fix_thing="kitchen",
+        seg_thing="room (any)", count_thing="window", lab_thing="door", inspect_thing="room (any)", fix_thing="room (any)",
         takeoff_targets="two rooms of your choice, one window and one door",
         questions_extra=[
             "From Step 3b: which rooms did you measure, what did you get, and what does the drawing say? Give the error in percent for each and explain where it comes from (your box, the mask stopping at furniture or a door opening, the scale).",
@@ -113,7 +113,9 @@ lab.setup(dataset="{spec.key}", load_model=load_model)""",
     ))
 
     # ------------------------------------------------------------------ Part 1
-    legend_rows = "\n".join(f"| {k} | {val} |" for k, val in LEGEND.items())
+    legend_items = [(k, val) for k, val in LEGEND.items() if not (spec.render and (k.startswith("SOVR") or k == "m²"))]
+    legend_rows = "\n".join(f"| {k} | {val} |" for k, val in legend_items)
+    labels_note = "Room labels are abbreviations in Finnish:" if spec.render else "Room labels are abbreviations in Finnish (one plan is Swedish):"
     cells.append(md(f"""
 ## Part 1 · Meet the plans
 
@@ -123,7 +125,7 @@ The model is **SAM 3** (Segment Anything Model 3, Meta 2025). You do not train i
 
 {spec.description}
 
-Every plan has a **5 m scale bar** at the bottom left. Room labels are abbreviations in Finnish (one plan is Swedish):
+Every plan has a **5 m scale bar** at the bottom left. {labels_note}
 
 | label | meaning |
 |---|---|
@@ -160,13 +162,15 @@ Pick a plan and a thing. You get three panels: the drawing, the **mask** (white 
     cells.append(md("""
 ## Part 3 · Quantity take-off with boxes
 
-A phrase is quick, but a take-off needs control. So now you draw the boxes. Three steps: **check the scale** on the scale bar (a 1 % error in the scale is a 2 % error in every area), **measure** rooms and elements by drawing a tight box around each (SAM 3 cuts out the outline inside the box; the notebook compares the area with the drawing), and **count** with *find_all*: draw one box around a window, and SAM 3 looks for every other thing that looks like it. The drawing's answer key tells you what it found, missed and added.
+A phrase is quick, but a take-off needs control. So now you draw the boxes. Three steps: **check the scale** on the scale bar (a 1 % error in the scale is a 2 % error in every area), **measure** rooms and elements by drawing a tight box around each, and **count** with *find_all*: draw one box around a window, and SAM 3 looks for every other thing that looks like it. The drawing's answer key tells you what it found, missed and added.
+
+How a *room* box is measured: a box alone makes SAM 3 cut out the *furniture symbols* inside it rather than the empty floor (it was trained to find objects). So the notebook asks for *empty room* **and** gives your box as the example, keeps the region that fits your box, fills the holes left by symbols, removes the black walls, and converts the pixels with the scale. Every result is printed next to the drawing's own area.
 """))
     cells.append(form("▶ Step 3a · Check the scale", "lab.scale_check(plan)",
                       notes=["Draw a box from the 0 tick to the 5 m tick of the scale bar (zoom in with the mouse wheel for precision), label it *scale bar*, click *Submit*."],
                       params=[f'plan = "{label_of[d0]}" #@param {jlist(labels)}']))
     cells.append(form("▶ Step 3b · Measure and count with boxes", "lab.takeoff(plan, find_all, confidence)",
-                      notes=[f"Draw tight boxes: label each one *room*, *window*, *door*, *fixture* or *other*, then *Submit*. Measure at least {v['takeoff_targets']}. "
+                      notes=[f"Draw tight boxes (zoom with the mouse wheel; put the edges on the inside faces of the walls): label each one *room*, *window*, *door*, *fixture* or *other*, then *Submit*. Measure at least {v['takeoff_targets']}. "
                              "With *find_all* ticked, SAM 3 also looks for everything like your first window / door / fixture / room box (blue boxes; thin green = the drawing's answer key). Needs the live model."],
                       params=[f'plan = "{label_of[d0]}" #@param {jlist(labels)}', 'find_all = True #@param {type:"boolean"}',
                               'confidence = 0.3 #@param {type:"slider", min:0.1, max:0.9, step:0.05}']))
@@ -193,8 +197,8 @@ Two plans side by side: square metres per room type from SAM 3, and the drawings
                       notes=["Draw a box over a region that is wrong, click *Submit*: SAM 3 runs again with your box as a *not this* hint. Needs the live model."],
                       params=[f'plan = "{label_of[d0]}" #@param {jlist(labels)}', f'thing = "{v["fix_thing"]}" #@param {jlist(things)}', conf]))
     cells.append(form("▶ Step 4e · Your own words", "lab.your_phrase(plan, phrase, confidence)",
-                      notes=["Type any phrase: a room, a symbol, a shape (*small square*, *circle*, *thick line*). Needs the live model."],
-                      params=[f'plan = "{label_of[d0]}" #@param {jlist(labels)}', 'phrase = "bed" #@param {type:"string"}', conf]))
+                      notes=["Type any phrase: a room, a symbol, a shape. Try *curved line* (the door swings), *thick black line* (the walls), *circle*, *small rectangle*. Needs the live model."],
+                      params=[f'plan = "{label_of[d0]}" #@param {jlist(labels)}', 'phrase = "curved line" #@param {type:"string"}', conf]))
     questions.append((len(questions) + 1, "From Step 4a: which plan has more bedroom area and more bathroom area according to SAM 3, and does the drawing agree? From Step 4b: which wording worked best for the thing you chose, and how different were the areas?"))
     cells.append(q(*questions[-1]))
     questions.append((len(questions) + 1, "Describe one mistake you found in Step 4c or 4d (what was included or missed, at which confidence). Did the negative box fix it? What would you tell a colleague who wants to use these square metres in a cost estimate?"))

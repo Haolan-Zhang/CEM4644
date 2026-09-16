@@ -1,80 +1,80 @@
 [
   {
-    "id": "13828",
-    "file": "13828.png",
-    "title": "detached house with furniture, 8 rooms",
+    "id": "1293",
+    "file": "1293.png",
+    "title": "flat with four large rooms",
     "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
     "license": "CC BY-NC-SA 4.0",
     "source": "https://zenodo.org/records/2613548",
-    "note": "CubiCasa5K sample 13828; CAD plan, furniture and dimension strings",
+    "note": "CubiCasa5K sample 1293; idx 58; living room, bedroom, kitchen, hall, bathroom",
     "size": [
-      1540,
-      1122
+      1036,
+      1036
     ]
   },
   {
-    "id": "9493",
-    "file": "9493.png",
-    "title": "detached house with garage and terrace",
+    "id": "2536",
+    "file": "2536.png",
+    "title": "flat with three bedrooms",
     "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
     "license": "CC BY-NC-SA 4.0",
     "source": "https://zenodo.org/records/2613548",
-    "note": "CubiCasa5K sample 9493; CAD plan with furniture; printed room areas",
+    "note": "CubiCasa5K sample 2536; idx 01; kitchen, bathroom with bathtub, WC, walk-in closet",
     "size": [
-      1558,
-      1124
+      1074,
+      986
     ]
   },
   {
-    "id": "14466",
-    "file": "14466.png",
-    "title": "apartment with balcony (bold walls)",
+    "id": "2090",
+    "file": "2090.png",
+    "title": "small flat with a balcony",
     "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
     "license": "CC BY-NC-SA 4.0",
     "source": "https://zenodo.org/records/2613548",
-    "note": "CubiCasa5K sample 14466; simple bold-wall plan",
+    "note": "CubiCasa5K sample 2090; idx 06; open kitchen, washroom",
     "size": [
-      948,
-      993
+      990,
+      951
     ]
   },
   {
-    "id": "11032",
-    "file": "11032.png",
-    "title": "detached house with terrace",
+    "id": "6457",
+    "file": "6457.png",
+    "title": "house with a dining area and stairs",
     "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
     "license": "CC BY-NC-SA 4.0",
     "source": "https://zenodo.org/records/2613548",
-    "note": "CubiCasa5K sample 11032; CAD plan with furniture",
+    "note": "CubiCasa5K sample 6457; idx 14; eight rooms, stairs, utility room",
     "size": [
-      1578,
-      1215
+      828,
+      1285
     ]
   },
   {
-    "id": "548",
-    "file": "548.png",
-    "title": "apartment next to a stair core",
+    "id": "207",
+    "file": "207.png",
+    "title": "large house, 15 rooms",
     "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
     "license": "CC BY-NC-SA 4.0",
     "source": "https://zenodo.org/records/2613548",
-    "note": "CubiCasa5K sample 548; bold walls, few symbols",
+    "note": "CubiCasa5K sample 207; idx 35; corridor, washroom, storage, five bedrooms, fireplace",
     "size": [
-      890,
-      901
+      1156,
+      918
     ]
   },
   {
-    "id": "1902",
-    "file": "1902.png",
-    "title": "studio flat, 24 m² (bold walls)",
+    "id": "7696",
+    "file": "7696.png",
+    "title": "studio flat",
     "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
     "license": "CC BY-NC-SA 4.0",
     "source": "https://zenodo.org/records/2613548",
-    "note": "CubiCasa5K sample 1902; small plan with printed areas",
+    "note": "CubiCasa5K sample 7696; idx 79; one room, kitchenette, bathroom, hall",
     "size": [
-      715,
-      1060
+      716,
+      1436
     ]
   }
 ]
