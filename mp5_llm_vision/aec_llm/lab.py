@@ -147,8 +147,8 @@ class LLMLab:
     def chat_count(self, site: str):
         self._need(); from . import chat; chat.chat_count(self, site)
 
-    def chat_rooms(self, plan: str, mode: str = "LLM only (polygons)"):
-        self._need(); from . import chat; chat.chat_rooms(self, plan, mode)
+    def chat_rooms(self, plan: str):
+        self._need(); from . import chat; chat.chat_rooms(self, plan)
 
     # ------------------------------------------------------------------ Part 5 / wrap-up
     def prompt_app(self):
@@ -156,8 +156,8 @@ class LLMLab:
         from .app import launch
         self.apps["prompt"] = launch(self)
 
-    def summary(self):
-        self._need(); ui.summary(self)
+    def summary(self, chat: bool = False):
+        self._need(); ui.summary(self, chat)
 
     def report_summary(self):
         self._need(); ui.report_summary(self)

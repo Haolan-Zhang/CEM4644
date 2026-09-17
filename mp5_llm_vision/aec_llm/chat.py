@@ -217,9 +217,9 @@ def chat_classify(lab, photo: str):
         print(("valid JSON" + (", wrapped in ``` fences (a naive parser would choke)" if fenced else "")) + f"; label: {label}"
               + ("" if label in classes else " (NOT one of the categories)") + f"; confidence: {r.data.get('confidence')}; reason: {r.data.get('reason', '')}")
         print(f"Truth: {ph.truth} → {'✓ correct' if label == ph.truth else '✗ wrong'}.")
-        g = lab.client.ask(ph.load(), prompt, schema=C.classify_schema(classes))
-        if g.ok:
-            print(f"For comparison, the API model ({g.model}) with the schema said: {tasks.normalise_label(g.data.get('label'), classes)} (confidence {g.data.get('confidence')}).")
+        if ph.specialist:
+            print(f"{lab.examples.photo_specialist.split(' (')[0]} on this photo: {ph.specialist.get('label')} (confidence {ph.specialist.get('confidence')}).")
+        lab.results.setdefault(("chat", "classify"), {})[ph.file] = {"label": label, "ok": label == ph.truth, "valid": True}
     paste_step(lab, ph.load(), ph.path, "photos", prompt, score, "classification")
 
 
@@ -245,11 +245,9 @@ def chat_detect(lab, site: str):
               + (f"; {skipped} entries unusable" if skipped else "") + ". Thin green = answer key found, thin red = missed, thick = the model's boxes (? = extra).")
         if pred and sum(found) == 0:
             print("Nothing matched: if the boxes sit in the wrong place, try the other box order or scale above and score again.")
-        g = tasks.detect(lab.client, [s], prompt, ex.site_classes, True)[0]
-        if g.reply.ok:
-            print(f"For comparison, the API model ({g.reply.model}) with the schema: {len(g.pred)} boxes; found {g.n_found}/{len(s.truth)}, extra {g.n_extra}.")
         sp = tasks.specialist_det_rows([s])[0]
-        print(f"{ex.site_specialist.split(' (')[0]}: found {sp.n_found}/{len(s.truth)}, extra {sp.n_extra}.")
+        print(f"{ex.site_specialist.split(' (')[0]} on this photo: found {sp.n_found}/{len(s.truth)}, extra {sp.n_extra}.")
+        lab.results.setdefault(("chat", "detect"), {})[s.file] = {"found": int(sum(found)), "truth": len(s.truth), "extra": int(sum(extra)), "boxes": len(pred)}
     paste_step(lab, s.load(), s.path, "sites", prompt, score, "boxes", extra_controls=[order, scale])
 
 
@@ -270,19 +268,19 @@ def chat_count(lab, site: str):
             nums = re.findall(r"\d+", text)
             print(f"⚠️ Not JSON ({err}); numbers found in the text: {nums[:6]}")
         print(f"Answer key: {truth_n} {sp.display.get(sp.count_class, sp.count_class)} of {truth_total} in total.")
-        g = tasks.count(lab.client, s, prompt, sp.count_field, True)
-        if g.ok:
-            print(f"For comparison, the API model ({g.model}) said {g.data.get(sp.count_field)} of {g.data.get('total')}.")
+        det = lab.results.get(("chat", "detect"), {}).get(s.file)
+        if det:
+            print(f"Your Step 3a boxes on this photo gave {det['boxes']} objects in total; counting from boxes and asking for a number are two different questions to the model.")
     paste_step(lab, s.load(), s.path, "sites", prompt, score, "count")
 
 
-def chat_rooms(lab, plan: str, mode_name: str):
+def chat_rooms(lab, plan: str):
+    """Rooms on one plan from the chat model's own polygons (the box's area when a polygon is missing), each checked against the drawing."""
     import ipywidgets as w
     from . import ui
     ex = lab.examples
     p = ex.plan(plan)
-    mode = ui.MODES.get(mode_name, mode_name)
-    prompt = C.PROMPTS["rooms_masks" if mode == "llm" else "rooms_boxes"]
+    prompt = C.PROMPTS["rooms_masks"]
     order = w.Dropdown(options=ORDERS, value=ORDERS[0], description="box order", style={"description_width": "80px"}, layout=w.Layout(width="360px"))
     scale = w.Dropdown(options=SCALES, value=SCALES[0], description="numbers are", style={"description_width": "90px"}, layout=w.Layout(width="320px"))
 
@@ -290,20 +288,19 @@ def chat_rooms(lab, plan: str, mode_name: str):
         r = normalise_reply(text, p.size, order_v, scale_v)
         if not r.ok or not isinstance(r.data, list) or not r.data:
             print(f"⚠️ The reply could not be read as a list of rooms ({r.error or 'no list found'}). Raw: {text[:300]}"); return
-        rows, skipped = tasks.measure_rooms(r, p, mode, sam=lab.sam)
-        viz.show_image(ui._seg_image(p, rows, mode), 820)
+        rows, skipped = tasks.measure_rooms(r, p, "llm", sam=None)
+        viz.show_image(ui._seg_image(p, rows, "llm"), 820)
         table_rows = [(rw.label, rw.how, f"{rw.m2:.1f}", (rw.truth["label"] or rw.truth["type"]) if rw.truth else "—", f"{rw.truth_m2:.1f}" if rw.truth else "—",
                        f"{rw.err_pct:+.0f} %" if rw.truth else "no room of the drawing fits", rw.note) for rw in rows]
         print(viz.table(table_rows, ["model label", "area from", "model m²", "drawing room", "drawing m²", "error", "note"], [12, 9, 9, 13, 10, 24, 46]))
         summ = tasks.seg_summary(rows, p)
-        print(f"\nChat model, {mode_name}: {summ['rooms_found']}/{summ['rooms_truth']} rooms of the drawing found"
+        n_poly = sum(1 for rw in rows if rw.poly)
+        print(f"\nChat model: {summ['rooms_found']}/{summ['rooms_truth']} rooms of the drawing found ({n_poly} of {len(rows)} entries had a usable polygon)"
               + (f", median error {summ['median_err']:.0f} % (worst {summ['max_err']:.0f} %)" if summ["median_err"] is not None else "")
               + f"; model total {summ['total_model_m2']:.1f} m² vs floor area {summ['floor_area_m2']:.1f} m²." + (f" {skipped} unusable entries." if skipped else ""))
         if rows and summ["rooms_found"] == 0:
             print("Nothing matched: if the shapes sit in the wrong place, try the other box order or scale above and score again.")
-        g_rows, g, _ = tasks.segment_rooms(lab.client, p, prompt, mode, True, sam=lab.sam)
-        if g.ok:
-            gs = tasks.seg_summary(g_rows, p)
-            print(f"For comparison, the API model ({g.model}) with the schema: {gs['rooms_found']}/{gs['rooms_truth']} rooms"
-                  + (f", median error {gs['median_err']:.0f} %." if gs["median_err"] is not None else "."))
+        sf, st, se = ui._specialist_seg(p)
+        print(f"MP4's specialist (SAM 3 asked for 'room' by phrase): {sf}/{st} rooms found" + (f", median error {se:.0f} %." if se is not None else "."))
+        lab.results.setdefault(("chat", "rooms"), {})[p.id] = summ
     paste_step(lab, p.load(), p.path, "plans", prompt, score, "rooms", extra_controls=[order, scale])

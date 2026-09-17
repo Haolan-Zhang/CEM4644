@@ -19,8 +19,10 @@ single-example steps (describe a photo, JSON asked nicely, boxes on one photo, t
 plain chat window, **hokie.ai** (https://hokie.ai.vt.edu/, Virginia Tech's free access to GPT models): the student
 downloads the example image, pastes the prompt, attaches the image, and pastes the reply back into a cell that parses,
 draws and scores it with the same code as the API path (`aec_llm/chat.py`; coordinate order and scale can be switched
-when the chat used another convention). The batch steps and the schema-enforced steps stay on the Gemini API. Generated
-with `python build/make_notebooks.py --chat` (`--all` for both kinds); the plain notebooks are untouched.
+when the chat used another convention). Nothing done in the chat is repeated on the API: the API keeps only the batch
+steps (every photo scored, prompts compared) and the prompt lab. Rooms are measured from the chat model's own polygons;
+there is no SAM 3 in the chat variants and they need no GPU. Generated with `python build/make_notebooks.py --chat`
+(`--all` for both kinds); the plain notebooks are untouched.
 
 All notebooks are generated from one template. Students need a **free Gemini API key** (https://aistudio.google.com/apikey)
 stored as the Colab secret `GEMINI_API_KEY`; without one, the precomputed answers of the built-in examples still work

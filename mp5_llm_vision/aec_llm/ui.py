@@ -289,13 +289,30 @@ def segment_compare(lab, plan: str):
 
 
 # ----------------------------------------------------------------------------- wrap-up
-def summary(lab):
+def summary(lab, chat: bool = False):
     ex = lab.examples
     cls_rows = tasks.classify(lab.client, ex.photos, C.fill("classify_basic", lab.spec), ex.photo_classes, True)
     cls = tasks.cls_summary(cls_rows, ex.photo_classes)
     det_rows = tasks.detect(lab.client, ex.sites, C.fill("detect", lab.spec), ex.site_classes, True)
     det = tasks.det_summary(det_rows, ex.site_classes)
     sp_det = tasks.det_summary(tasks.specialist_det_rows(ex.sites), ex.site_classes)
+    if chat:
+        # the rooms were done in the chat window: the student's own pasted results, not the API again; no SAM 3 route
+        seg_spec = [se for p in ex.plans for se in [_specialist_seg(p)[2]] if se is not None]
+        mine = lab.results.get(("chat", "rooms"), {})
+        med = [v["median_err"] for v in mine.values() if v.get("median_err") is not None]
+        rooms_cell = (f"{np.mean(med):.0f} % on {len(mine)} plan(s) (your pasted replies)" if med else "do Step 4a first (your pasted replies)")
+        m = lambda v: f"{np.mean(v):.0f} %" if v else "—"   # noqa: E731
+        rows = [
+            ("classification (API, batch)", f"accuracy on {cls['n']} photos", f"{cls['accuracy']:.0f} %", f"{tasks.specialist_cls_accuracy(ex.photos):.0f} %", f"{cls['seconds']:.0f} s, {cls['tokens']} tokens"),
+            ("detection (API, batch)", f"recall / precision, {det['truth']} boxes", f"{det['recall']:.0f} % / {det['precision']:.0f} %", f"{sp_det['recall']:.0f} % / {sp_det['precision']:.0f} %", f"{det['seconds']:.0f} s, {det['tokens']} tokens"),
+            ("rooms (chat, polygons)", "median area error per plan", rooms_cell, m(seg_spec) + " (SAM 3 'room')", "your time in the chat window"),
+        ]
+        print(viz.table(rows, ["task", "measure", "generalist", "specialist from MP2/MP3/MP4", "cost"], [28, 30, 44, 28, 32]))
+        print("\nSpecialists: " + ex.photo_specialist + "; " + ex.site_specialist + "; MP4's SAM 3 asked for 'room'.")
+        print("The generalist needed no training data and no training; the specialists needed hundreds of labelled photos each. "
+              "The batch rows are the API; the single examples of Parts 1, 3a, 3c and 4 were the chat window, once each.")
+        return
     seg_llm, seg_sam, seg_spec, secs, toks = [], [], [], 0.0, 0
     for p in ex.plans:
         rows, r1, _ = tasks.segment_rooms(lab.client, p, C.PROMPTS["rooms_masks"], "llm", True, sam=lab.sam)

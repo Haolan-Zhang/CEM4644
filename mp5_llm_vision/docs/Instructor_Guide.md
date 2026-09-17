@@ -24,18 +24,21 @@ furniture holes: 19–21 % median error).
 
 The `_chat` notebooks send the single-example steps through **hokie.ai** (https://hokie.ai.vt.edu/, VT login), so
 students meet the ordinary chat interface and see that a general chat model does these tasks too: Step 1b (describe),
-1c (JSON asked nicely; 1d is the API with the schema for the contrast), 3a (boxes on one photo), 3c (the count) and
-4a (rooms on one plan; the API's version becomes 4a′). Each paste-back cell shows the image with a download button,
-the prompt to copy, a box for the reply and a *Score* button; the reply is parsed with the same tolerant parser as the
-API replies, and drawn and scored the same way, next to the API model's numbers for the same image. Two dropdowns
-handle the chat model's habits: box order (`ymin, xmin, ymax, xmax` as asked, or `x1, y1, x2, y2`) and whether the
-numbers are on the 0–1000 grid, in pixels or fractions (detected automatically when the range makes it obvious).
-Everything else in those notebooks (batch scoring, prompt comparison, Step 4b, the prompt lab) is the API path.
+1c (JSON asked nicely), 3a (boxes on one photo), 3c (the count) and 4a (the rooms of one plan from the model's own
+polygons). Nothing done in the chat is repeated on the API: the API keeps the batch steps (2a, 2b, 3b) and the prompt
+lab, and the schema contrast comes from Step 2a's *schema* switch (question 1 points there). There is no SAM 3 route in
+these notebooks and Step 0 does not load it, so they need no GPU. Each paste-back cell shows the image with a download
+button, the prompt to copy, a box for the reply and a *Score* button; the reply is parsed with the same tolerant parser
+as the API replies, drawn and scored the same way, and shown next to the earlier lab's specialist for the same image
+(the MP2 model's label, the MP3 model's boxes, MP4's SAM 3 by phrase). Two dropdowns handle the chat model's habits: box
+order (`ymin, xmin, ymax, xmax` as asked, or `x1, y1, x2, y2`) and whether the numbers are on the 0–1000 grid, in pixels or
+fractions (detected automatically when the range makes it obvious). Step 6 shows the API's batch rows and the student's
+own pasted room results.
 
 What to expect from a chat model: prose around the JSON and ``` fences (the parser copes, a naive one would not);
 boxes given in pixels of a resized image or in the other order (hence the dropdowns); rougher boxes than the API's
 grounded output; polygons that are coarse or missing. Those are the lesson, not bugs. The notebook cannot call hokie.ai
-itself, so nothing there is precomputed; each student's replies are their own. The chat replies are not stored.
+itself, so nothing there is precomputed; each student's replies are their own and are not stored.
 
 ## 2. The Gemini API as the students meet it
 

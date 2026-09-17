@@ -13,7 +13,7 @@ from aec_llm.data import Examples  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
 CHAT_URL = "https://hokie.ai.vt.edu/"
-CHAT_INTRO = f"""**Two routes to the same model family.** For the *single-example* steps you will use a plain chat window: **hokie.ai** ({CHAT_URL}, Virginia Tech's free access to GPT models, sign in with your VT account). You download the example image, paste the prompt the notebook gives you, attach the image, and paste the reply back into the notebook, which draws and scores it exactly as it does for the API. The *batch* steps (every photo scored at once) and the schema-enforced steps use the Gemini API, whose answers are precomputed.
+CHAT_INTRO = f"""**Two routes, nothing done twice.** For the *single-example* steps (a photo described, a photo classified, boxes on one site photo, a count, the rooms of one plan) you use a plain chat window: **hokie.ai** ({CHAT_URL}, Virginia Tech's free access to GPT models, sign in with your VT account). You download the example image, paste the prompt the notebook gives you, attach the image, and paste the reply back into the notebook, which draws and scores it against the answer key and next to the earlier labs' specialist models. The *batch* steps (every photo scored at once, prompts compared) use the Gemini API, whose answers are precomputed. No GPU is needed in this notebook.
 
 """
 
@@ -24,6 +24,8 @@ VARIANTS = {
                     "Which classes does Gemini confuse (use the confusion table), and what did the descriptions and the rules change?"),
         q_detect=("From Step 3b: Gemini's recall and precision against the MP3 YOLO model's. Which label is hardest for Gemini (helmet, NO helmet, vest, NO vest, person) "
                   "and why might that be? Paste one overlay from Step 3a and explain the extras (thick boxes marked '?')."),
+        q_segment_chat=("From Step 4a on two plans: copy the per-room tables from your pasted replies. Which rooms did the chat model outline well and which not (missing polygons, merged rooms, shapes in the wrong place)? "
+                        "How does it compare with MP4's SAM 3 by phrase on the same plans, and with drawing the boxes yourself in MP4?"),
         q_segment=("From Step 4c on one plan: copy the per-room table. Which way is closer to the drawing, the model's own polygons or its boxes handed to SAM 3, "
                    "and on which rooms do they differ most? How does this compare with drawing the boxes yourself in MP4?"),
     ),
@@ -33,6 +35,8 @@ VARIANTS = {
                     "trained on the same kind of images: is that a fair comparison? Which styles does Gemini confuse with each other, and does the rules prompt help?"),
         q_detect=("From Step 3b: Gemini's recall and precision against the MP3 YOLO model's on the machinery photos. Which machine is hardest and why? "
                   "From Step 3c: does the model's count of excavators agree with its own boxes and with the answer key?"),
+        q_segment_chat=("From Step 4a on plan 8138 and on plan 11615 (scanned drawings with furniture and dimension strings): copy the per-room tables from your pasted replies. "
+                        "What does the scan's clutter do to the chat model's polygons? Compare with MP4's SAM 3 by phrase on the same plans."),
         q_segment=("From Step 4c on plan 8138 and on plan 11615 (scanned drawings with furniture and dimension strings, unlike the clean drawings of the workshop): "
                    "copy the per-room tables. Which way holds up better on a scan, and what does the scan's clutter do to the polygons? Compare with the MP4 numbers for the same plans."),
     ),
@@ -85,12 +89,12 @@ In MP2, MP3 and MP4 you trained or used one **specialist** model per task: a cla
 1. Talk to the model about a photo, and get the answer as JSON in two ways: by asking nicely, and by enforcing a schema.
 2. Classify the MP2 photos with three prompts and compare with the MP2 model.
 3. Detect and count on the MP3 photos, compare with the MP3 model.
-4. Measure rooms on the MP4 plans: the model's own polygons, or its boxes handed to SAM 3.
+4. {"Measure rooms on an MP4 plan from the model's own polygons." if chat else "Measure rooms on the MP4 plans: the model's own polygons, or its boxes handed to SAM 3."}
 5. Your own image and your own words in a small app.
 
 {CHAT_INTRO if chat else ""}**Before you start**
 - **Gemini API key (free).** Open https://aistudio.google.com/apikey, sign in with your Google account, create a key. In Colab, click the **key icon** in the left bar (*Secrets*), add a secret named `GEMINI_API_KEY` with the key as its value, and switch on *Notebook access*. Without a key the precomputed answers of the built-in examples still work; your own prompts and images do not.
-- **GPU (optional):** *Runtime → Change runtime type → T4 GPU* is only needed for Step 4b (SAM 3). Everything else runs on a remote service and needs no GPU.
+{"" if chat else "- **GPU (optional):** *Runtime → Change runtime type → T4 GPU* is only needed for Step 4b (SAM 3). Everything else runs on a remote service and needs no GPU."}
 - Never paste your key into a cell you might share: use the secret.
 """))
     cells.append(form(
@@ -112,10 +116,12 @@ for _m in [m for m in list(sys.modules) if m.split(".")[0] in (PKG, "aec_seg")]:
 importlib.invalidate_caches()
 sys.path.insert(0, os.path.abspath(os.path.join(REPO, FOLDER)))
 from aec_llm import lab
-lab.setup(dataset="{spec.key}", api_key=api_key, model=model, load_sam=load_sam)""",
-        notes=["Click ▶ and wait for the green ✅ line. This downloads the examples with their precomputed answers, and (if *load_sam* is ticked) SAM 3 for Step 4b (about 3 GB).",
-               "Leave *api_key* empty to use the Colab secret GEMINI_API_KEY (recommended). Untick *load_sam* if you have no GPU and want to skip Step 4b's live part."],
-        params=['api_key = "" #@param {type:"string"}', f'model = "{C.DEFAULT_MODEL}" #@param {jlist(C.MODELS)}', 'load_sam = True #@param {type:"boolean"}'],
+lab.setup(dataset="{spec.key}", api_key=api_key, model=model, load_sam={"False" if chat else "load_sam"})""",
+        notes=(["Click ▶ and wait for the green ✅ line. This downloads the examples with their precomputed answers.",
+                "Leave *api_key* empty to use the Colab secret GEMINI_API_KEY (recommended)."] if chat else
+               ["Click ▶ and wait for the green ✅ line. This downloads the examples with their precomputed answers, and (if *load_sam* is ticked) SAM 3 for Step 4b (about 3 GB).",
+                "Leave *api_key* empty to use the Colab secret GEMINI_API_KEY (recommended). Untick *load_sam* if you have no GPU and want to skip Step 4b's live part."]),
+        params=['api_key = "" #@param {type:"string"}', f'model = "{C.DEFAULT_MODEL}" #@param {jlist(C.MODELS)}'] + ([] if chat else ['load_sam = True #@param {type:"boolean"}']),
     ))
 
     # ------------------------------------------------------------------ Part 1
@@ -137,11 +143,9 @@ Two things to watch in every step: the **reply itself** (is it what you asked fo
                           notes=["The classification prompt asks for JSON; nothing enforces it. Paste the reply back: is it valid JSON, is the label one of the categories, is it right? "
                                  "Do it two or three times (new chat each time) and watch whether the format and the label stay the same."],
                           params=[f'photo = "{photos[0]}" #@param {jlist(photos)}']))
-        cells.append(form("▶ Step 1d · JSON, way B: the API with a schema", "lab.json_lab(photo, repeats)",
-                          notes=["The same prompt sent to the Gemini API, first as plain text (A again) and then with a **JSON schema** the API enforces (B), three runs each (precomputed for the first photo)."],
-                          params=[f'photo = "{photos[0]}" #@param {jlist(photos)}', 'repeats = 3 #@param {type:"slider", min:1, max:3, step:1}']))
-        questions.append((1, "From Steps 1c and 1d: how many of the chat replies (way A) were valid JSON, and did the label stay the same across your tries? How did the API's plain replies compare, and what did the schema (way B) change and not change? "
-                             "Why does a program that has to read the reply (to fill a table, to count, to draw a box) need B rather than A?"))
+        questions.append((1, "From Step 1c: across your tries, how many of the chat replies were valid JSON, was the label always one of the categories, and did it stay the same? "
+                             "In Step 2a, run the *basic* prompt with the schema off and on: what does the schema change in the replies, and what does it not change (the label can still be wrong)? "
+                             "Why does a program that has to read the reply (to fill a table, to count, to draw a box) need the schema rather than a polite request?"))
     else:
         cells.append(form("▶ Step 1b · Ask anything about a photo", "lab.describe(photo, question)",
                           notes=["Free text in, free text out. The three questions below are precomputed for the first photo; any other photo or question runs live (needs your key)."],
@@ -179,7 +183,7 @@ The MP3 task: {spec.sites.title[0].lower() + spec.sites.title[1:]}. The prompt a
 """))
     if chat:
         cells.append(form("▶ Step 3a · Boxes on one photo, from the chat", "lab.chat_detect(site)",
-                          notes=["Paste the reply back and the notebook draws the boxes on the photo and scores them against the answer key, next to the API model's and the MP3 model's numbers. "
+                          notes=["Paste the reply back and the notebook draws the boxes on the photo and scores them against the answer key, next to the MP3 model's numbers on the same photo. "
                                  "If the boxes land in the wrong place, the chat used another coordinate convention: change *box order* or *numbers are* and score again."],
                           params=[f'site = "{sites[0]}" #@param {jlist(sites)}']))
     else:
@@ -189,15 +193,15 @@ The MP3 task: {spec.sites.title[0].lower() + spec.sites.title[1:]}. The prompt a
                       params=['schema = True #@param {type:"boolean"}']))
     if chat:
         cells.append(form("▶ Step 3c · Just ask the chat for the number", "lab.chat_count(site)",
-                          notes=["Instead of boxes, the chat is asked for a count. Compared with the answer key and with the API model's count."],
+                          notes=["Instead of boxes, the chat is asked for a count. Compared with the answer key and with the boxes it gave you in Step 3a."],
                           params=[f'site = "{sites[0]}" #@param {jlist(sites)}']))
     else:
         cells.append(form("▶ Step 3c · Just ask for the number", "lab.count(site, schema)",
                           notes=["Instead of boxes, the model is asked for a count. Compared with the answer key and with counting the model's own boxes from Step 3a."],
                           params=[f'site = "{sites[0]}" #@param {jlist(sites)}', 'schema = True #@param {type:"boolean"}']))
-    questions.append((4, v["q_detect"] + (" Also: on the photo you gave the chat in Step 3a, how did its boxes compare with the API model's on the same photo?" if chat else "")))
+    questions.append((4, v["q_detect"] + (" Also: on the photo you gave the chat in Step 3a, how did its boxes compare with the MP3 model's on the same photo, and what coordinate convention did the chat use?" if chat else "")))
     cells.append(q(*questions[-1]))
-    questions.append((5, ("From Step 3c on two photos: the chat's count, the API model's count and the answer key. " if chat else
+    questions.append((5, ("From Step 3c on two photos: the chat's count, the number of boxes it gave you in Step 3a, and the answer key. " if chat else
                           "From Step 3c on two photos: the model's count, the count of its own boxes and the answer key. ")
                       + "When they disagree, which one is wrong and how would you know on a site where there is no answer key? Which of the two ways of counting would you trust on a site camera, and why?"))
     cells.append(q(*questions[-1]))
@@ -206,28 +210,29 @@ The MP3 task: {spec.sites.title[0].lower() + spec.sites.title[1:]}. The prompt a
     cells.append(md(f"""
 ## Part 4 · Rooms on a floor plan
 
-The MP4 task on {spec.plans.description}. Two ways to get square metres out of a language model:
-
+The MP4 task on {spec.plans.description}. {"The prompt asks the chat model for each room's outline as a polygon (a list of points on the 0–1000 grid) and its label; the notebook converts the polygon to pixels and to m² with the plan's scale, and checks every room against the drawing's answer key, next to MP4's result (SAM 3 asked for *room* by phrase)." if chat else "Two ways to get square metres out of a language model:"}
+{"" if chat else """
 - **LLM only:** the prompt asks for each room's outline as a polygon (a list of points on the 0–1000 grid) and its label; the notebook converts the polygon to pixels and to m² with the plan's scale.
 - **LLM boxes + SAM 3:** the prompt asks only for a box per room; each box is handed to SAM 3 exactly as your own boxes were in MP4 (*empty room* + box, holes filled, walls removed). The language model does the *finding and naming*, the segmentation model does the *pixels*.
 
-Both are scored against the drawing's answer key, and MP4's result (SAM 3 asked for *room* by phrase) is shown for comparison.
+Both are scored against the drawing's answer key, and MP4's result (SAM 3 asked for *room* by phrase) is shown for comparison."""}
 """))
     if chat:
-        cells.append(form("▶ Step 4a · Rooms from the chat: its polygons, or its boxes to SAM 3", "lab.chat_rooms(plan, mode)",
-                          notes=["Paste the reply back: the notebook converts the polygons (or hands the boxes to SAM 3), measures every room in m² and checks each against the drawing, next to the API model's result. "
-                                 "Long lists of coordinates are where chat replies break: look at what you get."],
-                          params=[f'plan = "{plans[0]}" #@param {jlist(plans)}', f'mode = "LLM only (polygons)" #@param {jlist(["LLM only (polygons)", "LLM boxes + SAM 3"])}']))
-    cells.append(form("▶ Step 4a · The model's own polygons" if not chat else "▶ Step 4a′ · The API model's polygons", "lab.segment(plan, mode, schema)",
-                      notes=["Precomputed for every plan with the schema on and off. Try both: without the schema this model tends to skip the polygons and only give boxes, "
-                             "and long lists of coordinates are where the plain JSON breaks."],
-                      params=[f'plan = "{plans[0]}" #@param {jlist(plans)}', f'mode = "LLM only (polygons)" #@param {jlist(["LLM only (polygons)"])}', 'schema = True #@param {type:"boolean"}']))
-    cells.append(form("▶ Step 4b · The model's boxes, SAM 3's pixels", "lab.segment(plan, mode, schema)",
-                      notes=["The model's boxes are precomputed; SAM 3 runs live on them (GPU: seconds; CPU: about a minute per plan). Without SAM 3 loaded, the box areas are used."],
-                      params=[f'plan = "{plans[0]}" #@param {jlist(plans)}', f'mode = "LLM boxes + SAM 3" #@param {jlist(["LLM boxes + SAM 3"])}', 'schema = True #@param {type:"boolean"}']))
-    cells.append(form("▶ Step 4c · Room by room, three ways", "lab.segment_compare(plan)",
-                      params=[f'plan = "{plans[0]}" #@param {jlist(plans)}']))
-    questions.append((6, v["q_segment"]))
+        cells.append(form("▶ Step 4a · Rooms from the chat's polygons", "lab.chat_rooms(plan)",
+                          notes=["Paste the reply back: the notebook converts the polygons, measures every room in m² and checks each against the drawing. "
+                                 "Long lists of coordinates are where chat replies break: look at what you get, and try a second plan."],
+                          params=[f'plan = "{plans[0]}" #@param {jlist(plans)}']))
+    else:
+        cells.append(form("▶ Step 4a · The model's own polygons", "lab.segment(plan, mode, schema)",
+                          notes=["Precomputed for every plan with the schema on and off. Try both: without the schema this model tends to skip the polygons and only give boxes, "
+                                 "and long lists of coordinates are where the plain JSON breaks."],
+                          params=[f'plan = "{plans[0]}" #@param {jlist(plans)}', f'mode = "LLM only (polygons)" #@param {jlist(["LLM only (polygons)"])}', 'schema = True #@param {type:"boolean"}']))
+        cells.append(form("▶ Step 4b · The model's boxes, SAM 3's pixels", "lab.segment(plan, mode, schema)",
+                          notes=["The model's boxes are precomputed; SAM 3 runs live on them (GPU: seconds; CPU: about a minute per plan). Without SAM 3 loaded, the box areas are used."],
+                          params=[f'plan = "{plans[0]}" #@param {jlist(plans)}', f'mode = "LLM boxes + SAM 3" #@param {jlist(["LLM boxes + SAM 3"])}', 'schema = True #@param {type:"boolean"}']))
+        cells.append(form("▶ Step 4c · Room by room, three ways", "lab.segment_compare(plan)",
+                          params=[f'plan = "{plans[0]}" #@param {jlist(plans)}']))
+    questions.append((6, v["q_segment_chat"] if chat else v["q_segment"]))
     cells.append(q(*questions[-1]))
 
     # ------------------------------------------------------------------ Part 5
@@ -244,16 +249,17 @@ A small app: pick a built-in image or upload your own, choose a task (it fills i
 
     # ------------------------------------------------------------------ wrap-up
     cells.append(md("## Wrap-up · Generalist or specialist?"))
-    cells.append(form("▶ Step 6 · All tasks side by side", "lab.summary()",
+    cells.append(form("▶ Step 6 · All tasks side by side", "lab.summary(chat=True)" if chat else "lab.summary()",
                       notes=["One table: the generalist with one prompt per task against the three specialists from MP2, MP3 and MP4, with time and tokens."]))
-    questions.append((8, "From Step 6: for each task, would you use the generalist, the specialist, or both together (as in Step 4b)? Argue with the numbers you got and with what each needs: labelled data, training, a GPU, a network connection, money per request, and someone who checks. "
+    questions.append((8, "From Step 6: for each task, would you use the generalist, the specialist, or both together" + (" (as in Step 4b)" if not chat else "") + "? Argue with the numbers you got and with what each needs: labelled data, training, a GPU, a network connection, money per request, and someone who checks. "
                          "What does structured output guarantee about a reply, and what does it not guarantee?"))
     cells.append(q(*questions[-1]))
     cells.append(form("▶ Numbers for your report", "lab.report_summary()"))
     cells.append(md("### Credits\n"
                     f"- Photos: {spec.photos.source}.\n- Site photos: {spec.sites.source}.\n- Floor plans: CubiCasa5K (CC BY-NC-SA 4.0), prepared for MP4 (plans {', '.join(spec.plans.ids)}).\n"
-                    "- Model: Gemini (Google) through the Gemini API, free tier; SAM 3 (Meta, SAM License) from the MP4 folder.\n"
-                    "- Lab code: https://github.com/Haolan-Zhang/CEM4644 (folder `mp5_llm_vision`).\n"))
+                    + ("- Models: the chat model behind hokie.ai (Virginia Tech) for the single examples; Gemini (Google) through the Gemini API, free tier, for the batch steps.\n" if chat else
+                       "- Model: Gemini (Google) through the Gemini API, free tier; SAM 3 (Meta, SAM License) from the MP4 folder.\n")
+                    + "- Lab code: https://github.com/Haolan-Zhang/CEM4644 (folder `mp5_llm_vision`).\n"))
 
     nb = new_notebook(cells=cells)
     nb.metadata.update({"colab": {"provenance": [], "gpuType": "T4", "toc_visible": True}, "accelerator": "GPU",
