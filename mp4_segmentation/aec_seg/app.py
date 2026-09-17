@@ -33,6 +33,17 @@ def launch(lab, share=None):
         description="Type a room or an object (room, kitchen, toilet, stairs, window...), move the threshold, compare wordings. "
                     "If the plan has a scale bar, measure it (pixels per metre) to enter the scale.",
     )
-    kw = dict(share=share, inline=True, debug=False, quiet=True, show_error=True, prevent_thread_lock=True)
-    demo.launch(**kw)
+    # not embedded in the cell (the embedded frame is unreliable in Colab): the cell prints a link to open in a new tab
+    import contextlib
+    import io
+    sink = io.StringIO()
+    with contextlib.redirect_stdout(sink), contextlib.redirect_stderr(sink):
+        demo.launch(share=True if share is None else share, inline=False, debug=False, quiet=True, show_error=True, prevent_thread_lock=True)
+    url = getattr(demo, "share_url", None)
+    if url:
+        print(f"Open the app in a new tab (works on a phone too): {url}")
+        print("The link stays alive while this notebook is running.")
+    else:
+        print("The public link could not be created (network hiccup). Run this cell again; "
+              f"the app is running at {getattr(demo, 'local_url', 'the local address')}, which only works from this machine.")
     return demo

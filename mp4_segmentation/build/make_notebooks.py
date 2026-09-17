@@ -19,20 +19,17 @@ VARIANTS = {
         file="MP4_Workshop_Segmentation.ipynb", label="Workshop (in class)", minutes=90, dataset="homes_a", own_plans=1,
         # which things the steps start with
         seg_thing="room (any)", count_thing="window", lab_thing="door", inspect_thing="room (any)", fix_thing="room (any)",
-        takeoff_targets="two rooms of your choice, one window and one door",
-        questions_extra=[
-            "From Step 3b: which rooms did you measure, what did you get, and what does the drawing say? Give the error in percent for each and explain where it comes from (your box, the mask stopping at furniture or a door opening, the scale).",
-            "From Step 3b with *find_all* on a window: how many windows does the drawing have, how many did SAM 3 find, how many did it miss and how many were extra? Which confidence worked best, and what did the extras have in common?",
-        ],
+        takeoff_plans="each of the three plans",
+        q_takeoff=("From Step 3a on each of the three plans: your scale reading and its error, the table of rooms (your m², the drawing's m², the error), the total of your rooms "
+                   "against the drawing's floor area, and the windows found / missed / extra. Which rooms came out worst, and why (your box, an open-plan space, the mask stopping at a door opening, the scale)?"),
     ),
     "homework": dict(
         file="MP4_Homework_Segmentation.ipynb", label="Homework (individual)", minutes=120, dataset="homes_b", own_plans=3,
         seg_thing="bedroom", count_thing="toilet", lab_thing="stairs", inspect_thing="living room", fix_thing="bedroom",
-        takeoff_targets="every bedroom of one plan, the stairs, one toilet and one bathtub",
-        questions_extra=[
-            "From Step 3b on plan 5018 (two floors on one sheet): measure the living room and the kitchen on the ground floor and two bedrooms upstairs. Give SAM 3's area and the drawing's area for each, and the total for the four rooms. The sheet itself prints the floor areas (KERROSALA, HUONEISTOALA): how do they relate to what you measured?",
-            "From Step 3b with *find_all*: count the toilets and the bathtubs on one plan, and the windows on plan 1217. Report found / missed / extra for each, with the confidence you used. Which symbol was easiest for the model and why?",
-        ],
+        takeoff_plans="three plans of your choice, one of them a two-storey sheet",
+        q_takeoff=("From Step 3a on three plans of your choice (one of them a two-storey sheet): your scale reading and its error, the table of rooms (your m², the drawing's m², the error), "
+                   "the total against the drawing's floor area, and the windows found / missed / extra. On plan 5018 the sheet prints KERROSALA and HUONEISTOALA (gross and net floor area per storey): "
+                   "how do they relate to what you measured?"),
     ),
 }
 
@@ -83,8 +80,8 @@ def build(variant):
 **What you will do (about {v['minutes']} minutes)**
 1. Meet SAM 3 on an ordinary site photo: ask by name, draw a box, tap an object. Then look at real floor plans and what is drawn on them.
 2. Ask a segmentation model, by name, for rooms, fixtures and openings: see the mask, the overlay, the count and the area, and compare with the drawing's own numbers.
-3. Do a quantity take-off with boxes: check the scale, measure rooms in square metres, count windows and doors.
-4. Compare two plans, and examine where the model goes wrong: wording, weak regions, and how to correct it.
+3. Do a quantity take-off with boxes, plan by plan: read the scale, count the windows, measure every room in square metres.
+4. Examine where the model goes wrong: wording, weak regions, and your own words.
 5. Try a plan of your own.
 
 **Before you start:** menu *Runtime → Change runtime type → T4 GPU → Save*. The model used here (SAM 3) is large: with a GPU each request takes well under a second; without one, the precomputed results still work but live requests take about a minute each.
@@ -169,67 +166,47 @@ Pick a plan and a thing. You get three panels: the drawing, the **mask** (white 
     cells.append(form("▶ Step 2b · Hits, misses and extras", "lab.count(plan, thing, confidence)",
                       notes=["The answer key drawn on the plan: green = a real one the model found, red = a real one it missed, blue = a region that is not one."],
                       params=[f'plan = "{label_of[d0]}" #@param {jlist(labels)}', f'thing = "{v["count_thing"]}" #@param {jlist(things)}', conf]))
-    cells.append(form("▶ Step 2c · Every room type at once", "lab.mix(plan, confidence)",
-                      notes=["SAM 3's square metres per room type next to the drawing's, and the counts of fixtures and openings next to the truth."],
-                      params=[f'plan = "{label_of[d0]}" #@param {jlist(labels)}', conf]))
-    cells.append(form("▶ Step 2d · Can *you* estimate an area?", "lab.guess_game(rounds)",
-                      notes=["A room is outlined on a plan: guess its area from the scale bar, then see the drawing's number and SAM 3's."],
-                      params=['rounds = 4 #@param {type:"slider", min:2, max:8, step:1}']))
     questions.append((1, "From Step 2a and 2b: which words found what they should (rooms? toilets? windows? doors?), and which found nothing or something else? Give the found / missed / extra counts for two things on one plan at confidence 0.3, and say what the misses have in common."))
     cells.append(q(*questions[-1]))
-    questions.append((2, "From Step 2c: for one plan, copy the table of square metres per room type (SAM 3 vs the drawing). Which room type is measured best and which worst, and why (merged rooms, furniture, open-plan kitchen and living room)? Then move the confidence to 0.2 and 0.7: what changes? Also give your score in the estimation game."))
-    cells.append(q(*questions[-1]))
-
     # ------------------------------------------------------------------ Part 3
     cells.append(md("""
 ## Part 3 · Quantity take-off with boxes
 
-A phrase is quick, but a take-off needs control. So now you draw the boxes. Three steps: **check the scale** on the scale bar (a 1 % error in the scale is a 2 % error in every area), **measure** rooms and elements by drawing a tight box around each, and **count** with *find_all*: draw one box around a window, and SAM 3 looks for every other thing that looks like it. The drawing's answer key tells you what it found, missed and added.
+A phrase is quick, but a take-off needs control. So now you draw the boxes, in one cell per plan: **the scale** (one box along the 5 m scale bar: a 1 % error in the scale is a 2 % error in every area), **every window** (a small box each), and **every room** (a tight box each, edges on the inside faces of the walls). Draw the small things first, so that later boxes do not overlap them. Then *Submit*: the notebook reads the scale from your box, counts your windows against the drawing's, measures every room with SAM 3 and prints each next to the drawing's own area.
 
-How a *room* box is measured: a box alone makes SAM 3 cut out the *furniture symbols* inside it rather than the empty floor (it was trained to find objects). So the notebook asks for *empty room* **and** gives your box as the example, keeps the region that fits your box, fills the holes left by symbols, removes the black walls, and converts the pixels with the scale. Every result is printed next to the drawing's own area.
+How a *room* box is measured: a box alone makes SAM 3 cut out the *furniture symbols* inside it rather than the empty floor (it was trained to find objects). So the notebook asks for *empty room* **and** gives your box as the example, keeps the region that fits your box, fills the holes left by symbols, removes the black walls, and converts the pixels with **your** scale.
 """))
-    cells.append(form("▶ Step 3a · Check the scale", "lab.scale_check(plan)",
-                      notes=["Draw a box from the 0 tick to the 5 m tick of the scale bar (zoom in with the mouse wheel for precision), label it *scale bar*, click *Submit*."],
+    cells.append(form("▶ Step 3a · Scale, windows, rooms: the take-off of one plan", "lab.takeoff(plan)",
+                      notes=["Zoom with the mouse wheel. Order: *scale bar* (0 to 5 m), then every *window*, then every *room*, then *Submit*. Rooms need the live model. "
+                             f"Do this for {v['takeoff_plans']} and copy each table into your report."],
                       params=[f'plan = "{label_of[d0]}" #@param {jlist(labels)}']))
-    cells.append(form("▶ Step 3b · Measure and count with boxes", "lab.takeoff(plan, find_all, confidence)",
-                      notes=[f"Draw tight boxes (zoom with the mouse wheel; put the edges on the inside faces of the walls): label each one *room*, *window*, *door*, *fixture* or *other*, then *Submit*. Measure at least {v['takeoff_targets']}. "
-                             "With *find_all* ticked, SAM 3 also looks for everything like your first window / door / fixture / room box (blue boxes; thin green = the drawing's answer key). Needs the live model."],
-                      params=[f'plan = "{label_of[d0]}" #@param {jlist(labels)}', 'find_all = True #@param {type:"boolean"}',
-                              'confidence = 0.3 #@param {type:"slider", min:0.1, max:0.9, step:0.05}']))
-    for text in v["questions_extra"]:
-        questions.append((len(questions) + 1, text))
-        cells.append(q(*questions[-1]))
+    questions.append((len(questions) + 1, v["q_takeoff"]))
+    cells.append(q(*questions[-1]))
 
     # ------------------------------------------------------------------ Part 4
-    a, b = spec.compare_default
     cells.append(md("""
-## Part 4 · Compare plans, and where it goes wrong
+## Part 4 · Where it goes wrong
 
-Two plans side by side: square metres per room type from SAM 3, and the drawings' own totals. Then three kinds of error to look for: the **words** you use (the model was trained on everyday photos, not on drawings), **weak regions** it proposes with low confidence, and plain **mistakes** that need a correction. The last step lets you correct the model by drawing a box over what it got wrong.
+Three kinds of error to look for: the **words** you use (the model was trained on everyday photos, not on drawings), **weak regions** it proposes with low confidence, and words of your own that describe what is *drawn* rather than what it *means*.
 """))
-    cells.append(form("▶ Step 4a · Compare two plans", "lab.compare(plan_a, plan_b, confidence)",
-                      params=[f'plan_a = "{label_of[a]}" #@param {jlist(labels)}', f'plan_b = "{label_of[b]}" #@param {jlist(labels)}', conf]))
-    cells.append(form("▶ Step 4b · Does the wording matter?", "lab.phrase_lab(plan, thing, confidence)",
+    cells.append(form("▶ Step 4a · Does the wording matter?", "lab.phrase_lab(plan, thing, confidence)",
                       notes=["The same thing asked for with different words; all wordings are precomputed."],
                       params=[f'plan = "{label_of[d0]}" #@param {jlist(labels)}', f'thing = "{v["lab_thing"]}" #@param {jlist(things)}', conf]))
-    cells.append(form("▶ Step 4c · Look at each region and its confidence", "lab.inspect(plan, thing)",
+    cells.append(form("▶ Step 4b · Look at each region and its confidence", "lab.inspect(plan, thing)",
                       notes=["Every region the model proposed, numbered, with its confidence, its area and the room it sits on. Move the slider to see which ones survive."],
                       params=[f'plan = "{label_of[d0]}" #@param {jlist(labels)}', f'thing = "{v["inspect_thing"]}" #@param {jlist(things)}']))
-    cells.append(form("▶ Step 4d · Correct it with a box", "lab.fix(plan, thing, confidence)",
-                      notes=["Draw a box over a region that is wrong, click *Submit*: SAM 3 runs again with your box as a *not this* hint. Needs the live model."],
-                      params=[f'plan = "{label_of[d0]}" #@param {jlist(labels)}', f'thing = "{v["fix_thing"]}" #@param {jlist(things)}', conf]))
-    cells.append(form("▶ Step 4e · Your own words", "lab.your_phrase(plan, phrase, confidence)",
+    cells.append(form("▶ Step 4c · Your own words", "lab.your_phrase(plan, phrase, confidence)",
                       notes=["Type any phrase: a room, a symbol, a shape. Try *curved line* (the door swings), *thick black line* (the walls), *circle*, *small rectangle*. Needs the live model."],
                       params=[f'plan = "{label_of[d0]}" #@param {jlist(labels)}', 'phrase = "curved line" #@param {type:"string"}', conf]))
-    questions.append((len(questions) + 1, "From Step 4a: which plan has more bedroom area and more bathroom area according to SAM 3, and does the drawing agree? From Step 4b: which wording worked best for the thing you chose, and how different were the areas?"))
+    questions.append((len(questions) + 1, "From Step 4a: which wording worked best for the thing you chose, and how different were the counts and areas? From Step 4b: describe one weak region (what it sits on, its confidence) and one plain mistake, and what you would tell a colleague who wants to use these square metres in a cost estimate."))
     cells.append(q(*questions[-1]))
-    questions.append((len(questions) + 1, "Describe one mistake you found in Step 4c or 4d (what was included or missed, at which confidence). Did the negative box fix it? What would you tell a colleague who wants to use these square metres in a cost estimate?"))
+    questions.append((len(questions) + 1, "From Step 4c: which of your own words found something the named things could not (for example *curved line* for the door swings, *thick black line* for the walls)? Why does a shape word work on a drawing where the name of the thing does not?"))
     cells.append(q(*questions[-1]))
 
     # ------------------------------------------------------------------ Part 5
     cells.append(md("## Part 5 · Your own plan"))
     cells.append(form("▶ Your plan, your words", "lab.upload_app()",
-                      notes=["Upload a floor plan (a photo of a drawing works too, or open the public link on your phone), type what to find, move the threshold. "
+                      notes=["This cell prints a **link**: open it in a new tab (or on your phone). Upload a floor plan (a photo of a drawing works too), type what to find, move the threshold. "
                              "If the plan has a scale bar, measure how many pixels one metre is and enter the centimetres per pixel to get square metres.",
                              f"Test at least {v['own_plans']} plan(s) of your own and take screenshots for your report. Needs the live model."]))
     questions.append((len(questions) + 1, f"Test {v['own_plans']} plan(s) of your own (any floor plan from the internet or a course). For each: the phrase you used, the count and area measured, and whether the mask is right. What kind of drawing or wording failed?"))

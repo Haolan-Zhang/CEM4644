@@ -26,6 +26,7 @@ class SegLab:
         self.engine: Optional[Sam3Engine] = None
         self._cache: Dict[tuple, SegResult] = {}
         self.apps = {}
+        self.takeoffs: Dict[str, dict] = {}     # the students' take-off reports per plan, for the summary
 
     # ------------------------------------------------------------------ setup
     def setup(self, dataset: str = "homes_a", load_model: bool = True, install: bool = True):
@@ -168,9 +169,9 @@ class SegLab:
         self._need()
         ui.scale_check(self, self._pid(plan))
 
-    def takeoff(self, plan, find_all=True, confidence=0.3):
+    def takeoff(self, plan):
         self._need()
-        ui.takeoff(self, self._pid(plan), bool(find_all), float(confidence))
+        ui.takeoff(self, self._pid(plan))
 
     def upload_app(self):
         self._need()

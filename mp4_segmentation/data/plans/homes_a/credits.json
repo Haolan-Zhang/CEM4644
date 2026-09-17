@@ -26,32 +26,6 @@
     ]
   },
   {
-    "id": "2090",
-    "file": "2090.png",
-    "title": "small flat with a balcony",
-    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
-    "license": "CC BY-NC-SA 4.0",
-    "source": "https://zenodo.org/records/2613548",
-    "note": "CubiCasa5K sample 2090; idx 06; open kitchen, washroom",
-    "size": [
-      990,
-      951
-    ]
-  },
-  {
-    "id": "6457",
-    "file": "6457.png",
-    "title": "house with a dining area and stairs",
-    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
-    "license": "CC BY-NC-SA 4.0",
-    "source": "https://zenodo.org/records/2613548",
-    "note": "CubiCasa5K sample 6457; idx 14; eight rooms, stairs, utility room",
-    "size": [
-      828,
-      1285
-    ]
-  },
-  {
     "id": "207",
     "file": "207.png",
     "title": "large house, 15 rooms",
@@ -62,19 +36,6 @@
     "size": [
       1156,
       918
-    ]
-  },
-  {
-    "id": "7696",
-    "file": "7696.png",
-    "title": "studio flat",
-    "author": "CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy",
-    "license": "CC BY-NC-SA 4.0",
-    "source": "https://zenodo.org/records/2613548",
-    "note": "CubiCasa5K sample 7696; idx 79; one room, kitchenette, bathroom, hall",
-    "size": [
-      716,
-      1436
     ]
   }
 ]

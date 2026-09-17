@@ -93,17 +93,14 @@ register(PlanSet(
     title="Residential floor plans, set A",
     folder="data/plans/homes_a",
     masks="data/masks/homes_a",
-    description=("Six real floor plans of Finnish homes from the CubiCasa5K dataset (CC BY-NC-SA 4.0), drawn cleanly from the dataset's "
+    description=("Three real floor plans of Finnish homes from the CubiCasa5K dataset (CC BY-NC-SA 4.0), drawn cleanly from the dataset's "
                  "vector data (black walls, light-blue windows, door arcs, fixture symbols) at a known scale with a 5 m scale bar. Each plan "
                  "comes with an answer key (every room's real area, every door, window and fixture) that the notebook uses to check your "
                  "measurements."),
     plans={   # CubiCasa5K sample id -> resampling factor (1 px = 1/factor cm) and title; 'idx' = position in the dataset's test split
         "1293": {"factor": 1.15, "title": "flat with four large rooms", "note": "idx 58; living room, bedroom, kitchen, hall, bathroom"},
         "2536": {"factor": 0.85, "title": "flat with three bedrooms", "note": "idx 01; kitchen, bathroom with bathtub, WC, walk-in closet"},
-        "2090": {"factor": 1.10, "title": "small flat with a balcony", "note": "idx 06; open kitchen, washroom"},
-        "6457": {"factor": 0.80, "title": "house with a dining area and stairs", "note": "idx 14; eight rooms, stairs, utility room"},
         "207": {"factor": 0.60, "title": "large house, 15 rooms", "note": "idx 35; corridor, washroom, storage, five bedrooms, fireplace"},
-        "7696": {"factor": 1.30, "title": "studio flat", "note": "idx 79; one room, kitchenette, bathroom, hall"},
     },
     default_plan="1293",
     compare_default=("1293", "2536"),

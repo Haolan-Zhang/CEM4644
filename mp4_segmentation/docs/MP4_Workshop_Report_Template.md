@@ -16,7 +16,7 @@ From Step 2a and 2b: which words found what they should (rooms? toilets? windows
 
 ## Question 2
 
-From Step 2c: for one plan, copy the table of square metres per room type (SAM 3 vs the drawing). Which room type is measured best and which worst, and why (merged rooms, furniture, open-plan kitchen and living room)? Then move the confidence to 0.2 and 0.7: what changes? Also give your score in the estimation game.
+From Step 3a on each of the three plans: your scale reading and its error, the table of rooms (your m², the drawing's m², the error), the total of your rooms against the drawing's floor area, and the windows found / missed / extra. Which rooms came out worst, and why (your box, an open-plan space, the mask stopping at a door opening, the scale)?
 
 *Your answer:*
 
@@ -24,7 +24,7 @@ From Step 2c: for one plan, copy the table of square metres per room type (SAM 3
 
 ## Question 3
 
-From Step 3b: which rooms did you measure, what did you get, and what does the drawing say? Give the error in percent for each and explain where it comes from (your box, the mask stopping at furniture or a door opening, the scale).
+From Step 4a: which wording worked best for the thing you chose, and how different were the counts and areas? From Step 4b: describe one weak region (what it sits on, its confidence) and one plain mistake, and what you would tell a colleague who wants to use these square metres in a cost estimate.
 
 *Your answer:*
 
@@ -32,7 +32,7 @@ From Step 3b: which rooms did you measure, what did you get, and what does the d
 
 ## Question 4
 
-From Step 3b with *find_all* on a window: how many windows does the drawing have, how many did SAM 3 find, how many did it miss and how many were extra? Which confidence worked best, and what did the extras have in common?
+From Step 4c: which of your own words found something the named things could not (for example *curved line* for the door swings, *thick black line* for the walls)? Why does a shape word work on a drawing where the name of the thing does not?
 
 *Your answer:*
 
@@ -40,29 +40,13 @@ From Step 3b with *find_all* on a window: how many windows does the drawing have
 
 ## Question 5
 
-From Step 4a: which plan has more bedroom area and more bathroom area according to SAM 3, and does the drawing agree? From Step 4b: which wording worked best for the thing you chose, and how different were the areas?
-
-*Your answer:*
-
-
-
-## Question 6
-
-Describe one mistake you found in Step 4c or 4d (what was included or missed, at which confidence). Did the negative box fix it? What would you tell a colleague who wants to use these square metres in a cost estimate?
-
-*Your answer:*
-
-
-
-## Question 7
-
 Test 1 plan(s) of your own (any floor plan from the internet or a course). For each: the phrase you used, the count and area measured, and whether the mask is right. What kind of drawing or wording failed?
 
 *Your answer:*
 
 
 
-## Question 8
+## Question 6
 
 Where in a project would a take-off like this be useful, and where would it mislead? What would you need (clean drawings, a scale, a room schedule, a person checking) to turn it into numbers you would put in an estimate?
 

@@ -7,7 +7,7 @@ Students need **no programming**: every notebook cell is a Colab form and the co
 
 | Notebook | Open | Plans |
 |---|---|---|
-| `MP4_Workshop_Segmentation.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp4_segmentation/MP4_Workshop_Segmentation.ipynb) | set A: six homes drawn cleanly from the dataset's vector data (flats, a large house, a studio) |
+| `MP4_Workshop_Segmentation.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp4_segmentation/MP4_Workshop_Segmentation.ipynb) | set A: three homes drawn cleanly from the dataset's vector data (two flats, a large house) |
 | `MP4_Homework_Segmentation.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp4_segmentation/MP4_Homework_Segmentation.ipynb) | set B: seven scanned plans, including two-storey sheets and a Swedish plan; other things to segment (bedrooms, toilets, bathtubs, stairs). To be redesigned around counting components on structural plans. |
 
 Both notebooks are generated from one template and differ in the plans and in what the steps start with.
@@ -16,10 +16,10 @@ There is no training exercise in MP4 (SAM 3 is used as is).
 ## What the students do
 
 1. **Meet SAM 3**: on an ordinary site photo, ask by phrase (a dropdown or their own words), draw a box, tap an object; then browse the six plans with their facts (rooms, floor area, doors, windows) and a legend of the Finnish room labels.
-2. **Ask by name**: original → mask → overlay for *room*, *bedroom*, *toilet*, *window*...; count, pixels, square metres; hits, misses and extras drawn against the answer key; square metres per room type next to the drawing's; an area-estimation game.
-3. **Take-off with boxes**: check the scale on the 5 m bar; draw tight boxes around rooms (the notebook asks SAM 3 for *empty room* with the box as the example, fills the symbol holes, removes the walls and prints the area next to the drawing's) and around a window or door, then *find_all* counts every look-alike (found / missed / extra).
-4. **Compare and examine errors**: two plans side by side; wording; region inspector; correction with a negative box; own words.
-5. **Own plan**: upload any floor plan in a small Gradio app.
+2. **Ask by name**: original → mask → overlay for *room*, *bedroom*, *toilet*, *window*...; count, pixels, square metres; hits, misses and extras drawn against the answer key.
+3. **Take-off with boxes**, one cell per plan: a box on the 5 m bar gives the scale, a box on every window gives the count (checked against the answer key), a tight box on every room gives its area (SAM 3 asked for *empty room* with the box as the example, symbol holes filled, walls removed, the student's scale applied), each next to the drawing's own area and the total against the floor area.
+4. **Where it goes wrong**: wording; region inspector; own words.
+5. **Own plan**: upload any floor plan in a small Gradio app, opened from a link.
 
 ## What is in this folder
 
@@ -38,7 +38,7 @@ docs/             report templates, instructor guide, a copy of the SAM License
 build/            instructor-side scripts: prepare_plans.py, precompute_masks.py, make_notebooks.py
 ```
 
-**Plans.** Thirteen plans from **CubiCasa5K** (Kalervo et al. 2019, CC BY-NC-SA 4.0, https://zenodo.org/records/2613548),
+**Plans.** Ten plans from **CubiCasa5K** (Kalervo et al. 2019, CC BY-NC-SA 4.0, https://zenodo.org/records/2613548),
 the `high_quality_architectural` subset. Every sample has a vector drawing (`model.svg`: walls, windows, door swings,
 fixture symbols, room polygons with real dimensions) drawn at exactly 1 unit = 1 cm, and a scanned image aligned with it.
 Set A (workshop) shows a clean rendering of the vector drawing (cairosvg; the "UNDEFINED" labels of unnamed rooms

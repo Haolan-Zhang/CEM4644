@@ -550,89 +550,110 @@ def wall_pixels(img) -> np.ndarray:
     return ndimage.binary_opening(dark, structure=np.ones((7, 7)))
 
 
-def takeoff_compute(lab, plan_id: str, boxes, find_all: bool, threshold: float):
-    """boxes: list of (label, [x1, y1, x2, y2]) in full-image pixels. Returns (overlay, rows, found, lines)."""
+def takeoff_compute(lab, plan_id: str, boxes):
+    """boxes: list of (label, [x1, y1, x2, y2]) in full-image pixels, labels 'scale bar' / 'window' / 'room'.
+    Returns (overlay, report dict). Rooms: SAM 3 inside each box (phrase 'empty room' + the box), holes filled, walls removed,
+    area from the student's scale (from their scale-bar box; the drawing's scale when there is none). Windows: counted from the
+    boxes against the answer key. Everything is checked against the drawing."""
+    from scipy import ndimage
     plan = lab.plans[plan_id]
     img = plan.load()
-    colors = ["#e63946", "#4cc9f0", "#ffd166", "#06d6a0", "#7b2cbf", "#f4a261", "#457b9d"]
-    rows, layers = [], []
-    from scipy import ndimage
-    thick_walls = None
-    for label, box in boxes:
-        if label == "room":
-            # a bare box on a drawing makes SAM 3 cut out the furniture symbols rather than the empty floor, so the
-            # room is asked for with a phrase AND the student's box as the example; the region that fits the box best
-            # is kept, clipped to the box (no leaking into the neighbour), holes left by symbols filled, walls removed
-            r = lab.engine.segment_room(img, box)
-            mask = r.masks[0].copy() if len(r) else np.zeros((img.height, img.width), bool)
-        else:
-            r = lab.engine.segment_box(img, box)
-            mask = r.union() if len(r) else np.zeros((img.height, img.width), bool)
-        k = len(rows) + 1
+    rep = {"rooms": [], "windows": {}, "scale": {}, "missed_rooms": []}
+    # ---- the scale from the student's box on the 5 m bar
+    bars = [b for l, b in boxes if l == "scale bar"]
+    metres = plan.key["scale_bar"]["metres"]
+    true_m_per_px = plan.m_per_px
+    if bars:
+        w_px = max(1.0, bars[0][2] - bars[0][0])
+        m_per_px = metres / w_px
+        rep["scale"] = {"drawn": True, "cm_per_px": m_per_px * 100, "true_cm_per_px": true_m_per_px * 100,
+                        "err_pct": (m_per_px - true_m_per_px) / true_m_per_px * 100, "w_px": w_px}
+    else:
+        m_per_px = true_m_per_px
+        rep["scale"] = {"drawn": False, "cm_per_px": m_per_px * 100, "true_cm_per_px": true_m_per_px * 100, "err_pct": 0.0}
+    area_m2 = lambda px: float(px) * m_per_px ** 2   # noqa: E731
+    # ---- windows: the student's boxes against the drawing's windows
+    truth_w = plan.truth_boxes("windows")
+    win_boxes = [b for l, b in boxes if l == "window"]
+    found_w = [any(box_iou(tb, b) >= 0.2 for b in win_boxes) for tb in truth_w]
+    extra_w = [not any(box_iou(tb, b) >= 0.2 for tb in truth_w) for b in win_boxes]
+    rep["windows"] = {"drawn": len(win_boxes), "truth": len(truth_w), "found": int(sum(found_w)), "missed": int(len(truth_w) - sum(found_w)), "extra": int(sum(extra_w))}
+    # ---- rooms: SAM 3 inside each box
+    colors = ["#e63946", "#4cc9f0", "#ffd166", "#06d6a0", "#7b2cbf", "#f4a261", "#457b9d", "#2a9d8f", "#e9c46a", "#8d6e63", "#ff70a6", "#9aa5b1"]
+    layers, walls, matched_ids = [], None, set()
+    room_boxes = [b for l, b in boxes if l == "room"]
+    for k, box in enumerate(room_boxes, 1):
+        r = lab.engine.segment_room(img, box)
+        mask = r.masks[0].copy() if len(r) else np.zeros((img.height, img.width), bool)
         box_px = max(1.0, (box[2] - box[0]) * (box[3] - box[1]))
         note = ""
-        if label == "room" and mask.any():
-            if thick_walls is None:
-                thick_walls = wall_pixels(img)
+        if mask.any():
+            if walls is None:
+                walls = wall_pixels(img)
             x1, y1, x2, y2 = [int(round(v)) for v in box]
             clip = np.zeros_like(mask); clip[max(0, y1):y2 + 1, max(0, x1):x2 + 1] = True
-            mask = ndimage.binary_fill_holes(mask & clip) & ~thick_walls
+            mask = ndimage.binary_fill_holes(mask & clip) & ~walls
             if mask.sum() < 0.6 * box_px:
-                note = f"the mask covers only {mask.sum() / box_px * 100:.0f} % of your box: no wall on one side (open plan)? The box itself is {plan.area_m2(box_px):.1f} m²."
-        px = int(mask.sum()); m2 = plan.area_m2(px)
-        row = {"n": k, "label": label, "px": px, "m2": m2, "score": float(r.scores[0]) if len(r) else 0.0, "box": box, "fill": px / box_px, "truth": note}
-        if label == "room":
-            room, frac = best_room(plan, mask)
-            if room and frac > 0.5:
-                err = (m2 - room["area_m2"]) / room["area_m2"] * 100
-                row["truth"] = f"{room['type']} '{room['label']}': {room['area_m2']:.1f} m² on the drawing ({err:+.0f} %). " + note
-            else:
-                row["truth"] = "does not sit on a single room of the drawing. " + note
-        elif label in ("window", "door", "fixture"):
-            what = {"window": "windows", "door": "doors", "fixture": "fixtures"}[label]
-            truth = plan.truth_boxes(what)
-            hit = any(box_iou(box, tb) >= 0.2 for tb in truth)
-            row["truth"] = f"a real {label} on the drawing" if hit else f"no {label} here on the drawing"
-        rows.append(row)
-        layers.append((f"{label} {k}", mask, colors[(k - 1) % len(colors)]))
+                note = f"the mask covers only {mask.sum() / box_px * 100:.0f} % of your box: no wall on one side (open plan)? The box itself is {area_m2(box_px):.1f} m²."
+        else:
+            note = "SAM 3 found nothing in this box."
+        px = int(mask.sum()); m2 = area_m2(px)
+        row = {"n": k, "px": px, "m2": m2, "box": box, "truth": None, "truth_m2": None, "err_pct": None, "note": note}
+        room, frac = best_room(plan, mask) if px else (None, 0.0)
+        if room and frac > 0.5:
+            row["truth"] = room["label"] or room["type"]; row["truth_m2"] = room["area_m2"]
+            row["err_pct"] = (m2 - room["area_m2"]) / room["area_m2"] * 100
+            matched_ids.add(id(room))
+        rep["rooms"].append(row)
+        layers.append((str(k), mask, colors[(k - 1) % len(colors)]))
+    rep["missed_rooms"] = [r["label"] or r["type"] for r in plan.rooms(indoor_only=True) if id(r) not in matched_ids]
+    rep["total_m2"] = sum(r["m2"] for r in rep["rooms"])
+    rep["matched_truth_m2"] = sum(r["truth_m2"] for r in rep["rooms"] if r["truth_m2"])
+    rep["floor_area_m2"] = plan.floor_area_m2
+    # ---- the picture
     over = viz.multi_overlay(img, layers, alpha=0.55) if layers else img.copy()
     d = ImageDraw.Draw(over)
-    for row in rows:
-        d.rectangle(row["box"], outline="black", width=3); d.text((row["box"][0] + 4, row["box"][1] + 4), str(row["n"]), fill="black")
-    found = None
-    first = next((row for row in rows if row["label"] in ("window", "door", "fixture", "room")), None)
-    if find_all and first is not None:
-        like = lab.engine.segment_like(img, first["box"], threshold=threshold, size_range=(0.2, 5.0))
-        pred = [list(map(float, b)) for b in like.boxes]
-        what = {"window": "windows", "door": "doors", "fixture": "fixtures", "room": "rooms"}[first["label"]]
-        truth = plan.truth_boxes(what)
-        ok, missed, extra = match_boxes(pred, truth, iou=0.3 if what == "rooms" else 0.2, near=(what == "doors"))
-        found = {"label": first["label"], "n": len(like), "truth": len(truth), "ok": ok, "missed": missed, "extra": extra,
-                 "m2": [plan.area_m2(m.sum()) for m in like.masks], "from": first["n"]}
-        for b in like.boxes:
-            d.rectangle(list(map(float, b)), outline="#0057ff", width=2)
-        for tb in truth:
-            d.rectangle(tb, outline="#2a9d8f", width=1)
-    return over, rows, found
+    for k, box in enumerate(room_boxes, 1):
+        d.rectangle(box, outline="black", width=3); d.text((box[0] + 4, box[1] + 4), str(k), fill="black")
+    for tb, f in zip(truth_w, found_w):
+        if not f:
+            d.rectangle(tb, outline=RED, width=3)
+    for b, e in zip(win_boxes, extra_w):
+        d.rectangle(b, outline=BLUE if e else GREEN, width=3)
+    for b in bars[:1]:
+        d.rectangle(b, outline="#7b2cbf", width=3)
+    return over, rep
 
 
-def print_takeoff(rows, found):
-    if rows:
-        print(f"{'#':>2} {'label':8s} {'pixels':>9s} {'m²':>7s} {'conf':>5s}  answer key / note")
-        for r in rows:
-            note = r["truth"] + ("   ⚠ the mask fills the whole box: draw a tighter box" if r["fill"] > 0.95 and r["label"] != "room" else "")
-            print(f"{r['n']:>2} {r['label']:8s} {r['px']:>9,d} {r['m2']:7.1f} {r['score'] * 100:4.0f}%  {note}")
-    if found is not None:
-        lab_ = found["label"]
-        print(f"\nFind-all from box {found['from']} ({lab_}): SAM 3 found {found['n']} region(s) that look like it (blue). "
-              f"The drawing has {found['truth']} {lab_}{'s' if found['truth'] != 1 else ''} (thin green): {found['ok']} found, {found['missed']} missed, {found['extra']} extra.")
-        if found["m2"]:
-            print(f"Their areas add up to {sum(found['m2']):.1f} m² (mean {sum(found['m2']) / len(found['m2']):.1f} m²).")
-        print("Which ones did it miss, and what did it add? Look at the plan, then adjust the confidence and submit again.")
+def print_takeoff(plan, rep):
+    sc = rep["scale"]
+    if sc["drawn"]:
+        print(f"Scale: your box on the 5 m bar is {sc['w_px']:.0f} px wide -> 1 px = {sc['cm_per_px']:.2f} cm. The drawing's own scale: 1 px = {sc['true_cm_per_px']:.2f} cm "
+              f"({sc['err_pct']:+.1f} % {'-> about ' + format(abs(sc['err_pct']) * 2, '.0f') + ' % on every area, because area is scale squared' if abs(sc['err_pct']) >= 0.5 else '-> good'}). "
+              "Your scale is used for the areas below.")
+    else:
+        print(f"No scale-bar box drawn: the drawing's own scale (1 px = {sc['true_cm_per_px']:.2f} cm) is used. Draw one to see how your reading changes the areas.")
+    w = rep["windows"]
+    if w["drawn"] or w["truth"]:
+        print(f"Windows: you boxed {w['drawn']}; the drawing has {w['truth']}: {w['found']} found (green), {w['missed']} missed (thin red), {w['extra']} of your boxes are not on a window (blue).")
+    if rep["rooms"]:
+        print(f"\n{'#':>2} {'your m²':>8s} {'drawing':>9s} {'error':>7s}  room / note")
+        for r in rep["rooms"]:
+            if r["truth"]:
+                print(f"{r['n']:>2} {r['m2']:8.1f} {r['truth_m2']:9.1f} {r['err_pct']:+6.0f} %  {r['truth']}" + (f"   {r['note']}" if r["note"] else ""))
+            else:
+                print(f"{r['n']:>2} {r['m2']:8.1f} {'—':>9s} {'':>7s}  does not sit on a single room of the drawing" + (f"   {r['note']}" if r["note"] else ""))
+        n_ok = sum(1 for r in rep["rooms"] if r["truth"])
+        print(f"\nYour rooms: {rep['total_m2']:.1f} m² over {len(rep['rooms'])} boxes; the {n_ok} matched rooms measure {rep['matched_truth_m2']:.1f} m² on the drawing "
+              f"({(rep['total_m2'] - rep['matched_truth_m2']) / rep['matched_truth_m2'] * 100:+.0f} %). " if rep["matched_truth_m2"] else
+              f"\nYour rooms: {rep['total_m2']:.1f} m² over {len(rep['rooms'])} boxes. ")
+        print(f"The plan's whole indoor floor area is {rep['floor_area_m2']:.1f} m² ({len(plan.rooms(indoor_only=True))} rooms)."
+              + (f" Rooms you did not box: {', '.join(rep['missed_rooms'])}." if rep["missed_rooms"] else " You boxed every room."))
 
 
-def takeoff(lab, plan_id: str, find_all: bool = True, threshold: float = 0.3):
-    """Boxes -> areas in m² checked against the drawing, and 'find everything like box 1'."""
+def takeoff(lab, plan_id: str):
+    """One cell for the whole take-off: the scale from a box on the 5 m bar, every window boxed and counted, every room boxed and
+    measured by SAM 3, all checked against the drawing."""
     import ipywidgets as w
     from IPython.display import display
     from jupyter_bbox_widget import BBoxWidget
@@ -640,27 +661,27 @@ def takeoff(lab, plan_id: str, find_all: bool = True, threshold: float = 0.3):
     img = plan.load()
     disp = img.copy(); disp.thumbnail((1100, 1100)); scale = img.width / disp.width
     buf = io.BytesIO(); disp.save(buf, "PNG")
-    widget = BBoxWidget(classes=["room", "window", "door", "fixture", "other"])
+    widget = BBoxWidget(classes=["scale bar", "window", "room"])
     widget.image_bytes = buf.getvalue()
-    find = w.Checkbox(value=find_all, description="find all like the first window/door/fixture/room box")
-    thr = w.FloatSlider(value=threshold, min=0.1, max=0.9, step=0.05, description="find-all confidence", style={"description_width": "140px"}, continuous_update=False)
-    msg = w.HTML("Draw a <b>tight</b> box around each thing to measure, pick its label (<b>room</b>, <b>window</b>, <b>door</b>, <b>fixture</b>, <b>other</b>), "
-                 "then click <b>Submit</b>. Rooms are checked against the drawing's real areas; windows, doors and fixtures against its symbols.")
+    msg = w.HTML("In this order: <b>1.</b> one box from the <b>0</b> tick to the <b>5 m</b> tick of the scale bar (label <b>scale bar</b>); "
+                 "<b>2.</b> a box on <b>every window</b> (label <b>window</b>: the small things first, so the boxes do not overlap); "
+                 "<b>3.</b> a tight box on <b>every room</b>, edges on the inside faces of the walls (label <b>room</b>). Zoom with the mouse wheel. Then <b>Submit</b>.")
     out = w.Output()
 
     @widget.on_submit
     def _go():
-        if lab.engine is None:
-            msg.value = "SAM 3 is not loaded. This step needs the live model (GPU runtime recommended)."; return
-        boxes = [(b.get("label", "other"), [b["x"] * scale, b["y"] * scale, (b["x"] + b["width"]) * scale, (b["y"] + b["height"]) * scale]) for b in widget.bboxes]
+        boxes = [(b.get("label", "room"), [b["x"] * scale, b["y"] * scale, (b["x"] + b["width"]) * scale, (b["y"] + b["height"]) * scale]) for b in widget.bboxes]
         if not boxes:
-            msg.value = "Draw at least one box."; return
-        over, rows, found = takeoff_compute(lab, plan_id, boxes, bool(find.value), float(thr.value))
+            msg.value = "Draw the boxes first."; return
+        if any(l == "room" for l, _ in boxes) and lab.engine is None:
+            msg.value = "SAM 3 is not loaded: rooms cannot be measured. Run Step 0 with load_model ticked (GPU runtime recommended)."; return
+        msg.value = "Running SAM 3 on your rooms..."
+        over, rep = takeoff_compute(lab, plan_id, boxes)
         with out:
             out.clear_output(wait=True)
             viz.show_image(over, 1000)
-            print(f"Scale of this drawing: 1 px = {plan.m_per_px * 100:.2f} cm (checked in Step 3a).")
-            print_takeoff(rows, found)
-        msg.value = "Done. Adjust the boxes or the confidence and submit again; a tight box gives a cleaner mask."
+            print_takeoff(plan, rep)
+        lab.takeoffs[plan_id] = rep
+        msg.value = "Done. Adjust the boxes and submit again; a tight box gives a cleaner mask. Copy the table into your report, then do the next plan."
 
-    display(w.VBox([msg, w.HBox([find, thr]), widget, out]))
+    display(w.VBox([msg, widget, out]))
