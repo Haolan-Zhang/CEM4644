@@ -134,6 +134,22 @@ class LLMLab:
     def segment_compare(self, plan: str):
         self._need(); ui.segment_compare(self, plan)
 
+    # ------------------------------------------------------------------ the chat-window route (paste-back steps)
+    def chat_describe(self, photo: str, question: str):
+        self._need(); from . import chat; chat.chat_describe(self, photo, question)
+
+    def chat_classify(self, photo: str):
+        self._need(); from . import chat; chat.chat_classify(self, photo)
+
+    def chat_detect(self, site: str):
+        self._need(); from . import chat; chat.chat_detect(self, site)
+
+    def chat_count(self, site: str):
+        self._need(); from . import chat; chat.chat_count(self, site)
+
+    def chat_rooms(self, plan: str, mode: str = "LLM only (polygons)"):
+        self._need(); from . import chat; chat.chat_rooms(self, plan, mode)
+
     # ------------------------------------------------------------------ Part 5 / wrap-up
     def prompt_app(self):
         self._need()

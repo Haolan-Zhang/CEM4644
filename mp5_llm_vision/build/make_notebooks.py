@@ -12,6 +12,10 @@ from aec_llm import config as C  # noqa: E402
 from aec_llm.data import Examples  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
+CHAT_URL = "https://hokie.ai.vt.edu/"
+CHAT_INTRO = f"""**Two routes to the same model family.** For the *single-example* steps you will use a plain chat window: **hokie.ai** ({CHAT_URL}, Virginia Tech's free access to GPT models, sign in with your VT account). You download the example image, paste the prompt the notebook gives you, attach the image, and paste the reply back into the notebook, which draws and scores it exactly as it does for the API. The *batch* steps (every photo scored at once) and the schema-enforced steps use the Gemini API, whose answers are precomputed.
+
+"""
 
 VARIANTS = {
     "workshop": dict(
@@ -57,7 +61,9 @@ def jlist(items):
     return json.dumps(list(items), ensure_ascii=False)
 
 
-def build(variant):
+def build(variant, chat=False):
+    """chat=True: the single-example steps go through a chat window (hokie.ai) with paste-back cells; the batch and
+    schema steps stay on the API. Written as separate *_chat notebooks; the originals are untouched."""
     v = VARIANTS[variant]
     spec = C.SPECS[v["dataset"]]
     ex = Examples(REPO, spec)
@@ -82,7 +88,7 @@ In MP2, MP3 and MP4 you trained or used one **specialist** model per task: a cla
 4. Measure rooms on the MP4 plans: the model's own polygons, or its boxes handed to SAM 3.
 5. Your own image and your own words in a small app.
 
-**Before you start**
+{CHAT_INTRO if chat else ""}**Before you start**
 - **Gemini API key (free).** Open https://aistudio.google.com/apikey, sign in with your Google account, create a key. In Colab, click the **key icon** in the left bar (*Secrets*), add a secret named `GEMINI_API_KEY` with the key as its value, and switch on *Notebook access*. Without a key the precomputed answers of the built-in examples still work; your own prompts and images do not.
 - **GPU (optional):** *Runtime → Change runtime type → T4 GPU* is only needed for Step 4b (SAM 3). Everything else runs on a remote service and needs no GPU.
 - Never paste your key into a cell you might share: use the secret.
@@ -123,15 +129,29 @@ Two things to watch in every step: the **reply itself** (is it what you asked fo
     cells.append(form("▶ Step 1a · The examples and their answer keys", "lab.show_examples(which)",
                       notes=["The same kind of material as in MP2, MP3 and MP4, with the answer keys and with what the earlier labs' specialist models said about them."],
                       params=[f'which = "photos" #@param {jlist(["photos", "site photos", "plans"])}']))
-    cells.append(form("▶ Step 1b · Ask anything about a photo", "lab.describe(photo, question)",
-                      notes=["Free text in, free text out. The three questions below are precomputed for the first photo; any other photo or question runs live (needs your key)."],
-                      params=[f'photo = "{photos[0]}" #@param {jlist(photos)}', f'question = "{C.DESCRIBE_QUESTIONS[0]}" #@param {jlist(C.DESCRIBE_QUESTIONS)} {{allow-input: true}}']))
-    cells.append(form("▶ Step 1c · Getting JSON, two ways", "lab.json_lab(photo, repeats)",
-                      notes=["**A:** the prompt asks for JSON, nothing enforces it. **B:** the same prompt with a **JSON schema** handed to the API, which rejects any reply that does not fit. "
-                             "Each way is run several times: watch whether the format and the label stay the same."],
-                      params=[f'photo = "{photos[0]}" #@param {jlist(photos)}', 'repeats = 3 #@param {type:"slider", min:1, max:3, step:1}']))
-    questions.append((1, "From Step 1c: how many of the plain replies (A) were valid JSON, and did the label stay the same across the runs? What did the schema (B) change, and what did it not change? "
-                         "Why does a program that has to read the reply (to fill a table, to count, to draw a box) need B rather than A?"))
+    if chat:
+        cells.append(form("▶ Step 1b · Ask the chat anything about a photo", "lab.chat_describe(photo, question)",
+                          notes=["Free text in, free text out, through the chat window: download the photo, paste the prompt with the photo attached, paste the reply back."],
+                          params=[f'photo = "{photos[0]}" #@param {jlist(photos)}', f'question = "{C.DESCRIBE_QUESTIONS[0]}" #@param {jlist(C.DESCRIBE_QUESTIONS)} {{allow-input: true}}']))
+        cells.append(form("▶ Step 1c · JSON, way A: ask the chat nicely", "lab.chat_classify(photo)",
+                          notes=["The classification prompt asks for JSON; nothing enforces it. Paste the reply back: is it valid JSON, is the label one of the categories, is it right? "
+                                 "Do it two or three times (new chat each time) and watch whether the format and the label stay the same."],
+                          params=[f'photo = "{photos[0]}" #@param {jlist(photos)}']))
+        cells.append(form("▶ Step 1d · JSON, way B: the API with a schema", "lab.json_lab(photo, repeats)",
+                          notes=["The same prompt sent to the Gemini API, first as plain text (A again) and then with a **JSON schema** the API enforces (B), three runs each (precomputed for the first photo)."],
+                          params=[f'photo = "{photos[0]}" #@param {jlist(photos)}', 'repeats = 3 #@param {type:"slider", min:1, max:3, step:1}']))
+        questions.append((1, "From Steps 1c and 1d: how many of the chat replies (way A) were valid JSON, and did the label stay the same across your tries? How did the API's plain replies compare, and what did the schema (way B) change and not change? "
+                             "Why does a program that has to read the reply (to fill a table, to count, to draw a box) need B rather than A?"))
+    else:
+        cells.append(form("▶ Step 1b · Ask anything about a photo", "lab.describe(photo, question)",
+                          notes=["Free text in, free text out. The three questions below are precomputed for the first photo; any other photo or question runs live (needs your key)."],
+                          params=[f'photo = "{photos[0]}" #@param {jlist(photos)}', f'question = "{C.DESCRIBE_QUESTIONS[0]}" #@param {jlist(C.DESCRIBE_QUESTIONS)} {{allow-input: true}}']))
+        cells.append(form("▶ Step 1c · Getting JSON, two ways", "lab.json_lab(photo, repeats)",
+                          notes=["**A:** the prompt asks for JSON, nothing enforces it. **B:** the same prompt with a **JSON schema** handed to the API, which rejects any reply that does not fit. "
+                                 "Each way is run several times: watch whether the format and the label stay the same."],
+                          params=[f'photo = "{photos[0]}" #@param {jlist(photos)}', 'repeats = 3 #@param {type:"slider", min:1, max:3, step:1}']))
+        questions.append((1, "From Step 1c: how many of the plain replies (A) were valid JSON, and did the label stay the same across the runs? What did the schema (B) change, and what did it not change? "
+                             "Why does a program that has to read the reply (to fill a table, to count, to draw a box) need B rather than A?"))
     cells.append(q(*questions[-1]))
 
     # ------------------------------------------------------------------ Part 2
@@ -157,16 +177,29 @@ The MP2 task again: {spec.photos.title.lower()}, {len(ex.photo_classes)} classes
 
 The MP3 task: {spec.sites.title[0].lower() + spec.sites.title[1:]}. The prompt asks for a list of boxes as `[ymin, xmin, ymax, xmax]` on a 0–1000 grid (the convention this model was trained with), the notebook converts them to pixels and scores them like MP3 did: a box is *found* when its label is right and it overlaps the answer key's box by at least half. The MP3 YOLO model's boxes on the same photos are shown next to Gemini's.
 """))
-    cells.append(form("▶ Step 3a · Boxes on one photo", "lab.detect(site, schema)",
-                      params=[f'site = "{sites[0]}" #@param {jlist(sites)}', 'schema = True #@param {type:"boolean"}']))
+    if chat:
+        cells.append(form("▶ Step 3a · Boxes on one photo, from the chat", "lab.chat_detect(site)",
+                          notes=["Paste the reply back and the notebook draws the boxes on the photo and scores them against the answer key, next to the API model's and the MP3 model's numbers. "
+                                 "If the boxes land in the wrong place, the chat used another coordinate convention: change *box order* or *numbers are* and score again."],
+                          params=[f'site = "{sites[0]}" #@param {jlist(sites)}']))
+    else:
+        cells.append(form("▶ Step 3a · Boxes on one photo", "lab.detect(site, schema)",
+                          params=[f'site = "{sites[0]}" #@param {jlist(sites)}', 'schema = True #@param {type:"boolean"}']))
     cells.append(form("▶ Step 3b · All the photos, scored", "lab.detect_all(schema)",
                       params=['schema = True #@param {type:"boolean"}']))
-    cells.append(form("▶ Step 3c · Just ask for the number", "lab.count(site, schema)",
-                      notes=["Instead of boxes, the model is asked for a count. Compared with the answer key and with counting the model's own boxes from Step 3a."],
-                      params=[f'site = "{sites[0]}" #@param {jlist(sites)}', 'schema = True #@param {type:"boolean"}']))
-    questions.append((4, v["q_detect"]))
+    if chat:
+        cells.append(form("▶ Step 3c · Just ask the chat for the number", "lab.chat_count(site)",
+                          notes=["Instead of boxes, the chat is asked for a count. Compared with the answer key and with the API model's count."],
+                          params=[f'site = "{sites[0]}" #@param {jlist(sites)}']))
+    else:
+        cells.append(form("▶ Step 3c · Just ask for the number", "lab.count(site, schema)",
+                          notes=["Instead of boxes, the model is asked for a count. Compared with the answer key and with counting the model's own boxes from Step 3a."],
+                          params=[f'site = "{sites[0]}" #@param {jlist(sites)}', 'schema = True #@param {type:"boolean"}']))
+    questions.append((4, v["q_detect"] + (" Also: on the photo you gave the chat in Step 3a, how did its boxes compare with the API model's on the same photo?" if chat else "")))
     cells.append(q(*questions[-1]))
-    questions.append((5, "From Step 3c on two photos: the model's count, the count of its own boxes and the answer key. When they disagree, which one is wrong and how would you know on a site where there is no answer key? Which of the two ways of counting would you trust on a site camera, and why?"))
+    questions.append((5, ("From Step 3c on two photos: the chat's count, the API model's count and the answer key. " if chat else
+                          "From Step 3c on two photos: the model's count, the count of its own boxes and the answer key. ")
+                      + "When they disagree, which one is wrong and how would you know on a site where there is no answer key? Which of the two ways of counting would you trust on a site camera, and why?"))
     cells.append(q(*questions[-1]))
 
     # ------------------------------------------------------------------ Part 4
@@ -180,7 +213,12 @@ The MP4 task on {spec.plans.description}. Two ways to get square metres out of a
 
 Both are scored against the drawing's answer key, and MP4's result (SAM 3 asked for *room* by phrase) is shown for comparison.
 """))
-    cells.append(form("▶ Step 4a · The model's own polygons", "lab.segment(plan, mode, schema)",
+    if chat:
+        cells.append(form("▶ Step 4a · Rooms from the chat: its polygons, or its boxes to SAM 3", "lab.chat_rooms(plan, mode)",
+                          notes=["Paste the reply back: the notebook converts the polygons (or hands the boxes to SAM 3), measures every room in m² and checks each against the drawing, next to the API model's result. "
+                                 "Long lists of coordinates are where chat replies break: look at what you get."],
+                          params=[f'plan = "{plans[0]}" #@param {jlist(plans)}', f'mode = "LLM only (polygons)" #@param {jlist(["LLM only (polygons)", "LLM boxes + SAM 3"])}']))
+    cells.append(form("▶ Step 4a · The model's own polygons" if not chat else "▶ Step 4a′ · The API model's polygons", "lab.segment(plan, mode, schema)",
                       notes=["Precomputed for every plan with the schema on and off. Try both: without the schema this model tends to skip the polygons and only give boxes, "
                              "and long lists of coordinates are where the plain JSON breaks."],
                       params=[f'plan = "{plans[0]}" #@param {jlist(plans)}', f'mode = "LLM only (polygons)" #@param {jlist(["LLM only (polygons)"])}', 'schema = True #@param {type:"boolean"}']))
@@ -221,7 +259,7 @@ A small app: pick a built-in image or upload your own, choose a task (it fills i
     nb.metadata.update({"colab": {"provenance": [], "gpuType": "T4", "toc_visible": True}, "accelerator": "GPU",
                         "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
                         "language_info": {"name": "python"}})
-    out = REPO / v["file"]
+    out = REPO / (v["file"].replace(".ipynb", "_chat.ipynb") if chat else v["file"])
     nbformat.write(nb, str(out))
     print("wrote", out)
     lines = [f"# CEM4644 · MP5 report — {v['label']}", "", "Name: ______________________    Date: ____________", "",
@@ -230,12 +268,17 @@ A small app: pick a built-in image or upload your own, choose a task (it fills i
              "Numbers must come from **your** run of the notebook.", ""]
     for n, text in questions:
         lines += [f"## Question {n}", "", text, "", "*Your answer:*", "", "", ""]
-    p = REPO / "docs" / f"MP5_{variant.capitalize()}_Report_Template.md"
+    p = REPO / "docs" / f"MP5_{variant.capitalize()}_Report_Template{'_chat' if chat else ''}.md"
     p.parent.mkdir(exist_ok=True)
     p.write_text("\n".join(lines))
     print("wrote", p)
 
 
 if __name__ == "__main__":
-    for variant in (sys.argv[1:] or VARIANTS):
-        build(variant)
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    chat = "--chat" in sys.argv or "--all" in sys.argv
+    for variant in (args or VARIANTS):
+        if "--all" in sys.argv or not chat:
+            build(variant)
+        if chat:
+            build(variant, chat=True)

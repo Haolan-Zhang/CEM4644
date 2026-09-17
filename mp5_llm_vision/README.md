@@ -12,7 +12,15 @@ Colab form and the code is hidden.
 | `MP5_Workshop_LLM_Vision.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Workshop_LLM_Vision.ipynb) | façade defects (14 photos, 7 classes), site safety (6 photos, 52 boxes), 3 clean floor plans |
 | `MP5_Homework_LLM_Vision.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Homework_LLM_Vision.ipynb) | architectural styles (20 images, 10 classes), machinery (6 photos), 3 scanned floor plans |
 
-Both notebooks are generated from one template. Students need a **free Gemini API key** (https://aistudio.google.com/apikey)
+**Chat-window variants.** `MP5_Workshop_LLM_Vision_chat.ipynb` and `MP5_Homework_LLM_Vision_chat.ipynb` route the
+single-example steps (describe a photo, JSON asked nicely, boxes on one photo, the count, rooms on one plan) through a
+plain chat window, **hokie.ai** (https://hokie.ai.vt.edu/, Virginia Tech's free access to GPT models): the student
+downloads the example image, pastes the prompt, attaches the image, and pastes the reply back into a cell that parses,
+draws and scores it with the same code as the API path (`aec_llm/chat.py`; coordinate order and scale can be switched
+when the chat used another convention). The batch steps and the schema-enforced steps stay on the Gemini API. Generated
+with `python build/make_notebooks.py --chat` (`--all` for both kinds); the plain notebooks are untouched.
+
+All notebooks are generated from one template. Students need a **free Gemini API key** (https://aistudio.google.com/apikey)
 stored as the Colab secret `GEMINI_API_KEY`; without one, the precomputed answers of the built-in examples still work
 and only live requests (own prompts, own images) are unavailable. A GPU is only needed for the LLM + SAM 3 step.
 
@@ -34,7 +42,8 @@ aec_llm/          all the code the notebooks call (hidden from students)
   config.py       example sets, model ids, the prompt templates and the JSON schemas
   client.py       the Gemini call: image + prompt (+ schema), disk cache, rate-limit retries, tolerant JSON parsing
   tasks.py        scoring: classification, detection (IoU matching), counting, rooms (polygons or boxes -> SAM 3)
-  ui.py, viz.py   the notebook steps and their pictures;  app.py  the prompt-lab app;  lab.py  the object the notebooks talk to
+  ui.py, viz.py   the notebook steps and their pictures;  chat.py  the paste-back steps of the chat variants;  app.py  the prompt-lab app;
+  lab.py          the object the notebooks talk to
 data/<variant>/   photos (from MP2's test split), sites (from MP3's test split, every box), plans (from MP4), each with
                   index.json: the answer key and what the earlier lab's specialist model said
 data/cache/       Gemini's replies for every built-in example x prompt (so the notebook is instant and works without a key)

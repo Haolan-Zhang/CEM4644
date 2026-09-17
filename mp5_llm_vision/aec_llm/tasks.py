@@ -268,13 +268,11 @@ def wall_pixels(img: Image.Image) -> np.ndarray:
     return ndimage.binary_opening(dark, structure=np.ones((7, 7)))
 
 
-def segment_rooms(client: GeminiClient, plan: Plan, prompt: str, mode: str, schema: bool, sam=None, run: int = 0, log=None,
-                  thinking: str = C.THINKING) -> Tuple[List[RoomRow], Reply, int]:
-    """mode 'llm': the model's own polygons (its box when the polygon is unusable); mode 'llm+sam': the model's boxes,
-    each handed to SAM 3 as 'empty room' + box, the mask clipped to the box, holes filled, walls removed (as in MP4)."""
-    with_mask = mode == "llm"
-    r = client.ask(plan.load(), prompt, schema=C.rooms_schema(with_mask) if schema else None, run=run, thinking=thinking)
-    rows, skipped = rooms_from_reply(r, plan) if r.ok else ([], 0)
+def measure_rooms(reply: Reply, plan: Plan, mode: str, sam=None) -> Tuple[List[RoomRow], int]:
+    """From a reply (the model's or a pasted one) to measured rooms. mode 'llm': the reply's own polygons (its box when the
+    polygon is unusable); mode 'llm+sam': the reply's boxes, each handed to SAM 3 as 'empty room' + box, the mask clipped
+    to the box, holes filled, walls removed (as in MP4)."""
+    rows, skipped = rooms_from_reply(reply, plan) if reply.ok else ([], 0)
     img = plan.load()
     walls = None
     for row in rows:
@@ -303,6 +301,15 @@ def segment_rooms(client: GeminiClient, plan: Plan, prompt: str, mode: str, sche
             if m.sum() < 0.6 * (x2 - x1) * (y2 - y1):
                 row.note = "the mask covers less than 60 % of the box (open plan?)"
     attach_truth(rows, plan)
+    return rows, skipped
+
+
+def segment_rooms(client: GeminiClient, plan: Plan, prompt: str, mode: str, schema: bool, sam=None, run: int = 0, log=None,
+                  thinking: str = C.THINKING) -> Tuple[List[RoomRow], Reply, int]:
+    """Ask the model for the rooms of a plan and measure them (see measure_rooms)."""
+    with_mask = mode == "llm"
+    r = client.ask(plan.load(), prompt, schema=C.rooms_schema(with_mask) if schema else None, run=run, thinking=thinking)
+    rows, skipped = measure_rooms(r, plan, mode, sam)
     if log:
         log(f"  {plan.id}: {len(rows)} rooms in the reply" + (f", {skipped} unusable entries" if skipped else "") + (f"  ({r.error})" if r.error else ""))
     return rows, r, skipped
