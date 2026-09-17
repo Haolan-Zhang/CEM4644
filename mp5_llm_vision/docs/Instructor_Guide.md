@@ -11,7 +11,7 @@ work without a key; a student's own prompt or image runs live and needs their fr
 |---|---|---|
 | Classification | 14 façade-defect photos, 7 classes (MP2 test split) | 20 computer-generated façade-style images, 10 classes (MP2) |
 | Detection | 6 site-safety photos, 52 boxes (MP3 test split) | 6 machinery photos, 9 boxes (MP3) |
-| Plans | 1293, 2536, 2090 (clean renderings, MP4 set A) | 8138, 10715, 11615 (scanned drawings, MP4 set B) |
+| Plans | 1293, 2536, 207 (the whole of MP4 set A, clean renderings) | 8138, 10715, 11615, 5018 (MP4 set B, scanned; 5018 has both storeys on one sheet) |
 | Own experiments | 2 | 3 |
 | Time | about 90 min | about 2 h |
 
@@ -25,8 +25,10 @@ furniture holes: 19–21 % median error).
 The `_chat` notebooks send the single-example steps through **hokie.ai** (https://hokie.ai.vt.edu/, VT login), so
 students meet the ordinary chat interface and see that a general chat model does these tasks too: Step 1b (describe),
 1c (JSON asked nicely), 3a (boxes on one photo), 3c (the count) and 4a (the rooms of one plan from the model's own
-polygons). Nothing done in the chat is repeated on the API: the API keeps the batch steps (2a, 2b, 3b) and the prompt
-lab, and the schema contrast comes from Step 2a's *schema* switch (question 1 points there). There is no SAM 3 route in
+polygons). Nothing done in the chat is repeated on the API: the API keeps the batch steps (2a, 2b, 3b and **4b**, which
+segments every plan at once with `lab.segment_all` and is the point of the batch route: three or four plans that would
+each cost a round of copying by hand) and the prompt lab, and the schema contrast comes from Step 2a's *schema* switch
+and Step 4b's (question 1 and question 6 point there). There is no SAM 3 route in
 these notebooks and Step 0 does not load it, so they need no GPU. Each paste-back cell shows the image with a download
 button, the prompt to copy, a box for the reply and a *Score* button; the reply is parsed with the same tolerant parser
 as the API replies, drawn and scored the same way, and shown next to the earlier lab's specialist for the same image
@@ -72,8 +74,10 @@ when they keep the defaults). Live runs vary by a photo or two.
 | Detection, all six photos, schema | recall **90 %** (47/52), precision 82 %, 10 extra | MP3 YOLO: recall 87 %, precision 90 % | per label: person 17/19, helmet 12/12, NO helmet 1/3 (+3 extra), vest 7/7, NO vest 10/11 |
 | Detection, JSON only asked for | recall 88 %, precision 92 % | | all six replies parse; NO helmet 0/3 |
 | Counting (asked for the number) | site 1: 1 NO helmet of 4 workers (key 3 of 4; its own boxes say 3); site 3: 1 of 3 (key 0; boxes 0); the other four photos right | | the direct count and the box count disagree on two photos: the lesson of Step 3c |
-| Rooms, LLM polygons + schema | 1293: 5/5 rooms, median error 0 %; 2536: 8/9, 16 %; 2090: 5/5, 16 % | MP4 SAM 3 'room': 5/5, 8/9, 4/5; 19–21 % | without the schema the model drops the polygons (1293) or breaks the JSON on the long coordinate lists (2536, 2090) |
-| Rooms, LLM boxes + SAM 3 | 1293: 5/5, 9 %; 2536: 8/9, 16 %; 2090: 5/5, 20 % | | the lite model's boxes are a little loose, so SAM 3 does not gain over the polygons here; `gemini-3.8-flash` gave boxes within a few pixels of the answer key in the first probe (but it allows 20 requests a day) |
+| Rooms, LLM polygons + schema | 1293: 5/5 rooms, median error 0 %; 2536: 8/9, 16 %; 207: 18/19, 6 % | MP4 SAM 3 'room': 5/5 at 19 %, 8/9 at 11 %, 14/19 at 4 % | the model names the rooms right and places the outlines loosely; over all 31 matched rooms the median is 8 % and 7 rooms are off by more than 25 % |
+| Rooms, LLM boxes + SAM 3 (plain notebooks only) | 1293: 5/5, 9 %; 2536: 8/9, 16 %; 207: 17/19, 20 % | | the lite model's boxes are a little loose, so SAM 3 does not gain over the polygons here; `gemini-3.8-flash` gave boxes within a few pixels of the answer key in the first probe (but it allows 20 requests a day) |
+| Rooms without the schema | 1293: the polygons are dropped, areas come from the boxes (4/5 at 3 %); 2536: the reply is not valid JSON; 207: 20 entries, no polygons, 18/19 at 4 % | | the long coordinate lists are where a plain JSON request breaks |
+| Step 4b, all 3 plans at once (chat notebooks) | 31 matched rooms, median 8 %, 7 above 25 % | | 11 s and about 6,100 tokens for the three plans, against three rounds of copying by hand |
 
 Worst rooms in both modes are the open-plan hall (1293 ET, +65 to +80 %: the model extends it into the kitchen) and
 the walk-in closet of 2536 (missed).
@@ -86,9 +90,10 @@ the walk-in closet of 2536 (missed).
 | JSON lab | A: 3/3 valid, all fenced; B: 3/3 valid, no fences; same label throughout | | |
 | Detection (machinery, 9 boxes) | recall **100 %**, precision 100 %, with and without the schema | MP3 YOLO: recall 100 %, precision 90 % | large, distinct objects: the easy case for a generalist |
 | Counting excavators | right on three photos; on site 3 it says 1 of 2 where the key has 0 (its own boxes: 0); on site 6 it says 0 of 1 where the key has 2 machines | | again the direct count is the less reliable of the two |
-| Rooms, LLM polygons + schema (scans) | 8138: 6/6 rooms, median 10 %; 10715: 6/7, 20 %; 11615: 4/6, 7 % | MP4 SAM 3 'room': 6/6, 4/7, 5/6 | on the scans the model returns extra "rooms" (9 for 6 on 8138) and the totals overshoot the floor area |
-| Rooms, LLM boxes + SAM 3 | 8138: 5/6, 10 %; 10715: 6/7, 12 %; 11615: 3/6, 26 % | | on 10715 SAM 3 tightens the loose boxes (20 → 12 %); on the small flat 11615 it loses rooms |
-| Rooms without the schema | 8138 and 10715: the reply is not valid JSON (long coordinate lists); 11615: 5/6, 15 % | | |
+| Rooms, LLM polygons + schema (scans) | 8138: 6/6 rooms, median 10 %; 10715: 6/7, 20 %; 11615: 4/6, 7 %; 5018 (two storeys): 13/17, 15 % | MP4 SAM 3 'room': 6/6 at 3 %, 4/7 at 24 %, 5/6 at 56 %, 13/17 at 8 % | on the scans the model returns extra "rooms" (9 for 6 on 8138, where it also gives no usable polygon and the areas come from the boxes) and the totals overshoot the floor area |
+| Rooms, LLM boxes + SAM 3 (plain notebooks only) | 8138: 5/6, 10 %; 10715: 6/7, 12 %; 11615: 3/6, 26 %; 5018: 13/17, 45 % | | on 10715 SAM 3 tightens the loose boxes (20 → 12 %); on the small flat 11615 and the two-storey sheet it loses area |
+| Rooms without the schema | 8138 and 10715: the reply is not valid JSON (long coordinate lists); 11615: 5/6 at 15 %; 5018: 15 entries but only 1 room matched, 60 % off | | |
+| Step 4b, all 4 plans at once (chat notebooks) | 30 matched rooms, median 11 %, 9 above 25 % | | 12 s and about 7,400 tokens; with the schema off, two of the four replies are unusable, which is the switch worth showing in class |
 
 The scans (set B) versus the clean drawings (set A) is the point of homework question 6: polygons drift into
 furniture and dimension strings, extra regions appear, and the boxes-to-SAM 3 route holds up better on the
@@ -102,8 +107,8 @@ cluttered plan but not on the small one.
 | 8–22 | Part 1 | Step 1b: a free question. Step 1c: the same prompt run three times without and with a schema; count the valid replies, the fences, the label drift. The point: a person can read prose, a program cannot. |
 | 22–40 | Part 2 | Step 2a with the three prompts: read the confusion table, look at the mistakes with the model's reasons. Step 2b: change one thing in the prompt (a rule, a description) and rerun live. Discuss overfitting a prompt to 14 photos. |
 | 40–58 | Part 3 | Step 3a on one photo, Gemini next to YOLO. Step 3b: recall and precision. Step 3c: ask for the number vs count the boxes; when they disagree, which one is wrong? |
-| 58–75 | Part 4 | Step 4a: polygons (watch the JSON break on long coordinate lists without a schema). Step 4b: the boxes to SAM 3. Step 4c: room by room, three ways. |
-| 75–90 | Part 5 + wrap-up | The prompt lab with a phone photo. Step 6: the table. Report template: `docs/MP5_Workshop_Report_Template.md`. |
+| 58–75 | Part 4 | Step 4a: polygons (watch the JSON break on long coordinate lists without a schema). Step 4b: the boxes to SAM 3, or, in the chat notebooks, every plan at once. Step 4c: room by room, three ways. |
+| 75–90 | Part 5 + wrap-up | The prompt lab (opened from the printed link) with a phone photo. Step 6: the table. Report template: `docs/MP5_Workshop_Report_Template.md`. |
 
 ## 5. Answer key and marking notes (100 points)
 
@@ -141,7 +146,7 @@ percent of the ones in section 3.
 - **Invalid JSON in Step 4a without a schema**: expected and part of the lesson; the schema version is one tick away.
 - **SAM 3 not loaded** (no GPU, or Step 0 asked for a restart after installing transformers): Step 4b falls back to
   the box areas and says so.
-- **The prompt lab does not appear**: run the cell again; it needs a live key.
+- **The prompt lab prints no link**: it is opened from a link rather than embedded (the embedded frame is unreliable in Colab). Run the cell again; it needs a live key.
 - **Licences**: the photos and plans keep the licences of the earlier labs (see the README); the model's replies are
   the students' to use.
 

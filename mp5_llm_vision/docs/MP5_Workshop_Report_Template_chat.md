@@ -48,7 +48,7 @@ From Step 3c on two photos: the chat's count, the number of boxes it gave you in
 
 ## Question 6
 
-From Step 4a on two plans: copy the per-room tables from your pasted replies. Which rooms did the chat model outline well and which not (missing polygons, merged rooms, shapes in the wrong place)? How does it compare with MP4's SAM 3 by phrase on the same plans, and with drawing the boxes yourself in MP4?
+From Step 4a on two plans: copy the per-room tables from your pasted replies. Which rooms did the chat model outline well and which not (missing polygons, merged rooms, shapes in the wrong place)? Then from Step 4b: the table for all three plans from the API, with and without the schema. How do the two routes compare on the plan you did by hand, how does either compare with MP4's SAM 3 by phrase, and what does the batch table tell you that one plan could not?
 
 *Your answer:*
 

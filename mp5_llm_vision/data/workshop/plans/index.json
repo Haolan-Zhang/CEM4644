@@ -107,46 +107,130 @@
    }
   },
   {
-   "id": "2090",
-   "file": "2090.png",
-   "key": "2090.key.json",
-   "title": "small flat with a balcony",
+   "id": "207",
+   "file": "207.png",
+   "key": "207.key.json",
+   "title": "large house, 15 rooms",
    "specialist": {
     "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
     "rooms": [
      {
-      "label": "OH",
-      "type": "living room",
-      "truth_m2": 13.45,
-      "sam_m2": 19.72
+      "label": "KÄYTÄVÄ",
+      "type": "corridor",
+      "truth_m2": 8.8,
+      "sam_m2": null
      },
      {
       "label": "ET",
       "type": "hall",
-      "truth_m2": 3.78,
+      "truth_m2": 2.72,
       "sam_m2": null
      },
      {
       "label": "K",
       "type": "kitchen",
-      "truth_m2": 9.4,
-      "sam_m2": 0.51
+      "truth_m2": 10.42,
+      "sam_m2": 4.97
+     },
+     {
+      "label": "RUOK",
+      "type": "dining room",
+      "truth_m2": 6.99,
+      "sam_m2": null
+     },
+     {
+      "label": "OH",
+      "type": "living room",
+      "truth_m2": 27.64,
+      "sam_m2": null
      },
      {
       "label": "MH",
       "type": "bedroom",
-      "truth_m2": 9.13,
-      "sam_m2": 7.41
+      "truth_m2": 16.42,
+      "sam_m2": 15.23
+     },
+     {
+      "label": "KHH",
+      "type": "utility room",
+      "truth_m2": 9.98,
+      "sam_m2": 8.43
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 10.79,
+      "sam_m2": 9.18
+     },
+     {
+      "label": "PESUH",
+      "type": "bathroom",
+      "truth_m2": 10.32,
+      "sam_m2": 9.33
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 10.58,
+      "sam_m2": 8.3
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 9.95,
+      "sam_m2": 9.87
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 9.7,
+      "sam_m2": 9.51
+     },
+     {
+      "label": "VARASTO",
+      "type": "storage",
+      "truth_m2": 8.7,
+      "sam_m2": 8.17
      },
      {
       "label": "PH",
       "type": "bathroom",
-      "truth_m2": 4.77,
-      "sam_m2": 4.5
+      "truth_m2": 2.76,
+      "sam_m2": 2.75
+     },
+     {
+      "label": "",
+      "type": "other room",
+      "truth_m2": 3.15,
+      "sam_m2": 3.11
+     },
+     {
+      "label": "WC",
+      "type": "bathroom",
+      "truth_m2": 2.79,
+      "sam_m2": 2.81
+     },
+     {
+      "label": "VH",
+      "type": "walk-in closet",
+      "truth_m2": 2.7,
+      "sam_m2": 2.66
+     },
+     {
+      "label": "WC",
+      "type": "bathroom",
+      "truth_m2": 2.62,
+      "sam_m2": 2.61
+     },
+     {
+      "label": "TK",
+      "type": "hall",
+      "truth_m2": 1.57,
+      "sam_m2": null
      }
     ]
    }
   }
  ],
- "credit": "- 1293: flat with four large rooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 2536: flat with three bedrooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 2090: small flat with a balcony. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 6457: house with a dining area and stairs. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 207: large house, 15 rooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 7696: studio flat. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548"
+ "credit": "- 1293: flat with four large rooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 2536: flat with three bedrooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 207: large house, 15 rooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548"
 }

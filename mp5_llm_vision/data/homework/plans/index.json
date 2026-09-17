@@ -146,6 +146,119 @@
      }
     ]
    }
+  },
+  {
+   "id": "5018",
+   "file": "5018.png",
+   "key": "5018.key.json",
+   "title": "two-storey house: ground floor (left) and upper floor (right)",
+   "specialist": {
+    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "rooms": [
+     {
+      "label": "OH",
+      "type": "living room",
+      "truth_m2": 21.75,
+      "sam_m2": 12.1
+     },
+     {
+      "label": "",
+      "type": "other room",
+      "truth_m2": 4.81,
+      "sam_m2": 5.11
+     },
+     {
+      "label": "WC",
+      "type": "bathroom",
+      "truth_m2": 1.77,
+      "sam_m2": null
+     },
+     {
+      "label": "PH",
+      "type": "bathroom",
+      "truth_m2": 4.11,
+      "sam_m2": null
+     },
+     {
+      "label": "",
+      "type": "other room",
+      "truth_m2": 4.57,
+      "sam_m2": null
+     },
+     {
+      "label": "VAR",
+      "type": "storage",
+      "truth_m2": 4.51,
+      "sam_m2": 4.85
+     },
+     {
+      "label": "KHH",
+      "type": "utility room",
+      "truth_m2": 5.45,
+      "sam_m2": 4.88
+     },
+     {
+      "label": "",
+      "type": "other room",
+      "truth_m2": 4.87,
+      "sam_m2": 4.89
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 10.71,
+      "sam_m2": 10.43
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 13.43,
+      "sam_m2": 13.46
+     },
+     {
+      "label": "K",
+      "type": "kitchen",
+      "truth_m2": 10.4,
+      "sam_m2": 18.37
+     },
+     {
+      "label": "ET",
+      "type": "hall",
+      "truth_m2": 16.04,
+      "sam_m2": 18.37
+     },
+     {
+      "label": "WC",
+      "type": "bathroom",
+      "truth_m2": 2.17,
+      "sam_m2": null
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 12.07,
+      "sam_m2": 11.31
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 12.33,
+      "sam_m2": 11.4
+     },
+     {
+      "label": "MH",
+      "type": "bedroom",
+      "truth_m2": 20.23,
+      "sam_m2": 0.4
+     },
+     {
+      "label": "AULA",
+      "type": "hall",
+      "truth_m2": 23.25,
+      "sam_m2": 14.07
+     }
+    ]
+   }
   }
  ],
  "credit": "- 14341: long single-storey house, 20 rooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 5018: two-storey house: ground floor (left) and upper floor (right). CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 1217: two-storey villa, Swedish labels. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 8138: apartment with bold walls and furniture. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 9136: two-storey house, both floors stacked on the sheet. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 11615: small flat A3 with printed room areas. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 10715: apartment (bold walls). CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548"

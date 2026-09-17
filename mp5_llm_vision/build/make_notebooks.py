@@ -25,7 +25,8 @@ VARIANTS = {
         q_detect=("From Step 3b: Gemini's recall and precision against the MP3 YOLO model's. Which label is hardest for Gemini (helmet, NO helmet, vest, NO vest, person) "
                   "and why might that be? Paste one overlay from Step 3a and explain the extras (thick boxes marked '?')."),
         q_segment_chat=("From Step 4a on two plans: copy the per-room tables from your pasted replies. Which rooms did the chat model outline well and which not (missing polygons, merged rooms, shapes in the wrong place)? "
-                        "How does it compare with MP4's SAM 3 by phrase on the same plans, and with drawing the boxes yourself in MP4?"),
+                        "Then from Step 4b: the table for all three plans from the API, with and without the schema. How do the two routes compare on the plan you did by hand, how does either compare with MP4's SAM 3 by phrase, "
+                        "and what does the batch table tell you that one plan could not?"),
         q_segment=("From Step 4c on one plan: copy the per-room table. Which way is closer to the drawing, the model's own polygons or its boxes handed to SAM 3, "
                    "and on which rooms do they differ most? How does this compare with drawing the boxes yourself in MP4?"),
     ),
@@ -36,7 +37,8 @@ VARIANTS = {
         q_detect=("From Step 3b: Gemini's recall and precision against the MP3 YOLO model's on the machinery photos. Which machine is hardest and why? "
                   "From Step 3c: does the model's count of excavators agree with its own boxes and with the answer key?"),
         q_segment_chat=("From Step 4a on plan 8138 and on plan 11615 (scanned drawings with furniture and dimension strings): copy the per-room tables from your pasted replies. "
-                        "What does the scan's clutter do to the chat model's polygons? Compare with MP4's SAM 3 by phrase on the same plans."),
+                        "What does the scan's clutter do to the chat model's polygons? Then from Step 4b: the table for all four plans from the API, including the two-storey sheet 5018. "
+                        "Where is the API's batch result better or worse than your chat replies, and how does either compare with MP4's SAM 3 by phrase?"),
         q_segment=("From Step 4c on plan 8138 and on plan 11615 (scanned drawings with furniture and dimension strings, unlike the clean drawings of the workshop): "
                    "copy the per-room tables. Which way holds up better on a scan, and what does the scan's clutter do to the polygons? Compare with the MP4 numbers for the same plans."),
     ),
@@ -89,7 +91,7 @@ In MP2, MP3 and MP4 you trained or used one **specialist** model per task: a cla
 1. Talk to the model about a photo, and get the answer as JSON in two ways: by asking nicely, and by enforcing a schema.
 2. Classify the MP2 photos with three prompts and compare with the MP2 model.
 3. Detect and count on the MP3 photos, compare with the MP3 model.
-4. {"Measure rooms on an MP4 plan from the model's own polygons." if chat else "Measure rooms on the MP4 plans: the model's own polygons, or its boxes handed to SAM 3."}
+4. {"Measure rooms from the model's own polygons: one plan through the chat, then every plan at once through the API." if chat else "Measure rooms on the MP4 plans: the model's own polygons, or its boxes handed to SAM 3."}
 5. Your own image and your own words in a small app.
 
 {CHAT_INTRO if chat else ""}**Before you start**
@@ -210,7 +212,7 @@ The MP3 task: {spec.sites.title[0].lower() + spec.sites.title[1:]}. The prompt a
     cells.append(md(f"""
 ## Part 4 · Rooms on a floor plan
 
-The MP4 task on {spec.plans.description}. {"The prompt asks the chat model for each room's outline as a polygon (a list of points on the 0–1000 grid) and its label; the notebook converts the polygon to pixels and to m² with the plan's scale, and checks every room against the drawing's answer key, next to MP4's result (SAM 3 asked for *room* by phrase)." if chat else "Two ways to get square metres out of a language model:"}
+The MP4 task on {spec.plans.description}. {"The prompt asks for each room's outline as a polygon (a list of points on the 0–1000 grid) and its label; the notebook converts the polygon to pixels and to m² with the plan's scale, and checks every room against the drawing's answer key, next to MP4's result (SAM 3 asked for *room* by phrase). First one plan by hand in the chat window, then all of them at once through the API." if chat else "Two ways to get square metres out of a language model:"}
 {"" if chat else """
 - **LLM only:** the prompt asks for each room's outline as a polygon (a list of points on the 0–1000 grid) and its label; the notebook converts the polygon to pixels and to m² with the plan's scale.
 - **LLM boxes + SAM 3:** the prompt asks only for a box per room; each box is handed to SAM 3 exactly as your own boxes were in MP4 (*empty room* + box, holes filled, walls removed). The language model does the *finding and naming*, the segmentation model does the *pixels*.
@@ -218,10 +220,15 @@ The MP4 task on {spec.plans.description}. {"The prompt asks the chat model for e
 Both are scored against the drawing's answer key, and MP4's result (SAM 3 asked for *room* by phrase) is shown for comparison."""}
 """))
     if chat:
-        cells.append(form("▶ Step 4a · Rooms from the chat's polygons", "lab.chat_rooms(plan)",
+        cells.append(form("▶ Step 4a · Rooms from the chat's polygons (one plan)", "lab.chat_rooms(plan)",
                           notes=["Paste the reply back: the notebook converts the polygons, measures every room in m² and checks each against the drawing. "
                                  "Long lists of coordinates are where chat replies break: look at what you get, and try a second plan."],
                           params=[f'plan = "{plans[0]}" #@param {jlist(plans)}']))
+        cells.append(form(f"▶ Step 4b · All {len(plans)} plans at once (the API)", "lab.segment_all(schema)",
+                          notes=[f"The same prompt sent to the API for all {len(plans)} plans, which would take you {len(plans)} rounds of copying by hand. One picture and one line per plan: "
+                                 "rooms found, median error against the drawing, the model's total against the floor area, and MP4's SAM 3 for comparison.",
+                                 "Untick *schema* to see what the same prompt returns when nothing enforces the structure (precomputed)."],
+                          params=['schema = True #@param {type:"boolean"}']))
     else:
         cells.append(form("▶ Step 4a · The model's own polygons", "lab.segment(plan, mode, schema)",
                           notes=["Precomputed for every plan with the schema on and off. Try both: without the schema this model tends to skip the polygons and only give boxes, "
@@ -239,10 +246,10 @@ Both are scored against the drawing's answer key, and MP4's result (SAM 3 asked 
     cells.append(md("""
 ## Part 5 · Your image, your words
 
-A small app: pick a built-in image or upload your own, choose a task (it fills in a starting prompt), edit the words, switch the schema on or off, and read the raw reply next to what the notebook draws from it. Needs your key: everything here is live.
+A small app, opened from a link: pick a built-in image or upload your own, choose a task (it fills in a starting prompt), edit the words, switch the schema on or off, and read the raw reply next to what the notebook draws from it. Needs your key: everything here is live.
 """))
     cells.append(form("▶ Step 5 · Prompt lab", "lab.prompt_app()",
-                      notes=["If the app does not appear, run the cell again; if a public link is printed, it also works on a phone."]))
+                      notes=["This cell prints a **link**: open it in a new tab (or on your phone). The app stays alive while this notebook is running; if no link appears, run the cell again."]))
     questions.append((7, f"Run at least {v['own_experiments']} experiments of your own in Step 5 (a photo from a site or from the internet, a plan, a changed prompt, the schema on and off). "
                          "For each: the image, the prompt, the raw reply, and whether it was right. What kind of request broke the model, and how did it break (wrong answer, invented objects, unreadable reply)?"))
     cells.append(q(*questions[-1]))

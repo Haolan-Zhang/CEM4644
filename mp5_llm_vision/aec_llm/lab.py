@@ -131,6 +131,9 @@ class LLMLab:
     def segment(self, plan: str, mode: str = "LLM only (polygons)", schema: bool = False):
         self._need(); ui.segment(self, plan, mode, schema)
 
+    def segment_all(self, schema: bool = True):
+        self._need(); ui.segment_all(self, schema)
+
     def segment_compare(self, plan: str):
         self._need(); ui.segment_compare(self, plan)
 

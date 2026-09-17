@@ -9,8 +9,8 @@ Colab form and the code is hidden.
 
 | Notebook | Open | Examples |
 |---|---|---|
-| `MP5_Workshop_LLM_Vision.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Workshop_LLM_Vision.ipynb) | façade defects (14 photos, 7 classes), site safety (6 photos, 52 boxes), 3 clean floor plans |
-| `MP5_Homework_LLM_Vision.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Homework_LLM_Vision.ipynb) | architectural styles (20 images, 10 classes), machinery (6 photos), 3 scanned floor plans |
+| `MP5_Workshop_LLM_Vision.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Workshop_LLM_Vision.ipynb) | façade defects (14 photos, 7 classes), site safety (6 photos, 52 boxes), the 3 clean floor plans of MP4 |
+| `MP5_Homework_LLM_Vision.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Homework_LLM_Vision.ipynb) | architectural styles (20 images, 10 classes), machinery (6 photos), 4 scanned floor plans (one two-storey) |
 | `MP5_Workshop_LLM_Vision_chat.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Workshop_LLM_Vision_chat.ipynb) | the workshop with the single-example steps through hokie.ai (chat window, paste-back cells) |
 | `MP5_Homework_LLM_Vision_chat.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Homework_LLM_Vision_chat.ipynb) | the homework with the single-example steps through hokie.ai |
 
@@ -19,9 +19,10 @@ single-example steps (describe a photo, JSON asked nicely, boxes on one photo, t
 plain chat window, **hokie.ai** (https://hokie.ai.vt.edu/, Virginia Tech's free access to GPT models): the student
 downloads the example image, pastes the prompt, attaches the image, and pastes the reply back into a cell that parses,
 draws and scores it with the same code as the API path (`aec_llm/chat.py`; coordinate order and scale can be switched
-when the chat used another convention). Nothing done in the chat is repeated on the API: the API keeps only the batch
-steps (every photo scored, prompts compared) and the prompt lab. Rooms are measured from the chat model's own polygons;
-there is no SAM 3 in the chat variants and they need no GPU. Generated with `python build/make_notebooks.py --chat`
+when the chat used another convention). Nothing done in the chat is repeated on the API: the API keeps the batch
+steps (every photo scored, prompts compared, **every plan segmented at once**) and the prompt lab. Rooms are measured from the
+chat model's own polygons, first one plan by hand in the chat and then all of them through the API; there is no SAM 3 in
+the chat variants and they need no GPU. Generated with `python build/make_notebooks.py --chat`
 (`--all` for both kinds); the plain notebooks are untouched.
 
 All notebooks are generated from one template. Students need a **free Gemini API key** (https://aistudio.google.com/apikey)
@@ -33,8 +34,8 @@ and only live requests (own prompts, own images) are unavailable. A GPU is only 
 1. **Talk to the model**: a free question about a photo; then the same classification asked as JSON in the prompt (run three times: fences, invalid JSON, drifting labels) and with a JSON schema enforced by the API.
 2. **Classification by prompt**: the MP2 photos with three prompts (class names / with descriptions / with rules), accuracy and confusion table against the answer key and the MP2 model; then their own prompt.
 3. **Detection and counting**: boxes as `[ymin, xmin, ymax, xmax]` on a 0–1000 grid, converted to pixels and scored like MP3 (right label and IoU ≥ 0.5) next to the MP3 YOLO model; a count asked directly vs. counted from the model's own boxes.
-4. **Rooms on a plan**: the model's own polygons vs. its boxes handed to SAM 3 (`Sam3Engine.segment_room` from MP4), both scored room by room against the drawing, with MP4's phrase result for comparison.
-5. **Prompt lab**: a small Gradio app for their own image and words (raw reply next to what it draws).
+4. **Rooms on a plan**: the model's own polygons vs. its boxes handed to SAM 3 (`Sam3Engine.segment_room` from MP4), both scored room by room against the drawing, with MP4's phrase result for comparison. The chat variants instead do one plan in the chat window and then every plan at once through the API (`lab.segment_all`).
+5. **Prompt lab**: a small Gradio app for their own image and words (raw reply next to what it draws), opened from a link rather than embedded in the cell.
 6. **Wrap-up**: one table, generalist vs. the three specialists, with time and tokens.
 
 ## What is in this folder

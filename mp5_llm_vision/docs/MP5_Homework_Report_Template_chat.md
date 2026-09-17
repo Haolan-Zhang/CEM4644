@@ -48,7 +48,7 @@ From Step 3c on two photos: the chat's count, the number of boxes it gave you in
 
 ## Question 6
 
-From Step 4a on plan 8138 and on plan 11615 (scanned drawings with furniture and dimension strings): copy the per-room tables from your pasted replies. What does the scan's clutter do to the chat model's polygons? Compare with MP4's SAM 3 by phrase on the same plans.
+From Step 4a on plan 8138 and on plan 11615 (scanned drawings with furniture and dimension strings): copy the per-room tables from your pasted replies. What does the scan's clutter do to the chat model's polygons? Then from Step 4b: the table for all four plans from the API, including the two-storey sheet 5018. Where is the API's batch result better or worse than your chat replies, and how does either compare with MP4's SAM 3 by phrase?
 
 *Your answer:*
 

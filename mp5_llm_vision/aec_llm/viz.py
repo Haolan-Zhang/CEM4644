@@ -48,6 +48,7 @@ def draw_boxes(image: Image.Image, boxes: Sequence[Tuple[str, Sequence[float], s
     fs = font_size or max(11, im.width // 60)
     font = _font(fs)
     for text, b, color, width in boxes:
+        text = " ".join(str(text).split())        # labels off a drawing can carry line breaks, which cannot be measured
         x1, y1, x2, y2 = [float(v) for v in b]
         d.rectangle([x1, y1, x2, y2], outline=color, width=width)
         if text:
@@ -65,6 +66,7 @@ def draw_polygons(image: Image.Image, polys: Sequence[Tuple[str, Sequence[Sequen
     d = ImageDraw.Draw(layer)
     font = _font(max(11, base.width // 60))
     for text, pts, color in polys:
+        text = " ".join(str(text).split())        # see draw_boxes
         if len(pts) < 3:
             continue
         rgb = hex_rgb(color)

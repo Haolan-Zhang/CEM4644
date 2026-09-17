@@ -112,8 +112,8 @@ register(LabSpec(
         mp3_key="construction_safety", mp3_model="models/construction_safety_yolo11n.pt",
         mp3_map={"person": "person", "helmet": "helmet", "no-helmet": "no-helmet", "vest": "vest", "no-vest": "no-vest"},
     ),
-    plans=PlanRef(title="Floor plans (clean drawings)", mp4_set="homes_a", ids=["1293", "2536", "2090"],
-                  description="three of the MP4 workshop plans: clean renderings of real Finnish homes with every room's real area in the answer key"),
+    plans=PlanRef(title="Floor plans (clean drawings)", mp4_set="homes_a", ids=["1293", "2536", "207"],
+                  description="the three MP4 workshop plans: clean renderings of real Finnish homes (two flats and a 19-room house) with every room's real area in the answer key"),
 ))
 
 register(LabSpec(
@@ -158,8 +158,8 @@ register(LabSpec(
         mp3_key="excavators", mp3_model="models/excavators_yolo11n.pt",
         mp3_map={"EXCAVATORS": "excavator", "dump truck": "dump truck", "wheel loader": "wheel loader"},
     ),
-    plans=PlanRef(title="Floor plans (scanned drawings)", mp4_set="homes_b", ids=["8138", "10715", "11615"],
-                  description="three of the MP4 homework plans: scanned real drawings with furniture and dimension strings, with the same answer keys"),
+    plans=PlanRef(title="Floor plans (scanned drawings)", mp4_set="homes_b", ids=["8138", "10715", "11615", "5018"],
+                  description="four of the MP4 homework plans: scanned real drawings with furniture and dimension strings (one of them a two-storey sheet), with the same answer keys"),
 ))
 
 

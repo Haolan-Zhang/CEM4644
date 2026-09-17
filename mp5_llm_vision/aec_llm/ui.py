@@ -258,6 +258,40 @@ def segment(lab, plan: str, mode_name: str, schema: bool):
     lab.results[("segment", p.id, mode)] = summ
 
 
+def segment_all(lab, schema: bool = True):
+    """Every plan at once through the API: the model's own polygons, scored room by room against each drawing."""
+    ex = lab.examples
+    ims, titles, rows, all_err = [], [], [], []
+    secs, toks = 0.0, 0
+    for p in ex.plans:
+        r_rows, r, skipped = tasks.segment_rooms(lab.client, p, C.PROMPTS["rooms_masks"], "llm", schema, sam=None)
+        summ = tasks.seg_summary(r_rows, p)
+        sf, st, se = _specialist_seg(p)
+        errs = [abs(rw.err_pct) for rw in r_rows if rw.err_pct is not None]
+        all_err += errs
+        secs += r.seconds; toks += r.tokens_in + r.tokens_out + r.tokens_thought
+        n_poly = sum(1 for rw in r_rows if rw.poly)
+        rows.append((p.id, f"{summ['rooms_found']}/{summ['rooms_truth']}", f"{len(r_rows)} ({n_poly} with a polygon)",
+                     f"{summ['median_err']:.0f} %" if summ["median_err"] is not None else "—",
+                     f"{summ['max_err']:.0f} %" if summ["max_err"] is not None else "—",
+                     f"{summ['total_model_m2']:.0f} / {summ['floor_area_m2']:.0f}",
+                     f"{sf}/{st}" + (f", {se:.0f} %" if se is not None else ""),
+                     ("⚠ " + r.error[:40]) if r.error else ""))
+        ims.append(_seg_image(p, r_rows, "llm"))
+        titles.append(f"{p.id}: {summ['rooms_found']}/{summ['rooms_truth']} rooms"
+                      + (f", median {summ['median_err']:.0f} %" if summ["median_err"] is not None else ""))
+    viz.show(viz.image_grid(ims, titles, ncols=min(3, len(ims)), size=4.4,
+                            suptitle=f"The model's own room polygons on all {len(ims)} plans" + (" (schema enforced)" if schema else " (JSON only asked for)")))
+    print(viz.table(rows, ["plan", "rooms found", "rooms in the reply", "median error", "worst", "model / drawing m²", "MP4 SAM 3 'room'", "note"],
+                    [7, 12, 22, 13, 7, 19, 17, 46]))
+    if all_err:
+        print(f"\nOver all {len(all_err)} matched rooms of {len(ims)} plans: median error {np.median(all_err):.0f} %, "
+              f"{sum(1 for e in all_err if e > 25)} room(s) off by more than 25 %.")
+    print(f"{secs:.0f} s and {toks:,.0f} tokens for {len(ims)} plans ({'precomputed' if secs == 0 else 'this run'}); "
+          "every number here comes from one prompt per plan and is checked against the drawing's own areas.")
+    lab.results[("segment_all", schema)] = {"plans": len(ims), "median": float(np.median(all_err)) if all_err else None}
+
+
 def segment_compare(lab, plan: str):
     ex = lab.examples
     p = ex.plan(plan)
