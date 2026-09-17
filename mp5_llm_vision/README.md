@@ -11,6 +11,8 @@ Colab form and the code is hidden.
 |---|---|---|
 | `MP5_Workshop_LLM_Vision.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Workshop_LLM_Vision.ipynb) | façade defects (14 photos, 7 classes), site safety (6 photos, 52 boxes), 3 clean floor plans |
 | `MP5_Homework_LLM_Vision.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Homework_LLM_Vision.ipynb) | architectural styles (20 images, 10 classes), machinery (6 photos), 3 scanned floor plans |
+| `MP5_Workshop_LLM_Vision_chat.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Workshop_LLM_Vision_chat.ipynb) | the workshop with the single-example steps through hokie.ai (chat window, paste-back cells) |
+| `MP5_Homework_LLM_Vision_chat.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Homework_LLM_Vision_chat.ipynb) | the homework with the single-example steps through hokie.ai |
 
 **Chat-window variants.** `MP5_Workshop_LLM_Vision_chat.ipynb` and `MP5_Homework_LLM_Vision_chat.ipynb` route the
 single-example steps (describe a photo, JSON asked nicely, boxes on one photo, the count, rooms on one plan) through a
