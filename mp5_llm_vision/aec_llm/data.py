@@ -8,6 +8,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 from PIL import Image, ImageDraw
 
+from .client import file_key
 from .config import LabSpec
 
 
@@ -20,6 +21,10 @@ class Photo:
 
     def load(self) -> Image.Image:
         return Image.open(self.path).convert("RGB")
+
+    @property
+    def cache_key(self) -> str:
+        return file_key(self.path)
 
     @property
     def label(self) -> str:
@@ -36,6 +41,10 @@ class Site:
 
     def load(self) -> Image.Image:
         return Image.open(self.path).convert("RGB")
+
+    @property
+    def cache_key(self) -> str:
+        return file_key(self.path)
 
     @property
     def label(self) -> str:
@@ -58,6 +67,10 @@ class Plan:
 
     def load(self) -> Image.Image:
         return Image.open(self.path).convert("RGB")
+
+    @property
+    def cache_key(self) -> str:
+        return file_key(self.path)
 
     @property
     def label(self) -> str:

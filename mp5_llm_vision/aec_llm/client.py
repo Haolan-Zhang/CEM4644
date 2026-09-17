@@ -82,11 +82,13 @@ class ReplyCache:
         self.folder.mkdir(parents=True, exist_ok=True)
 
     @staticmethod
-    def key(model: str, prompt: str, schema: Optional[dict], img: bytes, run: int) -> str:
+    def key(model: str, prompt: str, schema: Optional[dict], img: bytes, run: int, image_key: Optional[str] = None) -> str:
+        """image_key: a stable identity of a built-in example (the sha1 of its file on disk), so the key is the same on
+        every machine; without one the JPEG bytes are hashed, which differs between Pillow builds (uploads only)."""
         h = hashlib.sha1()
         h.update(model.encode()); h.update(b"\0"); h.update(prompt.encode()); h.update(b"\0")
         h.update(json.dumps(schema, sort_keys=True).encode() if schema else b"-"); h.update(b"\0")
-        h.update(hashlib.sha1(img).digest()); h.update(str(run).encode())
+        h.update(image_key.encode() if image_key else hashlib.sha1(img).digest()); h.update(str(run).encode())
         return h.hexdigest()[:20]
 
     def get(self, key: str) -> Optional[Reply]:
@@ -129,12 +131,13 @@ class GeminiClient:
         return self._client
 
     def ask(self, image: Optional[Image.Image], prompt: str, schema: Optional[dict] = None, thinking: str = THINKING,
-            model: Optional[str] = None, use_cache: bool = True, run: int = 0, temperature: Optional[float] = None) -> Reply:
+            model: Optional[str] = None, use_cache: bool = True, run: int = 0, temperature: Optional[float] = None,
+            image_key: Optional[str] = None) -> Reply:
         """One request. `schema` switches on the API's structured-output mode (the reply must follow it);
-        without it, JSON is only what the prompt asks for."""
+        without it, JSON is only what the prompt asks for. `image_key` identifies a built-in example for the cache."""
         model = model or self.model
         img = image_bytes(image) if image is not None else b""
-        key = ReplyCache.key(model, prompt, schema, img, run)
+        key = ReplyCache.key(model, prompt, schema, img, run, image_key)
         if use_cache and self.cache is not None:
             hit = self.cache.get(key)
             if hit is not None:
@@ -208,3 +211,9 @@ def find_api_key(explicit: Optional[str] = None) -> Optional[str]:
         return k or None
     except Exception:
         return None
+
+
+
+def file_key(path) -> str:
+    """The sha1 of a file's bytes: the same on every machine, unlike a re-encoded image."""
+    return hashlib.sha1(Path(path).read_bytes()).hexdigest()

@@ -100,7 +100,7 @@ def classify(client: GeminiClient, photos: Sequence[Photo], prompt: str, classes
              run: int = 0, log=None, thinking: str = C.THINKING) -> List[ClsRow]:
     rows = []
     for i, ph in enumerate(photos):
-        r = client.ask(ph.load(), prompt, schema=C.classify_schema(classes) if schema else None, run=run, thinking=thinking)
+        r = client.ask(ph.load(), prompt, schema=C.classify_schema(classes) if schema else None, run=run, thinking=thinking, image_key=ph.cache_key)
         row = ClsRow(ph, reply=r)
         if r.ok and isinstance(r.data, dict):
             row.label = normalise_label(r.data.get("label"), classes)
@@ -172,7 +172,7 @@ def detect(client: GeminiClient, sites: Sequence[Site], prompt: str, classes: Se
            thinking: str = C.THINKING) -> List[DetRow]:
     rows = []
     for i, s in enumerate(sites):
-        r = client.ask(s.load(), prompt, schema=C.detect_schema(classes) if schema else None, run=run, thinking=thinking)
+        r = client.ask(s.load(), prompt, schema=C.detect_schema(classes) if schema else None, run=run, thinking=thinking, image_key=s.cache_key)
         row = DetRow(s, reply=r)
         if r.ok:
             row.pred, row.skipped = boxes_from_reply(r, s.size, classes)
@@ -214,7 +214,7 @@ def det_summary(rows: Sequence[DetRow], classes: Sequence[str]) -> dict:
 
 # ----------------------------------------------------------------------------- counting
 def count(client: GeminiClient, site: Site, prompt: str, count_field: str, schema: bool, run: int = 0, thinking: str = C.THINKING) -> Reply:
-    return client.ask(site.load(), prompt, schema=C.count_schema(count_field) if schema else None, run=run, thinking=thinking)
+    return client.ask(site.load(), prompt, schema=C.count_schema(count_field) if schema else None, run=run, thinking=thinking, image_key=site.cache_key)
 
 
 # ----------------------------------------------------------------------------- rooms on a plan
@@ -238,6 +238,26 @@ class RoomRow:
         return (self.m2 - self.truth_m2) / self.truth_m2 * 100 if self.truth else None
 
 
+def oriented_polygon(points, size, box_xyxy) -> Optional[List[List[float]]]:
+    """The polygon in pixels, read as [x, y] pairs or as [y, x] pairs, whichever fits the entry's own box: the models
+    do not keep to one convention (their boxes are [ymin, xmin, ...], their polygons sometimes follow suit)."""
+    as_xy = points_to_px(points, size)
+    if as_xy is None:
+        return None
+    try:
+        swapped = [[p[1], p[0]] for p in points]
+    except Exception:
+        return as_xy
+    as_yx = points_to_px(swapped, size)
+    if as_yx is None or box_xyxy is None:
+        return as_xy
+
+    def fit(poly):
+        xs = [p[0] for p in poly]; ys = [p[1] for p in poly]
+        return iou([min(xs), min(ys), max(xs), max(ys)], box_xyxy)
+    return as_yx if fit(as_yx) > fit(as_xy) else as_xy
+
+
 def rooms_from_reply(reply: Reply, plan: Plan) -> Tuple[List[RoomRow], int]:
     rows, skipped = [], 0
     items = reply.data if isinstance(reply.data, list) else []
@@ -247,7 +267,7 @@ def rooms_from_reply(reply: Reply, plan: Plan) -> Tuple[List[RoomRow], int]:
         b = box_2d_to_xyxy(it.get("box_2d"), plan.size)
         if b is None:
             skipped += 1; continue
-        poly = points_to_px(it.get("mask"), plan.size) if it.get("mask") is not None else None
+        poly = oriented_polygon(it.get("mask"), plan.size, b) if it.get("mask") is not None else None
         rows.append(RoomRow(label=str(it.get("label", "?"))[:20], box=b, poly=poly))
     return rows, skipped
 
@@ -308,7 +328,7 @@ def segment_rooms(client: GeminiClient, plan: Plan, prompt: str, mode: str, sche
                   thinking: str = C.THINKING) -> Tuple[List[RoomRow], Reply, int]:
     """Ask the model for the rooms of a plan and measure them (see measure_rooms)."""
     with_mask = mode == "llm"
-    r = client.ask(plan.load(), prompt, schema=C.rooms_schema(with_mask) if schema else None, run=run, thinking=thinking)
+    r = client.ask(plan.load(), prompt, schema=C.rooms_schema(with_mask) if schema else None, run=run, thinking=thinking, image_key=plan.cache_key)
     rows, skipped = measure_rooms(r, plan, mode, sam)
     if log:
         log(f"  {plan.id}: {len(rows)} rooms in the reply" + (f", {skipped} unusable entries" if skipped else "") + (f"  ({r.error})" if r.error else ""))

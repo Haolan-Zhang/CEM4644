@@ -46,7 +46,9 @@ itself, so nothing there is precomputed; each student's replies are their own an
 
 - **Model:** `gemini-3.5-flash-lite` by default; Step 0 also offers `gemini-3.5-flash`, `gemini-3.8-flash` and `gemini-3.6-flash`. Thinking level *low*.
 - **Boxes:** `box_2d = [ymin, xmin, ymax, xmax]` on a 0–1000 grid (the convention the model was trained with);
-  the notebook converts to pixels. **Polygons:** `mask = [[x, y], ...]` on the same grid.
+  the notebook converts to pixels. **Polygons:** `mask = [[x, y], ...]` on the same grid, except that the model sometimes
+  writes them as `[y, x]` (the same order as its boxes); the notebook reads each polygon in whichever orientation fits
+  the entry's own box, so the outlines land on the rooms either way.
 - **Structured output:** `response_json_schema` on the request. With it the API refuses to return anything that does not
   fit the schema (enum labels, four integers in a box); without it the model may wrap the JSON in ``` fences, break a
   long list of coordinates, or invent a label. Step 1c shows both on the same prompt, three runs each.
@@ -138,7 +140,9 @@ percent of the ones in section 3.
 
 ## 6. Known failure modes
 
-- **"Gemini is busy ... waiting"** for a minute or more: the free tier's per-minute limit. It resolves itself; a
+- **"Gemini is busy ... waiting" on a built-in example** means a cache miss, which should not happen: the cache is keyed on the
+  example file's bytes, so it hits on any machine. If it does, the cache folder was not pulled (Step 0 refreshes the clone).
+- **"Gemini is busy ... waiting"** on a live step for a minute or more: the free tier's per-minute limit. It resolves itself; a
   whole class on one key would not, hence one key per student.
 - **"request failed: You exceeded your current quota"**: the daily cap of that model. Pick another model in Step 0
   (the precomputed answers are per model, so switching only affects live requests) or come back tomorrow.

@@ -51,7 +51,7 @@ def show_examples(lab, which: str):
 def describe(lab, photo: str, question: str):
     ph = lab.examples.photo(photo)
     prompt = C.fill("describe", lab.spec, question=question)
-    r = lab.client.ask(ph.load(), prompt)
+    r = lab.client.ask(ph.load(), prompt, image_key=ph.cache_key)
     viz.show_image(ph.load(), 320)
     print(f"Prompt: {prompt}\n")
     if r.error and not r.text:
@@ -73,7 +73,7 @@ def json_lab(lab, photo: str, repeats: int = 3):
         print(f"\n{'=' * 100}\n{mode}\n{'=' * 100}")
         labels, valid = [], 0
         for run in range(repeats):
-            r = lab.client.ask(img, prompt, schema=schema if use_schema else None, run=run)
+            r = lab.client.ask(img, prompt, schema=schema if use_schema else None, run=run, image_key=ph.cache_key)
             raw = (r.text or "").strip()
             fenced = raw.startswith("```")
             status = "valid JSON" if r.ok else f"⚠️ {r.error}"
@@ -262,14 +262,14 @@ def segment_all(lab, schema: bool = True):
     """Every plan at once through the API: the model's own polygons, scored room by room against each drawing."""
     ex = lab.examples
     ims, titles, rows, all_err = [], [], [], []
-    secs, toks = 0.0, 0
+    secs, toks, live = 0.0, 0, 0
     for p in ex.plans:
         r_rows, r, skipped = tasks.segment_rooms(lab.client, p, C.PROMPTS["rooms_masks"], "llm", schema, sam=None)
         summ = tasks.seg_summary(r_rows, p)
         sf, st, se = _specialist_seg(p)
         errs = [abs(rw.err_pct) for rw in r_rows if rw.err_pct is not None]
         all_err += errs
-        secs += r.seconds; toks += r.tokens_in + r.tokens_out + r.tokens_thought
+        secs += r.seconds; toks += r.tokens_in + r.tokens_out + r.tokens_thought; live += not r.cached
         n_poly = sum(1 for rw in r_rows if rw.poly)
         rows.append((p.id, f"{summ['rooms_found']}/{summ['rooms_truth']}", f"{len(r_rows)} ({n_poly} with a polygon)",
                      f"{summ['median_err']:.0f} %" if summ["median_err"] is not None else "—",
@@ -287,7 +287,7 @@ def segment_all(lab, schema: bool = True):
     if all_err:
         print(f"\nOver all {len(all_err)} matched rooms of {len(ims)} plans: median error {np.median(all_err):.0f} %, "
               f"{sum(1 for e in all_err if e > 25)} room(s) off by more than 25 %.")
-    print(f"{secs:.0f} s and {toks:,.0f} tokens for {len(ims)} plans ({'precomputed' if secs == 0 else 'this run'}); "
+    print(f"{secs:.0f} s and {toks:,.0f} tokens for {len(ims)} plans ({'precomputed' if not live else 'this run'}); "
           "every number here comes from one prompt per plan and is checked against the drawing's own areas.")
     lab.results[("segment_all", schema)] = {"plans": len(ims), "median": float(np.median(all_err)) if all_err else None}
 

@@ -58,7 +58,10 @@ build/            instructor-side scripts: prepare_data.py, precompute.py, make_
 
 **Model.** `gemini-3.5-flash-lite` by default (Step 0 also offers `gemini-3.5-flash`, `gemini-3.8-flash`, `gemini-3.6-flash`),
 thinking level *low*. Boxes follow Google's convention (`box_2d` = `[ymin, xmin, ymax, xmax]`, 0–1000); polygons are `[x, y]`
-points on the same grid. Structured output uses `response_json_schema`. The free tier caps every `gemini-3.x-flash` model
+points on the same grid. Structured output uses `response_json_schema`. Polygons come back as `[x, y]` or `[y, x]` pairs depending on the reply, so each
+room's polygon is read in whichever orientation fits its own box. Replies of the built-in examples are cached under a key made
+of the model, the prompt, the schema and the example file's own bytes (not a re-encoded image), so the cache hits on any machine.
+The free tier caps every `gemini-3.x-flash` model
 at 20 requests per day (measured), while the lite model allows a class-sized number; the client waits and retries on
 per-minute limits and 503s and says so, and every reply is cached, so students hit the service only with their own prompts.
 

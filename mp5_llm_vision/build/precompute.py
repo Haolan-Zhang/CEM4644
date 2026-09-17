@@ -55,10 +55,10 @@ def main():
         print("describe + JSON lab")
         ph = ex.photos[0]
         for q in C.DESCRIBE_QUESTIONS:
-            client.ask(ph.load(), C.fill("describe", spec, question=q))
+            client.ask(ph.load(), C.fill("describe", spec, question=q), image_key=ph.cache_key)
         for run in range(a.repeats):
-            client.ask(ph.load(), C.fill("classify_basic", spec), run=run)
-            client.ask(ph.load(), C.fill("classify_basic", spec), schema=C.classify_schema(ex.photo_classes), run=run)
+            client.ask(ph.load(), C.fill("classify_basic", spec), run=run, image_key=ph.cache_key)
+            client.ask(ph.load(), C.fill("classify_basic", spec), schema=C.classify_schema(ex.photo_classes), run=run, image_key=ph.cache_key)
         print(f"== {v}: {len(client.cache) - n0} new replies, {client.calls} live calls, {time.time() - t0:.0f} s", flush=True)
 
 
