@@ -8,7 +8,7 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-From the floor plans: your scale reading on each sheet and how far it is from the answer key. On the VA clinic sheet you were asked to box the graphic scale bar as well as the printed dimension - what did the two give, and which one is right? (Work out what the areas would have been if you had trusted the bar.) Then the room table of one sheet: your square feet, the drawing's, the error. Which rooms are worst and why?
+From the floor plans: your scale reading on each sheet and how far it is from the answer key. On the VA clinic sheet you were asked to box the graphic scale bar as well as the printed dimension - what did the two give, and which one is right? (Work out what the areas would have been if you had trusted the bar.) Then the room table of one sheet: your square feet, the drawing's, the error. Which rooms are worst and why? Finally, the two counts SAM 3 made from your example boxes on the clinic sheet (found / missed / extra): which of the two would you hand on, and which would you check yourself first?
 
 *Your answer:*
 
@@ -16,7 +16,7 @@ From the floor plans: your scale reading on each sheet and how far it is from th
 
 ## Question 2
 
-From the structural plans: for each sheet, the scale and how you set it, the areas of the footings you measured against the sizes their marks give, and the count from *find all like my first box* (found / missed / extra). One sheet asks you only to count, because its pile caps are too small to measure - what happens to the measured area of something that small, and why?
+From the structural plans: for each sheet, the scale and how you set it, the areas of the footings you measured against the sizes their marks give, and the count SAM 3 made from your one *example: footing* box (found / missed / extra). One sheet asks you only to count, because its pile caps are too small to measure - what happens to the measured area of something that small, and why?
 
 *Your answer:*
 
@@ -24,7 +24,7 @@ From the structural plans: for each sheet, the scale and how you set it, the are
 
 ## Question 3
 
-From the ceiling plan: the count of each symbol from one example box (found / missed / extra), the confidence you used, and what the extras were. Try a second example box of the same symbol, one that is rotated or sits in a cluttered spot, and report how the count changes. Why do the words *light fixture* and *diffuser* return nothing?
+From the ceiling plan: the count of each symbol that SAM 3 made from your one example box (found / missed / extra), the confidence you used, and what the extras were. Try a second example box of the same symbol, one that is rotated or sits in a cluttered spot, and report how the count changes. Why do the words *light fixture* and *diffuser* return nothing?
 
 *Your answer:*
 

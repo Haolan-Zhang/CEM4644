@@ -8,7 +8,7 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-From Steps 2a and 2b: which words found what they should (rooms? bedrooms? doors? windows?), and which found nothing or something else? Give the found / missed / extra numbers for two things on one drawing at confidence 0.3, and say what the misses have in common.
+From Steps 2a and 2b: which words found what they should (rooms? bedrooms? kitchens? doors? windows?), and which found nothing or something else? These drawings' answer keys measure rooms, so the hit / miss / extra overlay of Step 2b works on the room words: give the found / missed / extra numbers for two room words on one drawing at confidence 0.3. Then say what the words that found nothing have in common.
 
 *Your answer:*
 
@@ -16,7 +16,7 @@ From Steps 2a and 2b: which words found what they should (rooms? bedrooms? doors
 
 ## Question 2
 
-From Step 3 on all three drawings: your scale reading on each drawing and how far it is from the answer key; your window count (found / missed / extra); and the room table (your square feet, the drawing's, the error) for the drawing you did best on. What is the total of your rooms against the drawing's indoor total?
+From Step 3 on all three drawings: your two scale readings on each drawing, how far each one is from the answer key and how far they are from each other; and the room table (your square feet, the drawing's, the error) for the drawing you did best on. What is the total of your rooms against the drawing's indoor total?
 
 *Your answer:*
 
@@ -24,7 +24,7 @@ From Step 3 on all three drawings: your scale reading on each drawing and how fa
 
 ## Question 3
 
-Which rooms came out worst, and why? Look at the pictures and name the reason for at least three of them (a loose box, a kitchen counter or a bathtub eaten out of the mask, a hall that is really a set of doorways, an open space with no wall on one side, the scale). If you used the *find all like my first box* dropdown, say what it found and what it missed.
+Which rooms came out worst, and why? Look at the pictures and name the reason for at least three of them (a loose box, a kitchen counter or a bathtub eaten out of the mask, a hall that is really a set of doorways, an open space with no wall on one side, the scale). Did the notebook warn you about any of them, and was the warning right?
 
 *Your answer:*
 

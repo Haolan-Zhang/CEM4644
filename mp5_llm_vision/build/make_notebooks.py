@@ -99,20 +99,26 @@ In MP2, MP3 and MP4 you trained or used one **specialist** model per task: a cla
 {"" if chat else "- **GPU (optional):** *Runtime → Change runtime type → T4 GPU* is only needed for Step 4b (SAM 3). Everything else runs on a remote service and needs no GPU."}
 - Never paste your key into a cell you might share: use the secret.
 """))
+    # the chat notebooks never load SAM 3, so they do not need the MP4 folder next to this one
+    folders = ["mp5_llm_vision"] if chat else ["mp5_llm_vision", "mp4_segmentation"]
+    folders_note = "only this lab folder is" if chat else "only these two lab folders are"
     cells.append(form(
         "▶ Step 0 · Run me first (1–3 minutes)",
         f"""import importlib, os, shutil, subprocess, sys
 REPO, FOLDER, PKG = "CEM4644", "mp5_llm_vision", "aec_llm"
+FOLDERS = {json.dumps(folders)}  # {folders_note} downloaded, not the whole course repository
 
 def _git(*args):
     return subprocess.run(["git", "-C", REPO, *args], capture_output=True, text=True).returncode == 0
 
 if os.path.isdir(REPO):                      # a copy is already here: pull the newest course code over it
-    if not (_git("fetch", "-q", "--depth", "1", "origin", "master")
+    if not (_git("sparse-checkout", "set", *FOLDERS)     # also trims a full copy left by an earlier run
+            and _git("fetch", "-q", "--depth", "1", "origin", "master")
             and _git("reset", "-q", "--hard", "FETCH_HEAD") and _git("clean", "-qfd")):
         shutil.rmtree(REPO, ignore_errors=True)          # broken copy: start again from scratch
 if not os.path.isdir(REPO):
-    subprocess.run(["git", "clone", "--depth", "1", "-q", "{GITHUB_URL}", REPO], check=True)
+    subprocess.run(["git", "clone", "-q", "--depth", "1", "--filter=blob:none", "--sparse", "{GITHUB_URL}", REPO], check=True)
+    subprocess.run(["git", "-C", REPO, "sparse-checkout", "set", *FOLDERS], check=True)
 for _m in [m for m in list(sys.modules) if m.split(".")[0] in (PKG, "aec_seg")]:
     del sys.modules[_m]                      # Python caches imported code: drop it, or this cell keeps the old version
 importlib.invalidate_caches()

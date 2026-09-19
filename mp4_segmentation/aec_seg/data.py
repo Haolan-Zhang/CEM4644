@@ -8,8 +8,8 @@ Answer key (`data/sheets/<set>/<id>.key.json`, next to `<id>.png`):
      "scale_refs": [{"label", "feet", "box": [x1,y1,x2,y2], "axis": "x"|"y", "use": true, "note"}],
      "areas":  [{"label", "type", "category", "indoor", "printed", "printed_sqft",
                  "box": [x1,y1,x2,y2], "poly": [[x,y], ...], "true_sqft", "note"}],
-     "counts": {"window": [[x1,y1,x2,y2], ...]},
-     "count_hints": {"window": {"threshold": 0.4, "size_range": [0.2, 5.0], "tip": ""}},
+     "counts": {"footing": [[x1,y1,x2,y2], ...]},          # every one of them, for checking the model's count
+     "count_hints": {"footing": {"threshold": 0.4, "size_range": [0.2, 5.0], "tip": ""}},
      "legend": null | "<file name>",
      "tasks": ["...", ...]}
 
@@ -146,13 +146,19 @@ class Sheet:
         return f"scale: {ref['label']}"
 
     def area_label(self, category: str) -> str:
-        """The box label of an area category (a category that is also a counting category gets ' (area)')."""
-        return f"{category} (area)" if category in self.count_categories else category
+        """The box label of an area category: the plain word ('room', 'footing', 'pit')."""
+        return category
+
+    def example_label(self, category: str) -> str:
+        """The box label of a counting category: ONE example of it, which SAM 3 then finds everywhere."""
+        return f"example: {category}"
 
     def box_labels(self) -> List[str]:
-        """The labels of the box-drawing tool, in the order the student should draw them."""
-        return ([self.scale_label(r) for r in self.scale_refs] + list(self.count_categories)
-                + [self.area_label(c) for c in self.area_categories])
+        """The labels of the box-drawing tool, in the order the student should draw them: the scale
+        references, then the areas to measure, then one example of each thing to be counted."""
+        return ([self.scale_label(r) for r in self.scale_refs]
+                + [self.area_label(c) for c in self.area_categories]
+                + [self.example_label(c) for c in self.count_categories])
 
     # ------------------------------------------------------------------ truth lookups for the named things
     def truth_boxes(self, what: str, sub: Optional[str] = None) -> List[List[float]]:
@@ -173,7 +179,7 @@ class Sheet:
             if c != "room":
                 bits.append(f"{plural(len(self.areas(c)), c)} to measure")
         for c, boxes in self.counts.items():
-            bits.append(plural(len(boxes), c))
+            bits.append(f"{plural(len(boxes), c)} to count from one example")
         bits.append(f"1 ft = {self.px_per_ft:.1f} px")
         return "; ".join(bits)
 

@@ -21,16 +21,16 @@
     "file": "va_ceiling.png"
   },
   "test_fp": {
-    "title": "Foundation plan, instructor's own example image 1 (test_fp.png), cropped to the two interior footing rows",
-    "author": "Haolan Zhang (course instructor)",
-    "license": "Provided by the instructor for this course",
+    "title": "Foundation plan, example image 1 (test_fp.png), cropped to the two interior footing rows",
+    "author": "Course example drawing (GitHub repository Haolan-Zhang/SAM_Example_Image)",
+    "license": "Provided for this course",
     "source": "https://github.com/Haolan-Zhang/SAM_Example_Image",
     "file": "test_fp.png"
   },
   "test_fp_2": {
-    "title": "Foundation plan, instructor's own example image 2 (test_fp_2.png)",
-    "author": "Haolan Zhang (course instructor)",
-    "license": "Provided by the instructor for this course",
+    "title": "Foundation plan, example image 2 (test_fp_2.png)",
+    "author": "Course example drawing (GitHub repository Haolan-Zhang/SAM_Example_Image)",
+    "license": "Provided for this course",
     "source": "https://github.com/Haolan-Zhang/SAM_Example_Image",
     "file": "test_fp_2.png"
   },

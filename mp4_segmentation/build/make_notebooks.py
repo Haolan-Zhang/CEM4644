@@ -25,16 +25,19 @@ ROOT = REPO
 
 STEP0 = """import importlib, os, shutil, subprocess, sys
 REPO, FOLDER, PKG = "CEM4644", "mp4_segmentation", "aec_seg"
+FOLDERS = ["mp4_segmentation"]               # only this lab folder is downloaded, not the whole course repository
 
 def _git(*args):
     return subprocess.run(["git", "-C", REPO, *args], capture_output=True, text=True).returncode == 0
 
 if os.path.isdir(REPO):                      # a copy is already here: pull the newest course code over it
-    if not (_git("fetch", "-q", "--depth", "1", "origin", "master")
+    if not (_git("sparse-checkout", "set", *FOLDERS)     # also trims a full copy left by an earlier run
+            and _git("fetch", "-q", "--depth", "1", "origin", "master")
             and _git("reset", "-q", "--hard", "FETCH_HEAD") and _git("clean", "-qfd")):
         shutil.rmtree(REPO, ignore_errors=True)          # broken copy: start again from scratch
 if not os.path.isdir(REPO):
-    subprocess.run(["git", "clone", "--depth", "1", "-q", "{url}", REPO], check=True)
+    subprocess.run(["git", "clone", "-q", "--depth", "1", "--filter=blob:none", "--sparse", "{url}", REPO], check=True)
+    subprocess.run(["git", "-C", REPO, "sparse-checkout", "set", *FOLDERS], check=True)
 for _m in [m for m in list(sys.modules) if m == PKG or m.startswith(PKG + ".")]:
     del sys.modules[_m]                      # Python caches imported code: drop it, or this cell keeps the old version
 importlib.invalidate_caches()
@@ -161,8 +164,8 @@ def build_workshop():
     things = spec.names
     q = Questions()
     cells = [header("workshop", 90, """1. Meet SAM 3 on an ordinary site photo: ask by name, draw a box, tap an object. Then look at the three drawings.
-2. Ask for rooms, doors and windows **by name** on a drawing, and see what the drawing's own answer key says.
-3. Do the **take-off**: set the scale, box every window, measure every room in square feet - one cell per drawing.
+2. Ask for rooms, doors and windows **by name** on a drawing, and check the rooms against the drawing's own answer key.
+3. Do the **take-off**: set the scale from a printed dimension, then measure every room in square feet - one cell per drawing.
 4. Look at where the model goes wrong: the words, the weak regions, and words of your own.
 5. Try a drawing of your own."""), step0("workshop")]
 
@@ -223,9 +226,10 @@ answer key** says. The **confidence slider** hides the regions the model is unsu
                       notes=["The answer key drawn on the drawing: green = a real one the model found, red = a real one it missed, "
                              "blue = a region that is not one at all."],
                       params=[param_choice("drawing", d0, labels), param_choice("thing", "room (any)", things), CONF]))
-    cells.append(q.add("From Steps 2a and 2b: which words found what they should (rooms? bedrooms? doors? windows?), and which "
-                       "found nothing or something else? Give the found / missed / extra numbers for two things on one drawing at "
-                       "confidence 0.3, and say what the misses have in common."))
+    cells.append(q.add("From Steps 2a and 2b: which words found what they should (rooms? bedrooms? kitchens? doors? windows?), and "
+                       "which found nothing or something else? These drawings' answer keys measure rooms, so the hit / miss / extra "
+                       "overlay of Step 2b works on the room words: give the found / missed / extra numbers for two room words on one "
+                       "drawing at confidence 0.3. Then say what the words that found nothing have in common."))
 
     cells.append(md(f"""
 ## Part 3 - The take-off
@@ -233,14 +237,18 @@ answer key** says. The **confidence slider** hides the regions the model is unsu
 A phrase is quick, but a take-off needs control, so now **you** draw the boxes. One cell per drawing. In each cell, pick
 the label above the picture before you draw, and draw in this order:
 
-1. **the scale**: one box exactly along a printed overall dimension, from arrowhead to arrowhead. Only the length along
+1. **the scale**: one box exactly along the printed overall dimension, from arrowhead to arrowhead. Only the length along
    that dimension is used. *A 1 % error in the scale is a 2 % error in every area, because area is scale squared.*
-2. **every window**: a small box on each. There are no round numbers to guess here - the notebook checks your boxes
-   against the drawing.
-3. **every room**: a tight box each, the edges on the **inside faces** of the walls.
+2. **the second dimension** down the side of the plan, as a check. The two readings never agree exactly, and the report
+   tells you by how much they differ and which one the answer key trusts.
+3. **every room**: a tight box each, the edges on the **inside faces** of the walls - rooms, porches, halls and closets.
 
-Then press *Submit*. You can also ask the model to **find everything that looks like your first box** of something
-(the dropdown under the picture) - that is how repeated symbols get counted on a big sheet.
+Then press *Submit*.
+
+There is nothing to **count** on these three sheets, and that is deliberate: counting a repeated symbol is a job for the
+model, not for your pencil. Boxing every window yourself and ticking the boxes off against an answer key would tell you
+nothing about SAM 3. On the homework's structural and MEP sheets you draw **one** box labelled *example: footing* (or
+*example: 2x4 light fixture*) and the model finds all the others like it - that count is a result you can judge.
 
 How a *room* box becomes square feet: a box on its own makes SAM 3 cut out the *furniture symbols* inside it rather than
 the floor (it was trained to find objects). So the notebook asks for *empty room* **and** hands it your box, keeps the
@@ -253,13 +261,13 @@ swings take out of a rectangular room, and converts the pixels with **your** sca
                           notes=[f"**{s.title}.** " + " ".join(s.tasks),
                                  "Zoom with the mouse wheel. Pick the label above the picture before each box. Rooms need the "
                                  "live model. Copy the tables into your report."]))
-    cells.append(q.add("From Step 3 on all three drawings: your scale reading on each drawing and how far it is from the answer "
-                       "key; your window count (found / missed / extra); and the room table (your square feet, the drawing's, the "
+    cells.append(q.add("From Step 3 on all three drawings: your two scale readings on each drawing, how far each one is from the "
+                       "answer key and how far they are from each other; and the room table (your square feet, the drawing's, the "
                        "error) for the drawing you did best on. What is the total of your rooms against the drawing's indoor total?"))
     cells.append(q.add("Which rooms came out worst, and why? Look at the pictures and name the reason for at least three of them "
                        "(a loose box, a kitchen counter or a bathtub eaten out of the mask, a hall that is really a set of "
-                       "doorways, an open space with no wall on one side, the scale). If you used the *find all like my first box* "
-                       "dropdown, say what it found and what it missed."))
+                       "doorways, an open space with no wall on one side, the scale). Did the notebook warn you about any of "
+                       "them, and was the warning right?"))
 
     cells.append(md("""
 ## Part 4 - Where it goes wrong
@@ -269,8 +277,8 @@ the **weak regions** it proposes with a low confidence, and words of your own th
 what it *means*.
 """))
     cells.append(form("Step 4a - Does the wording matter?", "lab.phrase_lab(drawing, thing, confidence)",
-                      notes=["The same thing asked for with four different words. All the wordings are precomputed, so this is instant. "
-                             "Try *door* (against *curved line*) and *wall* (against *thick black line*)."],
+                      notes=["The same thing asked for with three or four different words. All the wordings are precomputed, so this "
+                             "is instant. Try *door* (against *curved line*) and *window* (against *short parallel lines*)."],
                       params=[param_choice("drawing", d0, labels), param_choice("thing", "door", things), CONF]))
     cells.append(form("Step 4b - Look at each region and its confidence", "lab.inspect(drawing, thing)",
                       notes=["Every region the model proposed, numbered, with its confidence, its area and the room it sits on. "
@@ -311,22 +319,26 @@ what it *means*.
 # --------------------------------------------------------------------------- the homework notebook
 GROUP_TEXT = {
     "floor": ("2a - Floor plans",
-              "On a floor plan you take off **areas of rooms** and **counts of fixtures**. Set the scale from a printed "
-              "dimension, never from a scale bar: one of these two sheets carries a graphic scale bar that is wrong by a "
-              "factor of two, and boxing it as well as the printed dimension is how you find that out. Then box every room "
-              "the task asks for. The number you get is the *net* floor area: what the drawing puts on the floor "
-              "(a counter, a bathtub) is cut out of the mask unless the room is a plain rectangle."),
+              "On a floor plan you take off **areas of rooms**. Set the scale from a printed dimension, never from a scale "
+              "bar: one of these two sheets carries a graphic scale bar that is wrong by a factor of two, and boxing it as "
+              "well as the printed dimension is how you find that out. Then box every room the task asks for. The number "
+              "you get is the *net* floor area: what the drawing puts on the floor (a counter, a bathtub) is cut out of "
+              "the mask unless the room is a plain rectangle. The clinic sheet also asks for two **counts**, the water "
+              "closets and the lavatories, and each one comes from a single box labelled *example: water closet* or "
+              "*example: lavatory*."),
     "structural": ("2b - Structural (foundation) plans",
-                   "On a foundation plan you take off **areas of footings** and **counts of them**. The scale comes from a "
-                   "printed bay dimension or from a footing whose width its mark gives you (F4.0 = 4'-0\" wide). Two things "
-                   "to watch: read the *same* edge of the ink at both ends (outside-to-outside or centre-to-centre, not one "
-                   "of each), and remember that a symbol smaller than about 60 pixels on the sheet is too small for the "
-                   "model - the mask becomes a rounded copy of your box, and the 'area' you get is the area you drew."),
+                   "On a foundation plan you take off **areas of footings** and a **count of them**. The scale comes from a "
+                   "printed bay dimension or from a footing whose width its mark gives you (F4.0 = 4'-0\" wide). The count "
+                   "is made by the model from one box labelled *example: footing* - you never count them yourself. Two "
+                   "things to watch: read the *same* edge of the ink at both ends (outside-to-outside or centre-to-centre, "
+                   "not one of each), and remember that a symbol smaller than about 60 pixels on the sheet is too small for "
+                   "the model - the mask becomes a rounded copy of your box, and the 'area' you get is the area you drew."),
     "mep": ("2c - MEP plans",
             "On an MEP sheet almost nothing is measured and almost everything is **counted**. The trade words - *light "
             "fixture*, *diffuser*, *sprinkler* - return nothing at all from the model, so counting is done the other way "
-            "round: box **one** example of the symbol and ask for everything that looks like it. Pick an example that is "
-            "clean and lying the same way as most of the others; a rotated example loses about 40 % of the count."),
+            "round: box **one** example of the symbol, labelled *example: 2x4 light fixture*, and the model finds every "
+            "other symbol like it. Pick an example that is clean and lying the same way as most of the others; a rotated "
+            "example loses about 40 % of the count."),
 }
 
 
@@ -351,7 +363,9 @@ You already met SAM 3 in the workshop, so this notebook goes straight to the wor
 - **you** set the scale, from a dimension the sheet prints or from something whose size the sheet tells you. Never from a
   scale bar you have not checked.
 - **you** draw the boxes. The model turns a box into an outline; it does not know what a footing or a diffuser is.
-- everything you measure is checked against an answer key, so you always see how far off you are.
+- **counts come from the model, never from a tally of your own boxes**: where a sheet asks for a count you box ONE
+  example of the symbol, labelled *example: ...*, and SAM 3 finds all the others like it.
+- everything you measure and everything you count is checked against an answer key, so you always see how far off you are.
 """))
     cells.append(form("Step 1a - Browse the seven drawings", "lab.show_sheets(drawing)",
                       notes=["*all drawings* shows all seven with the take-off tasks for each. Pick one drawing from the list to "
@@ -367,9 +381,13 @@ You already met SAM 3 in the workshop, so this notebook goes straight to the wor
 ## Part 2 - The take-off, discipline by discipline
 
 The same cell three times, with a different list of drawings. In each one: pick the drawing, then pick the label above
-the picture before each box you draw (the labels come from that sheet's task list), then *Submit*. The dropdown under
-the picture, **find all like my first box of...**, asks the model for every other symbol that looks like the first box
-you drew in that category - that is how a count of 41 light fixtures or 29 pile footings is made.
+the picture before each box you draw (the labels come from that sheet's answer key), then *Submit*.
+
+Three kinds of label: **scale: ...** for a length whose size the sheet gives you, the plain word (**room**, **footing**,
+**pit**) for something you want the area of, and **example: ...** for something you want counted. One box labelled
+*example: pile footing* is all a count needs: SAM 3 goes and finds every other symbol on the sheet that looks like it,
+and that is how a count of 41 light fixtures or 29 pile footings is made. The slider under the picture sets how sure the
+model has to be before it keeps one of them.
 """))
     for gid in ("floor", "structural", "mep"):
         gsheets = groups.get(gid, [])
@@ -416,14 +434,17 @@ QUESTION_BY_GROUP = {
     "floor": ("From the floor plans: your scale reading on each sheet and how far it is from the answer key. On the VA clinic "
               "sheet you were asked to box the graphic scale bar as well as the printed dimension - what did the two give, and "
               "which one is right? (Work out what the areas would have been if you had trusted the bar.) Then the room table of "
-              "one sheet: your square feet, the drawing's, the error. Which rooms are worst and why?"),
+              "one sheet: your square feet, the drawing's, the error. Which rooms are worst and why? Finally, the two counts SAM 3 "
+              "made from your example boxes on the clinic sheet (found / missed / extra): which of the two would you hand on, and "
+              "which would you check yourself first?"),
     "structural": ("From the structural plans: for each sheet, the scale and how you set it, the areas of the footings you "
-                   "measured against the sizes their marks give, and the count from *find all like my first box* (found / missed "
-                   "/ extra). One sheet asks you only to count, because its pile caps are too small to measure - what happens to "
-                   "the measured area of something that small, and why?"),
-    "mep": ("From the ceiling plan: the count of each symbol from one example box (found / missed / extra), the confidence you "
-            "used, and what the extras were. Try a second example box of the same symbol, one that is rotated or sits in a "
-            "cluttered spot, and report how the count changes. Why do the words *light fixture* and *diffuser* return nothing?"),
+                   "measured against the sizes their marks give, and the count SAM 3 made from your one *example: footing* box "
+                   "(found / missed / extra). One sheet asks you only to count, because its pile caps are too small to measure - "
+                   "what happens to the measured area of something that small, and why?"),
+    "mep": ("From the ceiling plan: the count of each symbol that SAM 3 made from your one example box (found / missed / extra), "
+            "the confidence you used, and what the extras were. Try a second example box of the same symbol, one that is rotated "
+            "or sits in a cluttered spot, and report how the count changes. Why do the words *light fixture* and *diffuser* "
+            "return nothing?"),
 }
 
 

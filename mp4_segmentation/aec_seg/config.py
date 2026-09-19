@@ -14,7 +14,7 @@ ROOM_TYPES = ["bedroom", "kitchen", "living room", "bathroom", "hall", "porch", 
 class Thing:
     """Something students can ask SAM 3 for by name on a drawing.
 
-    kind:  room (an enclosed space), fixture (a symbol), opening (door / window), structure (walls).
+    kind:  room (an enclosed space), opening (door / window).
     truth: how to check the answer against the key:
            ("areas", None)   -> every area whose category is "room"
            ("areas", <type>) -> the rooms of that type
@@ -30,9 +30,10 @@ class Thing:
     truth: Optional[Tuple[str, Optional[str]]] = None
 
 
-# The workshop vocabulary. The alternatives are the other wordings Step 4a compares, and they include the
-# SHAPE words that are the only ones that work on a drawing: "curved line" for a door swing, "thick black
-# line" for a wall.
+# The workshop vocabulary: the rooms and the two openings. The alternatives are the other wordings Step 4a
+# compares, and they include the SHAPE words that are the only ones that work on a drawing: "curved line"
+# for a door swing, "short parallel lines" for a window. (Shape words for things that are NOT in this list -
+# "thick black line" for a wall, "hatched square" for a fireplace - are typed live in Step 4c.)
 THINGS: List[Thing] = [
     Thing("room", "room (any)", "room", ["a room", "empty room", "floor area"], "#9aa5b1", "room", ("areas", None)),
     Thing("bedroom", "bedroom", "bedroom", ["bed", "sleeping room"], "#457b9d", "room", ("areas", "bedroom")),
@@ -43,9 +44,6 @@ THINGS: List[Thing] = [
     Thing("closet", "closet", "closet", ["cupboard", "wardrobe"], "#b5838d", "room", ("areas", "closet")),
     Thing("door", "door", "door", ["curved line", "door arc", "arc"], "#ffd166", "opening", ("counts", "door")),
     Thing("window", "window", "window", ["window opening", "short parallel lines", "gap in the wall"], "#bde0fe", "opening", ("counts", "window")),
-    Thing("wall", "wall", "wall", ["thick black line", "black bar", "solid black stripe"], "#333333", "structure", None),
-    Thing("stairs", "stairs", "stairs", ["staircase", "steps"], "#8d6e63", "fixture", None),
-    Thing("fireplace", "fireplace", "fireplace", ["chimney", "hatched square"], "#e63946", "fixture", None),
 ]
 
 
@@ -87,8 +85,8 @@ register(SheetSet(
     description=("Three small farmhouse floor plans published by the U.S. Department of Agriculture in 1940 (public domain). "
                  "Black walls, drawn windows and door swings, a printed size inside most rooms and overall dimension lines "
                  "along two sides. There is no scale bar on any of them: you set the scale yourself from a printed dimension. "
-                 "Each drawing comes with an answer key (every room's drawn area, every window, every door) that the notebook "
-                 "checks your measurements against."),
+                 "Each drawing comes with an answer key - every room's drawn area, measured off the drawing - that the "
+                 "notebook checks your measurements against."),
     default_sheet="usda_5544",
 ))
 
