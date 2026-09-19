@@ -1,14 +1,14 @@
-# CEM4644 · MP4 report — Homework (individual)
+# CEM4644 - MP4 report: Homework (individual)
 
 Name: ______________________    Date: ____________
 
-Notebook: `MP4_Homework_Segmentation.ipynb` — plans: *Residential floor plans, set B*.
+Notebook: `MP4_Homework_Segmentation.ipynb`.
 
-Answer every question in a few sentences. Paste screenshots where the question asks for overlays or tables. Numbers must come from **your** run of the notebook.
+Answer every question in a few sentences. Paste screenshots where the question asks for an overlay or a table. Every number must come from **your** run of the notebook.
 
 ## Question 1
 
-From Step 2a and 2b: which words found what they should (rooms? toilets? windows? doors?), and which found nothing or something else? Give the found / missed / extra counts for two things on one plan at confidence 0.3, and say what the misses have in common.
+From the floor plans: your scale reading on each sheet and how far it is from the answer key. On the VA clinic sheet you were asked to box the graphic scale bar as well as the printed dimension - what did the two give, and which one is right? (Work out what the areas would have been if you had trusted the bar.) Then the room table of one sheet: your square feet, the drawing's, the error. Which rooms are worst and why?
 
 *Your answer:*
 
@@ -16,7 +16,7 @@ From Step 2a and 2b: which words found what they should (rooms? toilets? windows
 
 ## Question 2
 
-From Step 3a on three plans of your choice (one of them a two-storey sheet): your scale reading and its error, the table of rooms (your m², the drawing's m², the error), the total against the drawing's floor area, and the windows found / missed / extra. On plan 5018 the sheet prints KERROSALA and HUONEISTOALA (gross and net floor area per storey): how do they relate to what you measured?
+From the structural plans: for each sheet, the scale and how you set it, the areas of the footings you measured against the sizes their marks give, and the count from *find all like my first box* (found / missed / extra). One sheet asks you only to count, because its pile caps are too small to measure - what happens to the measured area of something that small, and why?
 
 *Your answer:*
 
@@ -24,7 +24,7 @@ From Step 3a on three plans of your choice (one of them a two-storey sheet): you
 
 ## Question 3
 
-From Step 4a: which wording worked best for the thing you chose, and how different were the counts and areas? From Step 4b: describe one weak region (what it sits on, its confidence) and one plain mistake, and what you would tell a colleague who wants to use these square metres in a cost estimate.
+From the ceiling plan: the count of each symbol from one example box (found / missed / extra), the confidence you used, and what the extras were. Try a second example box of the same symbol, one that is rotated or sits in a cluttered spot, and report how the count changes. Why do the words *light fixture* and *diffuser* return nothing?
 
 *Your answer:*
 
@@ -32,7 +32,7 @@ From Step 4a: which wording worked best for the thing you chose, and how differe
 
 ## Question 4
 
-From Step 4c: which of your own words found something the named things could not (for example *curved line* for the door swings, *thick black line* for the walls)? Why does a shape word work on a drawing where the name of the thing does not?
+Test three drawings of your own, from at least two disciplines (a floor plan, a structural plan, an MEP sheet, a section, a site plan...). For each: the phrase or box you used, what came back, and whether it is right. Which kind of drawing failed, and can you say why?
 
 *Your answer:*
 
@@ -40,15 +40,7 @@ From Step 4c: which of your own words found something the named things could not
 
 ## Question 5
 
-Test 3 plan(s) of your own (any floor plan from the internet or a course). For each: the phrase you used, the count and area measured, and whether the mask is right. What kind of drawing or wording failed?
-
-*Your answer:*
-
-
-
-## Question 6
-
-Where in a project would a take-off like this be useful, and where would it mislead? What would you need (clean drawings, a scale, a room schedule, a person checking) to turn it into numbers you would put in an estimate?
+Across the three disciplines: which take-off task was the most reliable and which the least, and what decides that (the size of the thing on the sheet, how often it repeats, whether it is drawn as a simple outline)? Where would you use this in practice, where would it mislead you, and what would you insist on having (a known dimension, a schedule, a second pair of eyes) before putting these numbers in an estimate?
 
 *Your answer:*
 

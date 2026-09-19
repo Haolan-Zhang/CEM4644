@@ -107,10 +107,18 @@ def sites(spec, out: Path, n_pick: int = 6):
 
 
 def plans(spec, out: Path):
+    # The plans and their answer keys were copied from an earlier version of the MP4 lab (its Finnish plan sets), which MP4
+    # no longer ships. The copies under data/<variant>/plans are therefore the source of truth: when MP4's old sets are
+    # not there, they are left exactly as they are.
     sys.path.insert(0, str(MP4))
-    from aec_seg.config import SETS
-    from aec_seg.data import MaskStore, PlanSet
-    from aec_seg.ui import box_iou
+    try:
+        from aec_seg.config import SETS
+        from aec_seg.data import MaskStore, PlanSet
+        from aec_seg.ui import box_iou
+        SETS[spec.plans.mp4_set]
+    except (ImportError, KeyError):
+        print(f"{spec.key}/plans: MP4 no longer ships the plan set '{spec.plans.mp4_set}'; keeping the existing copies in {out / 'plans'}")
+        return
     s = SETS[spec.plans.mp4_set]
     ps = PlanSet(MP4 / s.folder)
     store = MaskStore(MP4 / s.masks)

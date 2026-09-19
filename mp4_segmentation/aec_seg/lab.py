@@ -6,9 +6,9 @@ import time
 from pathlib import Path
 from typing import Dict, Optional
 
-from . import ui, viz
-from .config import SETS, PlanSet as PlanSpec, Thing
-from .data import IntroPhotos, MaskStore, PlanSet
+from . import ui
+from .config import SETS, SheetSet as SheetSpec, Thing
+from .data import IntroPhotos, KeyError_, MaskStore, Sheets
 from .engine import SegResult, Sam3Engine
 
 TRANSFORMERS_MIN = "4.57.2"
@@ -20,16 +20,16 @@ class SegLab:
     def __init__(self):
         self.root = Path(__file__).resolve().parents[1]
         self.ready = False
-        self.spec: Optional[PlanSpec] = None
-        self.plans: Optional[PlanSet] = None
+        self.spec: Optional[SheetSpec] = None
+        self.sheets: Optional[Sheets] = None
         self.store: Optional[MaskStore] = None
         self.engine: Optional[Sam3Engine] = None
         self._cache: Dict[tuple, SegResult] = {}
         self.apps = {}
-        self.takeoffs: Dict[str, dict] = {}     # the students' take-off reports per plan, for the summary
+        self.takeoffs: Dict[str, dict] = {}     # the students' take-off of each drawing, for the summary
 
     # ------------------------------------------------------------------ setup
-    def setup(self, dataset: str = "homes_a", load_model: bool = True, install: bool = True):
+    def setup(self, dataset: str = "workshop", load_model: bool = True, install: bool = True):
         t0 = time.time()
         if install and not self._ensure_packages():
             return
@@ -39,9 +39,13 @@ class SegLab:
         except Exception:
             pass
         self.spec = SETS[dataset]
-        self.plans = PlanSet(self.root / self.spec.folder, dataset)
+        try:
+            self.sheets = Sheets(self.root / self.spec.folder, dataset)
+        except KeyError_ as e:
+            print("The answer keys of this set are broken, so the notebook cannot check anything:\n" + str(e))
+            raise
         self.intro_photos = IntroPhotos(self.root / "data" / "intro")
-        self.store = MaskStore(self.root / self.spec.masks)
+        self.store = MaskStore(self.root / self.spec.masks) if self.spec.masks else None
         if load_model:
             try:
                 self.engine = Sam3Engine(log=print)
@@ -49,7 +53,7 @@ class SegLab:
                 print(f"Could not load SAM 3 ({str(e)[:120]}). The precomputed steps still work; live steps are disabled.")
                 self.engine = None
         self.ready = True
-        print(f"✅ Ready in {time.time() - t0:.0f} s.")
+        print(f"Ready in {time.time() - t0:.0f} s.")
         self.intro()
 
     def _ensure_packages(self) -> bool:
@@ -71,8 +75,8 @@ class SegLab:
             print(f"Installing {', '.join(need)} (one to two minutes)...")
             subprocess.run([sys.executable, "-m", "pip", "install", "-q", *need], check=False)
         if restart:
-            print("\n⚠️  A newer 'transformers' was installed. Please restart the runtime now "
-                  "(menu Runtime → Restart session), then run this Step 0 cell again.")
+            print("\nA newer 'transformers' was installed. Please restart the runtime now "
+                  "(menu Runtime -> Restart session), then run this Step 0 cell again.")
             return False
         return True
 
@@ -83,34 +87,34 @@ class SegLab:
     def intro(self):
         self._need()
         s = self.spec
-        print(f"\n■ Plans: {s.title}")
+        print(f"\nDrawings: {s.title}")
         print(f"  {s.description}")
-        for p in self.plans.plans:
-            print(f"  {p.id}: {p.title} — {p.facts()}")
-        print("  Things you can ask for by name: " + ", ".join(t.name for t in s.things))
+        for sh in self.sheets:
+            print(f"  {sh.id}: {sh.title} ({sh.discipline}) - {sh.facts()}")
+        if self.store:
+            print("  Things you can ask for by name: " + ", ".join(t.name for t in s.things))
         print(f"  SAM 3 live model: {'loaded' if self.engine else 'not loaded (precomputed results only)'}")
 
     # ------------------------------------------------------------------ results
-    def get_phrase(self, plan_id: str, phrase: str, threshold: float = 0.1) -> SegResult:
-        key = (plan_id, phrase.strip().lower())
+    def get_phrase(self, sheet_id: str, phrase: str, threshold: float = 0.1) -> SegResult:
+        key = (sheet_id, phrase.strip().lower())
         if key in self._cache:
             return self._cache[key]
-        res = self.store.load(plan_id, phrase) if self.store else None
+        res = self.store.load(sheet_id, phrase) if self.store else None
         if res is None:
             if self.engine is None:
-                raise RuntimeError(f"No precomputed result for '{phrase}' on {plan_id} and SAM 3 is not loaded.")
-            res = self.engine.segment(self.plans[plan_id].load(), phrase, threshold=threshold)
+                raise RuntimeError(f"No precomputed result for '{phrase}' on {sheet_id} and SAM 3 is not loaded.")
+            res = self.engine.segment(self.sheets[sheet_id].load(), phrase, threshold=threshold)
         self._cache[key] = res
         return res
 
-    def get(self, plan_id: str, thing: Thing) -> SegResult:
-        return self.get_phrase(plan_id, thing.prompt)
+    def get(self, sheet_id: str, thing: Thing) -> SegResult:
+        return self.get_phrase(sheet_id, thing.prompt)
 
-    def _pid(self, label: str) -> str:
-        return self.plans[str(label)].id
+    def _sid(self, label) -> str:
+        return self.sheets[str(label)].id
 
     # ------------------------------------------------------------------ notebook steps
-    # ------------------------------------------------------------------ Part 1: SAM 3 on a photo
     def intro_phrase(self, photo: str, phrase: str = "person", own_phrase: str = "", confidence: float = 0.3):
         self._need()
         ui.intro_phrase(self, photo, own_phrase.strip() or phrase, float(confidence))
@@ -119,59 +123,40 @@ class SegLab:
         self._need()
         ui.intro_draw(self, photo)
 
-    def show_plans(self, which="all"):
+    def show_sheets(self, which="all"):
         self._need()
-        if which in ("all", None, "all plans"):
-            ui.gallery(self, ncols=2, size=5.2, title=self.spec.title)
+        if which in ("all", None, "all drawings"):
+            ui.gallery(self, ncols=2, size=5.2, title=self.spec.title, tasks=True)
         else:
-            ui.gallery(self, [self._pid(which)], ncols=1, size=9)
+            ui.gallery(self, [self._sid(which)], ncols=1, size=9, tasks=True)
 
-    def legend(self):
-        ui.legend()
-
-    def segment(self, plan, thing, confidence=0.4):
+    def show_legend(self, sheet=None):
         self._need()
-        ui.segment_view(self, self._pid(plan), thing, float(confidence))
+        ui.show_legend(self, self._sid(sheet) if sheet and sheet != "all" else None)
 
-    def count(self, plan, thing, confidence=0.4):
+    def segment(self, sheet, thing, confidence=0.3):
         self._need()
-        ui.count_view(self, self._pid(plan), thing, float(confidence))
+        ui.segment_view(self, self._sid(sheet), thing, float(confidence))
 
-    def mix(self, plan, confidence=0.4):
+    def count(self, sheet, thing, confidence=0.3):
         self._need()
-        ui.mix(self, self._pid(plan), float(confidence))
+        ui.count_view(self, self._sid(sheet), thing, float(confidence))
 
-    def guess_game(self, rounds=4):
+    def phrase_lab(self, sheet, thing, confidence=0.3):
         self._need()
-        ui.guess_game(self, int(rounds))
+        ui.phrase_lab(self, self._sid(sheet), thing, float(confidence))
 
-    def compare(self, plan_a, plan_b, confidence=0.4):
+    def inspect(self, sheet, thing):
         self._need()
-        ui.compare(self, self._pid(plan_a), self._pid(plan_b), float(confidence))
+        ui.inspector(self, self._sid(sheet), thing)
 
-    def phrase_lab(self, plan, thing, confidence=0.4):
+    def your_phrase(self, sheet, phrase, confidence=0.3):
         self._need()
-        ui.phrase_lab(self, self._pid(plan), thing, float(confidence))
+        ui.live_phrase(self, self._sid(sheet), str(phrase), float(confidence))
 
-    def inspect(self, plan, thing):
+    def takeoff(self, sheet):
         self._need()
-        ui.inspector(self, self._pid(plan), thing)
-
-    def fix(self, plan, thing, confidence=0.4):
-        self._need()
-        ui.fix_with_box(self, self._pid(plan), thing, float(confidence))
-
-    def your_phrase(self, plan, phrase, confidence=0.4):
-        self._need()
-        ui.live_phrase(self, self._pid(plan), str(phrase), float(confidence))
-
-    def scale_check(self, plan):
-        self._need()
-        ui.scale_check(self, self._pid(plan))
-
-    def takeoff(self, plan):
-        self._need()
-        ui.takeoff(self, self._pid(plan))
+        ui.takeoff(self, self._sid(sheet))
 
     def upload_app(self):
         self._need()
@@ -182,12 +167,23 @@ class SegLab:
         from . import app
         self.apps["upload"] = app.launch(self)
 
+    # ------------------------------------------------------------------ wrap-up
     def report_summary(self):
         self._need()
-        print("Numbers for your report: the notebook prints every measurement under its step; copy the ones you used.")
-        print(f"Plans: {self.spec.title}.")
-        for p in self.plans.plans:
-            print(f"  {p.id}: {p.title} — {p.facts()}")
+        print(f"Drawings: {self.spec.title}.")
+        for sh in self.sheets:
+            print(f"  {sh.id}: {sh.title} - {sh.facts()}")
+        if not self.takeoffs:
+            print("\nYou have not submitted a take-off yet. Go back to the take-off step, draw the boxes and click Submit; "
+                  "every submitted drawing is summarised here.")
+            return
+        print(f"\nYour take-offs ({len(self.takeoffs)} drawing(s)) - these are the numbers for your report:")
+        for sid, rep in self.takeoffs.items():
+            print(f"\n=== {sid}: {rep['title']}")
+            ui.print_takeoff(self.sheets[sid], rep)
+        missing = [sh.id for sh in self.sheets if sh.id not in self.takeoffs]
+        if missing:
+            print(f"\nNot done yet: {', '.join(missing)}.")
 
 
 lab = SegLab()

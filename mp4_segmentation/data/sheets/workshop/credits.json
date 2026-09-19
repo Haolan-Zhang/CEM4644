@@ -1,0 +1,23 @@
+{
+ "usda_5544": {
+  "title": "USDA design 710-5544, 'Five-room farmhouse', plan on page 17; rendered from the Internet Archive scan at 350 dpi, cropped to the plan and the paper tint flattened to white",
+  "author": "U.S. Department of Agriculture, Bureau of Agricultural Engineering (Miscellaneous Publication No. 360, 'Plans of Farm Buildings for Southern States', 1940)",
+  "license": "Public domain (work of the U.S. Government, 17 U.S.C. 105; the holding library also flags the scan as not in copyright)",
+  "source": "https://archive.org/details/plansoffarmbuild360unit",
+  "file": "usda_5544.png"
+ },
+ "usda_5540": {
+  "title": "USDA design 710-5540, 'Four-room and attic farmhouse', plan on page 13; rendered from the Internet Archive scan at 350 dpi and re-cropped so the side porch is complete, paper tint flattened to white",
+  "author": "U.S. Department of Agriculture, Bureau of Agricultural Engineering (Miscellaneous Publication No. 360, 'Plans of Farm Buildings for Southern States', 1940)",
+  "license": "Public domain (work of the U.S. Government, 17 U.S.C. 105; the holding library also flags the scan as not in copyright)",
+  "source": "https://archive.org/details/plansoffarmbuild360unit",
+  "file": "usda_5540.png"
+ },
+ "usda_5539": {
+  "title": "USDA design 710-5539, 'Four-room farmhouse', plan on page 12; rendered from the Internet Archive scan at 350 dpi, cropped to the plan, paper tint flattened to white and the stray letters of the facing text column painted out of the left margin",
+  "author": "U.S. Department of Agriculture, Bureau of Agricultural Engineering (Miscellaneous Publication No. 360, 'Plans of Farm Buildings for Southern States', 1940)",
+  "license": "Public domain (work of the U.S. Government, 17 U.S.C. 105; the holding library also flags the scan as not in copyright)",
+  "source": "https://archive.org/details/plansoffarmbuild360unit",
+  "file": "usda_5539.png"
+ }
+}

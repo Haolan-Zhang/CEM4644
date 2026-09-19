@@ -1,7 +1,7 @@
 """Overlays, panels and charts for the segmentation lab."""
 import io
 import math
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Optional, Sequence, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -107,64 +107,16 @@ def instances_image(image: Image.Image, res: SegResult, min_score: float = 0.0, 
     return out
 
 
-def three_panel(image: Image.Image, res: Optional[SegResult], color: str, title: str, min_score: float = 0.0, size: float = 4.2):
+def three_panel(image: Image.Image, res: Optional[SegResult], color: str, title: str, min_score: float = 0.0,
+                size: float = 4.2, what: str = "image"):
     import matplotlib.pyplot as plt
     mask = res.union(min_score) if res is not None else np.zeros((image.height, image.width), bool)
     n = int((res.scores >= min_score).sum()) if res is not None else 0
     fig, axes = plt.subplots(1, 3, figsize=(size * 3 + 0.4, size * image.height / image.width + 0.9))
     for ax, im, t in zip(axes, [image, mask_image(mask, color), overlay(image, mask, color)],
-                         ["original photo", f"mask: {n} region(s) found", f"overlay: {mask.mean() * 100:.1f}% of the photo"]):
+                         [f"the {what}", f"mask: {n} region(s) found", f"overlay: {mask.mean() * 100:.1f}% of the {what}"]):
         ax.imshow(im); ax.set_title(t, fontsize=10); ax.axis("off")
     fig.suptitle(title, fontsize=11)
-    fig.tight_layout()
-    return fig
-
-
-def bar_chart(values: Dict[str, float], colors: Dict[str, str], title: str = "", ylabel: str = "% of the photo", figsize=(7, 3)):
-    import matplotlib.pyplot as plt
-    fig, ax = plt.subplots(figsize=figsize)
-    names = list(values)
-    ax.bar(names, [values[n] for n in names], color=[colors.get(n, "#8d99ae") for n in names])
-    for i, n in enumerate(names):
-        ax.text(i, values[n] + 0.5, f"{values[n]:.1f}", ha="center", fontsize=8)
-    ax.set_ylabel(ylabel); ax.set_title(title, fontsize=10)
-    ax.set_ylim(0, max(5.0, max(values.values()) * 1.15 if values else 5))
-    plt.setp(ax.get_xticklabels(), rotation=25, ha="right", fontsize=8)
-    for s in ("top", "right"):
-        ax.spines[s].set_visible(False)
-    fig.tight_layout()
-    return fig
-
-
-def grouped_chart(groups: Dict[str, Dict[str, float]], colors: Dict[str, str], title: str = "", figsize=(8, 3.4)):
-    """groups: {photo label: {material: pct}} -> bars per material, one colour per photo? No: one bar group per material."""
-    import matplotlib.pyplot as plt
-    labels = list(groups)
-    mats = list(next(iter(groups.values())).keys()) if groups else []
-    x = np.arange(len(mats)); w = 0.8 / max(1, len(labels))
-    fig, ax = plt.subplots(figsize=figsize)
-    shades = ["#457b9d", "#e76f51", "#2a9d8f", "#f4a261", "#7b2cbf"]
-    for j, lab in enumerate(labels):
-        vals = [groups[lab].get(m, 0.0) for m in mats]
-        ax.bar(x + (j - (len(labels) - 1) / 2) * w, vals, w, label=lab, color=shades[j % len(shades)])
-    ax.set_xticks(x); ax.set_xticklabels(mats, rotation=25, ha="right", fontsize=8)
-    ax.set_ylabel("% of the photo"); ax.set_title(title, fontsize=10); ax.legend(fontsize=8)
-    for s in ("top", "right"):
-        ax.spines[s].set_visible(False)
-    fig.tight_layout()
-    return fig
-
-
-def series_chart(rows: List[Tuple[str, Dict[str, float]]], colors: Dict[str, str], title: str = "", figsize=(9, 3.6)):
-    """rows: [(time label, {material: pct})] -> one line per material over time."""
-    import matplotlib.pyplot as plt
-    fig, ax = plt.subplots(figsize=figsize)
-    labels = [r[0] for r in rows]
-    mats = list(rows[0][1].keys()) if rows else []
-    for m in mats:
-        ax.plot(range(len(rows)), [r[1].get(m, 0.0) for r in rows], marker="o", label=m, color=colors.get(m, None))
-    ax.set_xticks(range(len(rows))); ax.set_xticklabels(labels, rotation=25, ha="right", fontsize=8)
-    ax.set_ylabel("% of the photo"); ax.set_title(title, fontsize=10); ax.grid(alpha=0.3); ax.legend(fontsize=8, ncol=2)
     fig.tight_layout()
     return fig
 

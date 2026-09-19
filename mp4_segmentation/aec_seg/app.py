@@ -1,11 +1,11 @@
-"""Gradio app: your own floor plan + your own phrase -> mask, overlay and a count / area."""
+"""Gradio app: your own drawing + your own phrase -> mask, overlay and a count / area in square feet."""
 
 
 def launch(lab, share=None):
     import gradio as gr
     from . import viz
 
-    def fn(img, phrase, conf, cm_per_px):
+    def fn(img, phrase, conf, px_per_ft):
         if img is None or not phrase.strip():
             return None, None, ""
         im = img.convert("RGB")
@@ -16,22 +16,23 @@ def launch(lab, share=None):
         n = int((res.scores >= conf).sum())
         px = int(mask.sum())
         txt = f"'{phrase}': {n} region(s), {px:,} pixels = {mask.mean() * 100:.1f} % of the drawing"
-        if cm_per_px and cm_per_px > 0:
-            txt += f" = {px * (cm_per_px / 100) ** 2:.1f} m² at {cm_per_px:.2f} cm per pixel"
+        if px_per_ft and px_per_ft > 0:
+            txt += f" = {px / (px_per_ft ** 2):,.1f} sq ft at {px_per_ft:.2f} pixels per foot"
         else:
-            txt += " (enter the scale, in cm per pixel, to get square metres)"
+            txt += " (enter the scale, in pixels per foot, to get square feet)"
         return viz.mask_image(mask), viz.overlay(im, mask, "#ff70a6"), txt + f"  (SAM 3 in {res.seconds:.1f} s)"
 
     demo = gr.Interface(
         fn=fn,
-        inputs=[gr.Image(type="pil", label="Your floor plan (upload, paste, or photograph a drawing)", sources=["upload", "webcam", "clipboard"]),
+        inputs=[gr.Image(type="pil", label="Your drawing (upload, paste, or photograph a sheet)", sources=["upload", "webcam", "clipboard"]),
                 gr.Textbox(value="room", label="What should SAM 3 find? (a short phrase)"),
                 gr.Slider(0.2, 0.9, value=0.4, step=0.05, label="confidence threshold"),
-                gr.Number(value=0, label="scale: centimetres per pixel (0 = unknown)")],
+                gr.Number(value=0, label="scale: pixels per foot (0 = unknown)")],
         outputs=[gr.Image(type="pil", label="mask"), gr.Image(type="pil", label="overlay"), gr.Textbox(label="measurement")],
-        title="Segment what you name on your own plan",
-        description="Type a room or an object (room, kitchen, toilet, stairs, window...), move the threshold, compare wordings. "
-                    "If the plan has a scale bar, measure it (pixels per metre) to enter the scale.",
+        title="Segment what you name on your own drawing",
+        description="Type a room or an object (room, empty room, square, circle, curved line, thick black line...), move the "
+                    "threshold, compare wordings. To get square feet, measure a printed dimension on your sheet first: count "
+                    "the pixels along it, divide by its length in feet, and enter that number.",
     )
     # not embedded in the cell (the embedded frame is unreliable in Colab): the cell prints a link to open in a new tab
     import contextlib

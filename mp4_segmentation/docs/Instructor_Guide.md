@@ -2,132 +2,242 @@
 
 ## 1. What the students get
 
-Two Colab notebooks built from one template. Students never write code: each cell is a form with a
-▶ button; outputs are three-panel views (plan, mask, overlay), hit/miss/extra overlays, tables of
-square metres next to the drawing's own numbers, a box-drawing tool and a small upload app.
+Two Colab notebooks generated from `build/make_notebooks.py`. Students never write code: every cell is a form
+with a play button; the outputs are three-panel views (drawing, mask, overlay), hit / miss / extra overlays, a
+box-drawing tool, tables of square feet next to the drawing's own numbers, and a small upload app.
 
 | | Workshop | Homework |
 |---|---|---|
-| Plans | set A: 3 homes drawn cleanly from CubiCasa5K's vector data (1293, 2536, 207) | set B: 7 scanned CubiCasa5K plans (14341, 5018, 1217, 8138, 9136, 11615, 10715), two with both storeys on one sheet, one Swedish |
-| Steps start with | room (any), window, door (wording), room (any) | bedroom, toilet, stairs, living room |
-| Take-off | every window and every room of each of the 3 plans, one cell per plan | the same on three plans of their choice, one of them a two-storey sheet |
-| Own plans | 1 | 3 |
+| Drawings | three 1940 USDA farmhouse floor plans: `usda_5544` (easy), `usda_5540` (medium), `usda_5539` (L-shaped) | seven sheets: `usda_5542` + `va_floor` (floor plans), `test_fp`, `test_fp_2`, `uscg_motorpool`, `uscg_pile` (structural), `va_ceiling` (electrical) |
+| Teaches SAM 3 | yes: photo steps, ask-by-name, wording, inspector | no: straight into the take-off |
+| Take-off | one cell per drawing (Step 3a/3b/3c) | one cell per discipline (Step 2a/2b/2c), a dropdown of that discipline's sheets |
+| Own drawings | 1 | 3, from at least two disciplines |
+| Report questions | 6 | 5 |
 | Time | about 90 min | about 2 h |
 
-The homework still uses the scanned plans of the first version; it is due to be redesigned around
-counting components on structural plans (see section 6).
+Everything is in feet and square feet. **The scale is never taken from a scale bar.** On every sheet the student
+boxes a printed dimension (or something whose size the sheet states, such as a footing mark `F4.0` = 4'-0" wide).
+Both VA sheets carry a graphic 0–16 ft bar that is exactly twice too long — it is the ¼" = 1'-0" bar left on a
+sheet plotted at ⅛" = 1'-0" — and their tasks ask the student to box *both* the bar and a printed dimension, so
+that the 2× (i.e. 4× on area) disagreement is found rather than believed.
 
-**The plans.** All plans are from **CubiCasa5K** (CC BY-NC-SA 4.0). For set A the notebook shows a
-*rendering of the dataset's own vector drawing* (`model.svg`: uniform black walls, light-blue windows,
-door swings, fixture symbols, no dimension strings), not the scanned image; SAM 3 behaves much better on
-these clean drawings (section 2). The vector frame is drawn at exactly 1 px = 1 cm; `build/prepare_plans.py`
-resamples each plan by its own factor (so students cannot guess the scale), adds a 5 m scale bar and writes
-the answer key: every room's polygon and real area, every door, window and fixture (the SVG's nested
-transforms are composed, so the symbols land where they are drawn). That key is what every "the drawing
-says..." line in the notebook comes from.
+Part 1 of the workshop opens on two ordinary site photos (`data/intro`) so that students see the three prompt types
+(phrase, box, click) on a photograph before they meet a drawing; the box and the click use SAM 3's tracker head
+(the classic SAM prompt encoder, same checkpoint, loaded on first use).
 
-Part 1 opens on two ordinary site photos (Wikimedia Commons, public domain / CC BY-SA; `data/intro`) so that
-students see the three prompts (phrase, box, click) on a photo before the drawings; the click and the box use
-SAM 3's tracker head (the classic SAM prompt encoder, same checkpoint, loaded on first use).
+Everything the students see in Part 2 and Step 4a of the workshop is precomputed (`data/masks/workshop`) and
+instant. The live model is needed for Steps 1a/1b, every take-off cell, Step 4c and the upload app.
 
-Everything the students see for the built-in plans and phrases is precomputed and instant. Only the
-live steps run SAM 3 (Steps 1a and 1b, the Step 3a rooms, Step 4c, Part 5); on a T4 each request takes well
-under a second, on CPU about a minute.
+## 2. What SAM 3 actually does on these drawings (measured on this material)
 
-## 2. What SAM 3 actually does on these plans (measured)
+Everything in this section was measured through the notebook's own code (`aec_seg.ui.takeoff_compute`), on the
+files that ship here, with **student-like boxes**: every answer-key box with each side moved by 0.5–2 % of the box
+size, 70 % of the time outward, fixed seed; the scale boxes moved by up to 4 px per side, which is what a student
+who zooms in and aims at the arrowheads achieves.
 
-Instances at confidence ≥ 0.3 on the workshop plans: count (best score), then how many of the answer
-key's items they cover and how many regions are extra.
+### 2.1 Asking by name (workshop, Part 2) — regions at confidence ≥ 0.3, (best confidence), found / key, extras
 
-| plan | room | bedroom | bathroom | toilet | sink | bathtub | curved line (= doors) | thick black line (= walls) |
-|---|---|---|---|---|---|---|---|---|
-| 1293 | 5 (0.78), 6/6, 0 extra | 3 (0.53), 1/1, 2 extra | 2 (0.65), 1/1, 1 extra | 1 (0.76), 1/1 | 0 of 2 | – | 12 (0.90), 5/6, 6 extra | 32 (0.73), 12/15, 14 extra |
-| 2536 | 12 (0.84), 9/10, 1 extra | 6 (0.52), 3/3, 3 extra | 3 (0.81), 2/2, 1 extra | 1 (0.33), 1/1 | 4 (0.56), 3/3 | 2 (0.81), 1/1, 1 extra | 15 (0.88), 9/9, 2 extra | 33 (0.77), 17/22, 13 extra |
-| 207 | 15 (0.87), 14/19, 0 extra | 9 (0.64), 5/5, 4 extra | 2 (0.89), 2/4 | 2 (0.74), 2/2 | 5 (0.61), 5/5 | – | 24 (0.78), 17/17, 4 extra | 62 (0.70), 26/31, 29 extra |
+| thing | `usda_5544` | `usda_5540` | `usda_5539` |
+|---|---|---|---|
+| room (any) | 6 (0.79), 6/16, 0 extra | 6 (0.72), 5/12, 0 extra | 9 (0.72), 8/14, 0 extra |
+| bedroom | 4 (0.59), 3/3, 1 extra | 4 (0.55), 2/2, 2 extra | 5 (0.48), 2/2, 3 extra |
+| bathroom | 2 (0.79), 1/1, 1 extra | 1 (0.53), 1/1, 0 extra | 1 (0.67), 1/1, 0 extra |
+| living room | 1 (0.31), 1/1 | 0 (peak 0.20), 0/1 | 0 (peak 0.29), 0/1 |
+| kitchen | **0** (peak 0.15), 0/1 | **0**, 0/1 | **0** (peak 0.13), 0/1 |
+| porch / closet / door / window / wall / fireplace | **0** | **0** | **0** |
+| stairs | 3 (0.73), no key | 3 (0.52), no key | 1 (0.70), no key |
+| *curved line* (= door swings) | 30 regions → **17/17** doors, 2 extra | 25 → **13/14**, 9 extra | **0** (this sheet's arcs are drawn lighter) |
+| *thick black line* (= walls) | 31 regions | 28 | 32 |
 
-*kitchen*, *living room*, *balcony*, *stairs*, *door*, *window* and *wall* find nothing on any plan at any
-confidence (the table also held three plans that were dropped in favour of a shorter workshop; their numbers were alike). Read the table to the class like this:
+Read to the class: **enclosed spaces work** (*room* finds the large rooms with 0.7–0.8 confidence and no extras;
+what it misses are the closets, which are 3–10 sq ft); **functions do not** (*kitchen*, *living room*, *porch*,
+*closet* — the model sees no object, only a word); **drawing conventions do not, but shapes do** (*door* → nothing,
+*curved line* → every swing; *wall* → nothing, *thick black line* → the wall runs). *bedroom* returns rooms in
+general, not bedrooms: the model is not reading the lettering. **No wording finds a window on any of these sheets**
+(*window*, *window opening*, *short parallel lines*, *gap in the wall*: 0 of 9, 0 of 11, 0 of 10), which is why
+windows are boxed by hand in Part 3.
 
-- **Enclosed spaces work.** *room* finds most rooms with high scores (0.66–0.87) and almost no extras;
-  what it misses are the smallest rooms (closets, WC) and it merges open-plan spaces. *bedroom* and
-  *bathroom* find the right rooms plus a few look-alikes. Functions without walls (*kitchen*, *living
-  room*) find nothing: the model sees no object, only a word.
-- **Symbols work when the symbol is a picture of the thing**: *toilet* (a bowl seen from above), *sink*,
-  *bathtub*.
-- **Drawing conventions are not in the vocabulary, but shapes are.** *door* finds nothing; *curved line*
-  finds every door swing (9/9, 17/17) with a few extras (the bathtub, the toilet, a corner). *wall*
-  finds nothing; *thick black line* finds most wall segments. *window* finds nothing by any word, so
-  windows are boxed by hand in Step 3a. Ask the students why: the model was trained on
-  photographs, in which a door is a slab in a frame and a wall is a surface; on a plan they are an arc
-  and a thick line. Describe what is *drawn*, not what it *means*.
-- **The confidence slider matters**: the useful range on drawings is 0.2–0.5. The notebooks default to 0.3.
+### 2.2 The take-off (workshop Part 3, homework Part 2)
 
-**The take-off (Step 3a, one cell per plan).** Three kinds of box in one drawing tool, in this order: the 5 m scale
-bar, every window, every room (small things first, so later boxes do not overlap them). The scale is read from the
-student's bar box and used for the areas (a 1 % scale error is a 2 % area error; the drawing's own scale is printed
-next to it). Windows are counted from the boxes against the answer key (found / missed / extra). Rooms: a bare box
-on a clean drawing makes SAM 3 cut out the furniture symbols, not the floor, so the notebook asks for *empty room*
-**with** the student's box as the example, keeps the region that fits the box best, clips it to the box, fills the
-holes left by symbols and removes the thick black walls. Measured through the notebook's own code with a bar box
-within ±3 px, window boxes within ±4 px and room boxes moved by −5 to +20 cm per side:
+Scale error is the student's reading against the answer key's own box for the same reference. "Find all" is one
+example box through `segment_like` at the confidence the key suggests.
 
-| plan | rooms matched | median error | above 25 % | total of the rooms vs the drawing | windows |
-|---|---|---|---|---|---|
-| 1293 | 5/5 | 3.9 % | 0 | −5 % | 5/5 |
-| 2536 | 9/9 | 1.4 % | 1 (the open hall ET, +27 %, with the open-plan note) | +1 % | 5/5 |
-| 207 | 19/19 | 1.7 % | 1 (the small entrance ET, −25 %) | −6 % | 25/25 |
+| sheet | scale error (main ref / cross-check) | counted by hand | find all (confidence: found / key, extras) | areas: n, median, worst |
+|---|---|---|---|---|
+| `usda_5544` | −0.6 % / +0.6 % | window 9/9, door 17/17, 0 extra | window (0.4) **2/9**; door (0.4) 10/17 | room n=16, **median 3.5 %**, worst 23 % |
+| `usda_5540` | −0.3 % / +0.5 % | window 11/11, door 14/14, 0 extra | window (0.3) 10/11, 1 ex; door (0.4) 14/14, 2 ex | room n=12, **median 3.6 %**, worst 28 % |
+| `usda_5539` | −0.3 % / +0.4 % | window 10/10, door 11/11, 0 extra | window (0.3) 10/10, 9 ex; door (0.4) 11/11, 5 ex | room n=14, **median 3.1 %**, worst 17 % |
+| `usda_5542` | −0.4 % / +0.5 % | window 14/14, door 12/12, 0 extra | window (0.4) 14/14, 8 ex; door (0.4) **1/12** | room n=14, **median 3.6 %**, worst 26 % |
+| `va_floor` | −1.4 % / −0.4 % (the bar) | water closet 5/5, lavatory 5/5 | water closet (0.5) **5/5, 0 ex**; lavatory (0.3) 3/5, 4 ex | room n=13, **median 4.3 %**, worst 11 % |
+| `va_ceiling` | −0.7 % / −0.4 % (the bar) | 2×4 41/41, 2×2 8/8, cans 14/14 | 2×4 (0.4) **39/41, 0 ex**; 2×2 (0.4) 8/8, 1 ex; cans (0.5) **14/14, 0 ex** | – (nothing to measure) |
+| `test_fp` | −3.2 % (a 95 px footing is a short ruler) | spread footing 10/10 | spread footing (0.3) **10/10**, 4 ex | footing n=10, **median 4.3 %**, worst 8.5 % |
+| `test_fp_2` | −1.4 % / −3.2 % (the F4.0) | square footing 19/19 | square footing (0.4) **19/19**, 1 ex | footing n=19, median 6.2 %, worst 19 %; pit n=1, 5.2 % |
+| `uscg_motorpool` | −1.7 % / −0.3 % | spread footing 20/20, grid bubble 32/32 | spread footing (0.3) 19/20, 5 ex; grid bubble (0.5) **32/32**, 2 ex | footing n=20, median 6.0 %, worst 32 %; **pit n=2, median 92 %** |
+| `uscg_pile` | −1.8 % / −0.1 % | pile footing 29/29 | pile footing (0.3) **29/29**, 2 ex | – (the caps are too small to measure) |
 
-Living rooms that continue into a dining area come out 10–15 % low (207, OH); the open-plan hall of 2536 comes out
-high because the model has no wall to stop at. Both are printed with a note and are the cases to discuss.
+Three of those numbers are **designed failures** and are the teaching points of their sheets:
+
+- `usda_5544` **window find-all 2 of 9** and `usda_5542` **door find-all 1 of 12**: the symbols are small and vary in
+  length, so one example does not generalise. The answer key's tip says so, and the cell prints it. Counting by hand
+  is the right answer on those sheets — which is exactly the judgement the lab is trying to teach.
+- `uscg_motorpool` **pits +92 %**: a 2'-0" × 2'-6" pit is 36 × 39 px on a 2270 px sheet. The mask leaks into the wall
+  footing around it and the cell prints "your box is only 36 px across… the number is your box, not the pit."
+- `va_floor` / `va_ceiling` **the graphic scale bar**: boxing it gives 43.1 px/ft against the printed dimension's
+  21.3. The take-off cell prints "your two readings disagree by 102 %. On an AREA that is about 308 %" and names
+  which one to use.
+
+Room totals against the answer key, same run: `usda_5544` −3.5 %, `usda_5540` −1.5 %, `usda_5539` −3.9 %,
+`usda_5542` −2.6 %, `va_floor` −7.3 %. Footing totals: `test_fp` −3 %, `test_fp_2` +2 %, `uscg_motorpool` +3 %.
+
+### 2.3 How a room mask becomes an area, and why (the "fill the bites" rule)
+
+A room mask stops correctly at the walls, but the door swings, counters, bathtubs, stairs and fireplaces drawn
+inside the room are cut out of it, so the raw pixel count reads low. Three read-outs were measured on all 69 rooms
+of the five sheets that have rooms, with the same student-like boxes (median and worst |error| per sheet):
+
+| sheet | raw pixels | **convex hull** | bounding box |
+|---|---|---|---|
+| `usda_5544` | 6.1 % / 28.2 % | **3.5 % / 20.7 %** | 2.3 % / 18.4 % |
+| `usda_5540` | 7.7 % / 13.8 % | **3.5 % / 24.6 %** | 2.1 % / **49.3 %** |
+| `usda_5539` | 6.5 % / 13.4 % | **3.8 % / 11.0 %** | 1.5 % / 23.9 % |
+| `usda_5542` | 7.3 % / 30.3 % | **4.0 % / 28.9 %** | 3.0 % / 23.0 % |
+| `va_floor` | 8.9 % / 16.6 % | **2.8 % / 7.1 %** | 3.4 % / 7.2 % |
+
+Split by shape (the answer key's polygon tells which rooms are not rectangles):
+
+| | rooms | raw | **convex hull** | bounding box |
+|---|---|---|---|---|
+| rectangular rooms | 62 | median 7.0 % | **median 3.5 %** | median 1.9 % |
+| non-rectangular rooms (L-shaped halls, living rooms, porches) | 7 | median 8.0 %, worst 13.4 % | **median 4.0 %, worst 24.6 %** | median 5.0 %, worst **49.3 %** |
+
+**The lab ships the convex hull** (`AREA_RULE = "hull"` in `aec_seg/ui.py`). The bounding box is better on a plain
+rectangle — it gives back the whole bite — but on an L-shaped room it adds the *entire* missing corner: the
+six-sided hall of `usda_5540` reads **+49 %** with the bounding box against +25 % with the hull, and the eight-sided
+hall of `usda_5539` +24 % against +11 %. The hull can add at most half of a missing corner, it halves the raw error
+on non-rectangular rooms as well as on rectangles, and its worst case is better than the bounding box's on four of
+the five sheets. The difference in the medians (3.5 % against 1.9 % on rectangles) is not worth a 49 % outlier that
+a student would have no way of spotting. When the hull has to fill back more than 15 % of a room, the cell says so
+and tells the student to look at the picture.
+
+Areas of single objects use `segment_visual` (the tracker head), never `segment_box`: with a loose student box the
+concept head returns the box itself (measured on this material at up to +95 %) while the tracker head still returns
+the object (+4 %).
 
 ## 3. Suggested workshop timing (90 min)
 
-| Min | Part | What to say / do |
+| Min | Part | What to do and say |
 |---|---|---|
-| 0–5 | Step 0 | Everyone switches the runtime to T4 GPU and runs Step 0 (clone, SAM 3 load: 2–3 min) while you explain detection (boxes) vs. segmentation (pixels) and why pixels can be counted. Choose *Run anyway* on Colab's author warning. |
-| 5–15 | Part 1 | Step 1a on the concrete-pour photo: *person*, *helmet*, *wet concrete*, *hose*, then a word that is not there; the confidences and the slider. Step 1b: a box around a worker, a click on a helmet: one object each, no words. Then Step 1c: browse the plans; point out the scale bar, the Finnish labels (legend in the notebook), and that the notebook knows every room's real area from the dataset's annotations. |
-| 15–30 | Part 2 | *room* on 1293: 5 regions, 5/5 rooms found, 0 extra. Then *toilet*, *sink*. Then *kitchen*, *window* and *door*: nothing, and the hit/miss overlay shows the red windows. Key message: the number is only as good as the word, and the drawing's answer key is how you find out. |
-| 30–60 | Part 3 | Step 3a on 1293 together: the bar box (zoom in), the five window boxes, the five room boxes, Submit; read the scale line, the window line, the room table and the total against the floor area. Then 2536 and 207 on their own (207 has 19 rooms and 25 windows: ten minutes). Discuss the open-plan note on 2536's hall. |
-| 60–78 | Part 4 | Wording (Step 4a, *door*): *door* vs *door arc* vs *curved line* vs *arc*. Inspector: weak regions with 20–40 % confidence and the room they sit on. Own words: *thick black line*, *circle*, *small rectangle*. |
-| 78–90 | Part 5 + wrap-up | Own plan through the app link if time allows (a photo of any plan works). Report template: `docs/MP4_Workshop_Report_Template.md`. |
+| 0–8 | Step 0 | Everyone switches the runtime to *T4 GPU* and runs Step 0 (clone + SAM 3 load, 2–3 min) while you explain detection (a box) versus segmentation (pixels), and why pixels can be turned into square feet. Choose *Run anyway* on Colab's author warning. |
+| 8–18 | Part 1 | Step 1a on the concrete-pour photo: *person*, *helmet*, *wet concrete*, then a word that is not in the photo; watch the confidences and the slider. Step 1b: a box around a worker, a click on a helmet — one object each, no words. Step 1c: browse the three drawings; point out that there is **no scale bar**, that the overall dimension lines are where the scale comes from, and that the notebook knows every room's drawn area. |
+| 18–32 | Part 2 | *room (any)* on `usda_5544`, then *bedroom*, then *kitchen*, *door*, *window*. The hit/miss overlay of Step 2b makes the failures visible: the windows are all red. Message: the number is only as good as the word, and the answer key is how you find out. |
+| 32–68 | Part 3 | Do Step 3a together, slowly: the scale box from arrowhead to arrowhead (zoom in), two or three windows, then every room; Submit; read the scale line, the count line and the room table. Then let them do 3b and 3c on their own (about 12 min each). Walk around: the two things that go wrong are a loose room box and boxing the *dimension line* instead of the span between the arrowheads. |
+| 68–80 | Part 4 | Step 4a with *door*: *door* finds nothing, *curved line* finds the swings. Step 4b: weak regions and what they sit on. Step 4c: *thick black line*, *circle*, *hatched square*. |
+| 80–90 | Part 5 + wrap-up | The upload app from the link (a photo of any drawing works). Point at `lab.report_summary()` for the numbers and at `docs/MP4_Workshop_Report_Template.md`. |
 
-## 4. Answer key and marking notes (100 points)
+If you are short of time, drop Step 3c (`usda_5539`) and set it as homework; it is the drawing where the L-shaped
+footprint and the porches make the take-off hardest.
 
-Points are suggestions. Accept any well-argued answer; the numbers below are what a correct run
-produces, with small variation because boxes are drawn by hand.
+## 4. Answer key for the report questions
 
-1. **Words that work and words that do not (12).** Rooms, bedrooms, bathrooms, toilets, sinks, bathtubs: found (few misses); kitchen, living room, door, window, wall: nothing. Found/missed/extra for two things at 0.3, e.g. 2536 *room* 9 of 10 found with 1 extra, *window* 0 of 5. Misses have in common: the smallest rooms, symbols that are not pictures of the thing, anything drawn as a convention.
-2. **The take-off, three plans (30, workshop) / three plans of their choice (30, homework).** Per plan: the scale reading within about 1 % of the drawing's; all windows found (a missed one is usually a box that did not cover the light-blue bar); every room with an error under 10 % except the open-plan hall of 2536 and the entrance of 207; the total of the rooms within a few percent of the floor area. Full marks need the reason for the worst rooms (open plan, a loose box, the mask stopping at a door opening) and the scale-squared remark. Homework: on 5018 the sheet prints KERROSALA 121 / 74 m² (gross floor area per storey) and HUONEISTOALA 98 / 68 m² (net): the sum of the rooms is a part of the net area, not the gross.
-3. **Wording and weak regions (12).** Step 4a (*door*): *door* and *arc* find nothing, *door arc* nothing or little, *curved line* every swing. Step 4b: any documented weak region and mistake; the advice to a colleague (check every number against the drawing, use boxes for the take-off, never trust a phrase count).
-4. **Own words (10).** *curved line* / *thick black line* / *circle* / *small rectangle* find swings, walls, toilet bowls and cabinets that *door*, *wall*, *toilet*, *cabinet* miss; a shape word works because the model was trained on photographs of things, not on the conventions that stand for them.
-5. **Own plans (12; 16 in the homework).** Phrase, count, area and a judgement per plan; what failed (hand-drawn plans, photos at an angle, plans with colour fills, drawings where the scale is unknown).
-6. **Reflection (24; 20 in the homework).** Useful: a first pass over many plans, counting repeated symbols, checking a room schedule; misleading: open-plan spaces, drawing conventions, anything without a scale. Needs: clean drawings, a scale bar or a known dimension, a room schedule to check against, a person who signs off.
+Points are suggestions out of 100. Accept any well-argued answer; the numbers below are what a correct run
+produces, with a few percent of variation because the boxes are drawn by hand.
 
-## 5. Known failure modes
+### Workshop
 
-- **Step 0 is slow.** SAM 3 is 3.4 GB; on Colab it downloads in one to two minutes. If the runtime has no GPU the precomputed steps still work; live steps take about a minute each on CPU.
-- **Step 0 asks for a restart.** Colab shipped an older `transformers` without SAM 3: Step 0 installs a newer one and asks for *Runtime → Restart session*; after the restart, run Step 0 again (the install is kept).
-- **Box-drawing tool missing** (Steps 1b, 3a). It is a third-party widget; Step 0 enables Colab's custom widget manager. Re-run Step 0, then the step.
-- **"The mask covers only N % of your box."** An open-plan space: the model has no wall to stop at. The box area printed with the note is the better estimate; that is the point of the note.
-- **A phrase finds nothing at all.** Expected for kitchen, living room, balcony, stairs, door, window, wall. Send the students to *curved line* / *thick black line* (Step 4a, 4c).
-- **A cell looks stuck.** *Runtime → Interrupt execution*, run the cell again. Nothing is lost.
-- **The app link could not be created.** Part 5 prints a link instead of embedding the app; if the tunnel fails, run the cell again.
-- **Licence.** CubiCasa5K is CC BY-NC-SA 4.0: teaching use is fine, commercial use is not, and derived overlays fall under the same licence.
+1. **Words that work and words that do not (12).** *room (any)* finds most enclosed spaces with high confidence
+   and few extras; *bedroom* returns rooms in general, not bedrooms (the model does not read the lettering);
+   *kitchen*, *living room*, *porch*, *closet*, *door*, *window*, *wall*, *fireplace* find nothing at all. The
+   found/missed/extra numbers are in section 2. What the misses have in common: the model was trained on
+   photographs, so it finds *things that look like things*; a room is an enclosed space it can see, a "kitchen" is
+   a function it cannot, and a window on a plan is a drawing convention, not a picture of a window.
+2. **The take-off numbers (20).** Per drawing: the scale within about 1 % of the answer key when the box is drawn
+   arrowhead to arrowhead; the windows and doors all found when each box covers its symbol; the room table with
+   most rooms inside ±8 %. The total of the indoor rooms should land within a few percent of the drawing's total.
+   Full marks need all three drawings and the total-versus-key comparison.
+3. **Why the worst rooms are worst (18).** Expected answers: the hall is a set of doorways, not a room, so the mask
+   is a cross and the printed area is a rectangle; a kitchen loses the counter and the range; a bathroom loses the
+   tub; a porch with a screen rail instead of a wall has nothing to stop the mask; a box drawn loosely pushes the
+   number up. Full marks mention that a 1 % error in the scale is a 2 % error in every area.
+4. **Wording and weak regions (16).** *door* → nothing, *curved line* → the swings (with the bathtub and a few
+   corners as extras); *wall* → nothing, *thick black line* → most wall runs. A documented weak region (what it
+   sits on, its confidence) and one plain mistake. The advice to a colleague should be: check every number against
+   the drawing, use boxes rather than phrases for a take-off, and never hand on a phrase count unchecked.
+5. **Own words (12).** A shape word works because the model was trained on photographs of *things*; on a drawing
+   a door is an arc, a wall is a thick black stripe and a window is a gap with thin lines in it. Those are shapes,
+   and shapes are what the model can be asked for.
+6. **Own drawing and reflection (22).** Their own sheet, the phrase, the result, a judgement. Useful in practice: a
+   first pass over many sheets, counting repeated symbols, checking a room schedule, sanity-checking someone else's
+   take-off. Misleading: open-plan spaces, anything without a known dimension, small symbols, any drawing where the
+   convention matters more than the picture. Needed before it goes into an estimate: a printed dimension or a
+   schedule to set and check the scale, clean drawings, and a person who signs off.
+
+### Homework
+
+1. **Floor plans (22).** Both sheets' scales, and on `va_floor` the two readings: the printed 10'-0" dimension gives
+   about 21.6 px/ft, the graphic bar about 43.3 px/ft. The bar is twice too long, so areas taken from it are **four
+   times** too small; the printed dimension is right. The room table of one sheet with the worst rooms named.
+2. **Structural plans (22).** Per sheet the scale route and the footing areas against the sizes the marks give
+   (`F12.0` = 12 ft, `E4'-6"` = 4 ft 6 in, and the `FOOTING SCHEDULE` on `uscg_motorpool`), plus the count from
+   *find all like my first box*. On `uscg_pile` the caps are 2'-6" × 5'-0" and only about 27 × 53 px on the sheet:
+   below roughly 60 px the mask stops tracing the symbol and becomes a rounded copy of the drawn box, so the
+   "area" is the student's box. That is why the sheet is a counting exercise only.
+3. **MEP (22).** The counts of 2×4 fixtures, 2×2 fixtures and recessed lights from one example each, the confidence
+   used, and what the extras were. A rotated example loses roughly 40 % of the count and doubles the false
+   positives. The trade words return nothing because SAM 3 has no notion of an MEP legend: a "light fixture" on
+   this sheet is a rectangle with a diagonal and a circle, and only shape words or an example box can reach it.
+4. **Own drawings (14).** Three sheets from at least two disciplines; what failed and why (hand-drawn sheets,
+   photographs at an angle, colour fills, symbols too small, no known dimension).
+5. **Reflection (20).** What decides reliability: how large the thing is on the sheet (about 60 px is the floor),
+   how regularly it repeats, and whether it is drawn as a simple closed outline. Counting repeated symbols is the
+   most reliable task in the whole lab; measuring small symbols is the least.
+
+## 5. Failure modes the students will meet
+
+- **A small symbol measures as the box that was drawn round it.** Below about **60 px across on the sheet** SAM 3
+  gives back a rounded copy of the box instead of the thing inside it (`uscg_pile`'s pile caps at 27 × 53 px, the
+  pits and post footings on `uscg_motorpool` at 36 px). The take-off cell prints three different warnings, in this
+  order: *your box is only N px across… the number is your box*; *the mask is N % of your box: it has spilled
+  outside the box*; and, at over 90 % fill, *look at the outline: if it is a rounded copy of your box…*. The third
+  one fires on correct readings too (a tight box round a footing is 92–101 % filled), so tell the students it is a
+  "check the picture" prompt, not a verdict.
+- **The wrong scale bar.** `va_floor` and `va_ceiling` carry a 0–16 ft graphic bar that is exactly 2× too long.
+  Boxing it gives about 43 px/ft against the printed dimension's 21.6. A student who trusts the bar gets every area
+  four times too small. This is the designed lesson of Step 2a; the answer key's note explains it in the printout.
+- **A rotated example box.** `segment_like` generalises to the symbol *family*, but a rotated example costs about
+  40 % of the count on the ceiling plan and starts returning the stipple-hatched toilet ceilings as extras. Tell
+  the students to pick a clean example lying the same way as most of the others.
+- **Open-plan spaces.** When the mask covers less than 60 % of the drawn box, the cell says so: there is no wall on
+  one side, so the number is set by where the box was drawn, not by the drawing. Do not mark those as errors.
+- **A phrase that finds nothing.** Expected for *kitchen*, *living room*, *porch*, *closet*, *door*, *window*,
+  *wall*, *stairs*, *fireplace*, and for every trade word on a structural or MEP sheet. Send the students to the
+  shape words (Step 4a and 4c).
+- **Boxing the dimension line instead of the dimension.** The scale box must go from arrowhead tip to arrowhead tip.
+  Boxing the whole line including the extension lines makes the scale a few percent too large, and every area
+  twice that much too small.
+- **Step 0 asks for a restart.** Colab has shipped an older `transformers` without SAM 3; Step 0 installs a newer
+  one and asks for *Runtime → Restart session*. Run Step 0 again after the restart; the install is kept.
+- **The box tool does not appear** (Steps 1b and every take-off). It is a third-party widget; Step 0 enables
+  Colab's custom widget manager. Re-run Step 0, then the step.
+- **The app link could not be created.** Part 5 prints a link instead of embedding the app; if the tunnel fails,
+  run the cell again.
 
 ## 6. Rebuilding or changing the material
 
-See `README.md`. The plans are chosen in `aec_seg/config.py` (`plans` of each set: CubiCasa sample id,
-resampling factor, title; `render=True` for the clean vector rendering, `False` for the scanned image);
-after a change run `build/prepare_plans.py --dir <extracted cubicasa5k>` (or `--zip cubicasa5k.zip`),
-`build/precompute_masks.py` (only new plans and phrases are computed) and `build/make_notebooks.py`.
-The vocabulary is `THINGS` in `aec_seg/config.py`; each entry says what to look up in the answer key.
-Check a candidate plan with `Sam3Engine.segment(img, "room")` before adding it: on some plans (CubiCasa 7696, dropped)
-*room* finds almost nothing.
+See `README.md`. In short: drop `<id>.png` and `<id>.key.json` into `data/sheets/<set>/`, add the id to that
+set's `credits.json`, then
 
-**Planned homework redesign.** Counting components on structural drawings: the two foundation plans of
-the original MP4 notebook (`test_fp.png`, `test_fp_2.png` in the SAM_Example_Image repository) plus, if
-wanted, the four public-domain foundation sheets used in an earlier version (US Army standard drawings
-21-01-78 and 21-01-30, HABS Whittier hospital S1, HAER Shenandoah-Dives Mill; in git history before commit
-b802e88). Measured on those sheets: *small square* finds the spread footings (score 0.8–0.85), *circle*
-the grid bubbles, *hexagon* the footing tags; one box on a footing finds the rest with extras (about twice
-the true count at 0.3, close to it at 0.5); a tight box on a footing gives its area.
+```bash
+python -m aec_seg.data data/sheets/workshop data/sheets/homework   # validate every answer key
+python build/precompute_masks.py                                   # workshop phrases (GPU, a few minutes)
+python build/make_notebooks.py
+```
+
+The notebooks are generated from the answer keys: the sheet list, the labels of the box-drawing tool, the task
+text under each take-off cell and the credits all come out of the key files, so a new sheet needs no code change.
+`aec_seg/data.py` validates every key and the notebook refuses to open a set with a broken one — pixel boxes
+outside the image, a room type outside the vocabulary, two scale references marked `use`, a missing legend image
+and so on are reported in plain words with the file and the field.
+
+The vocabulary of Part 2 and Step 4a is `THINGS` in `aec_seg/config.py`; each entry says which wordings to
+precompute and what to look up in the answer key. `AREA_RULE` in `aec_seg/ui.py` selects how a room mask is turned
+into an area (see section 2); `MIN_SYMBOL_PX` is the size below which the cell warns that the answer is the box.

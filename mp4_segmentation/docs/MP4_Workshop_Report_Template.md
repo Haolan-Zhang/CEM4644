@@ -1,14 +1,14 @@
-# CEM4644 · MP4 report — Workshop (in class)
+# CEM4644 - MP4 report: Workshop (in class)
 
 Name: ______________________    Date: ____________
 
-Notebook: `MP4_Workshop_Segmentation.ipynb` — plans: *Residential floor plans, set A*.
+Notebook: `MP4_Workshop_Segmentation.ipynb`.
 
-Answer every question in a few sentences. Paste screenshots where the question asks for overlays or tables. Numbers must come from **your** run of the notebook.
+Answer every question in a few sentences. Paste screenshots where the question asks for an overlay or a table. Every number must come from **your** run of the notebook.
 
 ## Question 1
 
-From Step 2a and 2b: which words found what they should (rooms? toilets? windows? doors?), and which found nothing or something else? Give the found / missed / extra counts for two things on one plan at confidence 0.3, and say what the misses have in common.
+From Steps 2a and 2b: which words found what they should (rooms? bedrooms? doors? windows?), and which found nothing or something else? Give the found / missed / extra numbers for two things on one drawing at confidence 0.3, and say what the misses have in common.
 
 *Your answer:*
 
@@ -16,7 +16,7 @@ From Step 2a and 2b: which words found what they should (rooms? toilets? windows
 
 ## Question 2
 
-From Step 3a on each of the three plans: your scale reading and its error, the table of rooms (your m², the drawing's m², the error), the total of your rooms against the drawing's floor area, and the windows found / missed / extra. Which rooms came out worst, and why (your box, an open-plan space, the mask stopping at a door opening, the scale)?
+From Step 3 on all three drawings: your scale reading on each drawing and how far it is from the answer key; your window count (found / missed / extra); and the room table (your square feet, the drawing's, the error) for the drawing you did best on. What is the total of your rooms against the drawing's indoor total?
 
 *Your answer:*
 
@@ -24,7 +24,7 @@ From Step 3a on each of the three plans: your scale reading and its error, the t
 
 ## Question 3
 
-From Step 4a: which wording worked best for the thing you chose, and how different were the counts and areas? From Step 4b: describe one weak region (what it sits on, its confidence) and one plain mistake, and what you would tell a colleague who wants to use these square metres in a cost estimate.
+Which rooms came out worst, and why? Look at the pictures and name the reason for at least three of them (a loose box, a kitchen counter or a bathtub eaten out of the mask, a hall that is really a set of doorways, an open space with no wall on one side, the scale). If you used the *find all like my first box* dropdown, say what it found and what it missed.
 
 *Your answer:*
 
@@ -32,7 +32,7 @@ From Step 4a: which wording worked best for the thing you chose, and how differe
 
 ## Question 4
 
-From Step 4c: which of your own words found something the named things could not (for example *curved line* for the door swings, *thick black line* for the walls)? Why does a shape word work on a drawing where the name of the thing does not?
+From Step 4a: which wording worked best for the thing you chose, and how different were the counts? From Step 4b: describe one weak region (what it sits on, its confidence) and one plain mistake. What would you tell a colleague who wants to put these square feet in a cost estimate?
 
 *Your answer:*
 
@@ -40,7 +40,7 @@ From Step 4c: which of your own words found something the named things could not
 
 ## Question 5
 
-Test 1 plan(s) of your own (any floor plan from the internet or a course). For each: the phrase you used, the count and area measured, and whether the mask is right. What kind of drawing or wording failed?
+From Step 4c: which of your own words found something that the name of the thing could not (for example *curved line* for the door swings, *thick black line* for the walls)? Why does a shape word work on a drawing where the name of the thing does not?
 
 *Your answer:*
 
@@ -48,7 +48,7 @@ Test 1 plan(s) of your own (any floor plan from the internet or a course). For e
 
 ## Question 6
 
-Where in a project would a take-off like this be useful, and where would it mislead? What would you need (clean drawings, a scale, a room schedule, a person checking) to turn it into numbers you would put in an estimate?
+Test one drawing of your own (any floor plan or construction drawing). What phrase did you use, what did it find, and was the mask right? Then: where in a project would a take-off like this be useful, and where would it mislead you? What would you need (clean drawings, a known dimension, a room schedule, a person checking) before you would put these numbers in an estimate?
 
 *Your answer:*
 
