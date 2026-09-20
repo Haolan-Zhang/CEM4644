@@ -23,7 +23,10 @@ in MP4: SAM 3 is used as it comes.
    the area and, for the room words, the answer key's hits / misses / extras.
 3. **The take-off**, one cell per drawing: box the printed overall dimension (the scale) and the second dimension as a
    check, then box every room. The notebook prints your scale next to the key's and every room as
-   *your sq ft | the drawing's sq ft | error % | what the sheet prints*. Nothing is counted on these three sheets.
+   *your sq ft | the drawing's sq ft | error % | what the sheet prints*. Nothing is counted in these cells; Step 3d
+   then shows SAM 3's fourth prompt: **one box around one door as an example**, and the model finds every other
+   door on the sheet (the key marks found / missed / extra). Doors, not windows: from any example box the model
+   finds a median 11/17, 14/14 and 11/11 doors, but only 2/9 windows on the first sheet.
 4. **Where it goes wrong**: wording, the region inspector, words of their own.
 5. **Their own drawing** in a small Gradio app, opened from a link.
 

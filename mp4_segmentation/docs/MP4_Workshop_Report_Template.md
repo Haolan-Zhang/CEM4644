@@ -32,7 +32,7 @@ Which rooms came out worst, and why? Look at the pictures and name the reason fo
 
 ## Question 4
 
-From Step 4a: which wording worked best for the thing you chose, and how different were the counts? From Step 4b: describe one weak region (what it sits on, its confidence) and one plain mistake. What would you tell a colleague who wants to put these square feet in a cost estimate?
+From Step 3d: on each of the three drawings, the best count you got from one example box (found / missed / extra, and the confidence), and how much the count changed when you picked a different door as the example. Which drawing was hardest and why? In Step 2 the word *door* found nothing: why does one example work where the word does not?
 
 *Your answer:*
 
@@ -40,13 +40,21 @@ From Step 4a: which wording worked best for the thing you chose, and how differe
 
 ## Question 5
 
-From Step 4c: which of your own words found something that the name of the thing could not (for example *curved line* for the door swings, *thick black line* for the walls)? Why does a shape word work on a drawing where the name of the thing does not?
+From Step 4a: which wording worked best for the thing you chose, and how different were the counts? From Step 4b: describe one weak region (what it sits on, its confidence) and one plain mistake. What would you tell a colleague who wants to put these square feet in a cost estimate?
 
 *Your answer:*
 
 
 
 ## Question 6
+
+From Step 4c: which of your own words found something that the name of the thing could not (for example *curved line* for the door swings, *thick black line* for the walls)? Why does a shape word work on a drawing where the name of the thing does not?
+
+*Your answer:*
+
+
+
+## Question 7
 
 Test one drawing of your own (any floor plan or construction drawing). What phrase did you use, what did it find, and was the mask right? Then: where in a project would a take-off like this be useful, and where would it mislead you? What would you need (clean drawings, a known dimension, a room schedule, a person checking) before you would put these numbers in an estimate?
 

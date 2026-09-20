@@ -28,6 +28,7 @@ class SegLab:
         self.apps = {}
         self.takeoffs: Dict[str, dict] = {}     # the students' take-off of each drawing, for the summary
         self.phrases: Dict[tuple, dict] = {}    # (sheet, phrase) -> what the phrase cell found, for the summary
+        self.found: Dict[str, dict] = {}        # sheet -> what one example box found (workshop Step 3d), for the summary
 
     # ------------------------------------------------------------------ setup
     def setup(self, dataset: str = "workshop", load_model: bool = True, install: bool = True):
@@ -160,6 +161,11 @@ class SegLab:
         self._need()
         ui.phrase_check(self, self._sid(sheet), phrase, float(confidence), compare)
 
+    def find_like(self, sheet):
+        """Workshop: one example box, and SAM 3 finds every other one of the same thing (checked against the key)."""
+        self._need()
+        ui.find_like(self, self._sid(sheet))
+
     def takeoff(self, sheet):
         self._need()
         ui.takeoff(self, self._sid(sheet))
@@ -190,6 +196,14 @@ class SegLab:
             missing = [sh.id for sh in self.sheets if sh.id not in self.takeoffs]
             if missing:
                 print(f"\nNot done yet: {', '.join(missing)}.")
+        if self.found:
+            print("\nWhat SAM 3 found from ONE example box:")
+            for sid, counts in self.found.items():
+                for cat, c in counts.items():
+                    if "error" in c:
+                        continue
+                    print(f"  {sid}: '{cat}' at confidence >= {c['threshold']:.2f}: {c['matched']} of the drawing's "
+                          f"{c['truth']} found, {len(c['missed'])} missed, {len(c['extra'])} extra region(s)")
         if self.phrases:
             print(f"\nYour phrases ({len(self.phrases)}) - what SAM 3 found from words alone:")
             for (sid, ph), r in self.phrases.items():

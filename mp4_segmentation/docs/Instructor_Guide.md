@@ -12,9 +12,9 @@ box-drawing tool, tables of square feet next to the drawing's own numbers, and a
 | Teaches SAM 3 | yes: photo steps, ask-by-name, wording, inspector | no: straight into the take-off |
 | Take-off | one cell per drawing (Step 3a/3b/3c) | one cell per discipline (Steps 2a, 3a, 4a), a dropdown of that discipline's sheets, and after each a phrase cell (Steps 2b, 3b, 4b: `lab.ask`, the same things asked for by name and scored against the key) |
 | What is taken off | the scale (two readings) and the area of every room | areas (rooms, footings, pits) **and** counts |
-| Counts | none: the three floor plans are rooms only | one box labelled `example: <thing>` per counting category; SAM 3 finds the rest and the key checks it |
+| Counts | not in the take-off cells (rooms only); Step 3d counts the doors from one `example: door` box, scored against the key | one box labelled `example: <thing>` per counting category; SAM 3 finds the rest and the key checks it |
 | Own drawings | 1 | 3, from at least two disciplines |
-| Report questions | 6 | 5 |
+| Report questions | 7 | 5 |
 | Time | about 90 min | about 2.5 h |
 
 Everything is in feet and square feet. **The scale is never taken from a scale bar.** On every sheet the student
@@ -85,9 +85,9 @@ of the model, so the lab no longer asks for one.
 
 | sheet | scale error (main ref / cross-check) | count from one `example:` box (confidence: matched / key, extras) | areas: n, median, worst |
 |---|---|---|---|
-| `usda_5544` | −0.6 % / +0.6 % | – (rooms only) | room n=16, **median 3.5 %**, worst 23 % |
-| `usda_5540` | −0.3 % / +0.5 % | – (rooms only) | room n=12, **median 3.6 %**, worst 28 % |
-| `usda_5539` | −0.3 % / +0.4 % | – (rooms only) | room n=14, **median 3.1 %**, worst 17 % |
+| `usda_5544` | −0.6 % / +0.6 % | Step 3d, door (0.4): median **11/17** over all 17 possible examples (1–17), 0 extra; only 1 example finds all 17 | room n=16, **median 3.5 %**, worst 23 % |
+| `usda_5540` | −0.3 % / +0.5 % | Step 3d, door (0.4): median **14/14** (1–14), 2 extra; 9 of 14 examples find all | room n=12, **median 3.6 %**, worst 28 % |
+| `usda_5539` | −0.3 % / +0.4 % | Step 3d, door (0.4): median **11/11** (1–11), 4 extra; 6 of 11 examples find all | room n=14, **median 3.1 %**, worst 17 % |
 | `usda_5542` | −0.4 % / +0.5 % | – (rooms only) | room n=14, **median 3.6 %**, worst 26 % |
 | `va_floor` | −1.4 % / −0.4 % (the bar) | water closet (0.5) **5/5, 0 ex**; lavatory (0.3) 5/5, **9–10 ex** | room n=13, **median 4.3 %**, worst 11 % |
 | `va_ceiling` | −0.7 % / −0.4 % (the bar) | 2×4 (0.4) **39/41, 0 ex**; 2×2 (0.4) 8/8, 1 ex; cans (0.5) **14/14, 0 ex** | – (nothing to measure) |
@@ -177,8 +177,9 @@ the object (+4 %).
 | 0–8 | Step 0 | Everyone switches the runtime to *T4 GPU* and runs Step 0 (clone + SAM 3 load, 2–3 min) while you explain detection (a box) versus segmentation (pixels), and why pixels can be turned into square feet. Choose *Run anyway* on Colab's author warning. |
 | 8–18 | Part 1 | Step 1a on the concrete-pour photo: *person*, *helmet*, *wet concrete*, then a word that is not in the photo; watch the confidences and the slider. Step 1b: a box around a worker, a click on a helmet — one object each, no words. Step 1c: browse the three drawings; point out that there is **no scale bar**, that the overall dimension lines are where the scale comes from, and that the notebook knows every room's drawn area. |
 | 18–32 | Part 2 | *room (any)* on `usda_5544`, then *bedroom*, then *kitchen*, *door*, *window*. The hit/miss overlay of Step 2b makes the difference visible: the room words light up green and red on the key, while *kitchen*, *door* and *window* return nothing to draw at all. Message: the number is only as good as the word, and the answer key is how you find out. |
-| 32–68 | Part 3 | Do Step 3a together, slowly: the scale box from arrowhead to arrowhead (zoom in), then the second dimension down the side, then every room; Submit; read the two scale lines and the room table. Then let them do 3b and 3c on their own (about 12 min each). Walk around: the two things that go wrong are a loose room box and boxing the *dimension line* instead of the span between the arrowheads. |
-| 68–80 | Part 4 | Step 4a with *door*: *door* finds nothing, *curved line* finds the swings. Step 4b: weak regions and what they sit on. Step 4c: *thick black line*, *circle*, *hatched square*. |
+| 32–62 | Part 3 | Do Step 3a together, slowly: the scale box from arrowhead to arrowhead (zoom in), then the second dimension down the side, then every room; Submit; read the two scale lines and the room table. Then let them do 3b and 3c on their own (about 12 min each). Walk around: the two things that go wrong are a loose room box and boxing the *dimension line* instead of the span between the arrowheads. |
+| 62–70 | Step 3d | One box round one door on `usda_5540` (arc included): 14/14. Then the same on `usda_5544`: 11 or so of 17, the double door and the closet doors missed. Pick a poor example on purpose (a closet door in the corner) and watch the count collapse: the example is the prompt. Windows were left out on purpose: a median 2/9 on `usda_5544` (faint, varying lengths). |
+| 70–80 | Part 4 | Step 4a with *door*: *door* finds nothing, *curved line* finds the swings. Step 4b: weak regions and what they sit on. Step 4c: *thick black line*, *circle*, *hatched square*. |
 | 80–90 | Part 5 + wrap-up | The upload app from the link (a photo of any drawing works). Point at `lab.report_summary()` for the numbers and at `docs/MP4_Workshop_Report_Template.md`. |
 
 If you are short of time, drop Step 3c (`usda_5539`) and set it as homework; it is the drawing where the L-shaped
@@ -197,24 +198,30 @@ produces, with a few percent of variation because the boxes are drawn by hand.
    found/missed/extra numbers are in section 2. What the misses have in common: the model was trained on
    photographs, so it finds *things that look like things*; a room is an enclosed space it can see, a "kitchen" is
    a function it cannot, and a window on a plan is a drawing convention, not a picture of a window.
-2. **The take-off numbers (20).** Per drawing: both scale readings within about 1 % of the answer key when each box
+2. **The take-off numbers (18).** Per drawing: both scale readings within about 1 % of the answer key when each box
    is drawn arrowhead to arrowhead, and the 1.6–2.1 % disagreement between the two dimensions of a 1940 scan noticed
    (the cell prints it, and what it does to an area); the room table with most rooms inside ±8 %. The total of the
    indoor rooms should land within a few percent of the drawing's total. Full marks need all three drawings and the
    total-versus-key comparison.
-3. **Why the worst rooms are worst (18).** Expected answers: the hall is a set of doorways, not a room, so the mask
+3. **Why the worst rooms are worst (16).** Expected answers: the hall is a set of doorways, not a room, so the mask
    is a cross and the printed area is a rectangle; a kitchen loses the counter and the range; a bathroom loses the
    tub; a porch with a screen rail instead of a wall has nothing to stop the mask; a box drawn loosely pushes the
    number up. Full marks mention that a 1 % error in the scale is a 2 % error in every area.
-4. **Wording and weak regions (16).** *door* → nothing, *curved line* → the swings (with the bathtub and a few
+4. **One example, all the doors (10).** Best counts around 14/14 on `usda_5540`, 11/11 on `usda_5539`, 11–13 of 17
+   on `usda_5544` (the double door and the closet doors go missing), extras mostly the bathtub and a porch corner.
+   A different example changes the count: a poor one (a closet door, a door boxed without its arc) can drop it to a
+   handful, because the box *is* the prompt. Hardest: `usda_5544`, where the swings are small and several doors
+   are double. Why an example beats the word: SAM 3 matches what it *sees* in the box (an arc and a gap) against the
+   rest of the sheet, whereas the word *door* means a photographed door, which a drawing never contains.
+5. **Wording and weak regions (14).** *door* → nothing, *curved line* → the swings (with the bathtub and a few
    corners as extras); *window* → nothing, and none of its three alternatives does better. (In Step 4c, typed live:
    *wall* → nothing, *thick black line* → most wall runs.) A documented weak region (what it
    sits on, its confidence) and one plain mistake. The advice to a colleague should be: check every number against
    the drawing, use boxes rather than phrases for a take-off, and never hand on a phrase count unchecked.
-5. **Own words (12).** A shape word works because the model was trained on photographs of *things*; on a drawing
+6. **Own words (10).** A shape word works because the model was trained on photographs of *things*; on a drawing
    a door is an arc, a wall is a thick black stripe and a window is a gap with thin lines in it. Those are shapes,
    and shapes are what the model can be asked for.
-6. **Own drawing and reflection (22).** Their own sheet, the phrase, the result, a judgement. Useful in practice: a
+7. **Own drawing and reflection (20).** Their own sheet, the phrase, the result, a judgement. Useful in practice: a
    first pass over many sheets, counting repeated symbols, checking a room schedule, sanity-checking someone else's
    take-off. Misleading: open-plan spaces, anything without a known dimension, small symbols, any drawing where the
    convention matters more than the picture. Needed before it goes into an estimate: a printed dimension or a

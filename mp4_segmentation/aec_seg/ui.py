@@ -519,11 +519,12 @@ def _span(box, axis: str) -> float:
     return abs(box[2] - box[0]) if axis == "x" else abs(box[3] - box[1])
 
 
-def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None):
+def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None, count_categories=None):
     """The whole take-off of one drawing, without any widget.
 
     boxes:     [(label, [x1, y1, x2, y2])] in full-image pixels; the labels are `Sheet.box_labels()`.
     threshold: the confidence the counts use (None = the value each answer key suggests).
+    count_categories: which of the sheet's counting categories to run (None = all of them).
 
     Nothing here is a tally of the student's own boxes. A COUNT always comes from the model: the student
     draws ONE box labelled 'example: <category>' and SAM 3 (`segment_like`) finds everything else like it,
@@ -573,7 +574,7 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
         return float(px) / (px_per_ft * px_per_ft)
 
     # ---------------------------------------------------------------- 2. counts: one example box, SAM 3 finds the rest
-    for cat in sheet.count_categories:
+    for cat in (sheet.count_categories if count_categories is None else count_categories):
         mine = drawn.get(sheet.example_label(cat), [])
         if not mine:
             rep["counts_todo"].append(cat)
@@ -713,7 +714,12 @@ def print_takeoff(sheet, rep):
         if sc.get("trust"):
             print(f"  Use '{sc['trust']}' for the take-off - read the note on the other one above to see why it is different.")
     print(f"  Areas below use {sc['used_px_per_ft']:.2f} px per foot (from {sc['from']}).")
+    print_counts(rep)
+    print_areas(sheet, rep)
 
+
+def print_counts(rep):
+    """The counting part of a report: what SAM 3 found from one example box, against the key."""
     if rep["counts"] or rep.get("counts_todo"):
         print("\nWHAT SAM 3 COUNTED FROM YOUR EXAMPLE BOX")
         for cat, c in rep["counts"].items():
@@ -732,6 +738,9 @@ def print_takeoff(sheet, rep):
             print(f"  {cat}: not counted. Draw ONE clean box labelled 'example: {cat}' and submit again; "
                   "the count comes from the model, not from your boxes.")
 
+
+def print_areas(sheet, rep):
+    """The measuring part of a report: every area, the room total, the footing total."""
     for cat, rows in rep["areas"].items():
         print(f"\nAREAS - {cat.upper()}")
         print(f"  {'#':>2} {'your sq ft':>11s} {'drawing':>9s} {'error':>7s}  what the sheet prints / note")
@@ -773,10 +782,10 @@ def takeoff(lab, sheet_id: str):
     img = sheet.load()
     disp = img.copy(); disp.thumbnail((1400, 1400)); scale = img.width / disp.width
     buf = io.BytesIO(); disp.save(buf, "PNG")
-    labels = sheet.box_labels()
+    cats = sheet.count_categories if getattr(lab.spec, "takeoff_counts", True) else []
+    labels = [l for l in sheet.box_labels() if cats or not l.startswith("example: ")]
     widget = BBoxWidget(classes=labels)
     widget.image_bytes = buf.getvalue()
-    cats = sheet.count_categories
     controls, sl, sl0 = [], None, None
     if cats:                                  # only a sheet with something to count needs the confidence
         sl0 = float(sheet.hint(cats[0])["threshold"])
@@ -806,7 +815,7 @@ def takeoff(lab, sheet_id: str):
                          "Run Step 0 with load_model ticked."); return
         msg.value = "Running SAM 3 on your boxes..."
         thr = sl.value if (sl is not None and abs(sl.value - sl0) > 1e-9) else None   # moved = the student decides
-        over, rep = takeoff_compute(lab, sheet.id, boxes, threshold=thr)
+        over, rep = takeoff_compute(lab, sheet.id, boxes, threshold=thr, count_categories=cats)
         with out:
             out.clear_output(wait=True)
             viz.show_image(over, 1100)
@@ -816,3 +825,55 @@ def takeoff(lab, sheet_id: str):
                      "Copy the numbers into your report, then go to the next drawing.")
 
     display(w.VBox([msg, widget, *controls, out]))
+
+
+def find_like(lab, sheet_id: str):
+    """Workshop Step 3d: ONE box around one door and SAM 3 finds every other door on the sheet. This is the model's
+    own exemplar prompt (a box as a visual example, no words); the answer key marks what it found and missed."""
+    import ipywidgets as w
+    from IPython.display import display
+    from jupyter_bbox_widget import BBoxWidget
+    sheet = lab.sheets[sheet_id]
+    cats = sheet.count_categories
+    if not cats:
+        print(f"{sheet.id} has nothing to count in its answer key."); return
+    img = sheet.load()
+    disp = img.copy(); disp.thumbnail((1400, 1400)); scale = img.width / disp.width
+    buf = io.BytesIO(); disp.save(buf, "PNG")
+    labels = [sheet.example_label(c) for c in cats]
+    widget = BBoxWidget(classes=labels)
+    widget.image_bytes = buf.getvalue()
+    sl0 = float(sheet.hint(cats[0])["threshold"])
+    sl = w.FloatSlider(value=sl0, min=0.1, max=0.9, step=0.05, description="confidence >=",
+                       continuous_update=False, readout_format=".2f")
+    what = " and ".join(plural(len(sheet.counts[c]), c) for c in cats)
+    msg = w.HTML(f"<b>{sheet.id} - {sheet.title}</b>: the answer key lists {what}.<br>"
+                 "Draw <b>ONE</b> box around one of them - a door is the opening <i>and</i> its swing arc - with the "
+                 "<b>example:</b> label above the picture, then <b>Submit</b>. SAM 3 looks for everything like it; the "
+                 "answer key marks the real ones found (green), missed (red) and the regions that are not one (blue). "
+                 "Zoom with the mouse wheel.")
+    out = w.Output()
+
+    @widget.on_submit
+    def _go():
+        boxes = [(b.get("label", labels[0]),
+                  [b["x"] * scale, b["y"] * scale, (b["x"] + b["width"]) * scale, (b["y"] + b["height"]) * scale])
+                 for b in widget.bboxes if str(b.get("label", "")).startswith("example: ")]
+        if not boxes:
+            msg.value = "Draw one box first, with an <b>example:</b> label."; return
+        if lab.engine is None:
+            msg.value = "SAM 3 is not loaded. Run Step 0 with load_model ticked."; return
+        msg.value = "SAM 3 is looking for everything like your example..."
+        thr = sl.value if abs(sl.value - sl0) > 1e-9 else None
+        drawn = {l for l, _ in boxes}
+        over, rep = takeoff_compute(lab, sheet.id, boxes, threshold=thr,
+                                    count_categories=[c for c in cats if sheet.example_label(c) in drawn])
+        with out:
+            out.clear_output(wait=True)
+            viz.show_image(over, 1100)
+            print_counts(rep)
+        lab.found.setdefault(sheet.id, {}).update(rep["counts"])
+        msg.value = ("Done. Try another example (one in a cluttered corner, one drawn the other way round), move the "
+                     "confidence, then do the next drawing. Every run is kept for the summary.")
+
+    display(w.VBox([msg, widget, w.HBox([sl]), out]))

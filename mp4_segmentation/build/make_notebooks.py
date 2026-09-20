@@ -166,6 +166,7 @@ def build_workshop():
     cells = [header("workshop", 90, """1. Meet SAM 3 on an ordinary site photo: ask by name, draw a box, tap an object. Then look at the three drawings.
 2. Ask for rooms, doors and windows **by name** on a drawing, and check the rooms against the drawing's own answer key.
 3. Do the **take-off**: set the scale from a printed dimension, then measure every room in square feet - one cell per drawing.
+   Then box **one** door and let SAM 3 find all the others.
 4. Look at where the model goes wrong: the words, the weak regions, and words of your own.
 5. Try a drawing of your own."""), step0("workshop")]
 
@@ -177,11 +178,13 @@ what belongs to the object. Count the pixels and you have an area; know the scal
 makes it useful for a **quantity take-off**.
 
 The model is **SAM 3** (Segment Anything Model 3, Meta 2025). You do not train it, and it has no fixed list of classes.
-You tell it *what* or *where*, in one of three ways:
+You tell it *what* or *where*, in one of four ways:
 
 - a **phrase**, such as *helmet* or *wet concrete*: it returns every region that matches, each with a **confidence**;
 - a **box** around one object: it cuts out that object's exact outline;
-- a **click** on one object: the same thing, from a single point.
+- a **click** on one object: the same thing, from a single point;
+- a box around one object **as an example**: it returns every object on the picture that looks like it. No words,
+  and that is how a count is made (Step 3d).
 
 Two steps on an ordinary site photo first, so that you see what the model does before it meets a drawing.
 """))
@@ -245,10 +248,11 @@ the label above the picture before you draw, and draw in this order:
 
 Then press *Submit*.
 
-There is nothing to **count** on these three sheets, and that is deliberate: counting a repeated symbol is a job for the
-model, not for your pencil. Boxing every window yourself and ticking the boxes off against an answer key would tell you
-nothing about SAM 3. On the homework's structural and MEP sheets you draw **one** box labelled *example: footing* (or
-*example: 2x4 light fixture*) and the model finds all the others like it - that count is a result you can judge.
+The take-off cells measure rooms and nothing else. Counting is a separate job, and it is a job for the model, not for
+your pencil: boxing every door yourself and ticking the boxes off against an answer key would tell you nothing about
+SAM 3. So Step 3d does it the model's way - you draw **one** box around one door and SAM 3 finds all the others -
+and the answer key tells you how many it got. On the homework's structural and MEP sheets the same one box counts
+footings and light fixtures.
 
 How a *room* box becomes square feet: a box on its own makes SAM 3 cut out the *furniture symbols* inside it rather than
 the floor (it was trained to find objects). So the notebook asks for *empty room* **and** hands it your box, keeps the
@@ -268,6 +272,24 @@ swings take out of a rectangular room, and converts the pixels with **your** sca
                        "(a loose box, a kitchen counter or a bathtub eaten out of the mask, a hall that is really a set of "
                        "doorways, an open space with no wall on one side, the scale). Did the notebook warn you about any of "
                        "them, and was the warning right?"))
+    cells.append(md("""
+### Box one, and SAM 3 finds the rest
+
+In Step 2 the word *door* found nothing. Now give the model an **example** instead of a word: one box around one door,
+the opening and its swing arc together. SAM 3 looks at what is inside your box and returns everything on the sheet that
+looks like it - the fourth way of asking from Part 1. The answer key marks what it found and what it missed, so the
+count is checked, not taken on trust. Which door you pick matters: a clean single door in a quiet spot is a good
+example; a double door or a closet door in a cluttered corner is a poor one, and the count drops.
+"""))
+    cells.append(form("Step 3d - Box one door, and SAM 3 finds the rest", "lab.find_like(drawing)",
+                      notes=["Draw ONE box around one door (arc included), label it *example: door*, Submit. Then try another "
+                             "example on the same sheet, and the other two sheets: on one of them the doors are drawn so that "
+                             "even a good example misses several. Needs the live model."],
+                      params=[param_choice("drawing", labels[1], labels)]))
+    cells.append(q.add("From Step 3d: on each of the three drawings, the best count you got from one example box (found / "
+                       "missed / extra, and the confidence), and how much the count changed when you picked a different door "
+                       "as the example. Which drawing was hardest and why? In Step 2 the word *door* found nothing: why does one "
+                       "example work where the word does not?"))
 
     cells.append(md("""
 ## Part 4 - Where it goes wrong

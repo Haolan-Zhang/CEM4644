@@ -56,6 +56,7 @@ class SheetSet:
     description: str
     masks: str = ""                      # "" = no precomputed masks (the homework does not need any)
     default_sheet: str = ""              # "" = the first one in credits.json
+    takeoff_counts: bool = True          # False: the take-off cells measure only; counting from one example has its own step
     things: List[Thing] = field(default_factory=lambda: list(THINGS))
 
     def thing(self, name_or_key: str) -> Thing:
@@ -79,6 +80,7 @@ def register(spec: SheetSet) -> SheetSet:
 
 register(SheetSet(
     key="workshop",
+    takeoff_counts=False,                # Step 3d counts doors from one example; the take-off cells (3a-3c) are rooms only
     title="Three 1940 USDA farmhouse plans",
     folder="data/sheets/workshop",
     masks="data/masks/workshop",
