@@ -11,14 +11,14 @@ work without a key; a student's own prompt or image runs live and needs their fr
 |---|---|---|
 | Classification | 14 façade-defect photos, 7 classes (MP2 test split) | 20 computer-generated façade-style images, 10 classes (MP2) |
 | Detection | 6 site-safety photos, 52 boxes (MP3 test split) | 6 machinery photos, 9 boxes (MP3) |
-| Plans | 1293, 2536, 207 (the whole of MP4 set A, clean renderings) | 8138, 10715, 11615, 5018 (MP4 set B, scanned; 5018 has both storeys on one sheet) |
+| Plans | `usda_5544`, `usda_5540`, `usda_5539`: MP4's three 1940 USDA farmhouse plans (public domain), answer keys in square feet | 8138, 10715, 11615, 5018 (the earlier MP4 set of CubiCasa scans, metres; 5018 has both storeys on one sheet) |
 | Own experiments | 2 | 3 |
 | Time | about 90 min | about 2 h |
 
 The specialists the generalist is compared with are the earlier labs' own course models, run once by
 `build/prepare_data.py`: MP2's ConvNeXt V2 femto (93 % on the 14 workshop photos, 100 % on the 20 style images), MP3's
 YOLO11n at confidence 0.25, and MP4's SAM 3 asked for *room* by phrase (whole instances, so its areas include the
-furniture holes: 19–21 % median error).
+furniture holes: 7–14 % median error on the USDA plans, 19–21 % on the scans).
 
 ## 1b. The chat-window variants (`*_chat.ipynb`)
 
@@ -76,13 +76,14 @@ when they keep the defaults). Live runs vary by a photo or two.
 | Detection, all six photos, schema | recall **90 %** (47/52), precision 82 %, 10 extra | MP3 YOLO: recall 87 %, precision 90 % | per label: person 17/19, helmet 12/12, NO helmet 1/3 (+3 extra), vest 7/7, NO vest 10/11 |
 | Detection, JSON only asked for | recall 88 %, precision 92 % | | all six replies parse; NO helmet 0/3 |
 | Counting (asked for the number) | site 1: 1 NO helmet of 4 workers (key 3 of 4; its own boxes say 3); site 3: 1 of 3 (key 0; boxes 0); the other four photos right | | the direct count and the box count disagree on two photos: the lesson of Step 3c |
-| Rooms, LLM polygons + schema | 1293: 5/5 rooms, median error 0 %; 2536: 8/9, 16 %; 207: 18/19, 6 % | MP4 SAM 3 'room': 5/5 at 19 %, 8/9 at 11 %, 14/19 at 4 % | the model names the rooms right and places the outlines loosely; over all 31 matched rooms the median is 8 % and 7 rooms are off by more than 25 % |
-| Rooms, LLM boxes + SAM 3 (plain notebooks only) | 1293: 5/5, 9 %; 2536: 8/9, 16 %; 207: 17/19, 20 % | | the lite model's boxes are a little loose, so SAM 3 does not gain over the polygons here; `gemini-3.8-flash` gave boxes within a few pixels of the answer key in the first probe (but it allows 20 requests a day) |
-| Rooms without the schema | 1293: the polygons are dropped, areas come from the boxes (4/5 at 3 %); 2536: the reply is not valid JSON; 207: 20 entries, no polygons, 18/19 at 4 % | | the long coordinate lists are where a plain JSON request breaks |
-| Step 4b, all 3 plans at once (chat notebooks) | 31 matched rooms, median 8 %, 7 above 25 % | | 11 s and about 6,100 tokens for the three plans, against three rounds of copying by hand |
+| Rooms, LLM polygons + schema | usda_5544: 6/14 rooms, median error 7 % (worst 33 %); usda_5540: 2/11, 28 %; usda_5539: 5/12, 13 % | MP4 SAM 3 'room': 5/14 at 8 %, 4/11 at 7 %, 6/12 at 14 % | the lite model names the big rooms right and skips the closets and halls (14 rooms in the key of usda_5544, 6 in the reply); on these clean line drawings its "mask" is just the box's four corners (usda_5544, usda_5539) or two corners (usda_5540, unusable, so the box's area is used), so the polygon route is a box route in disguise; over all 13 matched rooms the median is 13 % and 3 rooms are off by more than 25 % |
+| Rooms, LLM boxes + SAM 3 (plain notebooks only) | usda_5544: 12/14, median 6 % (worst 74 %, the hall); usda_5540: 10/11, **37 %** (worst 72 %, the kitchen); usda_5539: 5/12, 30 % | | the box prompt returns nearly every room (14 and 11 entries), so SAM 3 gets to measure many more of them than the polygon route finds, and on usda_5544 it does so well; on usda_5540 the lite model's boxes sit a room off and SAM 3 faithfully measures the wrong rectangles — the lesson of Step 4c is that the finding and the measuring are separate jobs and the first one failed. `gemini-3.8-flash` gave boxes within a few pixels of the answer key in the first probe (but it allows 20 requests a day) |
+| Rooms without the schema | usda_5544: 9 entries, no usable polygon, box areas 6/14 at 1 %; usda_5540: 5/11 at 21 %; usda_5539: 6/12 at 10 % | | all three replies parse: with masks this short there is no long coordinate list to break the JSON, so the schema contrast on these plans is about the *shape* of the reply, not its validity (the homework scans still break without the schema) |
+| Step 4b, all 3 plans at once (chat notebooks) | 13 matched rooms, median 13 %, 3 above 25 % | | 7 s and about 4,800 tokens for the three plans, against three rounds of copying by hand |
 
-Worst rooms in both modes are the open-plan hall (1293 ET, +65 to +80 %: the model extends it into the kitchen) and
-the walk-in closet of 2536 (missed).
+Worst rooms: the L-shaped hall of usda_5544 (+74 % through SAM 3: the box spans the whole L and the mask fills it),
+the kitchen of usda_5540 (−72 %, a misplaced box), the bath of usda_5544 (+33 % from the polygon route). The five
+closets and the halls are missed by every route: the generalist stops at the rooms with a printed name.
 
 **Homework**
 
@@ -97,7 +98,7 @@ the walk-in closet of 2536 (missed).
 | Rooms without the schema | 8138 and 10715: the reply is not valid JSON (long coordinate lists); 11615: 5/6 at 15 %; 5018: 15 entries but only 1 room matched, 60 % off | | |
 | Step 4b, all 4 plans at once (chat notebooks) | 30 matched rooms, median 11 %, 9 above 25 % | | 12 s and about 7,400 tokens; with the schema off, two of the four replies are unusable, which is the switch worth showing in class |
 
-The scans (set B) versus the clean drawings (set A) is the point of homework question 6: polygons drift into
+The scans versus the workshop's clean USDA drawings is the point of homework question 6: polygons drift into
 furniture and dimension strings, extra regions appear, and the boxes-to-SAM 3 route holds up better on the
 cluttered plan but not on the small one.
 
@@ -109,7 +110,7 @@ cluttered plan but not on the small one.
 | 8–22 | Part 1 | Step 1b: a free question. Step 1c: the same prompt run three times without and with a schema; count the valid replies, the fences, the label drift. The point: a person can read prose, a program cannot. |
 | 22–40 | Part 2 | Step 2a with the three prompts: read the confusion table, look at the mistakes with the model's reasons. Step 2b: change one thing in the prompt (a rule, a description) and rerun live. Discuss overfitting a prompt to 14 photos. |
 | 40–58 | Part 3 | Step 3a on one photo, Gemini next to YOLO. Step 3b: recall and precision. Step 3c: ask for the number vs count the boxes; when they disagree, which one is wrong? |
-| 58–75 | Part 4 | Step 4a: polygons (watch the JSON break on long coordinate lists without a schema). Step 4b: the boxes to SAM 3, or, in the chat notebooks, every plan at once. Step 4c: room by room, three ways. |
+| 58–75 | Part 4 | Step 4a: polygons (on these plans the model's "mask" is the box's corners — show the raw reply; the JSON only breaks without a schema on the homework's scans). Step 4b: the boxes to SAM 3, or, in the chat notebooks, every plan at once. Step 4c: room by room, three ways, usda_5544 first (the box route does well) then usda_5540 (the boxes are off and SAM 3 measures the wrong rectangles). |
 | 75–90 | Part 5 + wrap-up | The prompt lab (opened from the printed link) with a phone photo. Step 6: the table. Report template: `docs/MP5_Workshop_Report_Template.md`. |
 
 ## 5. Answer key and marking notes (100 points)

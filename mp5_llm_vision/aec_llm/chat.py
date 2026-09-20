@@ -280,7 +280,7 @@ def chat_rooms(lab, plan: str):
     from . import ui
     ex = lab.examples
     p = ex.plan(plan)
-    prompt = C.PROMPTS["rooms_masks"]
+    prompt = C.fill("rooms_masks", lab.spec)
     order = w.Dropdown(options=ORDERS, value=ORDERS[0], description="box order", style={"description_width": "80px"}, layout=w.Layout(width="360px"))
     scale = w.Dropdown(options=SCALES, value=SCALES[0], description="numbers are", style={"description_width": "90px"}, layout=w.Layout(width="320px"))
 
@@ -290,14 +290,14 @@ def chat_rooms(lab, plan: str):
             print(f"⚠️ The reply could not be read as a list of rooms ({r.error or 'no list found'}). Raw: {text[:300]}"); return
         rows, skipped = tasks.measure_rooms(r, p, "llm", sam=None)
         viz.show_image(ui._seg_image(p, rows, "llm"), 820)
-        table_rows = [(rw.label, rw.how, f"{rw.m2:.1f}", (rw.truth["label"] or rw.truth["type"]) if rw.truth else "—", f"{rw.truth_m2:.1f}" if rw.truth else "—",
+        table_rows = [(rw.label, rw.how, f"{rw.area:.1f}", (rw.truth["label"] or rw.truth["type"]) if rw.truth else "—", f"{rw.truth_area:.1f}" if rw.truth else "—",
                        f"{rw.err_pct:+.0f} %" if rw.truth else "no room of the drawing fits", rw.note) for rw in rows]
-        print(viz.table(table_rows, ["model label", "area from", "model m²", "drawing room", "drawing m²", "error", "note"], [12, 9, 9, 13, 10, 24, 46]))
+        print(viz.table(table_rows, ["model label", "area from", f"model {p.unit_label}", "drawing room", f"drawing {p.unit_label}", "error", "note"], [12, 9, 9, 13, 10, 24, 46]))
         summ = tasks.seg_summary(rows, p)
         n_poly = sum(1 for rw in rows if rw.poly)
         print(f"\nChat model: {summ['rooms_found']}/{summ['rooms_truth']} rooms of the drawing found ({n_poly} of {len(rows)} entries had a usable polygon)"
               + (f", median error {summ['median_err']:.0f} % (worst {summ['max_err']:.0f} %)" if summ["median_err"] is not None else "")
-              + f"; model total {summ['total_model_m2']:.1f} m² vs floor area {summ['floor_area_m2']:.1f} m²." + (f" {skipped} unusable entries." if skipped else ""))
+              + f"; model total {summ['total_model']:.1f} vs floor area {summ['floor_area']:.1f} {p.unit_label}." + (f" {skipped} unusable entries." if skipped else ""))
         if rows and summ["rooms_found"] == 0:
             print("Nothing matched: if the shapes sit in the wrong place, try the other box order or scale above and score again.")
         sf, st, se = ui._specialist_seg(p)

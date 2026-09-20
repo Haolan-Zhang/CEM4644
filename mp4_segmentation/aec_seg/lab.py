@@ -27,6 +27,7 @@ class SegLab:
         self._cache: Dict[tuple, SegResult] = {}
         self.apps = {}
         self.takeoffs: Dict[str, dict] = {}     # the students' take-off of each drawing, for the summary
+        self.phrases: Dict[tuple, dict] = {}    # (sheet, phrase) -> what the phrase cell found, for the summary
 
     # ------------------------------------------------------------------ setup
     def setup(self, dataset: str = "workshop", load_model: bool = True, install: bool = True):
@@ -154,6 +155,11 @@ class SegLab:
         self._need()
         ui.live_phrase(self, self._sid(sheet), str(phrase), float(confidence))
 
+    def ask(self, sheet, phrase, confidence=0.3, compare="(nothing)"):
+        """Homework: a phrase straight to SAM 3 on a drawing, scored against one category of its answer key."""
+        self._need()
+        ui.phrase_check(self, self._sid(sheet), phrase, float(confidence), compare)
+
     def takeoff(self, sheet):
         self._need()
         ui.takeoff(self, self._sid(sheet))
@@ -176,14 +182,23 @@ class SegLab:
         if not self.takeoffs:
             print("\nYou have not submitted a take-off yet. Go back to the take-off step, draw the boxes and click Submit; "
                   "every submitted drawing is summarised here.")
-            return
-        print(f"\nYour take-offs ({len(self.takeoffs)} drawing(s)) - these are the numbers for your report:")
-        for sid, rep in self.takeoffs.items():
-            print(f"\n=== {sid}: {rep['title']}")
-            ui.print_takeoff(self.sheets[sid], rep)
-        missing = [sh.id for sh in self.sheets if sh.id not in self.takeoffs]
-        if missing:
-            print(f"\nNot done yet: {', '.join(missing)}.")
+        else:
+            print(f"\nYour take-offs ({len(self.takeoffs)} drawing(s)) - these are the numbers for your report:")
+            for sid, rep in self.takeoffs.items():
+                print(f"\n=== {sid}: {rep['title']}")
+                ui.print_takeoff(self.sheets[sid], rep)
+            missing = [sh.id for sh in self.sheets if sh.id not in self.takeoffs]
+            if missing:
+                print(f"\nNot done yet: {', '.join(missing)}.")
+        if self.phrases:
+            print(f"\nYour phrases ({len(self.phrases)}) - what SAM 3 found from words alone:")
+            for (sid, ph), r in self.phrases.items():
+                line = f"  {sid}: '{ph}' at confidence >= {r['threshold']:.2f}: {r['regions']} region(s)"
+                if r.get("compare"):
+                    line += f"; vs the key's '{r['compare']}': found {r['found']}/{r['truth']}, {r['extra']} extra"
+                if r.get("median_err") is not None:
+                    line += f", areas median {r['median_err']:.0f} % off (worst {r['worst_err']:.0f} %)"
+                print(line)
 
 
 lab = SegLab()

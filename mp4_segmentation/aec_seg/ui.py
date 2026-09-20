@@ -440,6 +440,80 @@ def live_phrase(lab, sheet_id: str, phrase: str, threshold: float):
     print(f"(SAM 3 took {res.seconds:.1f} s)")
 
 
+def phrase_check(lab, sheet_id: str, phrase: str, threshold: float, compare: str = "(nothing)"):
+    """Homework: a phrase typed straight to SAM 3 on any drawing, scored against one category of the answer key.
+
+    No box from the student: the words alone. 'compare' names an area category (room, footing, pit: hits, misses,
+    extras and the area of every region found) or a count category (hits, misses, extras), or '(nothing)'.
+    The result is kept in lab.phrases for the report summary."""
+    sheet = lab.sheets[sheet_id]
+    phrase = (phrase or "").strip()
+    if not phrase:
+        print("Type a phrase first."); return
+    if lab.engine is None and not (lab.store and lab.store.has(sheet.id, phrase)):
+        print("SAM 3 is not loaded. Re-run Step 0 with load_model ticked (and a GPU runtime)."); return
+    res = lab.get_phrase(sheet.id, phrase)
+    img = sheet.load()
+    idx = [int(i) for i in np.where(res.scores >= threshold)[0]]
+    pred = [list(map(float, res.boxes[i])) for i in idx]
+    cats = sheet.area_categories + [c for c in sheet.count_categories if c not in sheet.area_categories]
+    cat = None if compare in (None, "", "(nothing)") else compare
+    if cat and cat not in cats:
+        print(f"{sheet.id} has no '{cat}' in its answer key (it has: {', '.join(cats)}), so the regions are shown "
+              "without a score.")
+        cat = None
+    rec = {"sheet": sheet.id, "phrase": phrase, "threshold": float(threshold), "regions": len(pred), "proposed": len(res),
+           "sqft": sheet.sqft(int(res.union(threshold).sum())) if pred else 0.0, "compare": cat}
+    if cat is None:
+        viz.show(viz.three_panel(img, res, "#ff70a6", f"{sheet.id} - '{phrase}'", threshold, what="drawing"))
+        print_result(sheet, phrase, res, threshold)
+        if cats:
+            print(f"Pick one of {', '.join(cats)} under 'compare' to score these regions against the answer key.")
+    else:
+        is_area = cat in sheet.area_categories
+        truth_items = sheet.areas(cat) if is_area else [{"box": b} for b in sheet.counts[cat]]
+        truth = [list(t["box"]) for t in truth_items]
+        iou = 0.3 if is_area else 0.2
+        ok, n_missed, n_extra, found_flags, extra_flags = match_boxes(pred, truth, iou=iou)
+        over = viz.instances_image(img, res, threshold, alpha=0.35)
+        d = ImageDraw.Draw(over)
+        for tb, f in zip(truth, found_flags):
+            d.rectangle(tb, outline=GREEN if f else RED, width=4)
+        for p, e in zip(pred, extra_flags):
+            if e:
+                d.rectangle(p, outline=BLUE, width=3)
+        viz.show_image(over, 1000)
+        print_result(sheet, phrase, res, threshold)
+        print(f"Answer key '{cat}': {len(truth)} on the drawing. Found {ok} (green), missed {n_missed} (red), "
+              f"{n_extra} extra region(s) that are not one (blue).")
+        rec.update(truth=len(truth), found=ok, missed=n_missed, extra=n_extra)
+        if is_area and ok:
+            rows = []
+            for t in truth_items:
+                best, bi = 0.0, -1
+                for j, i in enumerate(idx):
+                    v = box_iou(t["box"], pred[j])
+                    if v > best:
+                        best, bi = v, i
+                if bi >= 0 and box_hit(t["box"], list(map(float, res.boxes[bi])), iou):
+                    mine = sheet.sqft(int(res.masks[bi].sum()))
+                    tru = float(t["true_sqft"])
+                    rows.append((t.get("label") or t.get("type") or cat, mine, tru, (mine - tru) / tru * 100))
+            if rows:
+                print(f"\n  Each {cat} the phrase found, measured as the region comes (no box of yours, no clean-up):")
+                print(f"  {'':24} {'phrase sq ft':>12} {'drawing':>9} {'error':>7}")
+                for name, mine, tru, e in rows[:15]:
+                    print(f"  {str(name)[:24]:24} {mine:12,.1f} {tru:9,.1f} {e:+6.0f} %")
+                if len(rows) > 15:
+                    print(f"  ... and {len(rows) - 15} more")
+                errs = [abs(e) for *_, e in rows]
+                print(f"  Median error {np.median(errs):.0f} %, worst {max(errs):.0f} %, on {len(rows)} {cat}(s).")
+                rec.update(median_err=float(np.median(errs)), worst_err=float(max(errs)), measured=len(rows))
+    print(f"(SAM 3 took {res.seconds:.1f} s)")
+    lab.phrases[(sheet.id, phrase.lower())] = rec
+    return rec
+
+
 # --------------------------------------------------------------------------- Part 3 / Part 2: the take-off cell
 def _span(box, axis: str) -> float:
     return abs(box[2] - box[0]) if axis == "x" else abs(box[3] - box[1])

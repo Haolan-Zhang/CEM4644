@@ -215,19 +215,20 @@ The MP3 task: {spec.sites.title[0].lower() + spec.sites.title[1:]}. The prompt a
     cells.append(q(*questions[-1]))
 
     # ------------------------------------------------------------------ Part 4
+    unit = "square feet" if spec.plans.units == "ft" else "square metres"
     cells.append(md(f"""
 ## Part 4 · Rooms on a floor plan
 
-The MP4 task on {spec.plans.description}. {"The prompt asks for each room's outline as a polygon (a list of points on the 0–1000 grid) and its label; the notebook converts the polygon to pixels and to m² with the plan's scale, and checks every room against the drawing's answer key, next to MP4's result (SAM 3 asked for *room* by phrase). First one plan by hand in the chat window, then all of them at once through the API." if chat else "Two ways to get square metres out of a language model:"}
+The MP4 task on {spec.plans.description}. {"The prompt asks for each room's outline as a polygon (a list of points on the 0–1000 grid) and its label; the notebook converts the polygon to pixels and to " + unit + " with the plan's scale, and checks every room against the drawing's answer key, next to MP4's result (SAM 3 asked for *room* by phrase). First one plan by hand in the chat window, then all of them at once through the API." if chat else f"Two ways to get {unit} out of a language model:"}
 {"" if chat else """
-- **LLM only:** the prompt asks for each room's outline as a polygon (a list of points on the 0–1000 grid) and its label; the notebook converts the polygon to pixels and to m² with the plan's scale.
+- **LLM only:** the prompt asks for each room's outline as a polygon (a list of points on the 0–1000 grid) and its label; the notebook converts the polygon to pixels and to """ + unit + """ with the plan's scale.
 - **LLM boxes + SAM 3:** the prompt asks only for a box per room; each box is handed to SAM 3 exactly as your own boxes were in MP4 (*empty room* + box, holes filled, walls removed). The language model does the *finding and naming*, the segmentation model does the *pixels*.
 
 Both are scored against the drawing's answer key, and MP4's result (SAM 3 asked for *room* by phrase) is shown for comparison."""}
 """))
     if chat:
         cells.append(form("▶ Step 4a · Rooms from the chat's polygons (one plan)", "lab.chat_rooms(plan)",
-                          notes=["Paste the reply back: the notebook converts the polygons, measures every room in m² and checks each against the drawing. "
+                          notes=[f"Paste the reply back: the notebook converts the polygons, measures every room in {unit} and checks each against the drawing. "
                                  "Long lists of coordinates are where chat replies break: look at what you get, and try a second plan."],
                           params=[f'plan = "{plans[0]}" #@param {jlist(plans)}']))
         cells.append(form(f"▶ Step 4b · All {len(plans)} plans at once (the API)", "lab.segment_all(schema)",
@@ -269,7 +270,7 @@ A small app, opened from a link: pick a built-in image or upload your own, choos
     cells.append(q(*questions[-1]))
     cells.append(form("▶ Numbers for your report", "lab.report_summary()"))
     cells.append(md("### Credits\n"
-                    f"- Photos: {spec.photos.source}.\n- Site photos: {spec.sites.source}.\n- Floor plans: CubiCasa5K (CC BY-NC-SA 4.0), prepared for MP4 (plans {', '.join(spec.plans.ids)}).\n"
+                    f"- Photos: {spec.photos.source}.\n- Site photos: {spec.sites.source}.\n- Floor plans: {spec.plans.source} (plans {', '.join(spec.plans.ids)}).\n"
                     + ("- Models: the chat model behind hokie.ai (Virginia Tech) for the single examples; Gemini (Google) through the Gemini API, free tier, for the batch steps.\n" if chat else
                        "- Model: Gemini (Google) through the Gemini API, free tier; SAM 3 (Meta, SAM License) from the MP4 folder.\n")
                     + "- Lab code: https://github.com/Haolan-Zhang/CEM4644 (folder `mp5_llm_vision`).\n"))

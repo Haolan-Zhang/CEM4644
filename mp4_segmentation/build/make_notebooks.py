@@ -318,7 +318,7 @@ what it *means*.
 
 # --------------------------------------------------------------------------- the homework notebook
 GROUP_TEXT = {
-    "floor": ("2a - Floor plans",
+    "floor": ("Floor plans",
               "On a floor plan you take off **areas of rooms**. Set the scale from a printed dimension, never from a scale "
               "bar: one of these two sheets carries a graphic scale bar that is wrong by a factor of two, and boxing it as "
               "well as the printed dimension is how you find that out. Then box every room the task asks for. The number "
@@ -326,14 +326,14 @@ GROUP_TEXT = {
               "the mask unless the room is a plain rectangle. The clinic sheet also asks for two **counts**, the water "
               "closets and the lavatories, and each one comes from a single box labelled *example: water closet* or "
               "*example: lavatory*."),
-    "structural": ("2b - Structural (foundation) plans",
+    "structural": ("Structural (foundation) plans",
                    "On a foundation plan you take off **areas of footings** and a **count of them**. The scale comes from a "
                    "printed bay dimension or from a footing whose width its mark gives you (F4.0 = 4'-0\" wide). The count "
                    "is made by the model from one box labelled *example: footing* - you never count them yourself. Two "
                    "things to watch: read the *same* edge of the ink at both ends (outside-to-outside or centre-to-centre, "
                    "not one of each), and remember that a symbol smaller than about 60 pixels on the sheet is too small for "
                    "the model - the mask becomes a rounded copy of your box, and the 'area' you get is the area you drew."),
-    "mep": ("2c - MEP plans",
+    "mep": ("MEP plans",
             "On an MEP sheet almost nothing is measured and almost everything is **counted**. The trade words - *light "
             "fixture*, *diffuser*, *sprinkler* - return nothing at all from the model, so counting is done the other way "
             "round: box **one** example of the symbol, labelled *example: 2x4 light fixture*, and the model finds every "
@@ -349,8 +349,9 @@ def build_homework():
     groups = {}
     for s in sheets:
         groups.setdefault(group_of(s.discipline), []).append(s)
-    cells = [header("homework", 120, """1. Look at the seven drawings: what each one is, what it shows, and what you have to take off from it.
-2. Do a take-off on each discipline in turn - floor plans, structural plans, MEP plans - with the same one cell.
+    cells = [header("homework", 150, """1. Look at the seven drawings: what each one is, what it shows, and what you have to take off from it.
+2. Do a take-off on each discipline in turn - floor plans, structural plans, MEP plans - with the same one cell, then
+   ask SAM 3 for the same things by phrase and see which way gets you a usable number.
 3. Try a drawing of your own."""), step0("homework")]
 
     cells.append(md(f"""
@@ -378,35 +379,58 @@ You already met SAM 3 in the workshop, so this notebook goes straight to the wor
                       params=[param_choice("drawing", "all", ["all"] + sheets.labels())]))
 
     cells.append(md("""
-## Part 2 - The take-off, discipline by discipline
+## Two ways of asking, on every discipline
 
-The same cell three times, with a different list of drawings. In each one: pick the drawing, then pick the label above
-the picture before each box you draw (the labels come from that sheet's answer key), then *Submit*.
+Each of the next three parts has two cells. The first is the **take-off**: pick the drawing, then pick the label above
+the picture before each box you draw (the labels come from that sheet's answer key), then *Submit*. Three kinds of
+label: **scale: ...** for a length whose size the sheet gives you, the plain word (**room**, **footing**, **pit**) for
+something you want the area of, and **example: ...** for something you want counted. One box labelled *example: pile
+footing* is all a count needs: SAM 3 goes and finds every other symbol on the sheet that looks like it, and that is how
+a count of 41 light fixtures or 29 pile footings is made. The slider under the picture sets how sure the model has to be
+before it keeps one of them.
 
-Three kinds of label: **scale: ...** for a length whose size the sheet gives you, the plain word (**room**, **footing**,
-**pit**) for something you want the area of, and **example: ...** for something you want counted. One box labelled
-*example: pile footing* is all a count needs: SAM 3 goes and finds every other symbol on the sheet that looks like it,
-and that is how a count of 41 light fixtures or 29 pile footings is made. The slider under the picture sets how sure the
-model has to be before it keeps one of them.
+The second cell is the other way of asking: **type a phrase** and SAM 3 looks for it on the whole sheet, with no box
+from you at all. *compare* picks the part of the answer key the regions are scored against: green for a real one found,
+red for one missed, blue for a region that is not one; for rooms and footings the notebook also measures every region
+the phrase found. Try the trade word first (*footing*, *light fixture*), then a word for the **shape on the paper**
+(*square*, *circle*, *rectangle with a diagonal line*), and move the confidence. Both cells feed the same report
+question: which way gets you a number you would put in an estimate, and which way is quicker?
 """))
+    part_no = {"floor": 2, "structural": 3, "mep": 4}
     for gid in ("floor", "structural", "mep"):
         gsheets = groups.get(gid, [])
         if not gsheets:
             continue
         gsheets.sort(key=lambda s: (len(s.discipline), s.id))   # the plainest sheet of the group first
+        n = part_no[gid]
         head, text = GROUP_TEXT[gid]
-        cells.append(md(f"### Step {head}\n\n{text}\n\n" + "\n".join(
+        cells.append(md(f"## Part {n} - {head}\n\n{text}\n\n" + "\n".join(
             f"- **{s.id}** ({s.title}): " + " ".join(s.tasks) for s in gsheets)))
         glabels = [s.label for s in gsheets]
         what = {"floor": "a floor plan", "structural": "a structural plan", "mep": "an MEP sheet"}[gid]
-        cells.append(form(f"Step {head.split(' - ')[0]} - Take-off on {what}",
+        cells.append(form(f"Step {n}a - Take-off on {what}: your boxes",
                           "lab.takeoff(drawing)",
                           notes=[f"Do **every** drawing in this list, one at a time: {', '.join(s.id for s in gsheets)}. "
                                  "Zoom with the mouse wheel. Copy each table into your report."],
                           params=[param_choice("drawing", glabels[0], glabels)]))
+        cats = []
+        for s in gsheets:
+            for c in s.area_categories + s.count_categories:
+                if c not in cats:
+                    cats.append(c)
+        default_phrase, phrase_note = PHRASE_HINTS[gid]
+        cells.append(form(f"Step {n}b - Ask by name on {what}: a phrase",
+                          "lab.ask(drawing, phrase, confidence, compare)",
+                          notes=[phrase_note,
+                                 "The phrase goes to SAM 3 exactly as typed. *compare* picks what the regions are scored against; "
+                                 "a drawing that has no such thing in its answer key says so and shows the regions anyway. "
+                                 "Run the cell as often as you like; every run is kept for the summary."],
+                          params=[param_choice("drawing", glabels[0], glabels),
+                                  f'phrase = {json.dumps(default_phrase)} #@param {{type:"string"}}', CONF,
+                                  param_choice("compare", cats[0], ["(nothing)"] + cats)]))
         cells.append(q.add(QUESTION_BY_GROUP[gid]))
 
-    cells.append(md("## Part 3 - Your own drawing"))
+    cells.append(md("## Part 5 - Your own drawing"))
     cells.append(form("Your drawing, your words", "lab.upload_app()",
                       notes=["This cell prints a **link**: open it in a new tab (it works on a phone too). Upload a drawing of your "
                              "own, type what to find, move the threshold.",
@@ -418,8 +442,9 @@ model has to be before it keeps one of them.
                        "right. Which kind of drawing failed, and can you say why?"))
     cells.append(q.add("Across the three disciplines: which take-off task was the most reliable and which the least, and what "
                        "decides that (the size of the thing on the sheet, how often it repeats, whether it is drawn as a simple "
-                       "outline)? Where would you use this in practice, where would it mislead you, and what would you insist on "
-                       "having (a known dimension, a schedule, a second pair of eyes) before putting these numbers in an estimate?"))
+                       "outline)? Boxes or phrases: for each discipline, say which way you would use and why. Where would you use "
+                       "this in practice, where would it mislead you, and what would you insist on having (a known dimension, a "
+                       "schedule, a second pair of eyes) before putting these numbers in an estimate?"))
 
     cells.append(md("## Wrap-up"))
     cells.append(form("Numbers for your report", "lab.report_summary()",
@@ -431,20 +456,35 @@ model has to be before it keeps one of them.
 
 
 QUESTION_BY_GROUP = {
-    "floor": ("From the floor plans: your scale reading on each sheet and how far it is from the answer key. On the VA clinic "
-              "sheet you were asked to box the graphic scale bar as well as the printed dimension - what did the two give, and "
-              "which one is right? (Work out what the areas would have been if you had trusted the bar.) Then the room table of "
-              "one sheet: your square feet, the drawing's, the error. Which rooms are worst and why? Finally, the two counts SAM 3 "
-              "made from your example boxes on the clinic sheet (found / missed / extra): which of the two would you hand on, and "
-              "which would you check yourself first?"),
-    "structural": ("From the structural plans: for each sheet, the scale and how you set it, the areas of the footings you "
-                   "measured against the sizes their marks give, and the count SAM 3 made from your one *example: footing* box "
-                   "(found / missed / extra). One sheet asks you only to count, because its pile caps are too small to measure - "
-                   "what happens to the measured area of something that small, and why?"),
-    "mep": ("From the ceiling plan: the count of each symbol that SAM 3 made from your one example box (found / missed / extra), "
-            "the confidence you used, and what the extras were. Try a second example box of the same symbol, one that is rotated "
-            "or sits in a cluttered spot, and report how the count changes. Why do the words *light fixture* and *diffuser* "
-            "return nothing?"),
+    "floor": ("From Step 2a: your scale reading on each sheet and how far it is from the answer key. On the VA clinic sheet you "
+              "were asked to box the graphic scale bar as well as the printed dimension - what did the two give, and which one "
+              "is right? (Work out what the areas would have been if you had trusted the bar.) Then the room table of one sheet: "
+              "your square feet, the drawing's, the error. Which rooms are worst and why? The two counts SAM 3 made from your "
+              "example boxes on the clinic sheet (found / missed / extra): which would you hand on, which would you check first? "
+              "Then from Step 2b: what did *room* find on each sheet (found / missed / extra, and the median error of the areas "
+              "it measured) against the rooms from your boxes? What did *door* and *window* return, and what did *curved line*?"),
+    "structural": ("From Step 3a: for each sheet, the scale and how you set it, the areas of the footings you measured against "
+                   "the sizes their marks give, and the count SAM 3 made from your one *example: footing* box (found / missed / "
+                   "extra). One sheet asks you only to count, because its pile caps are too small to measure - what happens to the "
+                   "measured area of something that small, and why? Then from Step 3b: does *footing* find anything? Which shape "
+                   "word finds the footings, on which sheet, with how many extras, and how do the areas it measures compare with "
+                   "the ones from your boxes? Did any phrase find the grid bubbles or the pile caps?"),
+    "mep": ("From Step 4a: the count of each symbol that SAM 3 made from your one example box (found / missed / extra), the "
+            "confidence you used, and what the extras were. Try a second example box of the same symbol, one that is rotated or "
+            "sits in a cluttered spot, and report how the count changes. Then from Step 4b: which words find any light fixture at "
+            "all - the trade words or the shape words - and does the best phrase get anywhere near the count from your one example "
+            "box (found / missed / extra for both)? Why do *light fixture* and *diffuser* return nothing on a drawing?"),
+}
+
+PHRASE_HINTS = {
+    "floor": ("room", "Try *room*, *bedroom*, *bathroom*, *door*, *window*; then *curved line* (a door swing is an arc on the "
+                      "paper) and, on the clinic sheet, *toilet* and *sink*. Compare with *room* for the areas, *water closet* "
+                      "or *lavatory* for the counts."),
+    "structural": ("footing", "Try *footing*, *foundation*, *column*; then *square* and *hatched square* for the footings, *rectangle* "
+                              "for the pile caps, *circle* for the grid bubbles. Compare with *footing* (hits and areas), *pit*, "
+                              "*pile footing* or *grid bubble*, and move the confidence: the extras go, then the real ones."),
+    "mep": ("light fixture", "Try *light fixture*, *light*, *diffuser*, *sprinkler*; then *rectangle with a diagonal line*, "
+                             "*small circle*, *circle with a cross*. Compare with the three fixture types of the answer key."),
 }
 
 

@@ -1,5 +1,5 @@
 {
  "photos": "BD3 Building Defect Dataset (CC-BY-4.0), the test photos of MP2",
  "sites": "Roboflow 100 'construction-safety' (CC-BY-4.0), the test photos of MP3",
- "plans": "CubiCasa5K (CC BY-NC-SA 4.0), prepared for MP4; see mp4_segmentation/README.md"
+ "plans": "U.S. Department of Agriculture, Miscellaneous Publication 360 (1940), public domain; prepared for MP4; see mp4_segmentation/README.md"
 }

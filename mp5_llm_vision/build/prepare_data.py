@@ -107,61 +107,71 @@ def sites(spec, out: Path, n_pick: int = 6):
 
 
 def plans(spec, out: Path):
-    # The plans and their answer keys were copied from an earlier version of the MP4 lab (its Finnish plan sets), which MP4
-    # no longer ships. The copies under data/<variant>/plans are therefore the source of truth: when MP4's old sets are
-    # not there, they are left exactly as they are.
+    """MP4's sheets (data/sheets/<set>/*.key.json, in feet) become MP5 plan keys, and the SAM 3 'room' result MP4
+    precomputed for them (data/masks/<set>) is stored as the specialist. The older metre-based copies of the Finnish
+    scans (a plan set MP4 no longer ships) are left exactly as they are."""
     sys.path.insert(0, str(MP4))
-    try:
-        from aec_seg.config import SETS
-        from aec_seg.data import MaskStore, PlanSet
-        from aec_seg.ui import box_iou
-        SETS[spec.plans.mp4_set]
-    except (ImportError, KeyError):
+    from aec_seg.config import SETS
+    from aec_seg.data import MaskStore, Sheets
+    from aec_seg.ui import box_iou
+    if spec.plans.mp4_set not in SETS:
         print(f"{spec.key}/plans: MP4 no longer ships the plan set '{spec.plans.mp4_set}'; keeping the existing copies in {out / 'plans'}")
         return
     s = SETS[spec.plans.mp4_set]
-    ps = PlanSet(MP4 / s.folder)
-    store = MaskStore(MP4 / s.masks)
+    sheets = Sheets(MP4 / s.folder, spec.plans.mp4_set)
+    store = MaskStore(MP4 / s.masks) if s.masks else None
     d = out / "plans"
     if d.exists():
         shutil.rmtree(d)
     d.mkdir(parents=True)
-    items = []
+    items, credits = [], []
     for pid in spec.plans.ids:
-        p = ps[pid]
-        shutil.copy(p.path, d / p.path.name)
-        shutil.copy(MP4 / s.folder / f"{pid}.key.json", d / f"{pid}.key.json")
-        res = store.load(pid, "room")
+        sh = sheets[pid]
+        shutil.copy(sh.path, d / sh.path.name)
+        rooms = [{"label": a["label"], "type": a["type"], "indoor": bool(a.get("indoor")), "printed": a.get("printed", ""),
+                  "box": a["box"], "poly": a["poly"], "area": float(a["true_sqft"])} for a in sh.areas("room")]
+        key = {"id": sh.id, "file": sh.path.name, "title": sh.title, "size": list(sh.size), "units": "ft",
+               "scale_units_per_px": 1.0 / sh.px_per_ft, "floor_area": round(sum(r["area"] for r in rooms if r["indoor"]), 1),
+               "rooms": rooms, "credit": sh.credit}
+        (d / f"{pid}.key.json").write_text(json.dumps(key, indent=1, ensure_ascii=False))
+        res = store.load(pid, "room") if store else None
         keep = np.where(res.scores >= 0.3)[0] if res is not None else []
-        rooms = []
-        for r in p.rooms(indoor_only=True):
+        spec_rooms = []
+        for r in rooms:
+            if not r["indoor"]:
+                continue
             best, bi = 0.0, -1
             for i in keep:
                 v = box_iou(r["box"], list(map(float, res.boxes[i])))
                 if v > best:
                     best, bi = v, int(i)
-            rooms.append({"label": r["label"], "type": r["type"], "truth_m2": r["area_m2"],
-                          "sam_m2": round(p.area_m2(res.masks[bi].sum()), 2) if best >= 0.3 else None})
-        items.append({"id": pid, "file": p.path.name, "key": f"{pid}.key.json", "title": p.title,
-                      "specialist": {"name": "MP4: SAM 3 asked for 'room' (confidence 0.3)", "rooms": rooms}})
-        found = sum(r["sam_m2"] is not None for r in rooms)
-        print(f"{spec.key}/plans: {pid} {p.title}: SAM 3 'room' found {found}/{len(rooms)} rooms")
-    (d / "index.json").write_text(json.dumps({"items": items, "credit": ps.credits_text()}, indent=1, ensure_ascii=False))
+            spec_rooms.append({"label": r["label"], "type": r["type"], "truth_area": r["area"],
+                               "sam_area": round(sh.sqft(res.masks[bi].sum()), 1) if best >= 0.3 else None})
+        items.append({"id": pid, "file": sh.path.name, "key": f"{pid}.key.json", "title": sh.title,
+                      "specialist": {"name": "MP4: SAM 3 asked for 'room' (confidence 0.3)", "rooms": spec_rooms}})
+        credits.append(sh.credit_line())
+        found = sum(r["sam_area"] is not None for r in spec_rooms)
+        print(f"{spec.key}/plans: {pid} {sh.title}: {len(rooms)} rooms in the key, SAM 3 'room' found {found}/{len(spec_rooms)} indoor rooms")
+    (d / "index.json").write_text(json.dumps({"items": items, "credit": "\n".join(credits)}, indent=1, ensure_ascii=False))
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--variants", nargs="*", default=list(SPECS))
+    ap.add_argument("--only", nargs="*", default=["photos", "sites", "plans"], help="which parts to rebuild")
     a = ap.parse_args()
     for key in a.variants:
         spec = SPECS[key]
         out = REPO / spec.folder
-        photos(spec, out)
-        sites(spec, out)
-        plans(spec, out)
+        if "photos" in a.only:
+            photos(spec, out)
+        if "sites" in a.only:
+            sites(spec, out)
+        if "plans" in a.only:
+            plans(spec, out)
         (out / "credits.json").write_text(json.dumps({
             "photos": spec.photos.source, "sites": spec.sites.source,
-            "plans": "CubiCasa5K (CC BY-NC-SA 4.0), prepared for MP4; see mp4_segmentation/README.md",
+            "plans": spec.plans.source + "; see mp4_segmentation/README.md",
         }, indent=1, ensure_ascii=False))
     print("done")
 

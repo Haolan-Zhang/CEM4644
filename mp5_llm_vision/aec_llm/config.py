@@ -46,11 +46,15 @@ class SiteSet:
 
 @dataclass
 class PlanRef:
-    """Segmentation examples: floor plans with answer keys, copied from MP4."""
+    """Segmentation examples: floor plans with answer keys, copied from MP4 (build/prepare_data.py)."""
     title: str
     mp4_set: str
     ids: List[str]
     description: str
+    units: str = "m"                    # "ft" for MP4's American sheets, "m" for the older scans
+    source: str = "CubiCasa5K (CC BY-NC-SA 4.0), prepared for MP4"
+    outdoor: str = "balcony, terrace, ULKOTILA"          # what the room prompts say to leave out
+    labels: str = "OH, MH, K"                            # example room labels the prompts quote
 
 
 @dataclass
@@ -112,8 +116,10 @@ register(LabSpec(
         mp3_key="construction_safety", mp3_model="models/construction_safety_yolo11n.pt",
         mp3_map={"person": "person", "helmet": "helmet", "no-helmet": "no-helmet", "vest": "vest", "no-vest": "no-vest"},
     ),
-    plans=PlanRef(title="Floor plans (clean drawings)", mp4_set="homes_a", ids=["1293", "2536", "207"],
-                  description="the three MP4 workshop plans: clean renderings of real Finnish homes (two flats and a 19-room house) with every room's real area in the answer key"),
+    plans=PlanRef(title="Floor plans (1940 USDA farmhouses)", mp4_set="workshop", ids=["usda_5544", "usda_5540", "usda_5539"],
+                  description="the three MP4 workshop plans: small farmhouse plans published by the U.S. Department of Agriculture in 1940, with every room's drawn area in the answer key, in square feet",
+                  units="ft", source="U.S. Department of Agriculture, Miscellaneous Publication 360 (1940), public domain; prepared for MP4",
+                  outdoor="the porches and the outside of the house", labels="BED ROOM, KITCHEN, LIVING ROOM, BATH, CL."),
 ))
 
 register(LabSpec(
@@ -184,11 +190,11 @@ PROMPTS: Dict[str, str] = {
               "{{\"{count_field}\": <integer>, \"total\": <integer>, \"reason\": <one short sentence>}}"),
     # segmentation on a plan
     "rooms_masks": ("This is an architectural floor plan. Give the segmentation masks for every room: the floor area inside the walls of each room, "
-                    "not the outdoor areas (balcony, terrace, ULKOTILA). Output a JSON list of segmentation masks where each entry contains the 2D bounding "
+                    "not the outdoor areas ({outdoor}). Output a JSON list of segmentation masks where each entry contains the 2D bounding "
                     "box in the key \"box_2d\" ([ymin, xmin, ymax, xmax] normalized to 0-1000), the segmentation mask in the key \"mask\", and the room "
                     "label as printed on the plan in the key \"label\"."),
     "rooms_boxes": ("This is an architectural floor plan. Detect every room: the floor area inside the walls of each room, not the outdoor areas "
-                    "(balcony, terrace, ULKOTILA). Output a JSON list where each entry has \"label\" (the room label printed on the plan, e.g. OH, MH, K) "
+                    "({outdoor}). Output a JSON list where each entry has \"label\" (the room label printed on the plan, e.g. {labels}) "
                     "and \"box_2d\" as [ymin, xmin, ymax, xmax] normalized to 0-1000, tight to the inside faces of the walls."),
 }
 CLASSIFY_PROMPTS = {"basic": "classify_basic", "with descriptions": "classify_described", "with descriptions and rules": "classify_careful"}
@@ -207,6 +213,8 @@ def fill(template_key: str, spec: LabSpec, **extra) -> str:
     )
     if template_key == "detect":
         fields["intro"] = s.intro; fields["classes"] = ", ".join(s.classes)
+    if template_key.startswith("rooms_"):
+        fields["outdoor"] = spec.plans.outdoor; fields["labels"] = spec.plans.labels
     fields.update(extra)
     return PROMPTS[template_key].format(**fields)
 

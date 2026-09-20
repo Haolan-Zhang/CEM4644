@@ -1,236 +1,260 @@
 {
  "items": [
   {
-   "id": "1293",
-   "file": "1293.png",
-   "key": "1293.key.json",
-   "title": "flat with four large rooms",
+   "id": "usda_5544",
+   "file": "usda_5544.png",
+   "key": "usda_5544.key.json",
+   "title": "Five-room farmhouse, 27 ft x 34 ft (USDA design 710-5544)",
    "specialist": {
     "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
     "rooms": [
      {
-      "label": "ET",
-      "type": "hall",
-      "truth_m2": 4.3,
-      "sam_m2": 9.0
-     },
-     {
-      "label": "K",
-      "type": "kitchen",
-      "truth_m2": 7.56,
-      "sam_m2": 9.0
-     },
-     {
-      "label": "OH",
-      "type": "living room",
-      "truth_m2": 14.69,
-      "sam_m2": 13.79
-     },
-     {
-      "label": "MH",
+      "label": "BEDROOM",
       "type": "bedroom",
-      "truth_m2": 10.64,
-      "sam_m2": 9.86
+      "truth_area": 164.0,
+      "sam_area": 157.8
      },
      {
-      "label": "KH",
+      "label": "BEDROOM",
+      "type": "bedroom",
+      "truth_area": 149.3,
+      "sam_area": 140.4
+     },
+     {
+      "label": "KITCHEN",
+      "type": "kitchen",
+      "truth_area": 118.5,
+      "sam_area": 88.3
+     },
+     {
+      "label": "BATH",
       "type": "bathroom",
-      "truth_m2": 2.61,
-      "sam_m2": 1.99
+      "truth_area": 40.0,
+      "sam_area": null
+     },
+     {
+      "label": "BEDROOM",
+      "type": "bedroom",
+      "truth_area": 169.3,
+      "sam_area": 151.4
+     },
+     {
+      "label": "LIVING AND DINING ROOM",
+      "type": "living room",
+      "truth_area": 289.2,
+      "sam_area": 266.9
+     },
+     {
+      "label": "HALL",
+      "type": "hall",
+      "truth_area": 41.0,
+      "sam_area": null
+     },
+     {
+      "label": "CL",
+      "type": "closet",
+      "truth_area": 9.8,
+      "sam_area": null
+     },
+     {
+      "label": "CL",
+      "type": "closet",
+      "truth_area": 8.9,
+      "sam_area": null
+     },
+     {
+      "label": "C.",
+      "type": "closet",
+      "truth_area": 4.1,
+      "sam_area": null
+     },
+     {
+      "label": "COATS",
+      "type": "closet",
+      "truth_area": 10.4,
+      "sam_area": null
+     },
+     {
+      "label": "CL",
+      "type": "closet",
+      "truth_area": 5.4,
+      "sam_area": null
+     },
+     {
+      "label": "L",
+      "type": "closet",
+      "truth_area": 3.0,
+      "sam_area": null
+     },
+     {
+      "label": "CL",
+      "type": "closet",
+      "truth_area": 4.9,
+      "sam_area": null
      }
     ]
    }
   },
   {
-   "id": "2536",
-   "file": "2536.png",
-   "key": "2536.key.json",
-   "title": "flat with three bedrooms",
+   "id": "usda_5540",
+   "file": "usda_5540.png",
+   "key": "usda_5540.key.json",
+   "title": "Four-room and attic farmhouse, 36 ft x 28 ft (USDA design 710-5540)",
    "specialist": {
     "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
     "rooms": [
      {
-      "label": "ET",
-      "type": "hall",
-      "truth_m2": 10.48,
-      "sam_m2": null
+      "label": "BEDROOM",
+      "type": "bedroom",
+      "truth_area": 131.6,
+      "sam_area": 127.2
      },
      {
-      "label": "VH",
-      "type": "walk-in closet",
-      "truth_m2": 4.26,
-      "sam_m2": 4.33
-     },
-     {
-      "label": "OH",
-      "type": "living room",
-      "truth_m2": 23.5,
-      "sam_m2": 0.11
-     },
-     {
-      "label": "K",
+      "label": "KITCHEN",
       "type": "kitchen",
-      "truth_m2": 12.12,
-      "sam_m2": 7.83
+      "truth_area": 166.3,
+      "sam_area": 116.4
      },
      {
-      "label": "MH",
-      "type": "bedroom",
-      "truth_m2": 11.41,
-      "sam_m2": 10.58
-     },
-     {
-      "label": "MH",
-      "type": "bedroom",
-      "truth_m2": 9.37,
-      "sam_m2": 8.05
-     },
-     {
-      "label": "MH",
-      "type": "bedroom",
-      "truth_m2": 9.26,
-      "sam_m2": 8.7
-     },
-     {
-      "label": "KH",
+      "label": "BATH",
       "type": "bathroom",
-      "truth_m2": 2.69,
-      "sam_m2": 1.51
+      "truth_area": 29.2,
+      "sam_area": null
      },
      {
-      "label": "WC",
-      "type": "bathroom",
-      "truth_m2": 1.37,
-      "sam_m2": 1.37
+      "label": "HALL",
+      "type": "hall",
+      "truth_area": 46.4,
+      "sam_area": null
+     },
+     {
+      "label": "BEDROOM",
+      "type": "bedroom",
+      "truth_area": 167.8,
+      "sam_area": 165.3
+     },
+     {
+      "label": "LIVING ROOM",
+      "type": "living room",
+      "truth_area": 270.8,
+      "sam_area": 244.0
+     },
+     {
+      "label": "CL.",
+      "type": "closet",
+      "truth_area": 6.4,
+      "sam_area": null
+     },
+     {
+      "label": "CL.",
+      "type": "closet",
+      "truth_area": 6.0,
+      "sam_area": null
+     },
+     {
+      "label": "CL.",
+      "type": "closet",
+      "truth_area": 5.2,
+      "sam_area": null
+     },
+     {
+      "label": "CL.",
+      "type": "closet",
+      "truth_area": 3.7,
+      "sam_area": null
+     },
+     {
+      "label": "CL.",
+      "type": "closet",
+      "truth_area": 3.6,
+      "sam_area": null
      }
     ]
    }
   },
   {
-   "id": "207",
-   "file": "207.png",
-   "key": "207.key.json",
-   "title": "large house, 15 rooms",
+   "id": "usda_5539",
+   "file": "usda_5539.png",
+   "key": "usda_5539.key.json",
+   "title": "Four-room farmhouse, 38 ft x 28 ft (USDA design 710-5539)",
    "specialist": {
     "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
     "rooms": [
      {
-      "label": "KÄYTÄVÄ",
-      "type": "corridor",
-      "truth_m2": 8.8,
-      "sam_m2": null
-     },
-     {
-      "label": "ET",
-      "type": "hall",
-      "truth_m2": 2.72,
-      "sam_m2": null
-     },
-     {
-      "label": "K",
+      "label": "KITCHEN",
       "type": "kitchen",
-      "truth_m2": 10.42,
-      "sam_m2": 4.97
+      "truth_area": 186.8,
+      "sam_area": 142.0
      },
      {
-      "label": "RUOK",
+      "label": "DINING CORNER",
       "type": "dining room",
-      "truth_m2": 6.99,
-      "sam_m2": null
+      "truth_area": 74.2,
+      "sam_area": 3.0
      },
      {
-      "label": "OH",
-      "type": "living room",
-      "truth_m2": 27.64,
-      "sam_m2": null
-     },
-     {
-      "label": "MH",
-      "type": "bedroom",
-      "truth_m2": 16.42,
-      "sam_m2": 15.23
-     },
-     {
-      "label": "KHH",
-      "type": "utility room",
-      "truth_m2": 9.98,
-      "sam_m2": 8.43
-     },
-     {
-      "label": "MH",
-      "type": "bedroom",
-      "truth_m2": 10.79,
-      "sam_m2": 9.18
-     },
-     {
-      "label": "PESUH",
+      "label": "BATH",
       "type": "bathroom",
-      "truth_m2": 10.32,
-      "sam_m2": 9.33
+      "truth_area": 37.2,
+      "sam_area": 31.1
      },
      {
-      "label": "MH",
+      "label": "BEDROOM",
       "type": "bedroom",
-      "truth_m2": 10.58,
-      "sam_m2": 8.3
+      "truth_area": 128.7,
+      "sam_area": 118.7
      },
      {
-      "label": "MH",
-      "type": "bedroom",
-      "truth_m2": 9.95,
-      "sam_m2": 9.87
-     },
-     {
-      "label": "MH",
-      "type": "bedroom",
-      "truth_m2": 9.7,
-      "sam_m2": 9.51
-     },
-     {
-      "label": "VARASTO",
-      "type": "storage",
-      "truth_m2": 8.7,
-      "sam_m2": 8.17
-     },
-     {
-      "label": "PH",
-      "type": "bathroom",
-      "truth_m2": 2.76,
-      "sam_m2": 2.75
-     },
-     {
-      "label": "",
-      "type": "other room",
-      "truth_m2": 3.15,
-      "sam_m2": 3.11
-     },
-     {
-      "label": "WC",
-      "type": "bathroom",
-      "truth_m2": 2.79,
-      "sam_m2": 2.81
-     },
-     {
-      "label": "VH",
-      "type": "walk-in closet",
-      "truth_m2": 2.7,
-      "sam_m2": 2.66
-     },
-     {
-      "label": "WC",
-      "type": "bathroom",
-      "truth_m2": 2.62,
-      "sam_m2": 2.61
-     },
-     {
-      "label": "TK",
+      "label": "HALL",
       "type": "hall",
-      "truth_m2": 1.57,
-      "sam_m2": null
+      "truth_area": 54.1,
+      "sam_area": null
+     },
+     {
+      "label": "LIVING ROOM",
+      "type": "living room",
+      "truth_area": 190.2,
+      "sam_area": 168.6
+     },
+     {
+      "label": "BEDROOM",
+      "type": "bedroom",
+      "truth_area": 183.0,
+      "sam_area": 176.8
+     },
+     {
+      "label": "CL",
+      "type": "closet",
+      "truth_area": 5.0,
+      "sam_area": null
+     },
+     {
+      "label": "L",
+      "type": "closet",
+      "truth_area": 4.2,
+      "sam_area": null
+     },
+     {
+      "label": "C",
+      "type": "closet",
+      "truth_area": 3.8,
+      "sam_area": null
+     },
+     {
+      "label": "CL",
+      "type": "closet",
+      "truth_area": 9.1,
+      "sam_area": null
+     },
+     {
+      "label": "CL",
+      "type": "closet",
+      "truth_area": 8.2,
+      "sam_area": null
      }
     ]
    }
   }
  ],
- "credit": "- 1293: flat with four large rooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 2536: flat with three bedrooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 207: large house, 15 rooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548"
+ "credit": "USDA design 710-5544, 'Five-room farmhouse', Miscellaneous Publication 360 'Plans of Farm Buildings for Southern States' (1940), p. 17. U.S. Department of Agriculture, Bureau of Agricultural Engineering, Public domain (work of the U.S. Government, 17 U.S.C. 105). https://archive.org/details/plansoffarmbuild360unit\nUSDA design 710-5540, 'Four-room and attic farmhouse', Miscellaneous Publication 360 'Plans of Farm Buildings for Southern States' (1940), p. 13. U.S. Department of Agriculture, Bureau of Agricultural Engineering, Public domain (work of the U.S. Government, 17 U.S.C. 105). https://archive.org/details/plansoffarmbuild360unit\nUSDA design 710-5539, 'Four-room farmhouse', Miscellaneous Publication 360 'Plans of Farm Buildings for Southern States' (1940), p. 12. U.S. Department of Agriculture, Bureau of Agricultural Engineering, Public domain (work of the U.S. Government, 17 U.S.C. 105). https://archive.org/details/plansoffarmbuild360unit"
 }

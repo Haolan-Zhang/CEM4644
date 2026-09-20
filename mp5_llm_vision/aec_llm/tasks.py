@@ -224,18 +224,18 @@ class RoomRow:
     box: List[float]                                  # xyxy px, from the model
     poly: Optional[List[List[float]]] = None          # px, from the model (LLM-only mode)
     mask: Optional[np.ndarray] = None                 # from SAM 3 (LLM + SAM 3 mode)
-    m2: float = 0.0
+    area: float = 0.0
     how: str = ""                                     # 'polygon', 'box', 'SAM 3'
     truth: Optional[dict] = None
     note: str = ""
 
     @property
-    def truth_m2(self) -> Optional[float]:
-        return self.truth["area_m2"] if self.truth else None
+    def truth_area(self) -> Optional[float]:
+        return self.truth["area"] if self.truth else None
 
     @property
     def err_pct(self) -> Optional[float]:
-        return (self.m2 - self.truth_m2) / self.truth_m2 * 100 if self.truth else None
+        return (self.area - self.truth_area) / self.truth_area * 100 if self.truth else None
 
 
 def oriented_polygon(points, size, box_xyxy) -> Optional[List[List[float]]]:
@@ -298,26 +298,26 @@ def measure_rooms(reply: Reply, plan: Plan, mode: str, sam=None) -> Tuple[List[R
     for row in rows:
         if mode == "llm":
             if row.poly is not None:
-                row.m2 = plan.area_m2(poly_area(row.poly)); row.how = "polygon"
+                row.area = plan.area(poly_area(row.poly)); row.how = "polygon"
             else:
-                row.m2 = plan.area_m2((row.box[2] - row.box[0]) * (row.box[3] - row.box[1])); row.how = "box"
+                row.area = plan.area((row.box[2] - row.box[0]) * (row.box[3] - row.box[1])); row.how = "box"
                 row.note = "no usable polygon in the reply: the box's area is used"
         else:
             if sam is None:
-                row.m2 = plan.area_m2((row.box[2] - row.box[0]) * (row.box[3] - row.box[1])); row.how = "box"
+                row.area = plan.area((row.box[2] - row.box[0]) * (row.box[3] - row.box[1])); row.how = "box"
                 row.note = "SAM 3 is not loaded: the box's area is used"
                 continue
             from scipy import ndimage
             res = sam.segment_room(img, row.box)
             if len(res) == 0:
-                row.m2 = 0.0; row.how = "SAM 3"; row.note = "SAM 3 found nothing in this box"; continue
+                row.area = 0.0; row.how = "SAM 3"; row.note = "SAM 3 found nothing in this box"; continue
             if walls is None:
                 walls = wall_pixels(img)
             m = res.masks[0].copy()
             x1, y1, x2, y2 = [int(round(v)) for v in row.box]
             clip = np.zeros_like(m); clip[max(0, y1):y2 + 1, max(0, x1):x2 + 1] = True
             m = ndimage.binary_fill_holes(m & clip) & ~walls
-            row.mask = m; row.m2 = plan.area_m2(m.sum()); row.how = "SAM 3"
+            row.mask = m; row.area = plan.area(m.sum()); row.how = "SAM 3"
             if m.sum() < 0.6 * (x2 - x1) * (y2 - y1):
                 row.note = "the mask covers less than 60 % of the box (open plan?)"
     attach_truth(rows, plan)
@@ -337,9 +337,9 @@ def segment_rooms(client: GeminiClient, plan: Plan, prompt: str, mode: str, sche
 
 def seg_summary(rows: Sequence[RoomRow], plan: Plan) -> dict:
     truth_rooms = plan.rooms(indoor_only=True)
-    matched = [r for r in rows if r.truth and r.truth["type"] not in ("balcony / terrace", "garage")]
-    errs = [abs(r.err_pct) for r in matched if r.truth_m2]
-    total_model = sum(r.m2 for r in rows if not (r.truth and r.truth["type"] in ("balcony / terrace", "garage")))
+    matched = [r for r in rows if r.truth and r.truth.get("indoor", True)]
+    errs = [abs(r.err_pct) for r in matched if r.truth_area]
+    total_model = sum(r.area for r in rows if not (r.truth and not r.truth.get("indoor", True)))
     return {"rooms_truth": len(truth_rooms), "rooms_found": len({id(r.truth) for r in matched}), "rooms_model": len(rows),
             "median_err": float(np.median(errs)) if errs else None, "max_err": float(max(errs)) if errs else None,
-            "total_model_m2": total_model, "floor_area_m2": plan.floor_area_m2}
+            "total_model": total_model, "floor_area": plan.floor_area}

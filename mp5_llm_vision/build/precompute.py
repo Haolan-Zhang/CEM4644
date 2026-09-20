@@ -40,12 +40,12 @@ def main():
         print("detect schema"); tasks.detect(client, ex.sites, C.fill("detect", spec), ex.site_classes, True, log=log)
         for p in ex.plans:
             print(f"rooms {p.id}")
-            tasks.segment_rooms(client, p, C.PROMPTS["rooms_masks"], "llm", True, log=log)
-            tasks.segment_rooms(client, p, C.PROMPTS["rooms_boxes"], "llm+sam", True, sam=None, log=log)   # same prompt and schema as Step 4b; SAM 3 runs live there
+            tasks.segment_rooms(client, p, C.fill("rooms_masks", spec), "llm", True, log=log)
+            tasks.segment_rooms(client, p, C.fill("rooms_boxes", spec), "llm+sam", True, sam=None, log=log)   # same prompt and schema as Step 4b; SAM 3 runs live there
         print("classify basic, plain"); tasks.classify(client, ex.photos, C.fill("classify_basic", spec), ex.photo_classes, False, log=log)
         print("detect plain"); tasks.detect(client, ex.sites, C.fill("detect", spec), ex.site_classes, False, log=log)
         for p in ex.plans:
-            print(f"rooms {p.id} masks, plain"); tasks.segment_rooms(client, p, C.PROMPTS["rooms_masks"], "llm", False, log=log)
+            print(f"rooms {p.id} masks, plain"); tasks.segment_rooms(client, p, C.fill("rooms_masks", spec), "llm", False, log=log)
         for key_ in ("classify_described", "classify_careful"):
             print(key_ + " + schema"); tasks.classify(client, ex.photos, C.fill(key_, spec), ex.photo_classes, True, log=log)
         print("count schema + plain")

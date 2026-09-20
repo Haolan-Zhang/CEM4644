@@ -10,12 +10,12 @@ box-drawing tool, tables of square feet next to the drawing's own numbers, and a
 |---|---|---|
 | Drawings | three 1940 USDA farmhouse floor plans: `usda_5544` (easy), `usda_5540` (medium), `usda_5539` (L-shaped) | seven sheets: `usda_5542` + `va_floor` (floor plans), `test_fp`, `test_fp_2`, `uscg_motorpool`, `uscg_pile` (structural), `va_ceiling` (electrical) |
 | Teaches SAM 3 | yes: photo steps, ask-by-name, wording, inspector | no: straight into the take-off |
-| Take-off | one cell per drawing (Step 3a/3b/3c) | one cell per discipline (Step 2a/2b/2c), a dropdown of that discipline's sheets |
+| Take-off | one cell per drawing (Step 3a/3b/3c) | one cell per discipline (Steps 2a, 3a, 4a), a dropdown of that discipline's sheets, and after each a phrase cell (Steps 2b, 3b, 4b: `lab.ask`, the same things asked for by name and scored against the key) |
 | What is taken off | the scale (two readings) and the area of every room | areas (rooms, footings, pits) **and** counts |
 | Counts | none: the three floor plans are rooms only | one box labelled `example: <thing>` per counting category; SAM 3 finds the rest and the key checks it |
 | Own drawings | 1 | 3, from at least two disciplines |
 | Report questions | 6 | 5 |
-| Time | about 90 min | about 2 h |
+| Time | about 90 min | about 2.5 h |
 
 Everything is in feet and square feet. **The scale is never taken from a scale bar.** On every sheet the student
 boxes a printed dimension (or something whose size the sheet states, such as a footing mark `F4.0` = 4'-0" wide).
@@ -76,7 +76,7 @@ general, not bedrooms: the model is not reading the lettering. **No wording find
 is where the lab leaves windows: boxing them by hand and ticking them off against a key would test the student, not
 the model.
 
-### 2.2 The take-off (workshop Part 3, homework Part 2)
+### 2.2 The take-off (workshop Part 3, homework Parts 2-4)
 
 Scale error is the student's reading against the answer key's own box for the same reference. The count column is
 what SAM 3 returns from ONE example box through `segment_like` at the confidence the key suggests: *matched of the
@@ -115,7 +115,28 @@ Three of those numbers are **designed failures** and are the teaching points of 
 Room totals against the answer key, same run: `usda_5544` −3.5 %, `usda_5540` −1.5 %, `usda_5539` −3.9 %,
 `usda_5542` −2.6 %, `va_floor` −7.3 %. Footing totals: `test_fp` −3 %, `test_fp_2` +2 %, `uscg_motorpool` +3 %.
 
-### 2.3 How a room mask becomes an area, and why (the "fill the bites" rule)
+### 2.3 Asking by name on the homework sheets (Steps 2b, 3b, 4b) — regions at confidence ≥ 0.3 (≥ 0.5), found / key, extras, median area error of the regions found
+
+The phrase cell sends the words straight to SAM 3 with no box, draws the answer key's hits (green), misses (red) and
+extra regions (blue), and for an area category measures every region found as it comes (no clip, no hull: the raw
+mask, which on a furnished room runs a few percent low). Measured 2026-09-19 with the live model:
+
+| sheet | works | finds nothing |
+|---|---|---|
+| `usda_5542` | *room* **10/14**, 0 extra, areas median 3 % (worst 45 %, the L-shaped hall); at 0.5 only 5/14. *bedroom* 6/14 at 0.3. *curved line* 31 regions = the door swings (no key) | *door*, *window* |
+| `va_floor` | *room* **10/13**, 3 extra, median 7 % (worst 58 %); at 0.5 nothing survives. *toilet* → water closets **5/5**, 2 extra (at 0.5: 2/5). *curved line* 12 regions | *door*, *window*, *sink* (0/5 lavatories) |
+| `test_fp` | *square* → footings **10/10**, 5 extra, areas median 2 % (at 0.5: 7/10, 2 extra, median 1 %). *rectangle* 10/10 but 9 extra | *footing*, *foundation*, *column*, *hatched square* |
+| `test_fp_2` | *square* **19/19**, 4 extra, areas median 10 % (the E-footings are drawn smaller than their mark; at 0.5 still 19/19, 1 extra). *rectangle* 19/19, 6 extra | *footing*, *hatched square* |
+| `uscg_motorpool` | *circle* → grid bubbles **32/32**, 6 extra (3 at 0.5). *square* → footings 12/20, 5 extra, median 3 %; *rectangle* 7/20 | *footing*, *hatched square* |
+| `uscg_pile` | *rectangle* → pile caps **29/29**, 8 extra; at 0.5 28/29, 2 extra | *footing*, *square*, *hatched square* |
+| `va_ceiling` | **nothing.** *rectangle* 7/41 fixtures with 24 extras; *small circle* 45 regions, 0 of the 14 recessed lights | *light fixture*, *light*, *diffuser*, *sprinkler*, *rectangle with a diagonal line*, *circle with a cross*, *square* |
+
+So the phrase route gives the students two real findings: a shape word gets the plain symbols of a foundation plan
+(and their areas, within a few percent), and it gets nothing at all on the ceiling plan, where the example box in
+Step 4a counts 39/41. The trade words fail everywhere. The confidence slider is the other lesson here: 0.3 keeps the
+extras, 0.5 loses real ones (`va_floor` *room* goes from 10/13 to 0).
+
+### 2.4 How a room mask becomes an area, and why (the "fill the bites" rule)
 
 A room mask stops correctly at the walls, but the door swings, counters, bathtubs, stairs and fireplaces drawn
 inside the room are cut out of it, so the raw pixel count reads low. Three read-outs were measured on all 69 rooms
@@ -205,21 +226,31 @@ produces, with a few percent of variation because the boxes are drawn by hand.
    about 21.6 px/ft, the graphic bar about 43.3 px/ft. The bar is twice too long, so areas taken from it are **four
    times** too small; the printed dimension is right. The room table of one sheet with the worst rooms named. Then
    the two counts on `va_floor`: the water closets come back 5/5 with no extras, the lavatories 5/5 with about ten
-   extras — a count that has to be checked by eye before anyone uses it.
+   extras — a count that has to be checked by eye before anyone uses it. From Step 2b: *room* finds 10/14 and 10/13
+   rooms at 0.3 with areas a few percent under the ones from the student's boxes (raw masks, furniture bitten out;
+   the hall on `usda_5542` is the worst); *door* and *window* return nothing; *curved line* returns the swings.
 2. **Structural plans (22).** Per sheet the scale route and the footing areas against the sizes the marks give
    (`F12.0` = 12 ft, `E4'-6"` = 4 ft 6 in, and the `FOOTING SCHEDULE` on `uscg_motorpool`), plus the count SAM 3 made
    from the one `example: footing` box. On `uscg_pile` the caps are 2'-6" × 5'-0" and only about 27 × 53 px on the sheet:
    below roughly 60 px the mask stops tracing the symbol and becomes a rounded copy of the drawn box, so the
-   "area" is the student's box. That is why the sheet is a counting exercise only.
+   "area" is the student's box. That is why the sheet is a counting exercise only. From Step 3b: *footing* finds
+   nothing on any sheet; *square* finds 10/10 and 19/19 footings on the two example plans (areas within 2 % and 10 %)
+   but only 12/20 on the motor pool sheet; *rectangle* finds all 29 pile caps and *circle* all 32 grid bubbles, each
+   with a handful of extras that go at 0.5. The phrase areas are close to the box areas where the symbol is a clean
+   square; the box route still wins on the schedule-sized footings of `uscg_motorpool`.
 3. **MEP (22).** The counts of 2×4 fixtures, 2×2 fixtures and recessed lights from one example each, the confidence
    used, and what the extras were. A rotated example loses roughly 40 % of the count and doubles the false
    positives. The trade words return nothing because SAM 3 has no notion of an MEP legend: a "light fixture" on
-   this sheet is a rectangle with a diagonal and a circle, and only shape words or an example box can reach it.
+   this sheet is a rectangle with a diagonal and a circle. From Step 4b: on this sheet not even the shape words work
+   (*rectangle* 7/41 with 24 extras, *small circle* 0/14), so the example box of Step 4a (39/41) is the only route —
+   which is the answer to the "does the best phrase get near the count" part of the question.
 4. **Own drawings (14).** Three sheets from at least two disciplines; what failed and why (hand-drawn sheets,
    photographs at an angle, colour fills, symbols too small, no known dimension).
 5. **Reflection (20).** What decides reliability: how large the thing is on the sheet (about 60 px is the floor),
    how regularly it repeats, and whether it is drawn as a simple closed outline. Counting repeated symbols is the
-   most reliable task in the whole lab; measuring small symbols is the least.
+   most reliable task in the whole lab; measuring small symbols is the least. Boxes or phrases: boxes for anything
+   that goes into an estimate (the scale, the areas, the counts); a phrase for a first look at a floor plan (*room*)
+   or a foundation plan (*square*), never on an MEP sheet, and never a trade word.
 
 ## 5. Failure modes the students will meet
 

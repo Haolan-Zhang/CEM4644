@@ -27,12 +27,16 @@ in MP4: SAM 3 is used as it comes.
 4. **Where it goes wrong**: wording, the region inspector, words of their own.
 5. **Their own drawing** in a small Gradio app, opened from a link.
 
-**Homework (about 2 h).** No SAM 3 teaching: straight into a take-off across disciplines.
+**Homework (about 2.5 h).** No SAM 3 teaching: straight into a take-off across disciplines, two ways on each.
 1. **The drawings**: all seven, what each one is, and the MEP symbol legend.
-2. **The take-off**, the same cell three times: 2a floor plans, 2b structural plans, 2c MEP plans. Room areas on the
-   floor plans (plus two fixture counts on the clinic sheet); footing areas and a footing count on the structural
-   sheets; light-fixture counts on the ceiling plan. **Every count is made by the model from one box labelled
-   `example: <thing>`** — students never tally their own boxes against the key.
+2. **Floor plans, structural plans, MEP plans** (Parts 2, 3, 4), two cells each. *Step Na, your boxes*: the take-off
+   cell. Room areas on the floor plans (plus two fixture counts on the clinic sheet); footing areas and a footing
+   count on the structural sheets; light-fixture counts on the ceiling plan. **Every count is made by the model from
+   one box labelled `example: <thing>`** — students never tally their own boxes against the key. *Step Nb, a phrase*:
+   the same things asked for by name (`lab.ask`), no box at all; the regions are scored against the answer key
+   (hits / misses / extras, and the area of every room or footing found). Measured: *room* finds most rooms, *toilet*
+   the water closets, *square* the footings, *rectangle* the pile caps, *circle* the grid bubbles; *footing*,
+   *light fixture* and every other trade word find nothing, and nothing at all works by phrase on the ceiling plan.
 3. **Their own drawing**.
 
 ## What is in this folder

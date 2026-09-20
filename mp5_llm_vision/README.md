@@ -90,6 +90,7 @@ of old prompts can be deleted from `data/cache`). To change the examples: the sp
 | Façade defect photos | BD3 Building Defect Dataset (via MP2) | CC-BY-4.0 |
 | Façade style images | Jonathandav/facade-styles (computer-generated, via MP2) | MIT |
 | Site safety and machinery photos | Roboflow 100 `construction-safety`, `excavators` (via MP3) | CC-BY-4.0 |
-| Floor plans and answer keys | CubiCasa5K (via MP4) | CC BY-NC-SA 4.0 |
+| Workshop floor plans and answer keys | USDA Miscellaneous Publication 360 (1940), via MP4 | Public domain |
+| Homework floor plans and answer keys | CubiCasa5K (via an earlier MP4 set) | CC BY-NC-SA 4.0 |
 | Gemini | Google, Gemini API (free tier) | Google's API terms; students use their own key |
 | SAM 3 | Meta, loaded from the MP4 folder | SAM License (copy in `mp4_segmentation/docs`) |

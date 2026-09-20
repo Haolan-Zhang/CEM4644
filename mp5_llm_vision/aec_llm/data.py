@@ -59,11 +59,27 @@ class Site:
 
 @dataclass
 class Plan:
+    """A floor plan with its answer key. Two key layouts are read: MP4's sheets as converted by build/prepare_data.py
+    (units "ft", every room with "area" and "indoor") and the older metre-based copies of the Finnish scans
+    ("scale_m_per_px", "area_m2"); both end up with the same fields."""
     id: str
     path: Path
     key: dict
     title: str
     specialist: dict = field(default_factory=dict)
+
+    def __post_init__(self):
+        k = self.key
+        if "units" not in k:                                   # the older metre-based layout
+            k["units"] = "m"
+            k["scale_units_per_px"] = float(k["scale_m_per_px"])
+            k["floor_area"] = float(k["floor_area_m2"])
+            for r in k["rooms"]:
+                r.setdefault("area", float(r["area_m2"]))
+                r.setdefault("indoor", r.get("type") not in ("balcony / terrace", "garage"))
+        for r in self.specialist.get("rooms", []):
+            if "sam_area" not in r:
+                r["sam_area"] = r.get("sam_m2"); r["truth_area"] = r.get("truth_m2")
 
     def load(self) -> Image.Image:
         return Image.open(self.path).convert("RGB")
@@ -81,17 +97,28 @@ class Plan:
         return tuple(self.key["size"])
 
     @property
-    def m_per_px(self) -> float:
-        return float(self.key["scale_m_per_px"])
+    def units(self) -> str:
+        return self.key["units"]
 
-    def area_m2(self, pixels: float) -> float:
-        return float(pixels) * self.m_per_px ** 2
+    @property
+    def unit_label(self) -> str:
+        return "sq ft" if self.units == "ft" else "m²"
+
+    @property
+    def scale(self) -> float:
+        """Plan units (ft or m) per pixel."""
+        return float(self.key["scale_units_per_px"])
+
+    @property
+    def scale_label(self) -> str:
+        return f"1 ft = {1 / self.scale:.1f} px" if self.units == "ft" else f"1 px = {self.scale * 100:.2f} cm"
+
+    def area(self, pixels: float) -> float:
+        return float(pixels) * self.scale ** 2
 
     def rooms(self, indoor_only: bool = True) -> List[dict]:
         rs = self.key["rooms"]
-        if indoor_only:
-            rs = [r for r in rs if r["type"] not in ("balcony / terrace", "garage")]
-        return rs
+        return [r for r in rs if r.get("indoor", True)] if indoor_only else list(rs)
 
     def room_mask(self, room: dict) -> np.ndarray:
         m = Image.new("1", self.size, 0)
@@ -99,8 +126,8 @@ class Plan:
         return np.asarray(m, dtype=bool)
 
     @property
-    def floor_area_m2(self) -> float:
-        return float(self.key["floor_area_m2"])
+    def floor_area(self) -> float:
+        return float(self.key["floor_area"])
 
 
 class Examples:

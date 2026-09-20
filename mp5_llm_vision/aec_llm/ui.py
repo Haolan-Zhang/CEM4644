@@ -42,9 +42,9 @@ def show_examples(lab, which: str):
         print("Source:", ex.spec.sites.source)
     else:
         ims = [p.load() for p in ex.plans]
-        titles = [f"{p.id}: {p.title}\n{len(p.rooms())} rooms, {p.floor_area_m2} m², 1 px = {p.m_per_px * 100:.2f} cm" for p in ex.plans]
+        titles = [f"{p.id}: {p.title}\n{len(p.rooms())} rooms, {p.floor_area:,.0f} {p.unit_label}, {p.scale_label}" for p in ex.plans]
         viz.show(viz.image_grid(ims, titles, ncols=3, size=4.2, suptitle=lab.spec.plans.title))
-        print("Answer key: every room's real area from the plans' vector annotations (see MP4). Specialist for comparison: SAM 3 asked for 'room' (MP4).")
+        print("Answer key: every room's area measured off the drawing (MP4's answer keys). Specialist for comparison: SAM 3 asked for 'room' (MP4).")
         print(ex.plan_credit)
 
 
@@ -217,41 +217,41 @@ def count(lab, site: str, schema: bool):
 def _seg_image(plan, rows: List[tasks.RoomRow], mode: str):
     img = plan.load()
     if mode == "llm":
-        polys = [(f"{r.label} {r.m2:.1f}", r.poly, PALETTE[i % len(PALETTE)]) for i, r in enumerate(rows) if r.poly]
+        polys = [(f"{r.label} {r.area:.1f}", r.poly, PALETTE[i % len(PALETTE)]) for i, r in enumerate(rows) if r.poly]
         out = viz.draw_polygons(img, polys) if polys else img
-        boxes = [(f"{r.label} {r.m2:.1f} (box)", r.box, PALETTE[i % len(PALETTE)], 3) for i, r in enumerate(rows) if not r.poly]
+        boxes = [(f"{r.label} {r.area:.1f} (box)", r.box, PALETTE[i % len(PALETTE)], 3) for i, r in enumerate(rows) if not r.poly]
         return viz.draw_boxes(out, boxes) if boxes else out
     out = img
     for i, r in enumerate(rows):
         if r.mask is not None:
             out = viz.mask_overlay(out, r.mask, PALETTE[i % len(PALETTE)], 0.5)
-    return viz.draw_boxes(out, [(f"{r.label} {r.m2:.1f}", r.box, PALETTE[i % len(PALETTE)], 2) for i, r in enumerate(rows)])
+    return viz.draw_boxes(out, [(f"{r.label} {r.area:.1f}", r.box, PALETTE[i % len(PALETTE)], 2) for i, r in enumerate(rows)])
 
 
 def _specialist_seg(plan):
     rooms = plan.specialist.get("rooms", [])
-    errs = [abs(r["sam_m2"] - r["truth_m2"]) / r["truth_m2"] * 100 for r in rooms if r["sam_m2"] and r["truth_m2"]]
-    return sum(1 for r in rooms if r["sam_m2"] is not None), len(rooms), (float(np.median(errs)) if errs else None)
+    errs = [abs(r["sam_area"] - r["truth_area"]) / r["truth_area"] * 100 for r in rooms if r["sam_area"] and r["truth_area"]]
+    return sum(1 for r in rooms if r["sam_area"] is not None), len(rooms), (float(np.median(errs)) if errs else None)
 
 
 def segment(lab, plan: str, mode_name: str, schema: bool):
     ex = lab.examples
     p = ex.plan(plan)
     mode = MODES.get(mode_name, mode_name)
-    prompt = C.PROMPTS["rooms_masks" if mode == "llm" else "rooms_boxes"]
+    prompt = C.fill("rooms_masks" if mode == "llm" else "rooms_boxes", lab.spec)
     rows, r, skipped = tasks.segment_rooms(lab.client, p, prompt, mode, schema, sam=lab.sam)
     viz.show_image(_seg_image(p, rows, mode), 820)
     print(f"Prompt{' + schema' if schema else ''}: {prompt}\n")
     if r.error:
         print("⚠️", r.error, "\n   raw:", _snippet(r.text, 300), "\n")
-    table_rows = [(rw.label, rw.how, f"{rw.m2:.1f}", (rw.truth["label"] or rw.truth["type"]) if rw.truth else "—", f"{rw.truth_m2:.1f}" if rw.truth else "—",
+    table_rows = [(rw.label, rw.how, f"{rw.area:.1f}", (rw.truth["label"] or rw.truth["type"]) if rw.truth else "—", f"{rw.truth_area:.1f}" if rw.truth else "—",
                    f"{rw.err_pct:+.0f} %" if rw.truth else "no room of the drawing fits", rw.note) for rw in rows]
-    print(viz.table(table_rows, ["model label", "area from", "model m²", "drawing room", "drawing m²", "error", "note"], [12, 9, 9, 13, 10, 24, 46]))
+    print(viz.table(table_rows, ["model label", "area from", f"model {p.unit_label}", "drawing room", f"drawing {p.unit_label}", "error", "note"], [12, 9, 9, 13, 10, 24, 46]))
     summ = tasks.seg_summary(rows, p)
     sf, st, se = _specialist_seg(p)
     print(f"\n{mode_name}: {summ['rooms_found']}/{summ['rooms_truth']} rooms of the drawing found, "
           + (f"median error {summ['median_err']:.0f} % (worst {summ['max_err']:.0f} %); " if summ["median_err"] is not None else "")
-          + f"model total {summ['total_model_m2']:.1f} m² vs floor area {summ['floor_area_m2']:.1f} m²."
+          + f"model total {summ['total_model']:.1f} vs floor area {summ['floor_area']:.1f} {p.unit_label}."
           + (f" {skipped} unusable entries in the reply." if skipped else ""))
     print(f"MP4's specialist (SAM 3 asked for 'room'): {sf}/{st} rooms found" + (f", median error {se:.0f} %." if se is not None else "."))
     print(_cost_line(r))
@@ -264,7 +264,7 @@ def segment_all(lab, schema: bool = True):
     ims, titles, rows, all_err = [], [], [], []
     secs, toks, live = 0.0, 0, 0
     for p in ex.plans:
-        r_rows, r, skipped = tasks.segment_rooms(lab.client, p, C.PROMPTS["rooms_masks"], "llm", schema, sam=None)
+        r_rows, r, skipped = tasks.segment_rooms(lab.client, p, C.fill("rooms_masks", lab.spec), "llm", schema, sam=None)
         summ = tasks.seg_summary(r_rows, p)
         sf, st, se = _specialist_seg(p)
         errs = [abs(rw.err_pct) for rw in r_rows if rw.err_pct is not None]
@@ -274,7 +274,7 @@ def segment_all(lab, schema: bool = True):
         rows.append((p.id, f"{summ['rooms_found']}/{summ['rooms_truth']}", f"{len(r_rows)} ({n_poly} with a polygon)",
                      f"{summ['median_err']:.0f} %" if summ["median_err"] is not None else "—",
                      f"{summ['max_err']:.0f} %" if summ["max_err"] is not None else "—",
-                     f"{summ['total_model_m2']:.0f} / {summ['floor_area_m2']:.0f}",
+                     f"{summ['total_model']:.0f} / {summ['floor_area']:.0f}",
                      f"{sf}/{st}" + (f", {se:.0f} %" if se is not None else ""),
                      ("⚠ " + r.error[:40]) if r.error else ""))
         ims.append(_seg_image(p, r_rows, "llm"))
@@ -282,7 +282,7 @@ def segment_all(lab, schema: bool = True):
                       + (f", median {summ['median_err']:.0f} %" if summ["median_err"] is not None else ""))
     viz.show(viz.image_grid(ims, titles, ncols=min(3, len(ims)), size=4.4,
                             suptitle=f"The model's own room polygons on all {len(ims)} plans" + (" (schema enforced)" if schema else " (JSON only asked for)")))
-    print(viz.table(rows, ["plan", "rooms found", "rooms in the reply", "median error", "worst", "model / drawing m²", "MP4 SAM 3 'room'", "note"],
+    print(viz.table(rows, ["plan", "rooms found", "rooms in the reply", "median error", "worst", f"model / drawing {ex.plans[0].unit_label}", "MP4 SAM 3 'room'", "note"],
                     [7, 12, 22, 13, 7, 19, 17, 46]))
     if all_err:
         print(f"\nOver all {len(all_err)} matched rooms of {len(ims)} plans: median error {np.median(all_err):.0f} %, "
@@ -295,28 +295,28 @@ def segment_all(lab, schema: bool = True):
 def segment_compare(lab, plan: str):
     ex = lab.examples
     p = ex.plan(plan)
-    rows_llm, r1, _ = tasks.segment_rooms(lab.client, p, C.PROMPTS["rooms_masks"], "llm", True, sam=lab.sam)
-    rows_sam, r2, _ = tasks.segment_rooms(lab.client, p, C.PROMPTS["rooms_boxes"], "llm+sam", True, sam=lab.sam)
+    rows_llm, r1, _ = tasks.segment_rooms(lab.client, p, C.fill("rooms_masks", lab.spec), "llm", True, sam=lab.sam)
+    rows_sam, r2, _ = tasks.segment_rooms(lab.client, p, C.fill("rooms_boxes", lab.spec), "llm+sam", True, sam=lab.sam)
     by_truth = {}
     for rows, key in ((rows_llm, "llm"), (rows_sam, "sam")):
         for rw in rows:
             if rw.truth:
-                by_truth.setdefault(id(rw.truth), {})[key] = rw.m2
-    spec_rooms = {(r["label"], r["truth_m2"]): r["sam_m2"] for r in p.specialist.get("rooms", [])}
+                by_truth.setdefault(id(rw.truth), {})[key] = rw.area
+    spec_rooms = {(r["label"], r["truth_area"]): r["sam_area"] for r in p.specialist.get("rooms", [])}
     table_rows = []
     errs = {"llm": [], "sam": [], "spec": []}
     for room in p.rooms(indoor_only=True):
         got = by_truth.get(id(room), {})
-        sp = spec_rooms.get((room["label"], room["area_m2"]))
-        cells = [room["label"] or room["type"], f"{room['area_m2']:.1f}"]
+        sp = spec_rooms.get((room["label"], room["area"]))
+        cells = [room["label"] or room["type"], f"{room['area']:.1f}"]
         for key, val in (("llm", got.get("llm")), ("sam", got.get("sam")), ("spec", sp)):
             if val is None:
                 cells.append("—")
             else:
-                e = (val - room["area_m2"]) / room["area_m2"] * 100; errs[key].append(abs(e)); cells.append(f"{val:.1f} ({e:+.0f} %)")
+                e = (val - room["area"]) / room["area"] * 100; errs[key].append(abs(e)); cells.append(f"{val:.1f} ({e:+.0f} %)")
         table_rows.append(cells)
     print(f"Plan {p.id}: {p.title}\n")
-    print(viz.table(table_rows, ["room", "drawing m²", "LLM polygons", "LLM boxes + SAM 3", "MP4: SAM 3 'room'"], [12, 10, 18, 18, 18]))
+    print(viz.table(table_rows, ["room", f"drawing {p.unit_label}", "LLM polygons", "LLM boxes + SAM 3", "MP4: SAM 3 'room'"], [12, 10, 18, 18, 18]))
     med = lambda k: f"median error {np.median(errs[k]):.0f} % on {len(errs[k])} rooms" if errs[k] else "no room matched"
     print(f"\nLLM polygons: {med('llm')}.   LLM boxes + SAM 3: {med('sam')}.   MP4's SAM 3 by phrase: {med('spec')}.")
     viz.show(viz.image_grid([_seg_image(p, rows_llm, "llm"), _seg_image(p, rows_sam, "llm+sam")], ["LLM polygons", "LLM boxes + SAM 3"], ncols=2, size=5.2))

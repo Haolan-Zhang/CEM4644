@@ -8,7 +8,7 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-From the floor plans: your scale reading on each sheet and how far it is from the answer key. On the VA clinic sheet you were asked to box the graphic scale bar as well as the printed dimension - what did the two give, and which one is right? (Work out what the areas would have been if you had trusted the bar.) Then the room table of one sheet: your square feet, the drawing's, the error. Which rooms are worst and why? Finally, the two counts SAM 3 made from your example boxes on the clinic sheet (found / missed / extra): which of the two would you hand on, and which would you check yourself first?
+From Step 2a: your scale reading on each sheet and how far it is from the answer key. On the VA clinic sheet you were asked to box the graphic scale bar as well as the printed dimension - what did the two give, and which one is right? (Work out what the areas would have been if you had trusted the bar.) Then the room table of one sheet: your square feet, the drawing's, the error. Which rooms are worst and why? The two counts SAM 3 made from your example boxes on the clinic sheet (found / missed / extra): which would you hand on, which would you check first? Then from Step 2b: what did *room* find on each sheet (found / missed / extra, and the median error of the areas it measured) against the rooms from your boxes? What did *door* and *window* return, and what did *curved line*?
 
 *Your answer:*
 
@@ -16,7 +16,7 @@ From the floor plans: your scale reading on each sheet and how far it is from th
 
 ## Question 2
 
-From the structural plans: for each sheet, the scale and how you set it, the areas of the footings you measured against the sizes their marks give, and the count SAM 3 made from your one *example: footing* box (found / missed / extra). One sheet asks you only to count, because its pile caps are too small to measure - what happens to the measured area of something that small, and why?
+From Step 3a: for each sheet, the scale and how you set it, the areas of the footings you measured against the sizes their marks give, and the count SAM 3 made from your one *example: footing* box (found / missed / extra). One sheet asks you only to count, because its pile caps are too small to measure - what happens to the measured area of something that small, and why? Then from Step 3b: does *footing* find anything? Which shape word finds the footings, on which sheet, with how many extras, and how do the areas it measures compare with the ones from your boxes? Did any phrase find the grid bubbles or the pile caps?
 
 *Your answer:*
 
@@ -24,7 +24,7 @@ From the structural plans: for each sheet, the scale and how you set it, the are
 
 ## Question 3
 
-From the ceiling plan: the count of each symbol that SAM 3 made from your one example box (found / missed / extra), the confidence you used, and what the extras were. Try a second example box of the same symbol, one that is rotated or sits in a cluttered spot, and report how the count changes. Why do the words *light fixture* and *diffuser* return nothing?
+From Step 4a: the count of each symbol that SAM 3 made from your one example box (found / missed / extra), the confidence you used, and what the extras were. Try a second example box of the same symbol, one that is rotated or sits in a cluttered spot, and report how the count changes. Then from Step 4b: which words find any light fixture at all - the trade words or the shape words - and does the best phrase get anywhere near the count from your one example box (found / missed / extra for both)? Why do *light fixture* and *diffuser* return nothing on a drawing?
 
 *Your answer:*
 
@@ -40,7 +40,7 @@ Test three drawings of your own, from at least two disciplines (a floor plan, a 
 
 ## Question 5
 
-Across the three disciplines: which take-off task was the most reliable and which the least, and what decides that (the size of the thing on the sheet, how often it repeats, whether it is drawn as a simple outline)? Where would you use this in practice, where would it mislead you, and what would you insist on having (a known dimension, a schedule, a second pair of eyes) before putting these numbers in an estimate?
+Across the three disciplines: which take-off task was the most reliable and which the least, and what decides that (the size of the thing on the sheet, how often it repeats, whether it is drawn as a simple outline)? Boxes or phrases: for each discipline, say which way you would use and why. Where would you use this in practice, where would it mislead you, and what would you insist on having (a known dimension, a schedule, a second pair of eyes) before putting these numbers in an estimate?
 
 *Your answer:*
 
