@@ -299,6 +299,8 @@ def gallery(lab, ids: Optional[Sequence[str]] = None, ncols: int = 2, size: floa
         im.thumbnail((1100, 1100))
     titles = [f"{s.id} - {s.title}\n{s.discipline}; {s.facts()}" for s in sel]
     viz.show(viz.image_grid(ims, titles, ncols=ncols, size=size, suptitle=title))
+    if not getattr(lab.spec, "guided", True):
+        return
     for s in sel:
         print(f"\n{s.id} - {s.title}")
         print(f"  {s.discipline}. {s.credit.get('author', '')}, {s.credit.get('license', '')}.")
@@ -718,25 +720,49 @@ def print_takeoff(sheet, rep):
     print_areas(sheet, rep)
 
 
-def print_counts(rep):
-    """The counting part of a report: what SAM 3 found from one example box, against the key."""
-    if rep["counts"] or rep.get("counts_todo"):
-        print("\nWHAT SAM 3 COUNTED FROM YOUR EXAMPLE BOX")
-        for cat, c in rep["counts"].items():
-            if "error" in c:
-                print(f"  {cat}: {c['error']}"); continue
-            print(f"  {cat} (confidence >= {c['threshold']:.2f}): from your one example box (purple) SAM 3 returned "
-                  f"{c['found']} region(s) in {c['seconds']:.1f} s - {c['matched']} of the drawing's "
-                  f"{plural(c['truth'], cat)} found (green), {len(c['missed'])} missed (red), "
-                  f"{len(c['extra'])} extra region(s) that are not one (blue).")
-            if c.get("extra_examples"):
-                print(f"    You drew {c['extra_examples'] + 1} boxes labelled 'example: {cat}'. "
-                      "Only the first one was used - one example is all the model needs.")
-            if c.get("tip"):
-                print(f"    {c['tip']}")
-        for cat in rep.get("counts_todo") or []:
-            print(f"  {cat}: not counted. Draw ONE clean box labelled 'example: {cat}' and submit again; "
-                  "the count comes from the model, not from your boxes.")
+def count_lines(rep, tips: bool = True, bold=lambda s: s):
+    """The counting part of a report as (heading, [lines]): what SAM 3 found from one example box, against the key.
+    `bold` wraps the four numbers a reader looks for first (regions returned, real ones, found, missed)."""
+    if not (rep["counts"] or rep.get("counts_todo")):
+        return None, []
+    lines = []
+    for cat, c in rep["counts"].items():
+        if "error" in c:
+            lines.append(f"{cat}: {c['error']}"); continue
+        n = c["found"]; ne = len(c["extra"]); nm = len(c["missed"])
+        real = plural(c["truth"], cat).split(" ", 1)[1]                      # "doors", "pile footings"
+        lines.append(f"{cat} (confidence >= {c['threshold']:.2f}): Using your example box (purple), SAM 3 returned "
+                     f"{bold(f'{n} region' + ('' if n == 1 else 's'))} in {c['seconds']:.1f} s. "
+                     f"Of the {bold(f"{c['truth']} actual {real}")}, it identified "
+                     f"{bold(str(c['matched']))} (green) and missed {bold(str(nm))} (red). "
+                     f"It also identified {ne} extra region{'' if ne == 1 else 's'} that "
+                     f"{'was' if ne == 1 else 'were'} not {real} (blue).")
+        if c.get("extra_examples"):
+            lines.append(f"   You drew {c['extra_examples'] + 1} boxes labelled 'example: {cat}'. "
+                         "Only the first one was used - one example is all the model needs.")
+        if tips and c.get("tip"):
+            lines.append(f"   {c['tip']}")
+    for cat in rep.get("counts_todo") or []:
+        lines.append(f"{cat}: not counted. Draw ONE clean box labelled 'example: {cat}' and submit again; "
+                     "the count comes from the model, not from your boxes.")
+    return "WHAT SAM 3 COUNTED FROM YOUR EXAMPLE BOX", lines
+
+
+def print_counts(rep, tips: bool = True):
+    head, lines = count_lines(rep, tips)
+    if head:
+        print("\n" + head)
+        for l in lines:
+            print("  " + l)
+
+
+def counts_html(rep, tips: bool = True) -> str:
+    import html
+    head, lines = count_lines(rep, tips, bold=lambda s: f"<b>{html.escape(s)}</b>")
+    if not head:
+        return ""
+    return (f"<div style='font-family:monospace;white-space:pre-wrap;line-height:1.4'><b>{head}</b>\n"
+            + "\n".join("  " + l for l in lines) + "</div>")
 
 
 def print_areas(sheet, rep):
@@ -795,8 +821,9 @@ def takeoff(lab, sheet_id: str):
                                            "<b>example:</b> box. Leave it alone and each thing is counted at the "
                                            "confidence its own answer key suggests.")]))
 
+    guided = getattr(lab.spec, "guided", True)
     todo = "<br>".join(f"<b>{i + 1}.</b> {t}" for i, t in enumerate(sheet.tasks))
-    msg = w.HTML(f"<b>{sheet.id} - {sheet.title}</b><br>{todo}<br>"
+    msg = w.HTML("" if not guided else f"<b>{sheet.id} - {sheet.title}</b><br>{todo}<br>"
                  "Pick the label above the picture before each box. Zoom with the mouse wheel. Then <b>Submit</b>."
                  + ("<br>A count is never a tally of your boxes: draw <b>one</b> box labelled "
                     "<b>example: ...</b> and SAM 3 finds all the others like it." if cats else ""))
@@ -821,7 +848,7 @@ def takeoff(lab, sheet_id: str):
             viz.show_image(over, 1100)
             print_takeoff(sheet, rep)
         lab.takeoffs[sheet.id] = rep
-        msg.value = ("Done. Adjust the boxes and submit again; a tight box gives a cleaner mask. "
+        msg.value = "" if not guided else ("Done. Adjust the boxes and submit again; a tight box gives a cleaner mask. "
                      "Copy the numbers into your report, then go to the next drawing.")
 
     display(w.VBox([msg, widget, *controls, out]))
@@ -831,7 +858,7 @@ def find_like(lab, sheet_id: str):
     """Workshop Step 3d: ONE box around one door and SAM 3 finds every other door on the sheet. This is the model's
     own exemplar prompt (a box as a visual example, no words); the answer key marks what it found and missed."""
     import ipywidgets as w
-    from IPython.display import display
+    from IPython.display import HTML, display
     from jupyter_bbox_widget import BBoxWidget
     sheet = lab.sheets[sheet_id]
     cats = sheet.count_categories
@@ -846,8 +873,9 @@ def find_like(lab, sheet_id: str):
     sl0 = float(sheet.hint(cats[0])["threshold"])
     sl = w.FloatSlider(value=sl0, min=0.1, max=0.9, step=0.05, description="confidence >=",
                        continuous_update=False, readout_format=".2f")
+    guided = getattr(lab.spec, "guided", True)
     what = " and ".join(plural(len(sheet.counts[c]), c) for c in cats)
-    msg = w.HTML(f"<b>{sheet.id} - {sheet.title}</b>: the answer key lists {what}.<br>"
+    msg = w.HTML("" if not guided else f"<b>{sheet.id} - {sheet.title}</b>: the answer key lists {what}.<br>"
                  "Draw <b>ONE</b> box around one of them - a door is the opening <i>and</i> its swing arc - with the "
                  "<b>example:</b> label above the picture, then <b>Submit</b>. SAM 3 looks for everything like it; the "
                  "answer key marks the real ones found (green), missed (red) and the regions that are not one (blue). "
@@ -871,9 +899,9 @@ def find_like(lab, sheet_id: str):
         with out:
             out.clear_output(wait=True)
             viz.show_image(over, 1100)
-            print_counts(rep)
+            display(HTML(counts_html(rep, tips=guided)))
         lab.found.setdefault(sheet.id, {}).update(rep["counts"])
-        msg.value = ("Done. Try another example (one in a cluttered corner, one drawn the other way round), move the "
+        msg.value = "" if not guided else ("Done. Try another example (one in a cluttered corner, one drawn the other way round), move the "
                      "confidence, then do the next drawing. Every run is kept for the summary.")
 
     display(w.VBox([msg, widget, w.HBox([sl]), out]))

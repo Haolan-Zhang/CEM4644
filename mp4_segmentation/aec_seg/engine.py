@@ -1,6 +1,9 @@
 """SAM 3 (Segment Anything with Concepts) wrapper: phrase prompts and box prompts, nothing else exposed."""
+import contextlib
+import logging
 import os
 import time
+import warnings
 from dataclasses import dataclass, field
 from typing import List, Optional, Sequence
 
@@ -63,6 +66,38 @@ def fit(image: Image.Image, max_side: int = MAX_SIDE) -> Image.Image:
     return im
 
 
+@contextlib.contextmanager
+def quiet_download():
+    """No progress bars and no Hub warnings while a checkpoint is fetched: the notebook prints one line instead."""
+    os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+    os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
+    restore = []
+    try:
+        from huggingface_hub.utils import disable_progress_bars, enable_progress_bars
+        disable_progress_bars(); restore.append(enable_progress_bars)
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        from transformers.utils import logging as tlog
+        prev = tlog.get_verbosity(); tlog.set_verbosity_error(); tlog.disable_progress_bar()
+        restore.append(lambda: tlog.set_verbosity(prev))
+    except Exception:  # noqa: BLE001
+        pass
+    hub = logging.getLogger("huggingface_hub"); level = hub.level; hub.setLevel(logging.ERROR)
+    restore.append(lambda: hub.setLevel(level))
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            with open(os.devnull, "w") as sink, contextlib.redirect_stdout(sink), contextlib.redirect_stderr(sink):
+                yield
+    finally:
+        for f in restore:
+            try:
+                f()
+            except Exception:  # noqa: BLE001
+                pass
+
+
 class Sam3Engine:
     def __init__(self, model_id: str = MIRROR, device: Optional[str] = None, log=print):
         import torch
@@ -72,9 +107,11 @@ class Sam3Engine:
         self.model_id = model_id
         self._trk = None
         t0 = time.time()
-        log(f"Loading SAM 3 ({'GPU' if self.device == 'cuda' else 'CPU: each phrase will take 10-30 s'})...")
-        self.processor = Sam3Processor.from_pretrained(model_id)
-        self.model = Sam3Model.from_pretrained(model_id, dtype=self.dtype).to(self.device).eval()
+        if self.device == "cpu":
+            log("No GPU: SAM 3 runs on the CPU and each phrase will take 10-30 s.")
+        with quiet_download():
+            self.processor = Sam3Processor.from_pretrained(model_id)
+            self.model = Sam3Model.from_pretrained(model_id, dtype=self.dtype).to(self.device).eval()
         if self.device == "cpu":
             torch.set_num_threads(max(1, os.cpu_count() or 1))
         log(f"SAM 3 ready in {time.time() - t0:.0f} s.")
@@ -167,8 +204,9 @@ class Sam3Engine:
             import logging
             logging.getLogger("transformers").setLevel(logging.ERROR)     # it warns about loading a part of the checkpoint
             from transformers import Sam3TrackerModel, Sam3TrackerProcessor
-            self._trk_proc = Sam3TrackerProcessor.from_pretrained(self.model_id)
-            self._trk = Sam3TrackerModel.from_pretrained(self.model_id, dtype=self.dtype).to(self.device).eval()
+            with quiet_download():
+                self._trk_proc = Sam3TrackerProcessor.from_pretrained(self.model_id)
+                self._trk = Sam3TrackerModel.from_pretrained(self.model_id, dtype=self.dtype).to(self.device).eval()
         return self._trk, self._trk_proc
 
     def segment_visual(self, image: Image.Image, point: Optional[Sequence[float]] = None, box: Optional[Sequence[float]] = None) -> SegResult:

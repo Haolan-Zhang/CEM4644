@@ -261,10 +261,7 @@ swings take out of a rectangular room, and converts the pixels with **your** sca
 """))
     for i, s in enumerate(sheets):
         letter = "abc"[i] if i < 3 else str(i)
-        cells.append(form(f"Step 3{letter} - Take-off: {s.id}, {s.title}", f'lab.takeoff({json.dumps(s.label)})',
-                          notes=[f"**{s.title}.** " + " ".join(s.tasks),
-                                 "Zoom with the mouse wheel. Pick the label above the picture before each box. Rooms need the "
-                                 "live model. Copy the tables into your report."]))
+        cells.append(form(f"Step 3{letter} - Take-off: {s.id}, {s.title}", f'lab.takeoff({json.dumps(s.label)})'))
     cells.append(q.add("From Step 3 on all three drawings: your two scale readings on each drawing, how far each one is from the "
                        "answer key and how far they are from each other; and the room table (your square feet, the drawing's, the "
                        "error) for the drawing you did best on. What is the total of your rooms against the drawing's indoor total?"))
@@ -282,9 +279,6 @@ count is checked, not taken on trust. Which door you pick matters: a clean singl
 example; a double door or a closet door in a cluttered corner is a poor one, and the count drops.
 """))
     cells.append(form("Step 3d - Box one door, and SAM 3 finds the rest", "lab.find_like(drawing)",
-                      notes=["Draw ONE box around one door (arc included), label it *example: door*, Submit. Then try another "
-                             "example on the same sheet, and the other two sheets: on one of them the doors are drawn so that "
-                             "even a good example misses several. Needs the live model."],
                       params=[param_choice("drawing", labels[1], labels)]))
     cells.append(q.add("From Step 3d: on each of the three drawings, the best count you got from one example box (found / "
                        "missed / extra, and the confidence), and how much the count changed when you picked a different door "

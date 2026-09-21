@@ -179,7 +179,8 @@ class Sheet:
             if c != "room":
                 bits.append(f"{plural(len(self.areas(c)), c)} to measure")
         for c, boxes in self.counts.items():
-            bits.append(f"{plural(len(boxes), c)} to count from one example")
+            if c not in self.area_categories:                # a footing is listed once, under its areas
+                bits.append(plural(len(boxes), c))
         bits.append(f"1 ft = {self.px_per_ft:.1f} px")
         return "; ".join(bits)
 

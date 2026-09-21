@@ -73,9 +73,8 @@ class SegLab:
                 __import__(mod)
             except ImportError:
                 need.append(req)
-        if need:
-            print(f"Installing {', '.join(need)} (one to two minutes)...")
-            subprocess.run([sys.executable, "-m", "pip", "install", "-q", *need], check=False)
+        if need:                                  # quietly: the notebook says to wait for the 'Ready' line
+            subprocess.run([sys.executable, "-m", "pip", "install", "-q", *need], check=False, capture_output=True)
         if restart:
             print("\nA newer 'transformers' was installed. Please restart the runtime now "
                   "(menu Runtime -> Restart session), then run this Step 0 cell again.")
