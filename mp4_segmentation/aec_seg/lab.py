@@ -192,7 +192,7 @@ class SegLab:
             print(f"\nYour take-offs ({len(self.takeoffs)} drawing(s)) - these are the numbers for your report:")
             for sid, rep in self.takeoffs.items():
                 print(f"\n=== {sid}: {rep['title']}")
-                ui.print_takeoff(self.sheets[sid], rep)
+                ui.print_takeoff(self.sheets[sid], rep, guided=getattr(self.spec, "guided", True))
             missing = [sh.id for sh in self.sheets if sh.id not in self.takeoffs]
             if missing:
                 print(f"\nNot done yet: {', '.join(missing)}.")

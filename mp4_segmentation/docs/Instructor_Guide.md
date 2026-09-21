@@ -85,9 +85,9 @@ of the model, so the lab no longer asks for one.
 
 | sheet | scale error (main ref / cross-check) | count from one `example:` box (confidence: matched / key, extras) | areas: n, median, worst |
 |---|---|---|---|
-| `usda_5544` | −0.6 % / +0.6 % | Step 3d, door (0.4): median **11/17** over all 17 possible examples (1–17), 0 extra; only 1 example finds all 17 | room n=16, **median 3.5 %**, worst 23 % |
-| `usda_5540` | −0.3 % / +0.5 % | Step 3d, door (0.4): median **14/14** (1–14), 2 extra; 9 of 14 examples find all | room n=12, **median 3.6 %**, worst 28 % |
-| `usda_5539` | −0.3 % / +0.4 % | Step 3d, door (0.4): median **11/11** (1–11), 4 extra; 6 of 11 examples find all | room n=14, **median 3.1 %**, worst 17 % |
+| `usda_5544` | −0.6 % / +0.6 % | Step 3d, door (0.4): median **11/17** over all 17 possible examples (1–17), 0 extra; only 1 example finds all 17 | room n=9 (closets are not in the take-off), **median 3.9 %**, worst 21 % (the hall) |
+| `usda_5540` | −0.3 % / +0.5 % | Step 3d, door (0.4): median **14/14** (1–14), 2 extra; 9 of 14 examples find all | room n=7, **median 0.6 %**, worst 26 % (the hall) |
+| `usda_5539` | −0.3 % / +0.4 % | Step 3d, door (0.4): median **11/11** (1–11), 4 extra; 6 of 11 examples find all | room n=9, **median 2.6 %**, worst 20 % (the hall) |
 | `usda_5542` | −0.4 % / +0.5 % | – (rooms only) | room n=14, **median 3.6 %**, worst 26 % |
 | `va_floor` | −1.4 % / −0.4 % (the bar) | water closet (0.5) **5/5, 0 ex**; lavatory (0.3) 5/5, **9–10 ex** | room n=13, **median 4.3 %**, worst 11 % |
 | `va_ceiling` | −0.7 % / −0.4 % (the bar) | 2×4 (0.4) **39/41, 0 ex**; 2×2 (0.4) 8/8, 1 ex; cans (0.5) **14/14, 0 ex** | – (nothing to measure) |
@@ -200,7 +200,7 @@ produces, with a few percent of variation because the boxes are drawn by hand.
    a function it cannot, and a window on a plan is a drawing convention, not a picture of a window.
 2. **The take-off numbers (18).** Per drawing: both scale readings within about 1 % of the answer key when each box
    is drawn arrowhead to arrowhead, and the 1.6–2.1 % disagreement between the two dimensions of a 1940 scan noticed
-   (the cell prints it, and what it does to an area); the room table with most rooms inside ±8 %. The total of the
+   (the cell prints both estimates in px/ft and how far apart they are); the room table with most rooms inside ±8 %. The total of the
    indoor rooms should land within a few percent of the drawing's total. Full marks need all three drawings and the
    total-versus-key comparison.
 3. **Why the worst rooms are worst (16).** Expected answers: the hall is a set of doorways, not a room, so the mask
@@ -274,8 +274,10 @@ produces, with a few percent of variation because the boxes are drawn by hand.
 - **A rotated example box.** `segment_like` generalises to the symbol *family*, but a rotated example costs about
   40 % of the count on the ceiling plan and starts returning the stipple-hatched toilet ceilings as extras. Tell
   the students to pick a clean example lying the same way as most of the others.
-- **Open-plan spaces.** When the mask covers less than 60 % of the drawn box, the cell says so: there is no wall on
-  one side, so the number is set by where the box was drawn, not by the drawing. Do not mark those as errors.
+- **Open-plan spaces.** A porch with a screen rail, a hall that is a set of doorways, a dining corner with no wall on one
+  side: the mask has nothing to stop it, so the number is set by where the box was drawn. The cell no longer prints a
+  warning for this (it fired on too many correct readings); the hall is the worst room on all three workshop plans
+  (20–26 %), and question 3 asks the students to find the reason in the picture.
 - **A phrase that finds nothing.** Expected for *kitchen*, *living room*, *porch*, *closet*, *door*, *window*, and
   for every trade word on a structural or MEP sheet (*footing*, *pile*, *grid bubble*, *light fixture*, *diffuser*,
   *sprinkler*). Send the students to the shape words (Step 4a and 4c) and, on a sheet with something to count, to

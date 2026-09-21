@@ -102,7 +102,10 @@ class Sheet:
         return float(pixels) / (p * p)
 
     # ------------------------------------------------------------------ areas (rooms, footings, pits...)
-    def areas(self, category: Optional[str] = None, type_: Optional[str] = None, indoor_only: bool = False) -> List[dict]:
+    def areas(self, category: Optional[str] = None, type_: Optional[str] = None, indoor_only: bool = False,
+              takeoff_only: bool = False) -> List[dict]:
+        """takeoff_only: leave out the areas marked "takeoff": false (closets too small to box; they stay in the key
+        for the ask-by-name steps but the take-off neither asks for them nor counts them)."""
         out = list(self.key.get("areas", []))
         if category:
             out = [a for a in out if a.get("category") == category]
@@ -110,6 +113,8 @@ class Sheet:
             out = [a for a in out if a.get("type") == type_]
         if indoor_only:
             out = [a for a in out if a.get("indoor")]
+        if takeoff_only:
+            out = [a for a in out if a.get("takeoff", True)]
         return out
 
     @property
@@ -171,9 +176,9 @@ class Sheet:
     # ------------------------------------------------------------------ text
     def facts(self) -> str:
         bits = []
-        rooms = self.areas("room")
+        rooms = self.areas("room", takeoff_only=True)
         if rooms:
-            indoor = self.areas("room", indoor_only=True)
+            indoor = self.areas("room", indoor_only=True, takeoff_only=True)
             bits.append(f"{plural(len(rooms), 'room')} ({sum(a['true_sqft'] for a in indoor):,.0f} sq ft indoors)")
         for c in self.area_categories:
             if c != "room":

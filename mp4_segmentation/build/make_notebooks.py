@@ -244,7 +244,7 @@ the label above the picture before you draw, and draw in this order:
    that dimension is used. *A 1 % error in the scale is a 2 % error in every area, because area is scale squared.*
 2. **the second dimension** down the side of the plan, as a check. The two readings never agree exactly, and the report
    tells you by how much they differ and which one the answer key trusts.
-3. **every room**: a tight box each, the edges on the **inside faces** of the walls - rooms, porches, halls and closets.
+3. **every room**: a tight box each, the edges on the **inside faces** of the walls - rooms, porches and halls.
 
 Then press *Submit*.
 

@@ -622,10 +622,6 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
                 mask, raw_px, score, filled_px = room_mask(lab.engine, img, b, walls)
                 if not mask.any():
                     note = "SAM 3 found nothing in this box."
-                elif raw_px < 0.6 * box_px:
-                    note = (f"the mask covers only {raw_px / box_px * 100:.0f} % of your box: is this an open space with no "
-                            f"wall on one side? Then the number is set by where you drew the box ({sqft(box_px):,.0f} sq ft), "
-                            "not by the drawing.")
                 elif filled_px > 1.15 * raw_px:
                     note = (f"{(filled_px - raw_px) / filled_px * 100:.0f} % of this area is drawn over (furniture, a stair, "
                             "door swings) and was filled back in from the outline of the mask - look at the picture and judge "
@@ -662,7 +658,7 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
             layers.append((str(i), mask, AREA_COLORS[(i - 1) % len(AREA_COLORS)]))
         rep["areas"][cat] = rows
         if cat == "room":
-            indoor = sheet.areas("room", indoor_only=True)
+            indoor = sheet.areas("room", indoor_only=True, takeoff_only=True)
             boxed = {key_areas[j]["label"] for j in used}
             rep["rooms"] = {"total": sum(r["your_sqft"] for r in rows if r.get("indoor")),
                             "n": sum(1 for r in rows if r.get("indoor")),
@@ -694,29 +690,28 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
     return over, rep
 
 
-def print_takeoff(sheet, rep):
-    """The report of `takeoff_compute` in plain words."""
+def print_takeoff(sheet, rep, guided: bool = True):
+    """The report of `takeoff_compute` in plain words. `guided` adds the answer key's notes on the scale references
+    (the homework's wrong scale bar is explained there); the workshop prints the numbers only."""
     sc = rep["scale"]
-    print("SCALE")
-    any_drawn = False
-    for r in sc["refs"]:
-        if not r["drawn"]:
-            continue
-        any_drawn = True
-        arrow = "wide" if r["axis"] == "x" else "tall"
-        print(f"  '{r['label']}' = {r['feet']:g} ft: your box is {r['px']:.0f} px {arrow} -> {r['px_per_ft']:.2f} px per foot. "
-              f"The answer key's own box gives {r['key_px_per_ft']:.2f} ({r['err_pct']:+.1f} %)."
-              + (f"  {r['note']}" if r["note"] else ""))
-    if not any_drawn:
-        print(f"  You boxed nothing for the scale, so the answer key's scale ({sc['key_px_per_ft']:.2f} px per foot) is used. "
-              f"How the key got it: {sc['how']}")
+    print("SCALE CHECK")
+    drawn = [r for r in sc["refs"] if r["drawn"]]
+    for r in drawn:
+        print(f"  {r['label']}: {r['px']:.0f} px \u00f7 {r['feet']:g} ft = {r['px_per_ft']:.2f} px/ft")
+    if not drawn:
+        print("  No scale box drawn: the answer key's scale is used.")
     if sc.get("disagree_pct") is not None:
-        print(f"  Your two readings disagree by {sc['disagree_pct']:.0f} %. On an AREA that is about "
-              f"{(1 + sc['disagree_pct'] / 100) ** 2 * 100 - 100:.0f} % - area goes with the scale squared.")
-        if sc.get("trust"):
-            print(f"  Use '{sc['trust']}' for the take-off - read the note on the other one above to see why it is different.")
-    print(f"  Areas below use {sc['used_px_per_ft']:.2f} px per foot (from {sc['from']}).")
-    print_counts(rep)
+        print(f"  Your two scale estimates differ by {sc['disagree_pct']:.0f}%. For more accurate results, draw the scale box precisely.")
+    if guided:
+        for r in drawn:
+            if r["note"]:
+                print(f"  {r['label']}: {r['note']}")
+    trusted = next((r for r in drawn if r["use"]), None)
+    if trusted:
+        print(f"  Scale used for takeoff: {sc['used_px_per_ft']:.2f} px/ft (from the first scale box: {trusted['label']})")
+    else:
+        print(f"  Scale used for takeoff: {sc['used_px_per_ft']:.2f} px/ft (from the answer key)")
+    print_counts(rep, tips=guided)
     print_areas(sheet, rep)
 
 
@@ -846,7 +841,7 @@ def takeoff(lab, sheet_id: str):
         with out:
             out.clear_output(wait=True)
             viz.show_image(over, 1100)
-            print_takeoff(sheet, rep)
+            print_takeoff(sheet, rep, guided=guided)
         lab.takeoffs[sheet.id] = rep
         msg.value = "" if not guided else ("Done. Adjust the boxes and submit again; a tight box gives a cleaner mask. "
                      "Copy the numbers into your report, then go to the next drawing.")
