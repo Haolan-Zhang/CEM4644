@@ -56,7 +56,8 @@ class SegLab:
                 self.engine = None
         self.ready = True
         print(f"Ready in {time.time() - t0:.0f} s.")
-        self.intro()
+        if getattr(self.spec, "guided", True):       # the workshop's Step 0 stops at the 'Ready' line
+            self.intro()
 
     def _ensure_packages(self) -> bool:
         """Install what is missing. Returns False when the runtime must be restarted before continuing."""

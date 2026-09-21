@@ -735,7 +735,7 @@ def count_lines(rep, tips: bool = True, bold=lambda s: s):
                      f"{bold(f'{n} region' + ('' if n == 1 else 's'))} in {c['seconds']:.1f} s. "
                      f"Of the {bold(f"{c['truth']} actual {real}")}, it identified "
                      f"{bold(str(c['matched']))} (green) and missed {bold(str(nm))} (red). "
-                     f"It also identified {ne} extra region{'' if ne == 1 else 's'} that "
+                     f"It also identified {bold(f'{ne} extra region' + ('' if ne == 1 else 's'))} that "
                      f"{'was' if ne == 1 else 'were'} not {real} (blue).")
         if c.get("extra_examples"):
             lines.append(f"   You drew {c['extra_examples'] + 1} boxes labelled 'example: {cat}'. "
