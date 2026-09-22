@@ -88,7 +88,7 @@ of the model, so the lab no longer asks for one.
 | `usda_5544` | −0.6 % / +0.6 % | Step 3d, door (0.4): median **11/17** over all 17 possible examples (1–17), 0 extra; only 1 example finds all 17 | room n=9 (closets are not in the take-off), **median 3.9 %**, worst 21 % (the hall) |
 | `usda_5540` | −0.3 % / +0.5 % | Step 3d, door (0.4): median **14/14** (1–14), 2 extra; 9 of 14 examples find all | room n=7, **median 0.6 %**, worst 26 % (the hall) |
 | `usda_5539` | −0.3 % / +0.4 % | Step 3d, door (0.4): median **11/11** (1–11), 4 extra; 6 of 11 examples find all | room n=9, **median 2.6 %**, worst 20 % (the hall) |
-| `usda_5542` | −0.4 % / +0.5 % | – (rooms only) | room n=14, **median 3.6 %**, worst 26 % |
+| `usda_5542` | −0.4 % / +0.5 % | – (rooms only) | room n=10 (closets are not in the take-off), **median 2.6 %**, worst 23 % (the hall) |
 | `va_floor` | −1.4 % / −0.4 % (the bar) | water closet (0.5) **5/5, 0 ex**; lavatory (0.3) 5/5, **9–10 ex** | room n=13, **median 4.3 %**, worst 11 % |
 | `va_ceiling` | −0.7 % / −0.4 % (the bar) | 2×4 (0.4) **39/41, 0 ex**; 2×2 (0.4) 8/8, 1 ex; cans (0.5) **14/14, 0 ex** | – (nothing to measure) |
 | `test_fp` | −3.2 % (a 95 px footing is a short ruler) | footing (0.3) **10/10**, 3–5 ex | footing n=10, **median 4.3 %**, worst 8.5 % |

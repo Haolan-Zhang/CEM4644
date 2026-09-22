@@ -420,9 +420,8 @@ question: which way gets you a number you would put in an estimate, and which wa
         n = part_no[gid]
         head, text = GROUP_TEXT[gid]
         default_phrase, phrase_note = PHRASE_HINTS[gid]
-        cells.append(md(f"## Part {n} - {head}\n\n{text}\n\n" + "\n".join(
-            f"- **{s.id}** ({s.title}): " + " ".join(s.tasks) for s in gsheets)
-            + f"\n\nDo every drawing in the list, one at a time, in Step {n}a. Phrases to try in Step {n}b: {phrase_note}"))
+        cells.append(md(f"## Part {n} - {head}\n\n{text}\n\n"
+                        f"Do every drawing in the list, one at a time, in Step {n}a. Phrases to try in Step {n}b: {phrase_note}"))
         glabels = [s.label for s in gsheets]
         what = {"floor": "a floor plan", "structural": "a structural plan", "mep": "an MEP sheet"}[gid]
         cells.append(form(f"Step {n}a - Take-off on {what}: your boxes", "lab.takeoff(drawing)",
