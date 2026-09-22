@@ -8,6 +8,7 @@ exercise. Students need **no programming**: every notebook cell is a Colab form 
 |---|---|---|
 | `MP3_Workshop_Object_Detection.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp3_object_detection/MP3_Workshop_Object_Detection.ipynb) | workers and PPE: person, helmet / NO helmet, vest / NO vest |
 | `MP3_Homework_Object_Detection.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp3_object_detection/MP3_Homework_Object_Detection.ipynb) | construction machinery: excavator, dump truck, wheel loader |
+| `MP3_Homework_Object_Detection_v2.ipynb` (short) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp3_object_detection/MP3_Homework_Object_Detection_v2.ipynb) | the same machinery data, about half the length: only what the workshop did not already cover, and the students' own photos as the main deliverable |
 
 Both notebooks are generated from one template and differ only in the dataset, the counting
 question, the dashboard and two report questions.
@@ -17,6 +18,7 @@ question, the dashboard and two report questions.
 ```
 MP3_Workshop_Object_Detection.ipynb   student notebook (generated)
 MP3_Homework_Object_Detection.ipynb   student notebook (generated)
+MP3_Homework_Object_Detection_v2.ipynb  the short homework (generated; python build/make_notebooks.py homework_v2)
 aec_det/          all the code the notebooks call (hidden from students)
 data/             YOLO-format image sets shipped as zips + the "tricky photos" galleries
 models/           yolo11n.pt (COCO-pretrained base) and the two fine-tuned course detectors

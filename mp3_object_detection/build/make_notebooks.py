@@ -281,6 +281,193 @@ lab.train_my_model(n, passes, start, run_name)""",
     print("wrote", p)
 
 
+def build_short():
+    """The short homework (MP3_Homework_Object_Detection_v2.ipynb): the machinery data, the parts the workshop did not
+    already cover, one question each, and the students' own photos as the main deliverable. The original homework is
+    untouched."""
+    v = dict(file="MP3_Homework_Object_Detection_v2.ipynb", label="Homework (individual)", minutes=75, dataset="excavators",
+             own_photos=5, own_photo_hint=VARIANTS["homework"]["own_photo_hint"])
+    spec = DETSETS[v["dataset"]]
+    classes = [spec.pretty(c) for c in spec.classes]
+    other = DETSETS[spec.other_domain] if spec.other_domain else None
+    questions, cells = [], []
+
+    cells.append(md(f"""
+# 🏗️ CEM4644 · MP3 — Object detection for construction
+## {v['label']}: *{spec.title}*
+
+**No coding needed.** Each grey box below is one *step*: click the ▶ (play) button at its left, wait until it finishes, look at the result, then answer the report question that follows. Run the steps **from top to bottom**.
+
+The workshop taught you how a detector works on the PPE photos. This homework puts the same tools on a second problem, **construction machinery**, and asks what changes. Every machine is boxed as *excavator*, *dump truck* or *wheel loader*.
+
+**What you will do (about {v['minutes']} minutes)**
+1. Look at the machinery photos.
+2. Score the machinery model on unseen photos and look at its mistakes; compare with the workshop's numbers.
+3. Send it photos from the other world.
+4. Turn boxes into an equipment count.
+5. Train your own detector: how much data does it need?
+6. **Your own photos** - the main deliverable of this homework.
+
+**Before you start:** menu *Runtime → Change runtime type → T4 GPU → Save*. Detection works on CPU too, but the training step in Part 5 is much faster with a GPU.
+
+**Dataset:** {spec.title}. Sources and licences are listed at the bottom.
+"""))
+    cells.append(form(
+        "▶ Step 0 · Run me first (about 2 minutes)",
+        f"""import importlib, os, shutil, subprocess, sys
+REPO, FOLDER, PKG = "CEM4644", "mp3_object_detection", "aec_det"
+FOLDERS = ["mp3_object_detection"]           # only this lab folder is downloaded, not the whole course repository
+
+def _git(*args):
+    return subprocess.run(["git", "-C", REPO, *args], capture_output=True, text=True).returncode == 0
+
+if os.path.isdir(REPO):                      # a copy is already here: pull the newest course code over it
+    if not (_git("sparse-checkout", "set", *FOLDERS)     # also trims a full copy left by an earlier run
+            and _git("fetch", "-q", "--depth", "1", "origin", "master")
+            and _git("reset", "-q", "--hard", "FETCH_HEAD") and _git("clean", "-qfd")):
+        shutil.rmtree(REPO, ignore_errors=True)          # broken copy: start again from scratch
+if not os.path.isdir(REPO):
+    subprocess.run(["git", "clone", "-q", "--depth", "1", "--filter=blob:none", "--sparse", "{GITHUB_URL}", REPO], check=True)
+    subprocess.run(["git", "-C", REPO, "sparse-checkout", "set", *FOLDERS], check=True)
+for _m in [m for m in list(sys.modules) if m == PKG or m.startswith(PKG + ".")]:
+    del sys.modules[_m]                      # Python caches imported code: drop it, or this cell keeps the old version
+importlib.invalidate_caches()
+sys.path.insert(0, os.path.abspath(os.path.join(REPO, FOLDER)))
+from aec_det import lab
+lab.setup(dataset="{spec.key}")""",
+        notes=["Click ▶ and wait for the green ✅ line. This downloads the photos and the course model and installs the detection library.",
+               "If Colab asks whether to run a notebook that was not authored by Google, choose *Run anyway*."],
+    ))
+
+    # ---------------------------------------------------------------- Part 1
+    cells.append(md(f"""
+## Part 1 · The machinery photos
+
+Three classes this time - {', '.join(classes)} - and machines that are large, but often far away, half hidden behind each other, and easy to confuse with one another. Boxes drawn with a **dashed** line are the labels made by people.
+"""))
+    cells.append(form(
+        "▶ Step 1a · Browse the labeled photos",
+        "lab.show_gallery(category, how_many, with_boxes)",
+        notes=["Pick a class to see photos that contain it. Untick *with_boxes* to see the raw photos. Click ▶ again for a new selection."],
+        params=[f'category = "all" #@param {jlist(["all"] + classes)}',
+                'how_many = 6 #@param [3, 6, 9] {type:"raw"}',
+                'with_boxes = True #@param {type:"boolean"}'],
+    ))
+
+    # ---------------------------------------------------------------- Part 2
+    cells.append(md(f"""
+## Part 2 · The machinery model
+
+The **course model** for this homework was fine-tuned on {n_train(spec)} labeled machinery photos. It is scored exactly as in the workshop: on unseen test photos, a detection is **correct** when it has the right class and overlaps the true box by at least half; **recall** is the share of true machines found, **precision** the share of detections that were right, **mAP50** the overall quality score.
+"""))
+    cells.append(form("▶ Step 2a · Score it on all the unseen test photos", "lab.evaluate(how_many, threshold)",
+                      notes=["Per class: how many true objects were found, how many were missed, how many detections were false alarms."],
+                      params=['how_many = "all" #@param ["all", "100"]', 'threshold = 0.5 #@param {type:"slider", min:0.1, max:0.9, step:0.1}']))
+    cells.append(form("▶ Step 2b · Look at the mistakes", "lab.error_explorer()",
+                      notes=["Green = correct, orange = false alarm, red dashed = missed object. Choose the kind of mistake and the class; the worst photos come first."]))
+    questions.append((1, "Which machine does the model find most reliably and which one does it miss most often (give the recall numbers)? "
+                         "Look at the missed and the false ones in Step 2b: what do they have in common? Then compare with the numbers you got in "
+                         "the workshop for the PPE model (your Step 6 there): which of the two datasets is the harder one for a detector, and what makes "
+                         "it harder - the size of the objects, how alike the classes look, how many training photos there were?"))
+    cells.append(q(*questions[-1]))
+
+    # ---------------------------------------------------------------- Part 3
+    if other is not None:
+        cells.append(md(f"""
+## Part 3 · Photos from a different world
+
+A detector only knows the kind of photos it was trained on. Here the photos of **{other.title}** are given to the machinery model, and to the workshop's PPE model, side by side. Each model can only answer with its own classes.
+"""))
+        cells.append(form("▶ Step 3a · Photos from a different world", "lab.domain_shift(how_many, threshold)",
+                          params=['how_many = 3 #@param {type:"slider", min:1, max:6, step:1}', 'threshold = 0.4 #@param {type:"slider", min:0.1, max:0.9, step:0.1}']))
+        questions.append((2, "What does the machinery model make of the PPE photos, and what does the PPE model make of them? Does either model "
+                             "stay silent, or does it label what it sees with the wrong names? What does this tell you about buying a detector "
+                             "that was trained on someone else's photos?"))
+        cells.append(q(*questions[-1]))
+
+    # ---------------------------------------------------------------- Part 4
+    cells.append(md("""
+## Part 4 · From boxes to an equipment count
+
+Boxes alone are not a decision. A site manager wants **numbers**: how many machines are on site in each photo, and of which type. The dashboard counts the model's boxes over all test photos and compares them with the labeled truth.
+"""))
+    cells.append(form("▶ Step 4a · Dashboard", "lab.dashboard(threshold)",
+                      notes=["Run it several times with different thresholds and compare the numbers."],
+                      params=['threshold = 0.5 #@param {type:"slider", min:0.1, max:0.9, step:0.1}']))
+    questions.append((3, "From the dashboard: how many machines does the AI count in total and how many do the labels contain? On how many photos "
+                         "is the count exactly right? Run it at threshold 0.3 and 0.7 and explain which one you would use for (a) an automatic "
+                         "equipment log that nobody checks and (b) a weekly report that a person reads."))
+    cells.append(q(*questions[-1]))
+
+    # ---------------------------------------------------------------- Part 5
+    cells.append(md("""
+## Part 5 · How much data does a detector need?
+
+In the workshop you trained a detector once. Here you run an **experiment**: the same number of passes, more and more training photos, and one run from a random start. Each run takes one to two minutes on a GPU. Suggested ladder: 60 photos · 10 passes → 120 · 10 → all · 10 → then the best of those with a *random* start. Name every run so the leaderboard stays readable.
+"""))
+    cells.append(form(
+        "▶ Step 5a · Train",
+        """n = 10**9 if training_photos == "all" else int(training_photos)
+lab.train_my_model(n, passes, start, run_name)""",
+        notes=["Choose the settings, name the run, click ▶. The quality score (mAP50) on the validation photos is printed after every pass; the final score on the unseen test photos is printed at the end."],
+        params=['training_photos = "60" #@param ["60", "120", "all"]', 'passes = 10 #@param {type:"slider", min:3, max:15, step:1}',
+                'start = "pretrained" #@param ["pretrained", "random"]', 'run_name = "60 photos" #@param {type:"string"}'],
+    ))
+    cells.append(form("▶ Step 5b · Leaderboard", "lab.leaderboard()", notes=["All your runs, best first. Copy this table into your report."]))
+    cells.append(form("▶ Step 5c · Your best model vs. the course model on the tricky photos", "lab.compare_my_model(group, threshold)",
+                      params=['group = "all" #@param ["all", "hard_real", "crowded", "synthetic", "other_domain", "out_of_scope"]',
+                              'threshold = 0.5 #@param {type:"slider", min:0.1, max:0.9, step:0.1}']))
+    questions.append((4, "Copy your leaderboard. How does the quality score grow with the number of training photos, and where does it start to "
+                         "flatten? How far is your best run from the course model, and what would it take to close the gap? What did the random "
+                         "start do, and what does that tell you about the 120,000 everyday photos the pretrained model had already seen?"))
+    cells.append(q(*questions[-1]))
+
+    # ---------------------------------------------------------------- Part 6
+    cells.append(md(f"""
+## Part 6 · Your own photos
+
+This is the main deliverable. Find {v['own_photos']} photos of construction machinery of your own ({v['own_photo_hint']}) and put them through the machinery model.
+"""))
+    cells.append(form("▶ Step 6a · Your own photos", "lab.upload_app()",
+                      notes=["This cell prints a **link**: open it in a new tab (or on your phone). The app has two tabs. *Photo*: upload " + v["own_photo_hint"] + ". *Live camera*: allow the camera and point it at a machine, a toy, or a picture on a screen; boxes update about once a second. Take screenshots for your report."]))
+    questions.append((5, f"Test {v['own_photos']} photos of your own in Step 6a. Include the screenshots. For each photo: what the model found, what it "
+                         "should have found, and what made the wrong ones hard (distance, angle, a machine the classes do not cover, a photo unlike "
+                         "the training photos). Which two of your photos would you add to the training set, and why those?"))
+    cells.append(q(*questions[-1]))
+
+    cells.append(md("## Wrap-up"))
+    cells.append(form("▶ Step 7 · Numbers for your report", "lab.report_summary()"))
+    src = [f"- **{spec.title}** — {spec.description}"]
+    if other is not None:
+        src.append(f"- **{other.title}** (used in Step 3a) — {other.description}")
+    cells.append(md("### Data and model sources\n" + "\n".join(src) + """
+- Detector: YOLO11n by Ultralytics (AGPL-3.0), pretrained on COCO, fine-tuned for this course. The `ultralytics` library is installed in Step 0.
+- Out-of-scope sample images: scikit-image data (public domain / CC0).
+- Lab code: https://github.com/Haolan-Zhang/CEM4644 (folder `mp3_object_detection`).
+"""))
+
+    nb = new_notebook(cells=cells)
+    nb.metadata.update({"colab": {"provenance": [], "gpuType": "T4", "toc_visible": True}, "accelerator": "GPU",
+                        "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
+                        "language_info": {"name": "python"}})
+    out = REPO / v["file"]
+    nbformat.write(nb, str(out))
+    print("wrote", out)
+    lines = [f"# CEM4644 · MP3 report — {v['label']}", "", "Name: ______________________    Date: ____________", "",
+             f"Notebook: `{v['file']}` — dataset: *{spec.title}*.", "",
+             "Answer every question in a few sentences. Paste screenshots where the question asks for photos or tables. "
+             "Numbers must come from **your** run of the notebook (Step 7 prints them).", ""]
+    for n, text in questions:
+        lines += [f"## Question {n}", "", text, "", "*Your answer:*", "", "", ""]
+    p = REPO / "docs" / "MP3_Homework_Report_Template_v2.md"
+    p.write_text("\n".join(lines))
+    print("wrote", p)
+
+
 if __name__ == "__main__":
-    for variant in (sys.argv[1:] or VARIANTS):
-        build(variant)
+    args = sys.argv[1:] or list(VARIANTS) + ["homework_v2"]
+    for variant in args:
+        if variant == "homework_v2":
+            build_short()
+        else:
+            build(variant)
