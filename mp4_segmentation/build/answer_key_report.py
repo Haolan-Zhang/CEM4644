@@ -26,11 +26,9 @@ MAX_SIDE = 1200
 
 # the phrases the homework suggests; the second value is the key category the phrase is expected to hit (None = nothing)
 PHRASES = {
-    "usda_5542": [("room", "room"), ("bedroom", "room"), ("door", None), ("window", None), ("curved line", None)],
     "va_floor": [("room", "room"), ("door", None), ("curved line", None)],
     "test_fp": [("footing", "footing"), ("foundation", "footing"), ("square", "footing"), ("hatched square", "footing"), ("rectangle", "footing")],
     "test_fp_2": [("footing", "footing"), ("square", "footing"), ("hatched square", "footing"), ("rectangle", "footing")],
-    "uscg_motorpool": [("footing", "footing"), ("square", "footing"), ("rectangle", "footing"), ("circle", "grid bubble")],
     "uscg_pile": [("footing", "pile footing"), ("square", "pile footing"), ("rectangle", "pile footing")],
     "va_ceiling": [("light fixture", "2x4 light fixture"), ("diffuser", None), ("rectangle", "2x4 light fixture"),
                    ("rectangle with a diagonal line", "2x4 light fixture"), ("small circle", "recessed light"), ("square", "2x2 light fixture")],
