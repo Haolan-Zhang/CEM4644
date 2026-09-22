@@ -345,7 +345,7 @@ GROUP_TEXT = {
     "structural": ("Structural (foundation) plans",
                    "On a foundation plan you take off **areas of footings** and a **count of them**. The scale comes from a "
                    "printed bay dimension or from a footing whose width its mark gives you (F4.0 = 4'-0\" wide). The count "
-                   "is made by the model from one box labelled *example: footing* - you never count them yourself. Two "
+                   "is made by the model from your first *footing* box, which it uses as the example - you never count them yourself. Two "
                    "things to watch: read the *same* edge of the ink at both ends (outside-to-outside or centre-to-centre, "
                    "not one of each), and remember that a symbol smaller than about 60 pixels on the sheet is too small for "
                    "the model - the mask becomes a rounded copy of your box, and the 'area' you get is the area you drew."),
@@ -401,7 +401,8 @@ the picture before each box you draw (the labels come from that sheet's answer k
 label: **scale: ...** for a length whose size the sheet gives you, the plain word (**room**, **footing**, **pit**) for
 something you want the area of, and **example: ...** for something you want counted. One box labelled *example: pile
 footing* is all a count needs: SAM 3 goes and finds every other symbol on the sheet that looks like it, and that is how
-a count of 41 light fixtures or 29 pile footings is made. The slider under the picture sets how sure the model has to be
+a count of 41 light fixtures or 29 pile footings is made. Where the thing counted is also measured (the footings), there is
+no separate example label: your **first** *footing* box is the example. The slider under the picture sets how sure the model has to be
 before it keeps one of them.
 
 The second cell is the other way of asking: **type a phrase** and SAM 3 looks for it on the whole sheet, with no box
@@ -472,7 +473,7 @@ QUESTION_BY_GROUP = {
               "Then from Step 2b: what did *room* find on each sheet (found / missed / extra, and the median error of the areas "
               "it measured) against the rooms from your boxes? What did *door* and *window* return, and what did *curved line*?"),
     "structural": ("From Step 3a: for each sheet, the scale and how you set it, the areas of the footings you measured against "
-                   "the sizes their marks give, and the count SAM 3 made from your one *example: footing* box (found / missed / "
+                   "the sizes their marks give, and the count SAM 3 made from your first *footing* box, its example (found / missed / "
                    "extra). One sheet asks you only to count, because its pile caps are too small to measure - what happens to the "
                    "measured area of something that small, and why? Then from Step 3b: does *footing* find anything? Which shape "
                    "word finds the footings, on which sheet, with how many extras, and how do the areas it measures compare with "

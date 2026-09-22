@@ -549,9 +549,12 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
         key_px_per_ft = _span(ref["box"], ref["axis"]) / float(ref["feet"])
         row = {"label": ref["label"], "feet": float(ref["feet"]), "axis": ref["axis"], "use": bool(ref.get("use")),
                "note": ref.get("note", ""), "drawn": False, "px": None, "px_per_ft": None,
-               "key_px_per_ft": key_px_per_ft, "err_pct": None, "box": ref["box"]}
-        if label in drawn:
-            b = drawn[label][0]
+               "key_px_per_ft": key_px_per_ft, "err_pct": None, "box": ref["box"], "via": None}
+        b = drawn[label][0] if label in drawn else None
+        if b is None and ref.get("from_category") and drawn.get(ref["from_category"]):
+            b = drawn[ref["from_category"]][0]                 # the first footing box is the scale reference too
+            row["via"] = ref["from_category"]
+        if b is not None:
             px = max(1.0, _span(b, ref["axis"]))
             row.update(drawn=True, px=px, px_per_ft=px / float(ref["feet"]), box=b,
                        err_pct=(px / float(ref["feet"]) - key_px_per_ft) / key_px_per_ft * 100)
@@ -576,16 +579,21 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
         return float(px) / (px_per_ft * px_per_ft)
 
     # ---------------------------------------------------------------- 2. counts: one example box, SAM 3 finds the rest
+    rep["todo_labels"] = {}
     for cat in (sheet.count_categories if count_categories is None else count_categories):
         mine = drawn.get(sheet.example_label(cat), [])
+        via = None
+        if not mine and cat in sheet.area_categories and drawn.get(sheet.area_label(cat)):
+            mine, via = drawn[sheet.area_label(cat)][:1], sheet.area_label(cat)   # the first footing box is the example
         if not mine:
             rep["counts_todo"].append(cat)
+            rep["todo_labels"][cat] = sheet.area_label(cat) if cat in sheet.area_categories else sheet.example_label(cat)
             continue
         truth = sheet.counts.get(cat, [])
         hint = sheet.hint(cat)
         thr = float(hint["threshold"] if threshold is None else threshold)
         info = {"category": cat, "threshold": thr, "tip": hint.get("tip", ""), "size_range": hint["size_range"],
-                "example": mine[0], "extra_examples": len(mine) - 1, "truth": len(truth), "seconds": 0.0,
+                "example": mine[0], "extra_examples": len(mine) - 1, "example_from": via, "truth": len(truth), "seconds": 0.0,
                 "found": 0, "matched": 0, "missed": [], "extra": [], "pred": [], "extra_flags": []}
         if lab.engine is None:
             info["error"] = ("SAM 3 is not loaded, so your example box cannot be used to count. Re-run Step 0 "
@@ -707,7 +715,9 @@ def print_takeoff(sheet, rep, guided: bool = True):
             if r["note"]:
                 print(f"  {r['label']}: {r['note']}")
     trusted = next((r for r in drawn if r["use"]), None)
-    if trusted:
+    if trusted and trusted.get("via"):
+        print(f"  Scale used for takeoff: {sc['used_px_per_ft']:.2f} px/ft (from your first {trusted['via']} box: {trusted['label']})")
+    elif trusted:
         print(f"  Scale used for takeoff: {sc['used_px_per_ft']:.2f} px/ft (from the first scale box: {trusted['label']})")
     else:
         print(f"  Scale used for takeoff: {sc['used_px_per_ft']:.2f} px/ft (from the answer key)")
@@ -726,19 +736,21 @@ def count_lines(rep, tips: bool = True, bold=lambda s: s):
             lines.append(f"{cat}: {c['error']}"); continue
         n = c["found"]; ne = len(c["extra"]); nm = len(c["missed"])
         real = plural(c["truth"], cat).split(" ", 1)[1]                      # "doors", "pile footings"
-        lines.append(f"{cat} (confidence >= {c['threshold']:.2f}): Using your example box (purple), SAM 3 returned "
+        source = f"your first {c['example_from']} box as the example" if c.get("example_from") else "your example box"
+        lines.append(f"{cat} (confidence >= {c['threshold']:.2f}): Using {source} (purple), SAM 3 returned "
                      f"{bold(f'{n} region' + ('' if n == 1 else 's'))} in {c['seconds']:.1f} s. "
                      f"Of the {bold(f"{c['truth']} actual {real}")}, it identified "
                      f"{bold(str(c['matched']))} (green) and missed {bold(str(nm))} (red). "
                      f"It also identified {bold(f'{ne} extra region' + ('' if ne == 1 else 's'))} that "
-                     f"{'was' if ne == 1 else 'were'} not {real} (blue).")
+                     f"{'was not a ' + cat if ne == 1 else 'were not ' + real} (blue).")
         if c.get("extra_examples"):
             lines.append(f"   You drew {c['extra_examples'] + 1} boxes labelled 'example: {cat}'. "
                          "Only the first one was used - one example is all the model needs.")
         if tips and c.get("tip"):
             lines.append(f"   {c['tip']}")
     for cat in rep.get("counts_todo") or []:
-        lines.append(f"{cat}: not counted. Draw ONE clean box labelled 'example: {cat}' and submit again; "
+        label = (rep.get("todo_labels") or {}).get(cat, f"example: {cat}")
+        lines.append(f"{cat}: not counted. Draw ONE clean box labelled '{label}' and submit again; "
                      "the count comes from the model, not from your boxes.")
     return "WHAT SAM 3 COUNTED FROM YOUR EXAMPLE BOX", lines
 

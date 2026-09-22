@@ -97,7 +97,7 @@ of the model, so the lab no longer asks for one.
 | `uscg_pile` | −1.8 % / −0.1 % | pile footing (0.3) **29/29**, 2 ex | – (the caps are too small to measure) |
 
 The counting categories are named after the same object as the area category, so a sheet that has both reads
-`footing` and `example: footing` (not `spread footing` beside `footing`); `uscg_motorpool` keeps a second category,
+`footing`, whose first box is also the counting example (no `example: footing` label, and no `spread footing` beside `footing`); `uscg_motorpool` keeps a second category,
 `grid bubble`, because it is a different object.
 
 Three of those numbers are **designed failures** and are the teaching points of their sheets:
@@ -238,7 +238,7 @@ produces, with a few percent of variation because the boxes are drawn by hand.
    the hall on `usda_5542` is the worst); *door* and *window* return nothing; *curved line* returns the swings.
 2. **Structural plans (22).** Per sheet the scale route and the footing areas against the sizes the marks give
    (`F12.0` = 12 ft, `E4'-6"` = 4 ft 6 in, and the `FOOTING SCHEDULE` on `uscg_motorpool`), plus the count SAM 3 made
-   from the one `example: footing` box. On `uscg_pile` the caps are 2'-6" × 5'-0" and only about 27 × 53 px on the sheet:
+   from the first `footing` box, which is the example. On `uscg_pile` the caps are 2'-6" × 5'-0" and only about 27 × 53 px on the sheet:
    below roughly 60 px the mask stops tracing the symbol and becomes a rounded copy of the drawn box, so the
    "area" is the student's box. That is why the sheet is a counting exercise only. From Step 3b: *footing* finds
    nothing on any sheet; *square* finds 10/10 and 19/19 footings on the two example plans (areas within 2 % and 10 %)

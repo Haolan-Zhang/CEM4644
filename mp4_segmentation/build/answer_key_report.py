@@ -87,7 +87,8 @@ def measure(sheet):
     boxes = [(sheet.scale_label(r), jitter(r["box"], 0.01)) for r in sheet.scale_refs]
     boxes += [(sheet.area_label(a["category"]), jitter(a["box"])) for a in sheet.areas(takeoff_only=True)]
     for cat, truth in sheet.counts.items():
-        boxes.append((sheet.example_label(cat), jitter(truth[0], 0.03)))
+        if cat not in sheet.area_categories:                 # a footing's first area box is its own example
+            boxes.append((sheet.example_label(cat), jitter(truth[0], 0.03)))
     over, rep = ui.takeoff_compute(lab, sheet.id, boxes, threshold=None)
     return over, rep
 

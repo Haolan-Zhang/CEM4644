@@ -85,7 +85,7 @@ sheet prints and is shown as information. For a footing or a pit, `true_sqft` is
 gives. `scale_refs[].use` marks the one the areas are computed with; a second ref with `use: false` is a cross-check.
 `counts` keys are plain student words, and they use the **same word as the area category** when they are the same
 object (`footing`, not `spread footing` next to an area called `footing`). A `counts` entry lists every instance on
-the sheet, and it exists to check the model's count: the student boxes **one** example (`example: footing`), SAM 3
+the sheet, and it exists to check the model's count: the student boxes **one** example (`example: grid bubble`; for a thing that is also measured, the first `footing` box is the example), SAM 3
 finds the rest, and the key says what should have been found. A sheet with nothing to count carries `"counts": {}`.
 `aec_seg.data.check_key` validates all of this and the notebook refuses to load a set with a broken key:
 `python -m aec_seg.data data/sheets/workshop` prints the report.

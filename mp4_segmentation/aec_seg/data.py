@@ -5,7 +5,8 @@ Answer key (`data/sheets/<set>/<id>.key.json`, next to `<id>.png`):
     {"id", "file", "title", "discipline", "units": "ft", "size": [W, H],
      "credit": {"title", "author", "license", "source"},
      "scale": {"px_per_ft": 20.3, "how": "..."},
-     "scale_refs": [{"label", "feet", "box": [x1,y1,x2,y2], "axis": "x"|"y", "use": true, "note"}],
+     "scale_refs": [{"label", "feet", "box": [x1,y1,x2,y2], "axis": "x"|"y", "use": true, "note",
+                     "from_category": "footing"   # optional: any box of that area category serves as this reference}],
      "areas":  [{"label", "type", "category", "indoor", "printed", "printed_sqft",
                  "box": [x1,y1,x2,y2], "poly": [[x,y], ...], "true_sqft", "note"}],
      "counts": {"footing": [[x1,y1,x2,y2], ...]},          # every one of them, for checking the model's count
@@ -161,9 +162,11 @@ class Sheet:
     def box_labels(self) -> List[str]:
         """The labels of the box-drawing tool, in the order the student should draw them: the scale
         references, then the areas to measure, then one example of each thing to be counted."""
-        return ([self.scale_label(r) for r in self.scale_refs]
-                + [self.area_label(c) for c in self.area_categories]
-                + [self.example_label(c) for c in self.count_categories])
+        labels = [self.scale_label(r) for r in self.scale_refs if r.get("from_category") not in self.area_categories]
+        labels += [self.area_label(c) for c in self.area_categories]
+        # a thing that is measured AND counted (a footing) needs no example label: the first area box is the example
+        labels += [self.example_label(c) for c in self.count_categories if c not in self.area_categories]
+        return labels
 
     # ------------------------------------------------------------------ truth lookups for the named things
     def truth_boxes(self, what: str, sub: Optional[str] = None) -> List[List[float]]:
@@ -254,6 +257,8 @@ def check_key(key: dict, folder: Path) -> List[str]:
             why = _is_box(r["box"], size)
             if why:
                 bad.append(f"scale_refs[{i}] ('{r.get('label')}'): box {why}")
+        if r.get("from_category") and r["from_category"] not in {a.get("category") for a in key.get("areas") or []}:
+            bad.append(f"scale_refs[{i}] ('{r.get('label')}'): from_category '{r['from_category']}' is not an area category of this sheet")
     # areas
     for i, a in enumerate(key.get("areas") or []):
         who = f"areas[{i}] ('{a.get('label')}')"
