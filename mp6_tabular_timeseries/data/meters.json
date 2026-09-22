@@ -1,0 +1,90 @@
+{
+ "Hog_office_Marlena": {
+  "set": "workshop",
+  "use": "office",
+  "sub_use": "Office",
+  "sqm": 12240,
+  "site": "Hog",
+  "timezone": "US/Central",
+  "year_built": null,
+  "mean_kWh": 81.4,
+  "missing_hours": 8
+ },
+ "Bear_education_Lila": {
+  "set": "workshop",
+  "use": "school",
+  "sub_use": "Education",
+  "sqm": 11484,
+  "site": "Bear",
+  "timezone": "US/Pacific",
+  "year_built": 1961,
+  "mean_kWh": 212.5,
+  "missing_hours": 1
+ },
+ "Bear_lodging_Evan": {
+  "set": "workshop",
+  "use": "residence hall",
+  "sub_use": "Lodging/residential",
+  "sqm": 17206,
+  "site": "Bear",
+  "timezone": "US/Pacific",
+  "year_built": 1930,
+  "mean_kWh": 170.6,
+  "missing_hours": 38
+ },
+ "Bear_assembly_Jose": {
+  "set": "workshop",
+  "use": "assembly hall",
+  "sub_use": "Entertainment/public assembly",
+  "sqm": 3361,
+  "site": "Bear",
+  "timezone": "US/Pacific",
+  "year_built": 1966,
+  "mean_kWh": 256.2,
+  "missing_hours": 38
+ },
+ "Hog_office_Gustavo": {
+  "set": "homework",
+  "use": "office",
+  "sub_use": "Office",
+  "sqm": 6582,
+  "site": "Hog",
+  "timezone": "US/Central",
+  "year_built": null,
+  "mean_kWh": 755.7,
+  "missing_hours": 0
+ },
+ "Moose_education_Leland": {
+  "set": "homework",
+  "use": "school",
+  "sub_use": "College Classroom",
+  "sqm": 49000,
+  "site": "Moose",
+  "timezone": "US/Eastern",
+  "year_built": 1976,
+  "mean_kWh": 1430.0,
+  "missing_hours": 30
+ },
+ "Robin_lodging_Janie": {
+  "set": "homework",
+  "use": "residence hall",
+  "sub_use": "Dormitory",
+  "sqm": 6193,
+  "site": "Robin",
+  "timezone": "Europe/London",
+  "year_built": 1930,
+  "mean_kWh": 111.5,
+  "missing_hours": 0
+ },
+ "Rat_assembly_Rolland": {
+  "set": "homework",
+  "use": "assembly hall",
+  "sub_use": "Swimming Pool",
+  "sqm": 663,
+  "site": "Rat",
+  "timezone": "US/Eastern",
+  "year_built": null,
+  "mean_kWh": 45.5,
+  "missing_hours": 30
+ }
+}

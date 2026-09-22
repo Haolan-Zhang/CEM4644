@@ -1,0 +1,26 @@
+{
+ "concrete": {
+  "title": "Concrete Compressive Strength",
+  "author": "I-Cheng Yeh (1998), UCI Machine Learning Repository",
+  "license": "CC BY 4.0",
+  "source": "https://archive.ics.uci.edu/dataset/165/concrete+compressive+strength"
+ },
+ "energy_efficiency": {
+  "title": "Energy Efficiency",
+  "author": "A. Tsanas and A. Xifara (2012), UCI Machine Learning Repository",
+  "license": "CC BY 4.0",
+  "source": "https://archive.ics.uci.edu/dataset/242/energy+efficiency"
+ },
+ "meters": {
+  "title": "Building Data Genome Project 2 (hourly electricity meters and site weather, 2017)",
+  "author": "Miller et al. (2020), Scientific Data 7:368",
+  "license": "MIT",
+  "source": "https://github.com/buds-lab/building-data-genome-project-2"
+ },
+ "forecaster": {
+  "title": "Chronos-Bolt (small)",
+  "author": "Amazon Science",
+  "license": "Apache-2.0",
+  "source": "https://huggingface.co/amazon/chronos-bolt-small"
+ }
+}
