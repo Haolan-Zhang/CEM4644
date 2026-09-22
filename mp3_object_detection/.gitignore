@@ -7,3 +7,4 @@ work/
 *.log
 yolo11n.pt
 !models/yolo11n.pt
+weights/
