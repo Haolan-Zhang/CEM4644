@@ -58,8 +58,9 @@ aec_seg/          all the code the notebooks call (hidden from students)
 data/intro/       two site photos (Wikimedia Commons) for the opening steps + credits.json
 data/sheets/      workshop/ and homework/: <id>.png + <id>.key.json + credits.json (+ a legend image)
 data/masks/       SAM 3 precomputed for every workshop drawing x phrase, so Part 2 and Step 4a are instant
-docs/             report templates, instructor guide, a copy of the SAM License
-build/            instructor-side scripts: precompute_masks.py, make_notebooks.py
+docs/             report templates, instructor guide, Homework_Answer_Keys.md (every homework key drawn on its sheet,
+                  with what SAM 3 measures on it; built by build/answer_key_report.py), a copy of the SAM License
+build/            instructor-side scripts: precompute_masks.py, make_notebooks.py, answer_key_report.py
 ```
 
 ### The answer key (`data/sheets/<set>/<id>.key.json`)
