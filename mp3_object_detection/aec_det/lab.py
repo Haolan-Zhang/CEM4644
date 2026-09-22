@@ -2,10 +2,12 @@
 import os
 os.environ.setdefault("YOLO_VERBOSE", "False")
 
+import contextlib
 import shutil
 import subprocess
 import sys
 import time
+import warnings
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -21,6 +23,15 @@ from .train import LEADERBOARD, add_to_leaderboard, leaderboard_table, quick_tra
 ULTRALYTICS_PIN = "ultralytics==8.4.143"
 GRADIO_PIN = "gradio==6.26.0"
 BBOX_PIN = "jupyter-bbox-widget>=0.7.0"
+
+
+@contextlib.contextmanager
+def quiet():
+    """Nothing printed while packages install and models load: the notebook prints one line instead."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        with open(os.devnull, "w") as sink, contextlib.redirect_stdout(sink), contextlib.redirect_stderr(sink):
+            yield
 
 
 class DetLab:
@@ -50,6 +61,13 @@ class DetLab:
             _colab_output.enable_custom_widget_manager()
         except Exception:
             pass
+        with quiet():                                  # the photos and the models, without a word
+            self._load(dataset)
+        self.ready = True
+        dev = "GPU" if get_device() != "cpu" else "CPU (fine; training will be slower)"
+        print(f"✅ Ready in {time.time() - t0:.0f} s. Running on: {dev}.")
+
+    def _load(self, dataset: str):
         self.spec = spec = DETSETS[dataset]
         unz = self.root / "_unzipped"
         folder = unzip_dataset(self.root / "data" / spec.zip_name, unz)
@@ -78,18 +96,14 @@ class DetLab:
                 self.other_test = DetSet.from_folder(of / "test", o.classes, o.display, "other test")
                 self.other = Detector(self.root / o.course_model, name=f"model trained on {o.key.replace('_', ' ')}",
                                       classes=[o.pretty(c) for c in o.classes])
-        self.ready = True
-        dev = "GPU" if get_device() != "cpu" else "CPU (fine; training will be slower)"
-        print(f"✅ Ready in {time.time() - t0:.0f} s. Running on: {dev}.")
-        self.intro()
 
     def _install_missing(self, pkgs: Dict[str, str]):
         for mod, req in pkgs.items():
             try:
-                __import__(mod)
-            except ImportError:
-                print(f"Installing {mod} (about a minute)...")
-                subprocess.run([sys.executable, "-m", "pip", "install", "-q", req], check=False)
+                with quiet():
+                    __import__(mod)
+            except ImportError:                      # quietly: the notebook says to wait for the ✅ line
+                subprocess.run([sys.executable, "-m", "pip", "install", "-q", req], check=False, capture_output=True)
 
     def _need(self):
         if not self.ready:
