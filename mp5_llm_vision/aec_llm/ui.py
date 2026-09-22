@@ -29,23 +29,16 @@ def show_examples(lab, which: str):
         titles = [f"{p.file.rsplit('.', 1)[0]}\ntruth: {p.truth}" for p in ex.photos]
         viz.show(viz.image_grid(ims, titles, ncols=7, size=2.2, suptitle=f"{ex.spec.photos.title}: {len(ims)} photos, {len(ex.photo_classes)} classes"))
         print("Classes:", "; ".join(ex.photo_classes))
-        print(f"Answer key: the folder each photo came from. Specialist for comparison: {ex.photo_specialist} "
-              f"({tasks.specialist_cls_accuracy(ex.photos):.0f} % correct on these {len(ims)}).")
-        print("Source:", ex.spec.photos.source)
     elif which.startswith("site"):
         cols = ex.spec.sites.colors
         ims = [viz.draw_boxes(s.load(), [(t["label"], t["box"], cols.get(t["label"], viz.GREY), 2) for t in s.truth]) for s in ex.sites]
         titles = [f"{s.file.rsplit('.', 1)[0]}: " + ", ".join(f"{n} {ex.spec.sites.display.get(l, l)}" for l, n in s.counts().items()) for s in ex.sites]
         viz.show(viz.image_grid(ims, titles, ncols=3, size=3.6, suptitle=f"{ex.spec.sites.title}: the answer key drawn on each photo"))
         print("Labels:", ", ".join(ex.site_classes))
-        print(f"Answer key: the boxes people drew for the dataset. Specialist for comparison: {ex.site_specialist}.")
-        print("Source:", ex.spec.sites.source)
     else:
         ims = [p.load() for p in ex.plans]
         titles = [f"{p.id}: {p.title}\n{len(p.rooms())} rooms, {p.floor_area:,.0f} {p.unit_label}, {p.scale_label}" for p in ex.plans]
         viz.show(viz.image_grid(ims, titles, ncols=3, size=4.2, suptitle=lab.spec.plans.title))
-        print("Answer key: every room's area measured off the drawing (MP4's answer keys). Specialist for comparison: SAM 3 asked for 'room' (MP4).")
-        print(ex.plan_credit)
 
 
 def describe(lab, photo: str, question: str):
@@ -182,7 +175,6 @@ def detect_all(lab, schema: bool):
           + (f", {g['other_labels']} with a label outside the list" if g["other_labels"] else "") + (f", {g['invalid']} unusable replies" if g["invalid"] else "")
           + f"; {g['seconds']:.0f} s, {g['tokens']} tokens.")
     print(f"{ex.site_specialist}: found {sp['found']}/{sp['truth']} (recall {sp['recall']:.0f} %), {sp['extra']} extra (precision {sp['precision']:.0f} %) at confidence 0.25.")
-    print("A box counts as found when it has the right label and overlaps the answer key's box by at least half (IoU ≥ 0.5).")
     viz.show(viz.bar_compare({"Gemini recall": g["recall"], "Gemini precision": g["precision"], "specialist recall": sp["recall"], "specialist precision": sp["precision"]},
                              title="all photos", ylabel="%", colors=["#457b9d", "#457b9d", "#f4a261", "#f4a261"], figsize=(6.5, 3)))
     lab.results[("detect", schema)] = g
@@ -344,8 +336,6 @@ def summary(lab, chat: bool = False):
         ]
         print(viz.table(rows, ["task", "measure", "generalist", "specialist from MP2/MP3/MP4", "cost"], [28, 30, 44, 28, 32]))
         print("\nSpecialists: " + ex.photo_specialist + "; " + ex.site_specialist + "; MP4's SAM 3 asked for 'room'.")
-        print("The generalist needed no training data and no training; the specialists needed hundreds of labelled photos each. "
-              "The batch rows are the API; the single examples of Parts 1, 3a, 3c and 4 were the chat window, once each.")
         return
     seg_llm, seg_sam, seg_spec, secs, toks = [], [], [], 0.0, 0
     for p in ex.plans:
@@ -367,16 +357,10 @@ def summary(lab, chat: bool = False):
     ]
     print(viz.table(rows, ["task", "measure", "Gemini (one prompt each)", "specialist from MP2/MP3/MP4", "Gemini time and tokens"], [24, 30, 24, 28, 30]))
     print("\nSpecialists: " + ex.photo_specialist + "; " + ex.site_specialist + "; MP4's SAM 3 asked for 'room'.")
-    print("The generalist needed no training data and no training; the specialists needed hundreds of labelled photos each. "
-          "Times are per request to a remote service; the specialists answer in milliseconds on a GPU.")
 
 
 def report_summary(lab):
     ex = lab.examples
     c = lab.client
-    print("Numbers for your report: every step prints its own; copy the ones you used.")
     print(f"Model: {c.model}. Live requests in this session: {c.calls} ({c.seconds:.0f} s, {c.tokens} tokens). "
           f"Precomputed answers on disk: {len(c.cache) if c.cache else 0}.")
-    print(f"Examples: {ex.spec.photos.title} ({len(ex.photos)} photos, {ex.spec.photos.source}); "
-          f"{ex.spec.sites.title} ({len(ex.sites)} photos, {ex.spec.sites.source}); {lab.spec.plans.title} ({', '.join(p.id for p in ex.plans)}).")
-    print(ex.plan_credit)

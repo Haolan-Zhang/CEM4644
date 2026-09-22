@@ -96,6 +96,7 @@ register(SheetSet(
 
 register(SheetSet(
     key="homework",
+    guided=False,                        # the Part texts explain each sheet once; cells, widgets and Step 0 stay clean
     title="Seven sheets from three disciplines",
     folder="data/sheets/homework",
     description=("Seven real drawings: two floor plans (a 1940 farmhouse and a modern VA clinic), four structural foundation "

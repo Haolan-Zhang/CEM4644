@@ -385,8 +385,7 @@ You already met SAM 3 in the workshop, so this notebook goes straight to the wor
 - everything you measure and everything you count is checked against an answer key, so you always see how far off you are.
 """))
     cells.append(form("Step 1a - Browse the seven drawings", "lab.show_sheets(drawing)",
-                      notes=["*all drawings* shows all seven with the take-off tasks for each. Pick one drawing from the list to "
-                             "see it large before you work on it."],
+                      notes=["*all drawings* shows all seven; pick one to see it large."],
                       params=[param_choice("drawing", "all drawings", ["all drawings"] + sheets.labels())]))
     cells.append(form("Step 1b - The symbol legend", "lab.show_legend(drawing)",
                       notes=["The MEP sheets carry a legend of their symbols: a bold rectangle with a diagonal and a small circle "
@@ -420,27 +419,21 @@ question: which way gets you a number you would put in an estimate, and which wa
         gsheets.sort(key=lambda s: (len(s.discipline), s.id))   # the plainest sheet of the group first
         n = part_no[gid]
         head, text = GROUP_TEXT[gid]
+        default_phrase, phrase_note = PHRASE_HINTS[gid]
         cells.append(md(f"## Part {n} - {head}\n\n{text}\n\n" + "\n".join(
-            f"- **{s.id}** ({s.title}): " + " ".join(s.tasks) for s in gsheets)))
+            f"- **{s.id}** ({s.title}): " + " ".join(s.tasks) for s in gsheets)
+            + f"\n\nDo every drawing in the list, one at a time, in Step {n}a. Phrases to try in Step {n}b: {phrase_note}"))
         glabels = [s.label for s in gsheets]
         what = {"floor": "a floor plan", "structural": "a structural plan", "mep": "an MEP sheet"}[gid]
-        cells.append(form(f"Step {n}a - Take-off on {what}: your boxes",
-                          "lab.takeoff(drawing)",
-                          notes=[f"Do **every** drawing in this list, one at a time: {', '.join(s.id for s in gsheets)}. "
-                                 "Zoom with the mouse wheel. Copy each table into your report."],
+        cells.append(form(f"Step {n}a - Take-off on {what}: your boxes", "lab.takeoff(drawing)",
                           params=[param_choice("drawing", glabels[0], glabels)]))
         cats = []
         for s in gsheets:
             for c in s.area_categories + s.count_categories:
                 if c not in cats:
                     cats.append(c)
-        default_phrase, phrase_note = PHRASE_HINTS[gid]
         cells.append(form(f"Step {n}b - Ask by name on {what}: a phrase",
                           "lab.ask(drawing, phrase, confidence, compare)",
-                          notes=[phrase_note,
-                                 "The phrase goes to SAM 3 exactly as typed. *compare* picks what the regions are scored against; "
-                                 "a drawing that has no such thing in its answer key says so and shows the regions anyway. "
-                                 "Run the cell as often as you like; every run is kept for the summary."],
                           params=[param_choice("drawing", glabels[0], glabels),
                                   f'phrase = {json.dumps(default_phrase)} #@param {{type:"string"}}', CONF,
                                   param_choice("compare", cats[0], ["(nothing)"] + cats)]))

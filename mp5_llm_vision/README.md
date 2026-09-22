@@ -83,6 +83,13 @@ To change the prompts: `PROMPTS` in `aec_llm/config.py`, then `precompute.py` (o
 of old prompts can be deleted from `data/cache`). To change the examples: the specs in `aec_llm/config.py` and
 `prepare_data.py`.
 
+**Editing the text.** The notebooks are where the wording lives. Edit any markdown cell or any cell's `#@markdown`
+notes in Colab (*Show code* on a form cell), then *File → Save a copy in GitHub* (clear the outputs first). A later
+`make_notebooks.py` run keeps every markdown cell and every note it finds in the existing notebook (matched by the
+cell's first line or title) and rebuilds only the code; the report template follows the question cells. Pass
+`--fresh-text` to throw the notebook's text away and start again from this file's defaults. Step 0 prints only the
+✅ line (and a warning when no Gemini key is found); the result cells print numbers and tables, not explanations.
+
 ## Sources and licences
 
 | Item | Source | Licence |

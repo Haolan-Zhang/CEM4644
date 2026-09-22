@@ -13,9 +13,12 @@ from aec_llm.data import Examples  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
 CHAT_URL = "https://hokie.ai.vt.edu/"
-CHAT_INTRO = f"""**Two routes, nothing done twice.** For the *single-example* steps (a photo described, a photo classified, boxes on one site photo, a count, the rooms of one plan) you use a plain chat window: **hokie.ai** ({CHAT_URL}, Virginia Tech's free access to GPT models, sign in with your VT account). You download the example image, paste the prompt the notebook gives you, attach the image, and paste the reply back into the notebook, which draws and scores it against the answer key and next to the earlier labs' specialist models. The *batch* steps (every photo scored at once, prompts compared) use the Gemini API, whose answers are precomputed. No GPU is needed in this notebook.
+CHAT_INTRO_OLD = f"""**Two routes, nothing done twice.** For the *single-example* steps (a photo described, a photo classified, boxes on one site photo, a count, the rooms of one plan) you use a plain chat window: **hokie.ai** ({CHAT_URL}, Virginia Tech's free access to GPT models, sign in with your VT account). You download the example image, paste the prompt the notebook gives you, attach the image, and paste the reply back into the notebook, which draws and scores it against the answer key and next to the earlier labs' specialist models. The *batch* steps (every photo scored at once, prompts compared) use the Gemini API, whose answers are precomputed. No GPU is needed in this notebook.
 
 """
+
+CHAT_INTRO = (f"- **hokie.ai:** the single-example steps use a chat window, {CHAT_URL} (VT login): download the picture, "
+              "paste the prompt with the picture attached, paste the reply back into the cell.\n")
 
 VARIANTS = {
     "workshop": dict(
@@ -45,8 +48,29 @@ VARIANTS = {
 }
 
 
+KEEP_TEXT = True          # --fresh-text: rebuild every text from this file instead of keeping the notebook's
+EXISTING = {}             # text already in the notebook being rebuilt: first line -> markdown source, title -> notes
+
+
+def load_existing(path: Path):
+    """The notebook is where the text is edited (in Colab, then saved to GitHub). A rebuild keeps every markdown
+    cell and every cell's #@markdown notes that it finds there, matched by the cell's first line / title."""
+    EXISTING.clear()
+    if not (KEEP_TEXT and path.exists()):
+        return
+    for c in nbformat.read(str(path), as_version=4).cells:
+        first = c.source.split("\n", 1)[0].strip()
+        if c.cell_type == "markdown":
+            EXISTING[first] = c.source
+        elif first.startswith("#@title"):
+            EXISTING[first] = [l[len("#@markdown "):] for l in c.source.split("\n") if l.startswith("#@markdown ")]
+
+
 def form(title, body, notes=(), params=()):
-    src = f'#@title {title} {{ display-mode: "form" }}\n'
+    head = f'#@title {title} {{ display-mode: "form" }}'
+    if head in EXISTING:
+        notes = EXISTING[head]
+    src = head + "\n"
     src += "".join(f"#@markdown {n}\n" for n in notes)
     src += "".join(p + "\n" for p in params)
     src += body.rstrip() + "\n"
@@ -56,7 +80,9 @@ def form(title, body, notes=(), params=()):
 
 
 def md(text):
-    return new_markdown_cell(text.strip("\n"))
+    text = text.strip("\n")
+    first = text.split("\n", 1)[0].strip()
+    return new_markdown_cell(EXISTING.get(first, text))
 
 
 def q(n, text):
@@ -73,6 +99,7 @@ def build(variant, chat=False):
     v = VARIANTS[variant]
     spec = C.SPECS[v["dataset"]]
     ex = Examples(REPO, spec)
+    load_existing(REPO / (v["file"].replace(".ipynb", "_chat.ipynb") if chat else v["file"]))
     photos = [p.label for p in ex.photos]
     sites = [s.label for s in ex.sites]
     plans = [p.label for p in ex.plans]
@@ -80,24 +107,16 @@ def build(variant, chat=False):
     own_template = C.PROMPTS["classify_basic"].replace("{intro}", "{intro}").replace("{{", "{").replace("}}", "}")
 
     cells.append(md(f"""
-# 🤖 CEM4644 · MP5 — One model for everything? A vision-language model for classification, detection and take-off
+# 🤖 CEM4644 · MP5 — One model for everything?
 ## {v['label']}: *{spec.title}*
 
-**No coding needed.** Each grey box below is one *step*: click the ▶ (play) button at its left, wait until it finishes, look at the result, then answer the report question that follows. Run the steps **from top to bottom**.
+**No coding needed.** Each grey box is one step: click ▶, wait, read the result, answer the report question. Run from top to bottom.
 
-In MP2, MP3 and MP4 you trained or used one **specialist** model per task: a classifier, a detector, a segmentation model. This lab gives all three tasks to one **generalist**: a large multimodal language model (Gemini), which has never seen our photos and is steered only by the words you send it. The lab is built around two questions: *can a prompt replace a trained model?* and *how do you get an answer a program can read?*
+One **generalist** model (Gemini) does the MP2, MP3 and MP4 tasks from words alone, and every answer is scored against the same answer keys as before. About {v['minutes']} minutes.
 
-**What you will do (about {v['minutes']} minutes)**
-1. Talk to the model about a photo, and get the answer as JSON in two ways: by asking nicely, and by enforcing a schema.
-2. Classify the MP2 photos with three prompts and compare with the MP2 model.
-3. Detect and count on the MP3 photos, compare with the MP3 model.
-4. {"Measure rooms from the model's own polygons: one plan through the chat, then every plan at once through the API." if chat else "Measure rooms on the MP4 plans: the model's own polygons, or its boxes handed to SAM 3."}
-5. Your own image and your own words in a small app.
-
-{CHAT_INTRO if chat else ""}**Before you start**
-- **Gemini API key (free).** Open https://aistudio.google.com/apikey, sign in with your Google account, create a key. In Colab, click the **key icon** in the left bar (*Secrets*), add a secret named `GEMINI_API_KEY` with the key as its value, and switch on *Notebook access*. Without a key the precomputed answers of the built-in examples still work; your own prompts and images do not.
-{"" if chat else "- **GPU (optional):** *Runtime → Change runtime type → T4 GPU* is only needed for Step 4b (SAM 3). Everything else runs on a remote service and needs no GPU."}
-- Never paste your key into a cell you might share: use the secret.
+**Before you start**
+- **Gemini API key (free):** https://aistudio.google.com/apikey → in Colab, the key icon (*Secrets*) → name `GEMINI_API_KEY`, *Notebook access* on. Never paste the key into a cell.
+{CHAT_INTRO if chat else "- **GPU (optional):** *Runtime → Change runtime type → T4 GPU*, only for Step 4b."}
 """))
     # the chat notebooks never load SAM 3, so they do not need the MP4 folder next to this one
     folders = ["mp5_llm_vision"] if chat else ["mp5_llm_vision", "mp4_segmentation"]
@@ -125,10 +144,8 @@ importlib.invalidate_caches()
 sys.path.insert(0, os.path.abspath(os.path.join(REPO, FOLDER)))
 from aec_llm import lab
 lab.setup(dataset="{spec.key}", api_key=api_key, model=model, load_sam={"False" if chat else "load_sam"})""",
-        notes=(["Click ▶ and wait for the green ✅ line. This downloads the examples with their precomputed answers.",
-                "Leave *api_key* empty to use the Colab secret GEMINI_API_KEY (recommended)."] if chat else
-               ["Click ▶ and wait for the green ✅ line. This downloads the examples with their precomputed answers, and (if *load_sam* is ticked) SAM 3 for Step 4b (about 3 GB).",
-                "Leave *api_key* empty to use the Colab secret GEMINI_API_KEY (recommended). Untick *load_sam* if you have no GPU and want to skip Step 4b's live part."]),
+        notes=["Click ▶ and wait for the ✅ line. Leave *api_key* empty to use the Colab secret."
+               + ("" if chat else " Untick *load_sam* if you have no GPU.")],
         params=['api_key = "" #@param {type:"string"}', f'model = "{C.DEFAULT_MODEL}" #@param {jlist(C.MODELS)}'] + ([] if chat else ['load_sam = True #@param {type:"boolean"}']),
     ))
 
@@ -136,31 +153,24 @@ lab.setup(dataset="{spec.key}", api_key=api_key, model=model, load_sam={"False" 
     cells.append(md("""
 ## Part 1 · Talk to the model
 
-A **vision-language model** reads an image and text together and answers in text. It has no fixed list of classes and no output layer for boxes: whatever structure you want back, you must **ask for it in words**, and the reply is a piece of text that a program then has to read. That is the whole difference from the specialists: the prompt is the program.
-
-Two things to watch in every step: the **reply itself** (is it what you asked for, is it right?) and its **cost**: seconds per request and **tokens** (the units the service bills; an image costs a few hundred tokens, the model's private *thinking* costs more).
+A vision-language model reads an image and text and answers in text. Whatever structure you want back, you ask for it in words. Watch the reply and its cost (seconds, tokens).
 """))
     cells.append(form("▶ Step 1a · The examples and their answer keys", "lab.show_examples(which)",
-                      notes=["The same kind of material as in MP2, MP3 and MP4, with the answer keys and with what the earlier labs' specialist models said about them."],
                       params=[f'which = "photos" #@param {jlist(["photos", "site photos", "plans"])}']))
     if chat:
         cells.append(form("▶ Step 1b · Ask the chat anything about a photo", "lab.chat_describe(photo, question)",
-                          notes=["Free text in, free text out, through the chat window: download the photo, paste the prompt with the photo attached, paste the reply back."],
                           params=[f'photo = "{photos[0]}" #@param {jlist(photos)}', f'question = "{C.DESCRIBE_QUESTIONS[0]}" #@param {jlist(C.DESCRIBE_QUESTIONS)} {{allow-input: true}}']))
         cells.append(form("▶ Step 1c · JSON, way A: ask the chat nicely", "lab.chat_classify(photo)",
-                          notes=["The classification prompt asks for JSON; nothing enforces it. Paste the reply back: is it valid JSON, is the label one of the categories, is it right? "
-                                 "Do it two or three times (new chat each time) and watch whether the format and the label stay the same."],
+                          notes=["Paste the reply back. Do it two or three times (a new chat each time)."],
                           params=[f'photo = "{photos[0]}" #@param {jlist(photos)}']))
         questions.append((1, "From Step 1c: across your tries, how many of the chat replies were valid JSON, was the label always one of the categories, and did it stay the same? "
                              "In Step 2a, run the *basic* prompt with the schema off and on: what does the schema change in the replies, and what does it not change (the label can still be wrong)? "
                              "Why does a program that has to read the reply (to fill a table, to count, to draw a box) need the schema rather than a polite request?"))
     else:
         cells.append(form("▶ Step 1b · Ask anything about a photo", "lab.describe(photo, question)",
-                          notes=["Free text in, free text out. The three questions below are precomputed for the first photo; any other photo or question runs live (needs your key)."],
                           params=[f'photo = "{photos[0]}" #@param {jlist(photos)}', f'question = "{C.DESCRIBE_QUESTIONS[0]}" #@param {jlist(C.DESCRIBE_QUESTIONS)} {{allow-input: true}}']))
         cells.append(form("▶ Step 1c · Getting JSON, two ways", "lab.json_lab(photo, repeats)",
-                          notes=["**A:** the prompt asks for JSON, nothing enforces it. **B:** the same prompt with a **JSON schema** handed to the API, which rejects any reply that does not fit. "
-                                 "Each way is run several times: watch whether the format and the label stay the same."],
+                          notes=["**A:** JSON asked for in the prompt. **B:** a JSON schema enforced by the API. Each run several times."],
                           params=[f'photo = "{photos[0]}" #@param {jlist(photos)}', 'repeats = 3 #@param {type:"slider", min:1, max:3, step:1}']))
         questions.append((1, "From Step 1c: how many of the plain replies (A) were valid JSON, and did the label stay the same across the runs? What did the schema (B) change, and what did it not change? "
                              "Why does a program that has to read the reply (to fill a table, to count, to draw a box) need B rather than A?"))
@@ -170,13 +180,12 @@ Two things to watch in every step: the **reply itself** (is it what you asked fo
     cells.append(md(f"""
 ## Part 2 · Classification by prompt
 
-The MP2 task again: {spec.photos.title.lower()}, {len(ex.photo_classes)} classes, and a model that was never trained on them. Three prompts of increasing length are prepared: the class names only, the names with a one-line description each, and the descriptions plus decision rules. The reply is scored against the answer key exactly as in MP2, and the MP2 course model's accuracy on the same photos is shown next to it.
+The MP2 photos ({len(ex.photo_classes)} classes), three prompts: the class names, the names with descriptions, the descriptions with rules. Scored against the answer key and the MP2 model.
 """))
     cells.append(form("▶ Step 2a · Classify all the photos", "lab.classify(prompt, schema, show_mistakes)",
-                      notes=["All three prompts are precomputed with the schema on; *basic* is also precomputed with the schema off. Other combinations run live (a few minutes on the free tier)."],
                       params=[f'prompt = "basic" #@param {jlist(C.CLASSIFY_PROMPTS)}', 'schema = True #@param {type:"boolean"}', 'show_mistakes = True #@param {type:"boolean"}']))
     cells.append(form("▶ Step 2b · Your own prompt", "lab.classify_own(prompt_text, schema)",
-                      notes=["Edit the text (keep `{classes}` where the list of categories should go; `{intro}` is the first sentence). Runs live on every photo: needs your key; the free tier allows only a few requests per minute, so this takes one to three minutes."],
+                      notes=["Keep `{classes}` and `{intro}` in the text. Runs live on every photo (one to three minutes)."],
                       params=[f'prompt_text = {json.dumps(own_template, ensure_ascii=False)} #@param {{type:"string"}}', 'schema = True #@param {type:"boolean"}']))
     questions.append((2, v["q_classify"]))
     cells.append(q(*questions[-1]))
@@ -187,12 +196,11 @@ The MP2 task again: {spec.photos.title.lower()}, {len(ex.photo_classes)} classes
     cells.append(md(f"""
 ## Part 3 · Detection and counting by prompt
 
-The MP3 task: {spec.sites.title[0].lower() + spec.sites.title[1:]}. The prompt asks for a list of boxes as `[ymin, xmin, ymax, xmax]` on a 0–1000 grid (the convention this model was trained with), the notebook converts them to pixels and scores them like MP3 did: a box is *found* when its label is right and it overlaps the answer key's box by at least half. The MP3 YOLO model's boxes on the same photos are shown next to Gemini's.
+The MP3 photos. Boxes come back as `[ymin, xmin, ymax, xmax]` on a 0–1000 grid and are scored like MP3: right label and an overlap of at least half (IoU ≥ 0.5).
 """))
     if chat:
         cells.append(form("▶ Step 3a · Boxes on one photo, from the chat", "lab.chat_detect(site)",
-                          notes=["Paste the reply back and the notebook draws the boxes on the photo and scores them against the answer key, next to the MP3 model's numbers on the same photo. "
-                                 "If the boxes land in the wrong place, the chat used another coordinate convention: change *box order* or *numbers are* and score again."],
+                          notes=["If the boxes land in the wrong place, change *box order* or *numbers are* and score again."],
                           params=[f'site = "{sites[0]}" #@param {jlist(sites)}']))
     else:
         cells.append(form("▶ Step 3a · Boxes on one photo", "lab.detect(site, schema)",
@@ -201,11 +209,9 @@ The MP3 task: {spec.sites.title[0].lower() + spec.sites.title[1:]}. The prompt a
                       params=['schema = True #@param {type:"boolean"}']))
     if chat:
         cells.append(form("▶ Step 3c · Just ask the chat for the number", "lab.chat_count(site)",
-                          notes=["Instead of boxes, the chat is asked for a count. Compared with the answer key and with the boxes it gave you in Step 3a."],
                           params=[f'site = "{sites[0]}" #@param {jlist(sites)}']))
     else:
         cells.append(form("▶ Step 3c · Just ask for the number", "lab.count(site, schema)",
-                          notes=["Instead of boxes, the model is asked for a count. Compared with the answer key and with counting the model's own boxes from Step 3a."],
                           params=[f'site = "{sites[0]}" #@param {jlist(sites)}', 'schema = True #@param {type:"boolean"}']))
     questions.append((4, v["q_detect"] + (" Also: on the photo you gave the chat in Step 3a, how did its boxes compare with the MP3 model's on the same photo, and what coordinate convention did the chat use?" if chat else "")))
     cells.append(q(*questions[-1]))
@@ -219,30 +225,19 @@ The MP3 task: {spec.sites.title[0].lower() + spec.sites.title[1:]}. The prompt a
     cells.append(md(f"""
 ## Part 4 · Rooms on a floor plan
 
-The MP4 task on {spec.plans.description}. {"The prompt asks for each room's outline as a polygon (a list of points on the 0–1000 grid) and its label; the notebook converts the polygon to pixels and to " + unit + " with the plan's scale, and checks every room against the drawing's answer key, next to MP4's result (SAM 3 asked for *room* by phrase). First one plan by hand in the chat window, then all of them at once through the API." if chat else f"Two ways to get {unit} out of a language model:"}
-{"" if chat else """
-- **LLM only:** the prompt asks for each room's outline as a polygon (a list of points on the 0–1000 grid) and its label; the notebook converts the polygon to pixels and to """ + unit + """ with the plan's scale.
-- **LLM boxes + SAM 3:** the prompt asks only for a box per room; each box is handed to SAM 3 exactly as your own boxes were in MP4 (*empty room* + box, holes filled, walls removed). The language model does the *finding and naming*, the segmentation model does the *pixels*.
-
-Both are scored against the drawing's answer key, and MP4's result (SAM 3 asked for *room* by phrase) is shown for comparison."""}
+The MP4 plans, in {unit}. {"One plan from the chat's polygons, then every plan at once through the API." if chat else "Two routes: the model's own polygons, or its boxes handed to SAM 3."} Every room is scored against the drawing, next to MP4's SAM 3 by phrase.
 """))
     if chat:
         cells.append(form("▶ Step 4a · Rooms from the chat's polygons (one plan)", "lab.chat_rooms(plan)",
-                          notes=[f"Paste the reply back: the notebook converts the polygons, measures every room in {unit} and checks each against the drawing. "
-                                 "Long lists of coordinates are where chat replies break: look at what you get, and try a second plan."],
+                          notes=["If the shapes sit in the wrong place, change *box order* or *numbers are* and score again."],
                           params=[f'plan = "{plans[0]}" #@param {jlist(plans)}']))
         cells.append(form(f"▶ Step 4b · All {len(plans)} plans at once (the API)", "lab.segment_all(schema)",
-                          notes=[f"The same prompt sent to the API for all {len(plans)} plans, which would take you {len(plans)} rounds of copying by hand. One picture and one line per plan: "
-                                 "rooms found, median error against the drawing, the model's total against the floor area, and MP4's SAM 3 for comparison.",
-                                 "Untick *schema* to see what the same prompt returns when nothing enforces the structure (precomputed)."],
+                          notes=["Untick *schema* to see the same prompt without the enforced structure."],
                           params=['schema = True #@param {type:"boolean"}']))
     else:
         cells.append(form("▶ Step 4a · The model's own polygons", "lab.segment(plan, mode, schema)",
-                          notes=["Precomputed for every plan with the schema on and off. Try both: without the schema this model tends to skip the polygons and only give boxes, "
-                                 "and long lists of coordinates are where the plain JSON breaks."],
                           params=[f'plan = "{plans[0]}" #@param {jlist(plans)}', f'mode = "LLM only (polygons)" #@param {jlist(["LLM only (polygons)"])}', 'schema = True #@param {type:"boolean"}']))
         cells.append(form("▶ Step 4b · The model's boxes, SAM 3's pixels", "lab.segment(plan, mode, schema)",
-                          notes=["The model's boxes are precomputed; SAM 3 runs live on them (GPU: seconds; CPU: about a minute per plan). Without SAM 3 loaded, the box areas are used."],
                           params=[f'plan = "{plans[0]}" #@param {jlist(plans)}', f'mode = "LLM boxes + SAM 3" #@param {jlist(["LLM boxes + SAM 3"])}', 'schema = True #@param {type:"boolean"}']))
         cells.append(form("▶ Step 4c · Room by room, three ways", "lab.segment_compare(plan)",
                           params=[f'plan = "{plans[0]}" #@param {jlist(plans)}']))
@@ -253,18 +248,17 @@ Both are scored against the drawing's answer key, and MP4's result (SAM 3 asked 
     cells.append(md("""
 ## Part 5 · Your image, your words
 
-A small app, opened from a link: pick a built-in image or upload your own, choose a task (it fills in a starting prompt), edit the words, switch the schema on or off, and read the raw reply next to what the notebook draws from it. Needs your key: everything here is live.
+A small app for your own image and your own prompt. Needs your key.
 """))
     cells.append(form("▶ Step 5 · Prompt lab", "lab.prompt_app()",
-                      notes=["This cell prints a **link**: open it in a new tab (or on your phone). The app stays alive while this notebook is running; if no link appears, run the cell again."]))
+                      notes=["Open the printed link in a new tab."]))
     questions.append((7, f"Run at least {v['own_experiments']} experiments of your own in Step 5 (a photo from a site or from the internet, a plan, a changed prompt, the schema on and off). "
                          "For each: the image, the prompt, the raw reply, and whether it was right. What kind of request broke the model, and how did it break (wrong answer, invented objects, unreadable reply)?"))
     cells.append(q(*questions[-1]))
 
     # ------------------------------------------------------------------ wrap-up
     cells.append(md("## Wrap-up · Generalist or specialist?"))
-    cells.append(form("▶ Step 6 · All tasks side by side", "lab.summary(chat=True)" if chat else "lab.summary()",
-                      notes=["One table: the generalist with one prompt per task against the three specialists from MP2, MP3 and MP4, with time and tokens."]))
+    cells.append(form("▶ Step 6 · All tasks side by side", "lab.summary(chat=True)" if chat else "lab.summary()"))
     questions.append((8, "From Step 6: for each task, would you use the generalist, the specialist, or both together" + (" (as in Step 4b)" if not chat else "") + "? Argue with the numbers you got and with what each needs: labelled data, training, a GPU, a network connection, money per request, and someone who checks. "
                          "What does structured output guarantee about a reply, and what does it not guarantee?"))
     cells.append(q(*questions[-1]))
@@ -275,6 +269,11 @@ A small app, opened from a link: pick a built-in image or upload your own, choos
                        "- Model: Gemini (Google) through the Gemini API, free tier; SAM 3 (Meta, SAM License) from the MP4 folder.\n")
                     + "- Lab code: https://github.com/Haolan-Zhang/CEM4644 (folder `mp5_llm_vision`).\n"))
 
+    questions = []                                             # from the cells: an edited question is kept
+    for c in cells:
+        if c.cell_type == "markdown" and c.source.startswith("> ### 📝 Report question "):
+            head, _, body = c.source.partition("\n")
+            questions.append((int(head.rsplit(" ", 1)[1]), body[2:].strip() if body.startswith("> ") else body.strip()))
     nb = new_notebook(cells=cells)
     nb.metadata.update({"colab": {"provenance": [], "gpuType": "T4", "toc_visible": True}, "accelerator": "GPU",
                         "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
@@ -296,6 +295,7 @@ A small app, opened from a link: pick a built-in image or upload your own, choos
 
 if __name__ == "__main__":
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    KEEP_TEXT = "--fresh-text" not in sys.argv
     chat = "--chat" in sys.argv or "--all" in sys.argv
     for variant in (args or VARIANTS):
         if "--all" in sys.argv or not chat:

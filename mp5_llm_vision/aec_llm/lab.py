@@ -40,7 +40,9 @@ class LLMLab:
             self._load_sam()
         self.ready = True
         print(f"✅ Ready in {time.time() - t0:.0f} s.")
-        self.intro()
+        if not self.client.live:
+            print("No Gemini key found: the precomputed answers work, your own prompts and images will not run "
+                  "(add the Colab secret GEMINI_API_KEY and run this cell again).")
 
     def _ensure_packages(self, load_sam: bool) -> bool:
         need, restart = [], False
@@ -60,9 +62,8 @@ class LLMLab:
                     need.append(f"transformers>={TRANSFORMERS_MIN}"); restart = True
             except Exception:
                 need.append(f"transformers>={TRANSFORMERS_MIN}"); restart = True
-        if need:
-            print(f"Installing {', '.join(need)} (about a minute)...")
-            subprocess.run([sys.executable, "-m", "pip", "install", "-q", *need], check=False)
+        if need:                                  # quietly: the notebook says to wait for the ✅ line
+            subprocess.run([sys.executable, "-m", "pip", "install", "-q", *need], check=False, capture_output=True)
         if restart:
             print("\n⚠️  A newer 'transformers' was installed for SAM 3. Please restart the runtime now "
                   "(menu Runtime → Restart session), then run this Step 0 cell again.")
