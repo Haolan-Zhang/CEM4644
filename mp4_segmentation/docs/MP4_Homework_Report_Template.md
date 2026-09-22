@@ -16,7 +16,7 @@ From Step 2a: your scale reading on each sheet and how far it is from the answer
 
 ## Question 2
 
-From Step 3a: for each sheet, the scale and how you set it, the areas of the footings you measured against the sizes their marks give, and the count SAM 3 made from your first *footing* box, its example (found / missed / extra). One sheet asks you only to count, because its pile caps are too small to measure - what happens to the measured area of something that small, and why? Then from Step 3b: does *footing* find anything? Which shape word finds the footings, on which sheet, with how many extras, and how do the areas it measures compare with the ones from your boxes? Did any phrase find the pile caps?
+From Step 3a: for each sheet, the scale and how you set it, the areas of the footings you measured against the sizes their marks give, and the count SAM 3 made from your first *footing* box, its example (found / missed / extra). One sheet asks you only to count, because its pile caps are too small to measure - what happens to the measured area of something that small, and why? Then from Step 3b: does *footing* find anything? Which shape word finds the footings, on which sheet, with how many extras, and how do the areas it measures compare with the ones from your boxes? Did any phrase find the grid bubbles or the pile caps?
 
 *Your answer:*
 

@@ -1,44 +1,58 @@
 {
- "va_floor": {
-  "title": "Outpatient / PACT Clinic, lease module (CBOC-L.pdf), VA Technical Information Library room templates",
-  "author": "US Department of Veterans Affairs, Office of Construction & Facilities Management (2018)",
-  "license": "Public domain (work of the US federal government)",
-  "source": "https://www.cfm.va.gov/til/rTemplate/documents/CBOC-L.pdf",
-  "file": "va_floor.png"
- },
- "va_ceiling": {
-  "title": "Outpatient / PACT Clinic, lease module (CBOC-L.pdf), VA Technical Information Library room templates",
-  "author": "US Department of Veterans Affairs, Office of Construction & Facilities Management (2018)",
-  "license": "Public domain (work of the US federal government)",
-  "source": "https://www.cfm.va.gov/til/rTemplate/documents/CBOC-L.pdf",
-  "file": "va_ceiling.png"
- },
- "test_fp": {
-  "title": "Foundation plan, example image 1 (test_fp.png), cropped to the two interior footing rows",
-  "author": "Course example drawing (GitHub repository Haolan-Zhang/SAM_Example_Image)",
-  "license": "Provided for this course",
-  "source": "https://github.com/Haolan-Zhang/SAM_Example_Image",
-  "file": "test_fp.png"
- },
- "test_fp_2": {
-  "title": "Foundation plan, example image 2 (test_fp_2.png)",
-  "author": "Course example drawing (GitHub repository Haolan-Zhang/SAM_Example_Image)",
-  "license": "Provided for this course",
-  "source": "https://github.com/Haolan-Zhang/SAM_Example_Image",
-  "file": "test_fp_2.png"
- },
- "uscg_pile": {
-  "title": "Building 785, Sixteen Lane Bowling Facility, Governors Island: foundation plan, sheet 7 of 11, 19 January 1983",
-  "author": "U.S. Coast Guard Support Center New York, Public Works Engineering (traced from International Design Consultants Inc.)",
-  "license": "Public domain (work of the US federal government)",
-  "source": "https://commons.wikimedia.org/wiki/File:Building_785_Sixteen_Lane_Bowling_Facility_Foundation_Plan,_January_19,_1983_-_DPLA_-_ec587aa2a393d5917cb73be19a2da195.tiff",
-  "file": "uscg_pile.png"
- },
- "va_legend": {
-  "title": "Outpatient / PACT Clinic, lease module (CBOC-L.pdf): symbol legend page",
-  "author": "US Department of Veterans Affairs, Office of Construction & Facilities Management (2018)",
-  "license": "Public domain (work of the US federal government)",
-  "source": "https://www.cfm.va.gov/til/rTemplate/documents/CBOC-L.pdf",
-  "file": "va_legend.png"
- }
+  "usda_5542": {
+    "title": "USDA design 710-5542, 'Five-room farmhouse', plan on page 15; rendered from the Internet Archive scan at 350 dpi, cropped to the plan and the paper tint flattened to white",
+    "author": "U.S. Department of Agriculture, Bureau of Agricultural Engineering (Miscellaneous Publication No. 360, 'Plans of Farm Buildings for Southern States', 1940)",
+    "license": "Public domain (work of the U.S. Government, 17 U.S.C. 105; the holding library also flags the scan as not in copyright)",
+    "source": "https://archive.org/details/plansoffarmbuild360unit",
+    "file": "usda_5542.png"
+  },
+  "va_floor": {
+    "title": "Outpatient / PACT Clinic, lease module (CBOC-L.pdf), VA Technical Information Library room templates",
+    "author": "US Department of Veterans Affairs, Office of Construction & Facilities Management (2018)",
+    "license": "Public domain (work of the US federal government)",
+    "source": "https://www.cfm.va.gov/til/rTemplate/documents/CBOC-L.pdf",
+    "file": "va_floor.png"
+  },
+  "va_ceiling": {
+    "title": "Outpatient / PACT Clinic, lease module (CBOC-L.pdf), VA Technical Information Library room templates",
+    "author": "US Department of Veterans Affairs, Office of Construction & Facilities Management (2018)",
+    "license": "Public domain (work of the US federal government)",
+    "source": "https://www.cfm.va.gov/til/rTemplate/documents/CBOC-L.pdf",
+    "file": "va_ceiling.png"
+  },
+  "test_fp": {
+    "title": "Foundation plan, example image 1 (test_fp.png), cropped to the two interior footing rows",
+    "author": "Course example drawing (GitHub repository Haolan-Zhang/SAM_Example_Image)",
+    "license": "Provided for this course",
+    "source": "https://github.com/Haolan-Zhang/SAM_Example_Image",
+    "file": "test_fp.png"
+  },
+  "test_fp_2": {
+    "title": "Foundation plan, example image 2 (test_fp_2.png)",
+    "author": "Course example drawing (GitHub repository Haolan-Zhang/SAM_Example_Image)",
+    "license": "Provided for this course",
+    "source": "https://github.com/Haolan-Zhang/SAM_Example_Image",
+    "file": "test_fp_2.png"
+  },
+  "uscg_motorpool": {
+    "title": "Motor Pool Facility, Support Center New York, Shop Building (Building 928): structural foundation plan, details and notes, sheet S-1, 20 June 1984",
+    "author": "U.S. Coast Guard, 3rd District Governors Island NY, Civil Engineering; drawn by Gonchor & Sput, Architects & Planners",
+    "license": "Public domain (work of the US federal government)",
+    "source": "https://commons.wikimedia.org/wiki/File:Building_928_Structural_Foundation_Plan,_Details_and_Notes_Shop_Building,_June_20,_1984_-_DPLA_-_2938a6cfb0663504470f4b44fe7ae27e.tiff",
+    "file": "uscg_motorpool.png"
+  },
+  "uscg_pile": {
+    "title": "Building 785, Sixteen Lane Bowling Facility, Governors Island: foundation plan, sheet 7 of 11, 19 January 1983",
+    "author": "U.S. Coast Guard Support Center New York, Public Works Engineering (traced from International Design Consultants Inc.)",
+    "license": "Public domain (work of the US federal government)",
+    "source": "https://commons.wikimedia.org/wiki/File:Building_785_Sixteen_Lane_Bowling_Facility_Foundation_Plan,_January_19,_1983_-_DPLA_-_ec587aa2a393d5917cb73be19a2da195.tiff",
+    "file": "uscg_pile.png"
+  },
+  "va_legend": {
+    "title": "Outpatient / PACT Clinic, lease module (CBOC-L.pdf): symbol legend page",
+    "author": "US Department of Veterans Affairs, Office of Construction & Facilities Management (2018)",
+    "license": "Public domain (work of the US federal government)",
+    "source": "https://www.cfm.va.gov/til/rTemplate/documents/CBOC-L.pdf",
+    "file": "va_legend.png"
+  }
 }

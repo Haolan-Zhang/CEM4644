@@ -336,8 +336,8 @@ what it *means*.
 GROUP_TEXT = {
     "floor": ("Floor plans",
               "On a floor plan you take off **areas of rooms**. Set the scale from a printed dimension, never from a scale "
-              "bar: this sheet carries a graphic scale bar that is wrong by a factor of two, and boxing it as well as the "
-              "printed dimension is how you find that out. Then box every room the task asks for. The number "
+              "bar: one of these two sheets carries a graphic scale bar that is wrong by a factor of two, and boxing it as "
+              "well as the printed dimension is how you find that out. Then box every room the task asks for. The number "
               "you get is the *net* floor area: what the drawing puts on the floor (a counter, a bathtub) is cut out of "
               "the mask unless the room is a plain rectangle."),
     "structural": ("Structural (foundation) plans",
@@ -363,7 +363,7 @@ def build_homework():
     groups = {}
     for s in sheets:
         groups.setdefault(group_of(s.discipline), []).append(s)
-    cells = [header("homework", 150, """1. Look at the five drawings: what each one is, what it shows, and what you have to take off from it.
+    cells = [header("homework", 150, """1. Look at the seven drawings: what each one is, what it shows, and what you have to take off from it.
 2. Do a take-off on each discipline in turn - floor plans, structural plans, MEP plans - with the same one cell, then
    ask SAM 3 for the same things by phrase and see which way gets you a usable number.
 3. Try a drawing of your own."""), step0("homework")]
@@ -382,8 +382,8 @@ You already met SAM 3 in the workshop, so this notebook goes straight to the wor
   example of the symbol, labelled *example: ...*, and SAM 3 finds all the others like it.
 - everything you measure and everything you count is checked against an answer key, so you always see how far off you are.
 """))
-    cells.append(form("Step 1a - Browse the five drawings", "lab.show_sheets(drawing)",
-                      notes=["*all drawings* shows all five; pick one to see it large."],
+    cells.append(form("Step 1a - Browse the seven drawings", "lab.show_sheets(drawing)",
+                      notes=["*all drawings* shows all seven; pick one to see it large."],
                       params=[param_choice("drawing", "all drawings", ["all drawings"] + sheets.labels())]))
     cells.append(form("Step 1b - The symbol legend", "lab.show_legend(drawing)",
                       notes=["The MEP sheets carry a legend of their symbols: a bold rectangle with a diagonal and a small circle "
@@ -466,7 +466,7 @@ QUESTION_BY_GROUP = {
                    "extra). One sheet asks you only to count, because its pile caps are too small to measure - what happens to the "
                    "measured area of something that small, and why? Then from Step 3b: does *footing* find anything? Which shape "
                    "word finds the footings, on which sheet, with how many extras, and how do the areas it measures compare with "
-                   "the ones from your boxes? Did any phrase find the pile caps?"),
+                   "the ones from your boxes? Did any phrase find the grid bubbles or the pile caps?"),
     "mep": ("From Step 4a: the count of each symbol that SAM 3 made from your one example box (found / missed / extra), the "
             "confidence you used, and what the extras were. Try a second example box of the same symbol, one that is rotated or "
             "sits in a cluttered spot, and report how the count changes. Then from Step 4b: which words find any light fixture at "
@@ -478,7 +478,7 @@ PHRASE_HINTS = {
     "floor": ("room", "Try *room*, *bedroom*, *bathroom*, *door*, *window*; then *curved line* (a door swing is an arc on the "
                       "paper)."),
     "structural": ("footing", "Try *footing*, *foundation*, *column*; then *square* and *hatched square* for the footings, *rectangle* "
-                              "for the pile caps. Move the confidence: the extras go first, then "
+                              "for the pile caps, *circle* for the grid bubbles. Move the confidence: the extras go first, then "
                               "the real ones."),
     "mep": ("light fixture", "Try *light fixture*, *light*, *diffuser*, *sprinkler*; then *rectangle with a diagonal line*, "
                              "*small circle*, *circle with a cross*."),

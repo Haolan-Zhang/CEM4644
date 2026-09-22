@@ -8,7 +8,7 @@ notebook cell is a Colab form and the code is hidden in `aec_seg/`.
 | Notebook | Open | Drawings |
 |---|---|---|
 | `MP4_Workshop_Segmentation.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp4_segmentation/MP4_Workshop_Segmentation.ipynb) | three 1940 USDA farmhouse floor plans (easy, medium, L-shaped) |
-| `MP4_Homework_Segmentation.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp4_segmentation/MP4_Homework_Segmentation.ipynb) | five sheets from three disciplines: 1 floor plan, 3 structural foundation plans, 1 reflected ceiling plan |
+| `MP4_Homework_Segmentation.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp4_segmentation/MP4_Homework_Segmentation.ipynb) | seven sheets from three disciplines: 2 floor plans, 4 structural foundation plans, 1 reflected ceiling plan |
 
 Everything is in feet and square feet. **The scale is always set by the student**, from a printed dimension or from
 something whose real size the sheet states — never trusted from a scale bar (one homework sheet carries a graphic
@@ -31,13 +31,13 @@ in MP4: SAM 3 is used as it comes.
 5. **Their own drawing** in a small Gradio app, opened from a link: the scale from a box along a printed dimension, then a phrase, a box for an area, or one example box for a count.
 
 **Homework (about 2.5 h).** No SAM 3 teaching: straight into a take-off across disciplines, two ways on each.
-1. **The drawings**: all five, what each one is, and the MEP symbol legend.
+1. **The drawings**: all seven, what each one is, and the MEP symbol legend.
 2. **Floor plans, structural plans, MEP plans** (Parts 2, 3, 4), two cells each. *Step Na, your boxes*: the take-off
    cell. Room areas on the floor plans (plus two fixture counts on the clinic sheet); footing areas and a footing
    count on the structural sheets; light-fixture counts on the ceiling plan. **Every count is made by the model from
    one box labelled `example: <thing>`** — students never tally their own boxes against the key. *Step Nb, a phrase*:
    the same things asked for by name (`lab.ask`), no box at all; the regions are scored against the answer key
-   (hits / misses / extras, and the area of every room or footing found). Measured: *room* finds most rooms, *square* the footings, *rectangle* the pile caps; *footing*,
+   (hits / misses / extras, and the area of every room or footing found). Measured: *room* finds most rooms, *square* the footings, *rectangle* the pile caps, *circle* the grid bubbles; *footing*,
    *light fixture* and every other trade word find nothing, and nothing at all works by phrase on the ceiling plan.
 3. **Their own drawing**.
 
@@ -84,7 +84,7 @@ sheet prints and is shown as information. For a footing or a pit, `true_sqft` is
 gives. `scale_refs[].use` marks the one the areas are computed with; a second ref with `use: false` is a cross-check.
 `counts` keys are plain student words, and they use the **same word as the area category** when they are the same
 object (`footing`, not `spread footing` next to an area called `footing`). A `counts` entry lists every instance on
-the sheet, and it exists to check the model's count: the student boxes **one** example (`example: pile footing`; for a thing that is also measured, the first `footing` box is the example), SAM 3
+the sheet, and it exists to check the model's count: the student boxes **one** example (`example: grid bubble`; for a thing that is also measured, the first `footing` box is the example), SAM 3
 finds the rest, and the key says what should have been found. A sheet with nothing to count carries `"counts": {}`.
 `aec_seg.data.check_key` validates all of this and the notebook refuses to load a set with a broken key:
 `python -m aec_seg.data data/sheets/workshop` prints the report.
@@ -101,10 +101,12 @@ answer key is not a model result, so the lab does not ask for one.
 | `usda_5544` | workshop | USDA design 710-5544, five-room farmhouse (Misc. Pub. 360 p. 17, 1940) | [archive.org/details/plansoffarmbuild360unit](https://archive.org/details/plansoffarmbuild360unit) | Public domain, work of the U.S. Government (17 U.S.C. 105) |
 | `usda_5540` | workshop | USDA design 710-5540, four-room and attic farmhouse (p. 13, 1940); re-cropped from the source PDF so the side porch is complete | same | same |
 | `usda_5539` | workshop | USDA design 710-5539, four-room farmhouse, L-shaped footprint (p. 12, 1940); stray letters cleaned from the left margin | same | same |
+| `usda_5542` | homework | USDA design 710-5542, five-room farmhouse (p. 15, 1940) | same | same |
 | `va_floor` | homework | VA outpatient / PACT clinic lease module, floor plan (2018) | [cfm.va.gov/til/rTemplate](https://www.cfm.va.gov/til/rTemplate/) | Public domain, US Government work ([VA copyright policy](https://department.va.gov/copyright-policy/)) |
 | `va_ceiling` | homework | the same clinic, reflected ceiling plan; the symbol legend ships with it | same | same |
 | `test_fp` | homework | foundation plan, the course's example drawing 1 | [github.com/Haolan-Zhang/SAM_Example_Image](https://github.com/Haolan-Zhang/SAM_Example_Image) | provided for this course |
 | `test_fp_2` | homework | foundation plan, the course's example drawing 2 | same | provided for this course |
+| `uscg_motorpool` | homework | US Coast Guard Motor Pool Facility, Support Center New York, shop building foundation plan S-1 (1984); cropped to keep the footing schedule | [Wikimedia Commons / DPLA](https://commons.wikimedia.org/wiki/File:Building_928_Structural_Foundation_Plan,_Details_and_Notes_Shop_Building,_June_20,_1984_-_DPLA_-_2938a6cfb0663504470f4b44fe7ae27e.tiff) | Public domain, US Government work |
 | `uscg_pile` | homework | US Coast Guard Building 785 bowling facility, pile footing plan (1983) | [Wikimedia Commons / DPLA](https://commons.wikimedia.org/wiki/File:Building_785_Sixteen_Lane_Bowling_Facility_Foundation_Plan,_January_19,_1983_-_DPLA_-_ec587aa2a393d5917cb73be19a2da195.tiff) | Public domain, US Government work |
 
 The USDA sheets were rendered from the scanned publication, cropped to the plan and cleaned of page artefacts; the
@@ -124,7 +126,7 @@ Measured on these sheets (numbers per drawing are in `docs/Instructor_Guide.md`)
 - **Enclosed spaces work.** A box plus the phrase *empty room* (`segment_room`) traces a room to its walls. The raw
   mask runs about 10 % low because door swings, counters, bathtubs and fireplaces are cut out of it, so the take-off
   gives the bites back on rooms that are rectangles and leaves odd-shaped spaces alone.
-- **Trade words return nothing.** *footing*, *pile*, *light fixture*, *diffuser*, *sprinkler*,
+- **Trade words return nothing.** *footing*, *pile*, *grid bubble*, *light fixture*, *diffuser*, *sprinkler*,
   *window*, *door*, *wall* find nothing at any confidence. **Shape words do**: *curved line* finds door swings,
   *thick black line* the walls, *square* / *small circle* the footings and the fixture symbols.
 - **Repeated symbols are counted from one example box** (`segment_like`), not from a phrase: 29/29 pile footings,

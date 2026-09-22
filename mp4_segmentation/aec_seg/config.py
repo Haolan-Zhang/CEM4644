@@ -97,11 +97,11 @@ register(SheetSet(
 register(SheetSet(
     key="homework",
     guided=False,                        # the Part texts explain each sheet once; cells, widgets and Step 0 stay clean
-    title="Five sheets from three disciplines",
+    title="Seven sheets from three disciplines",
     folder="data/sheets/homework",
-    description=("Five real drawings: a floor plan (a modern VA clinic), three structural foundation plans and one reflected "
-                 "ceiling plan. Each one carries a different take-off task - areas of rooms, areas of footings, counts of "
-                 "repeated symbols - and each one has an answer key."),
+    description=("Seven real drawings: two floor plans (a 1940 farmhouse and a modern VA clinic), four structural foundation "
+                 "plans and one reflected ceiling plan. Each one carries a different take-off task - areas of rooms, areas of "
+                 "footings, counts of repeated symbols - and each one has an answer key."),
 ))
 
 # How the homework groups its sheets into the three take-off steps (2a floor plans, 2b structural, 2c MEP).

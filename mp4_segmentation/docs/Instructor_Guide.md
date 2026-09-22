@@ -8,7 +8,7 @@ box-drawing tool, tables of square feet next to the drawing's own numbers, and a
 
 | | Workshop | Homework |
 |---|---|---|
-| Drawings | three 1940 USDA farmhouse floor plans: `usda_5544` (easy), `usda_5540` (medium), `usda_5539` (L-shaped) | five sheets: `va_floor` (floor plan), `test_fp`, `test_fp_2`, `uscg_pile` (structural), `va_ceiling` (electrical) |
+| Drawings | three 1940 USDA farmhouse floor plans: `usda_5544` (easy), `usda_5540` (medium), `usda_5539` (L-shaped) | seven sheets: `usda_5542` + `va_floor` (floor plans), `test_fp`, `test_fp_2`, `uscg_motorpool`, `uscg_pile` (structural), `va_ceiling` (electrical) |
 | Teaches SAM 3 | yes: photo steps, ask-by-name, wording, inspector | no: straight into the take-off |
 | Take-off | one cell per drawing (Step 3a/3b/3c) | one cell per discipline (Steps 2a, 3a, 4a), a dropdown of that discipline's sheets, and after each a phrase cell (Steps 2b, 3b, 4b: `lab.ask`, the same things asked for by name and scored against the key) |
 | What is taken off | the scale (two readings) and the area of every room | areas (rooms, footings, pits) **and** counts |
@@ -88,25 +88,29 @@ of the model, so the lab no longer asks for one.
 | `usda_5544` | −0.6 % / +0.6 % | Step 3d, door (0.4): median **11/17** over all 17 possible examples (1–17), 0 extra; only 1 example finds all 17 | room n=9 (closets are not in the take-off), **median 3.9 %**, worst 21 % (the hall) |
 | `usda_5540` | −0.3 % / +0.5 % | Step 3d, door (0.4): median **14/14** (1–14), 2 extra; 9 of 14 examples find all | room n=7, **median 0.6 %**, worst 26 % (the hall) |
 | `usda_5539` | −0.3 % / +0.4 % | Step 3d, door (0.4): median **11/11** (1–11), 4 extra; 6 of 11 examples find all | room n=9, **median 2.6 %**, worst 20 % (the hall) |
+| `usda_5542` | −0.4 % / +0.5 % | – (rooms only) | room n=10 (closets are not in the take-off), **median 2.6 %**, worst 23 % (the hall) |
 | `va_floor` | −1.4 % / −0.4 % (the bar) | – (rooms only) | room n=13, **median 4.3 %**, worst 11 % |
 | `va_ceiling` | −0.7 % / −0.4 % (the bar) | 2×4 (0.4) **39/41, 0 ex**; 2×2 (0.4) 8/8, 1 ex; cans (0.5) **14/14, 0 ex** | – (nothing to measure) |
 | `test_fp` | −3.2 % (a 95 px footing is a short ruler) | footing (0.3) **10/10**, 3–5 ex | footing n=10, **median 4.3 %**, worst 8.5 % |
 | `test_fp_2` | −1.4 % / −3.2 % (the F4.0) | footing (0.4) **19/19**, 1 ex | footing n=19, median 6.2 %, worst 19 %; pit n=1, 5.2 % |
+| `uscg_motorpool` | −1.7 % / −0.3 % | footing (0.3) 19/20, 2–5 ex; grid bubble (0.5) **32/32**, 2 ex | footing n=20, median 6.0 %, worst 32 %; **pit n=2, median 92 %** |
 | `uscg_pile` | −1.8 % / −0.1 % | pile footing (0.3) **29/29**, 2 ex | – (the caps are too small to measure) |
 
 The counting categories are named after the same object as the area category, so a sheet that has both reads
-`footing`, whose first box is also the counting example (no `example: footing` label, and no `spread footing` beside `footing`).
+`footing`, whose first box is also the counting example (no `example: footing` label, and no `spread footing` beside `footing`); `uscg_motorpool` keeps a second category,
+`grid bubble`, because it is a different object.
 
 Three of those numbers are **designed failures** and are the teaching points of their sheets:
 
 - `va_floor` had two fixture counts (water closets, lavatories) in an earlier version; they were dropped so that the floor plans are room areas and nothing else.
-- (The motor pool sheet with its 36 px pits was dropped from the homework on 2026-09-22.)
+- `uscg_motorpool` **pits +92 %**: a 2'-0" × 2'-6" pit is 36 × 39 px on a 2270 px sheet. The mask leaks into the wall
+  footing around it and the cell prints "your box is only 36 px across… the number is your box, not the pit."
 - `va_floor` / `va_ceiling` **the graphic scale bar**: boxing it gives 43.1 px/ft against the printed dimension's
   21.3. The take-off cell prints "your two readings disagree by 102 %. On an AREA that is about 308 %" and names
   which one to use.
 
 Room totals against the answer key, same run: `usda_5544` −3.5 %, `usda_5540` −1.5 %, `usda_5539` −3.9 %,
-`va_floor` −7.3 %. Footing totals: `test_fp` −3 %, `test_fp_2` +2 %.
+`usda_5542` −2.6 %, `va_floor` −7.3 %. Footing totals: `test_fp` −3 %, `test_fp_2` +2 %, `uscg_motorpool` +3 %.
 
 ### 2.3 Asking by name on the homework sheets (Steps 2b, 3b, 4b) — regions at confidence ≥ 0.3 (≥ 0.5), found / key, extras, median area error of the regions found
 
@@ -116,9 +120,11 @@ mask, which on a furnished room runs a few percent low). Measured 2026-09-19 wit
 
 | sheet | works | finds nothing |
 |---|---|---|
+| `usda_5542` | *room* **10/14**, 0 extra, areas median 3 % (worst 45 %, the L-shaped hall); at 0.5 only 5/14. *bedroom* 6/14 at 0.3. *curved line* 31 regions = the door swings (no key) | *door*, *window* |
 | `va_floor` | *room* **10/13**, 3 extra, median 7 % (worst 58 %); at 0.5 nothing survives. *curved line* 12 regions | *door*, *window* |
 | `test_fp` | *square* → footings **10/10**, 5 extra, areas median 2 % (at 0.5: 7/10, 2 extra, median 1 %). *rectangle* 10/10 but 9 extra | *footing*, *foundation*, *column*, *hatched square* |
 | `test_fp_2` | *square* **19/19**, 4 extra, areas median 10 % (the E-footings are drawn smaller than their mark; at 0.5 still 19/19, 1 extra). *rectangle* 19/19, 6 extra | *footing*, *hatched square* |
+| `uscg_motorpool` | *circle* → grid bubbles **32/32**, 6 extra (3 at 0.5). *square* → footings 12/20, 5 extra, median 3 %; *rectangle* 7/20 | *footing*, *hatched square* |
 | `uscg_pile` | *rectangle* → pile caps **29/29**, 8 extra; at 0.5 28/29, 2 extra | *footing*, *square*, *hatched square* |
 | `va_ceiling` | **nothing.** *rectangle* 7/41 fixtures with 24 extras; *small circle* 45 regions, 0 of the 14 recessed lights | *light fixture*, *light*, *diffuser*, *sprinkler*, *rectangle with a diagonal line*, *circle with a cross*, *square* |
 
@@ -138,6 +144,7 @@ of the five sheets that have rooms, with the same student-like boxes (median and
 | `usda_5544` | 6.1 % / 28.2 % | **3.5 % / 20.7 %** | 2.3 % / 18.4 % |
 | `usda_5540` | 7.7 % / 13.8 % | **3.5 % / 24.6 %** | 2.1 % / **49.3 %** |
 | `usda_5539` | 6.5 % / 13.4 % | **3.8 % / 11.0 %** | 1.5 % / 23.9 % |
+| `usda_5542` | 7.3 % / 30.3 % | **4.0 % / 28.9 %** | 3.0 % / 23.0 % |
 | `va_floor` | 8.9 % / 16.6 % | **2.8 % / 7.1 %** | 3.4 % / 7.2 % |
 
 Split by shape (the answer key's polygon tells which rooms are not rectangles):
@@ -222,14 +229,17 @@ produces, with a few percent of variation because the boxes are drawn by hand.
 1. **Floor plans (22).** Both sheets' scales, and on `va_floor` the two readings: the printed 10'-0" dimension gives
    about 21.6 px/ft, the graphic bar about 43.3 px/ft. The bar is twice too long, so areas taken from it are **four
    times** too small; the printed dimension is right. The room table of one sheet with the worst rooms named. From Step 2b: *room* finds 10/14 and 10/13
-   rooms at 0.3 with areas a few percent under the ones from the student's boxes (raw masks, furniture bitten out;); *door* and *window* return nothing; *curved line* returns the swings.
+   rooms at 0.3 with areas a few percent under the ones from the student's boxes (raw masks, furniture bitten out;
+   the hall on `usda_5542` is the worst); *door* and *window* return nothing; *curved line* returns the swings.
 2. **Structural plans (22).** Per sheet the scale route and the footing areas against the sizes the marks give
-   (`F12.0` = 12 ft, `E4'-6"` = 4 ft 6 in), plus the count SAM 3 made
+   (`F12.0` = 12 ft, `E4'-6"` = 4 ft 6 in, and the `FOOTING SCHEDULE` on `uscg_motorpool`), plus the count SAM 3 made
    from the first `footing` box, which is the example. On `uscg_pile` the caps are 2'-6" × 5'-0" and only about 27 × 53 px on the sheet:
    below roughly 60 px the mask stops tracing the symbol and becomes a rounded copy of the drawn box, so the
    "area" is the student's box. That is why the sheet is a counting exercise only. From Step 3b: *footing* finds
-   nothing on any sheet; *square* finds 10/10 and 19/19 footings on the two example plans (areas within 2 % and 10 %); *rectangle* finds all 29 pile caps, each
-   with a handful of extras that go at 0.5. The phrase areas are close to the box areas where the symbol is a clean square.
+   nothing on any sheet; *square* finds 10/10 and 19/19 footings on the two example plans (areas within 2 % and 10 %)
+   but only 12/20 on the motor pool sheet; *rectangle* finds all 29 pile caps and *circle* all 32 grid bubbles, each
+   with a handful of extras that go at 0.5. The phrase areas are close to the box areas where the symbol is a clean
+   square; the box route still wins on the schedule-sized footings of `uscg_motorpool`.
 3. **MEP (22).** The counts of 2×4 fixtures, 2×2 fixtures and recessed lights from one example each, the confidence
    used, and what the extras were. A rotated example loses roughly 40 % of the count and doubles the false
    positives. The trade words return nothing because SAM 3 has no notion of an MEP legend: a "light fixture" on
@@ -247,7 +257,8 @@ produces, with a few percent of variation because the boxes are drawn by hand.
 ## 5. Failure modes the students will meet
 
 - **A small symbol measures as the box that was drawn round it.** Below about **60 px across on the sheet** SAM 3
-  gives back a rounded copy of the box instead of the thing inside it (`uscg_pile`'s pile caps at 27 × 53 px, the). The take-off cell prints three different warnings, in this
+  gives back a rounded copy of the box instead of the thing inside it (`uscg_pile`'s pile caps at 27 × 53 px, the
+  pits and post footings on `uscg_motorpool` at 36 px). The take-off cell prints three different warnings, in this
   order: *your box is only N px across… the number is your box*; *the mask is N % of your box: it has spilled
   outside the box*; and, at over 90 % fill, *look at the outline: if it is a rounded copy of your box…*. The third
   one fires on correct readings too (a tight box round a footing is 92–101 % filled), so tell the students it is a
@@ -263,7 +274,7 @@ produces, with a few percent of variation because the boxes are drawn by hand.
   warning for this (it fired on too many correct readings); the hall is the worst room on all three workshop plans
   (20–26 %), and question 3 asks the students to find the reason in the picture.
 - **A phrase that finds nothing.** Expected for *kitchen*, *living room*, *porch*, *closet*, *door*, *window*, and
-  for every trade word on a structural or MEP sheet (*footing*, *pile*, *light fixture*, *diffuser*,
+  for every trade word on a structural or MEP sheet (*footing*, *pile*, *grid bubble*, *light fixture*, *diffuser*,
   *sprinkler*). Send the students to the shape words (Step 4a and 4c) and, on a sheet with something to count, to
   the `example:` box.
 - **No `example:` box drawn.** A take-off on a sheet with a counting category prints, for each one that has no
