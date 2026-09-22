@@ -8,7 +8,7 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-From Step 2a: your scale reading on each sheet and how far it is from the answer key. On the VA clinic sheet you were asked to box the graphic scale bar as well as the printed dimension - what did the two give, and which one is right? (Work out what the areas would have been if you had trusted the bar.) Then the room table of one sheet: your square feet, the drawing's, the error. Which rooms are worst and why? The two counts SAM 3 made from your example boxes on the clinic sheet (found / missed / extra): which would you hand on, which would you check first? Then from Step 2b: what did *room* find on each sheet (found / missed / extra, and the median error of the areas it measured) against the rooms from your boxes? What did *door* and *window* return, and what did *curved line*?
+From Step 2a: your scale reading on each sheet and how far it is from the answer key. On the VA clinic sheet you were asked to box the graphic scale bar as well as the printed dimension - what did the two give, and which one is right? (Work out what the areas would have been if you had trusted the bar.) Then the room table of one sheet: your square feet, the drawing's, the error. Which rooms are worst and why? Then from Step 2b: what did *room* find on each sheet (found / missed / extra, and the median error of the areas it measured) against the rooms from your boxes? What did *door* and *window* return, and what did *curved line*?
 
 *Your answer:*
 

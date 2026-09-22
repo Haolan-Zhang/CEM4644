@@ -156,10 +156,10 @@ class SegLab:
         self._need()
         ui.live_phrase(self, self._sid(sheet), str(phrase), float(confidence))
 
-    def ask(self, sheet, phrase, confidence=0.3, compare="(nothing)"):
-        """Homework: a phrase straight to SAM 3 on a drawing, scored against one category of its answer key."""
+    def ask(self, sheet, phrase, confidence=0.3):
+        """Homework: a phrase straight to SAM 3 on a drawing, scored against the drawing's answer key."""
         self._need()
-        ui.phrase_check(self, self._sid(sheet), phrase, float(confidence), compare)
+        ui.phrase_check(self, self._sid(sheet), phrase, float(confidence))
 
     def find_like(self, sheet):
         """Workshop: one example box, and SAM 3 finds every other one of the same thing (checked against the key)."""

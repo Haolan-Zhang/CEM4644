@@ -89,7 +89,7 @@ of the model, so the lab no longer asks for one.
 | `usda_5540` | −0.3 % / +0.5 % | Step 3d, door (0.4): median **14/14** (1–14), 2 extra; 9 of 14 examples find all | room n=7, **median 0.6 %**, worst 26 % (the hall) |
 | `usda_5539` | −0.3 % / +0.4 % | Step 3d, door (0.4): median **11/11** (1–11), 4 extra; 6 of 11 examples find all | room n=9, **median 2.6 %**, worst 20 % (the hall) |
 | `usda_5542` | −0.4 % / +0.5 % | – (rooms only) | room n=10 (closets are not in the take-off), **median 2.6 %**, worst 23 % (the hall) |
-| `va_floor` | −1.4 % / −0.4 % (the bar) | water closet (0.5) **5/5, 0 ex**; lavatory (0.3) 5/5, **9–10 ex** | room n=13, **median 4.3 %**, worst 11 % |
+| `va_floor` | −1.4 % / −0.4 % (the bar) | – (rooms only) | room n=13, **median 4.3 %**, worst 11 % |
 | `va_ceiling` | −0.7 % / −0.4 % (the bar) | 2×4 (0.4) **39/41, 0 ex**; 2×2 (0.4) 8/8, 1 ex; cans (0.5) **14/14, 0 ex** | – (nothing to measure) |
 | `test_fp` | −3.2 % (a 95 px footing is a short ruler) | footing (0.3) **10/10**, 3–5 ex | footing n=10, **median 4.3 %**, worst 8.5 % |
 | `test_fp_2` | −1.4 % / −3.2 % (the F4.0) | footing (0.4) **19/19**, 1 ex | footing n=19, median 6.2 %, worst 19 %; pit n=1, 5.2 % |
@@ -102,10 +102,7 @@ The counting categories are named after the same object as the area category, so
 
 Three of those numbers are **designed failures** and are the teaching points of their sheets:
 
-- `va_floor` **lavatory: all 5 found and about 10 extras**. A lavatory is a 37 × 42 px rounded box on a sheet full of
-  rounded boxes, and raising the confidence to 0.4 throws away four of the five real ones. The count is right and
-  useless at the same time: the student has to look at the picture and say which five are lavatories. That judgement,
-  not a tally, is the exercise.
+- `va_floor` had two fixture counts (water closets, lavatories) in an earlier version; they were dropped so that the floor plans are room areas and nothing else.
 - `uscg_motorpool` **pits +92 %**: a 2'-0" × 2'-6" pit is 36 × 39 px on a 2270 px sheet. The mask leaks into the wall
   footing around it and the cell prints "your box is only 36 px across… the number is your box, not the pit."
 - `va_floor` / `va_ceiling` **the graphic scale bar**: boxing it gives 43.1 px/ft against the printed dimension's
@@ -124,7 +121,7 @@ mask, which on a furnished room runs a few percent low). Measured 2026-09-19 wit
 | sheet | works | finds nothing |
 |---|---|---|
 | `usda_5542` | *room* **10/14**, 0 extra, areas median 3 % (worst 45 %, the L-shaped hall); at 0.5 only 5/14. *bedroom* 6/14 at 0.3. *curved line* 31 regions = the door swings (no key) | *door*, *window* |
-| `va_floor` | *room* **10/13**, 3 extra, median 7 % (worst 58 %); at 0.5 nothing survives. *toilet* → water closets **5/5**, 2 extra (at 0.5: 2/5). *curved line* 12 regions | *door*, *window*, *sink* (0/5 lavatories) |
+| `va_floor` | *room* **10/13**, 3 extra, median 7 % (worst 58 %); at 0.5 nothing survives. *curved line* 12 regions | *door*, *window* |
 | `test_fp` | *square* → footings **10/10**, 5 extra, areas median 2 % (at 0.5: 7/10, 2 extra, median 1 %). *rectangle* 10/10 but 9 extra | *footing*, *foundation*, *column*, *hatched square* |
 | `test_fp_2` | *square* **19/19**, 4 extra, areas median 10 % (the E-footings are drawn smaller than their mark; at 0.5 still 19/19, 1 extra). *rectangle* 19/19, 6 extra | *footing*, *hatched square* |
 | `uscg_motorpool` | *circle* → grid bubbles **32/32**, 6 extra (3 at 0.5). *square* → footings 12/20, 5 extra, median 3 %; *rectangle* 7/20 | *footing*, *hatched square* |
@@ -231,9 +228,7 @@ produces, with a few percent of variation because the boxes are drawn by hand.
 
 1. **Floor plans (22).** Both sheets' scales, and on `va_floor` the two readings: the printed 10'-0" dimension gives
    about 21.6 px/ft, the graphic bar about 43.3 px/ft. The bar is twice too long, so areas taken from it are **four
-   times** too small; the printed dimension is right. The room table of one sheet with the worst rooms named. Then
-   the two counts on `va_floor`: the water closets come back 5/5 with no extras, the lavatories 5/5 with about ten
-   extras — a count that has to be checked by eye before anyone uses it. From Step 2b: *room* finds 10/14 and 10/13
+   times** too small; the printed dimension is right. The room table of one sheet with the worst rooms named. From Step 2b: *room* finds 10/14 and 10/13
    rooms at 0.3 with areas a few percent under the ones from the student's boxes (raw masks, furniture bitten out;
    the hall on `usda_5542` is the worst); *door* and *window* return nothing; *curved line* returns the swings.
 2. **Structural plans (22).** Per sheet the scale route and the footing areas against the sizes the marks give

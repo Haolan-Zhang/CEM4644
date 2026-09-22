@@ -37,9 +37,13 @@ def centre_in(p, t) -> bool:
 
 
 def box_hit(truth, pred, iou: float = 0.2) -> bool:
-    """A predicted box counts for a key box when they overlap enough, or when its centre is inside it
-    (small symbols: a box a few pixels off has a low IoU but is clearly the same thing)."""
-    return box_iou(truth, pred) >= iou or centre_in(pred, truth)
+    """A predicted box counts for a key box when they overlap enough, or when its centre is inside it and it is at
+    least a quarter of its size (small symbols: a box a few pixels off has a low IoU but is clearly the same thing;
+    a small part drawn inside a large symbol - the circle inside a light fixture - is not the symbol)."""
+    if box_iou(truth, pred) >= iou:
+        return True
+    area = lambda b: max(0.0, b[2] - b[0]) * max(0.0, b[3] - b[1])   # noqa: E731
+    return centre_in(pred, truth) and area(pred) >= 0.25 * area(truth)
 
 
 def match_boxes(pred: Sequence[Sequence[float]], truth: Sequence[Sequence[float]], iou: float = 0.2):
@@ -442,12 +446,13 @@ def live_phrase(lab, sheet_id: str, phrase: str, threshold: float):
     print(f"(SAM 3 took {res.seconds:.1f} s)")
 
 
-def phrase_check(lab, sheet_id: str, phrase: str, threshold: float, compare: str = "(nothing)"):
-    """Homework: a phrase typed straight to SAM 3 on any drawing, scored against one category of the answer key.
+def phrase_check(lab, sheet_id: str, phrase: str, threshold: float):
+    """Homework: a phrase typed straight to SAM 3 on any drawing, scored against the sheet's own answer key.
 
-    No box from the student: the words alone. 'compare' names an area category (room, footing, pit: hits, misses,
-    extras and the area of every region found) or a count category (hits, misses, extras), or '(nothing)'.
-    The result is kept in lab.phrases for the report summary."""
+    No box from the student: the words alone. The regions are scored against the category of the key they match
+    best (the rooms of a floor plan, the footings of a foundation plan, a fixture type of the ceiling plan); when
+    they match nothing, against the sheet's main category, so the miss is stated in the task's own terms. For an
+    area category the area of every region found is measured too. Kept in lab.phrases for the report summary."""
     sheet = lab.sheets[sheet_id]
     phrase = (phrase or "").strip()
     if not phrase:
@@ -459,18 +464,22 @@ def phrase_check(lab, sheet_id: str, phrase: str, threshold: float, compare: str
     idx = [int(i) for i in np.where(res.scores >= threshold)[0]]
     pred = [list(map(float, res.boxes[i])) for i in idx]
     cats = sheet.area_categories + [c for c in sheet.count_categories if c not in sheet.area_categories]
-    cat = None if compare in (None, "", "(nothing)") else compare
-    if cat and cat not in cats:
-        print(f"{sheet.id} has no '{cat}' in its answer key (it has: {', '.join(cats)}), so the regions are shown "
-              "without a score.")
-        cat = None
+    cat = cats[0] if cats else None
+    if cats and pred:                                   # the category the regions match best, if any
+        best, best_hits = None, 0
+        for c in cats:
+            is_area = c in sheet.area_categories
+            truth = [a["box"] for a in sheet.areas(c)] if is_area else sheet.counts[c]
+            ok, *_ = match_boxes(pred, truth, iou=0.3 if is_area else 0.2)
+            if ok > best_hits:
+                best, best_hits = c, ok
+        if best:
+            cat = best
     rec = {"sheet": sheet.id, "phrase": phrase, "threshold": float(threshold), "regions": len(pred), "proposed": len(res),
            "sqft": sheet.sqft(int(res.union(threshold).sum())) if pred else 0.0, "compare": cat}
     if cat is None:
         viz.show(viz.three_panel(img, res, "#ff70a6", f"{sheet.id} - '{phrase}'", threshold, what="drawing"))
         print_result(sheet, phrase, res, threshold)
-        if cats:
-            print(f"Pick one of {', '.join(cats)} under 'compare' to score these regions against the answer key.")
     else:
         is_area = cat in sheet.area_categories
         truth_items = sheet.areas(cat) if is_area else [{"box": b} for b in sheet.counts[cat]]

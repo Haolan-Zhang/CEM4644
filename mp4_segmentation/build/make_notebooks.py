@@ -339,9 +339,7 @@ GROUP_TEXT = {
               "bar: one of these two sheets carries a graphic scale bar that is wrong by a factor of two, and boxing it as "
               "well as the printed dimension is how you find that out. Then box every room the task asks for. The number "
               "you get is the *net* floor area: what the drawing puts on the floor (a counter, a bathtub) is cut out of "
-              "the mask unless the room is a plain rectangle. The clinic sheet also asks for two **counts**, the water "
-              "closets and the lavatories, and each one comes from a single box labelled *example: water closet* or "
-              "*example: lavatory*."),
+              "the mask unless the room is a plain rectangle."),
     "structural": ("Structural (foundation) plans",
                    "On a foundation plan you take off **areas of footings** and a **count of them**. The scale comes from a "
                    "printed bay dimension or from a footing whose width its mark gives you (F4.0 = 4'-0\" wide). The count "
@@ -406,9 +404,8 @@ no separate example label: your **first** *footing* box is the example. The slid
 before it keeps one of them.
 
 The second cell is the other way of asking: **type a phrase** and SAM 3 looks for it on the whole sheet, with no box
-from you at all. *compare* picks the part of the answer key the regions are scored against: green for a real one found,
-red for one missed, blue for a region that is not one; for rooms and footings the notebook also measures every region
-the phrase found. Try the trade word first (*footing*, *light fixture*), then a word for the **shape on the paper**
+from you at all. The regions are scored against the answer key: green for a real one found, red for one missed, blue
+for a region that is not one; for rooms and footings the notebook also measures every region the phrase found. Try the trade word first (*footing*, *light fixture*), then a word for the **shape on the paper**
 (*square*, *circle*, *rectangle with a diagonal line*), and move the confidence. Both cells feed the same report
 question: which way gets you a number you would put in an estimate, and which way is quicker?
 """))
@@ -427,16 +424,10 @@ question: which way gets you a number you would put in an estimate, and which wa
         what = {"floor": "a floor plan", "structural": "a structural plan", "mep": "an MEP sheet"}[gid]
         cells.append(form(f"Step {n}a - Take-off on {what}: your boxes", "lab.takeoff(drawing)",
                           params=[param_choice("drawing", glabels[0], glabels)]))
-        cats = []
-        for s in gsheets:
-            for c in s.area_categories + s.count_categories:
-                if c not in cats:
-                    cats.append(c)
         cells.append(form(f"Step {n}b - Ask by name on {what}: a phrase",
-                          "lab.ask(drawing, phrase, confidence, compare)",
+                          "lab.ask(drawing, phrase, confidence)",
                           params=[param_choice("drawing", glabels[0], glabels),
-                                  f'phrase = {json.dumps(default_phrase)} #@param {{type:"string"}}', CONF,
-                                  param_choice("compare", cats[0], ["(nothing)"] + cats)]))
+                                  f'phrase = {json.dumps(default_phrase)} #@param {{type:"string"}}', CONF]))
         cells.append(q.add(QUESTION_BY_GROUP[gid]))
 
     cells.append(md("## Part 5 - Your own drawing"))
@@ -468,9 +459,7 @@ QUESTION_BY_GROUP = {
     "floor": ("From Step 2a: your scale reading on each sheet and how far it is from the answer key. On the VA clinic sheet you "
               "were asked to box the graphic scale bar as well as the printed dimension - what did the two give, and which one "
               "is right? (Work out what the areas would have been if you had trusted the bar.) Then the room table of one sheet: "
-              "your square feet, the drawing's, the error. Which rooms are worst and why? The two counts SAM 3 made from your "
-              "example boxes on the clinic sheet (found / missed / extra): which would you hand on, which would you check first? "
-              "Then from Step 2b: what did *room* find on each sheet (found / missed / extra, and the median error of the areas "
+              "your square feet, the drawing's, the error. Which rooms are worst and why? Then from Step 2b: what did *room* find on each sheet (found / missed / extra, and the median error of the areas "
               "it measured) against the rooms from your boxes? What did *door* and *window* return, and what did *curved line*?"),
     "structural": ("From Step 3a: for each sheet, the scale and how you set it, the areas of the footings you measured against "
                    "the sizes their marks give, and the count SAM 3 made from your first *footing* box, its example (found / missed / "
@@ -487,13 +476,12 @@ QUESTION_BY_GROUP = {
 
 PHRASE_HINTS = {
     "floor": ("room", "Try *room*, *bedroom*, *bathroom*, *door*, *window*; then *curved line* (a door swing is an arc on the "
-                      "paper) and, on the clinic sheet, *toilet* and *sink*. Compare with *room* for the areas, *water closet* "
-                      "or *lavatory* for the counts."),
+                      "paper)."),
     "structural": ("footing", "Try *footing*, *foundation*, *column*; then *square* and *hatched square* for the footings, *rectangle* "
-                              "for the pile caps, *circle* for the grid bubbles. Compare with *footing* (hits and areas), *pit*, "
-                              "*pile footing* or *grid bubble*, and move the confidence: the extras go, then the real ones."),
+                              "for the pile caps, *circle* for the grid bubbles. Move the confidence: the extras go first, then "
+                              "the real ones."),
     "mep": ("light fixture", "Try *light fixture*, *light*, *diffuser*, *sprinkler*; then *rectangle with a diagonal line*, "
-                             "*small circle*, *circle with a cross*. Compare with the three fixture types of the answer key."),
+                             "*small circle*, *circle with a cross*."),
 }
 
 

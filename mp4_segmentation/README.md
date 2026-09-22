@@ -37,8 +37,7 @@ in MP4: SAM 3 is used as it comes.
    count on the structural sheets; light-fixture counts on the ceiling plan. **Every count is made by the model from
    one box labelled `example: <thing>`** — students never tally their own boxes against the key. *Step Nb, a phrase*:
    the same things asked for by name (`lab.ask`), no box at all; the regions are scored against the answer key
-   (hits / misses / extras, and the area of every room or footing found). Measured: *room* finds most rooms, *toilet*
-   the water closets, *square* the footings, *rectangle* the pile caps, *circle* the grid bubbles; *footing*,
+   (hits / misses / extras, and the area of every room or footing found). Measured: *room* finds most rooms, *square* the footings, *rectangle* the pile caps, *circle* the grid bubbles; *footing*,
    *light fixture* and every other trade word find nothing, and nothing at all works by phrase on the ceiling plan.
 3. **Their own drawing**.
 

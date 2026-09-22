@@ -9,12 +9,12 @@ chose these sheets live in `_candidates/sam3_eval/` (not in the repository); the
 
 | sheet | discipline | areas (measured) | counts from one example (found / on the sheet, extras) | phrases that work |
 |---|---|---|---|---|
-| usda_5542 | floor plan | room n=10, median 6.8 %, worst 31 % | - | *room*: 10/14 found, 0 extra; *bedroom*: 6/14 found, 0 extra |
-| va_floor | floor plan + plumbing | room n=13, median 3.2 %, worst 11 % | water closet 5/5 (+0); lavatory 3/5 (+4) | *room*: 10/13 found, 3 extra; *toilet*: 5/5 found, 2 extra |
+| usda_5542 | floor plan | room n=10, median 6.8 %, worst 31 % | - | *room*: 10/14 found, 0 extra; *bedroom*: 6/14 found, 0 extra; *curved line*: 1/14 found, 30 extra |
+| va_floor | floor plan + plumbing | room n=13, median 3.2 %, worst 11 % | - | *room*: 10/13 found, 3 extra |
 | va_ceiling | electrical | - | 2x4 light fixture 39/41 (+0); 2x2 light fixture 8/8 (+1); recessed light 14/14 (+0) | *rectangle*: 7/41 found, 24 extra |
-| test_fp | structural | footing n=10, median 5.8 %, worst 10 % | footing 10/10 (+4) | *square*: 10/10 found, 5 extra; *rectangle*: 10/10 found, 9 extra |
-| test_fp_2 | structural | footing n=19, median 1.2 %, worst 25 %; pit n=1, median 1.5 %, worst 2 % | footing 19/19 (+1) | *square*: 19/19 found, 4 extra; *rectangle*: 19/19 found, 6 extra |
-| uscg_motorpool | structural | footing n=20, median 3.0 %, worst 28 %; pit n=2, median 85.0 %, worst 110 % | footing 19/20 (+5); grid bubble 32/32 (+2) | *square*: 12/20 found, 5 extra; *rectangle*: 7/20 found, 4 extra; *circle*: 32/32 found, 6 extra |
+| test_fp | structural | footing n=10, median 3.3 %, worst 8 % | footing 10/10 (+4) | *square*: 10/10 found, 5 extra; *rectangle*: 10/10 found, 9 extra |
+| test_fp_2 | structural | footing n=19, median 1.7 %, worst 25 %; pit n=1, median 1.3 %, worst 1 % | footing 19/19 (+1) | *square*: 19/19 found, 23 extra; *rectangle*: 19/19 found, 6 extra |
+| uscg_motorpool | structural | footing n=20, median 4.9 %, worst 30 %; pit n=2, median 80.3 %, worst 100 % | footing 19/20 (+4); grid bubble 32/32 (+2) | *square*: 9/20 found, 10 extra; *rectangle*: 7/20 found, 4 extra; *circle*: 32/32 found, 6 extra |
 | uscg_pile | structural | - | pile footing 29/29 (+2) | *rectangle*: 29/29 found, 8 extra |
 
 ## usda_5542 - Five-room farmhouse, 32 ft x 29 ft (USDA design 710-5542)
@@ -86,13 +86,13 @@ Scale used: 27.53 px/ft.
 
 ### What phrases find (the phrase cells 2b, 3b and 4b, confidence 0.3)
 
-| phrase | regions | scored against | result |
+| phrase | regions | scored against (the key category the regions match best) | result |
 |---|---|---|---|
 | room | 10 | room | 10/14 found, 0 extra; areas median 3 %, worst 45 % |
 | bedroom | 5 | room | 6/14 found, 0 extra; areas median 4 %, worst 119 % |
-| door | 0 | - | not scored (nothing of that kind in the key) |
-| window | 0 | - | not scored (nothing of that kind in the key) |
-| curved line | 31 | - | not scored (nothing of that kind in the key) |
+| door | 0 | room | 0/14 found, 0 extra |
+| window | 0 | room | 0/14 found, 0 extra |
+| curved line | 31 | room | 1/14 found, 30 extra; areas median 96 %, worst 96 % |
 
 ## va_floor - VA outpatient clinic, lease module: floor plan (rooms and plumbing fixtures)
 
@@ -129,18 +129,11 @@ Scale: 21.60 px/ft. a printed 10'-0" dimension on the top dimension string measu
 
 - 13 rooms in the take-off, 1,833 sq ft together (1,833 sq ft indoors).
 
-| counted from one example | how many on the sheet | confidence the key suggests | tip |
-|---|---|---|---|
-| water closet | 5 | 0.50 | Pick a water closet that sits in a roomy toilet room. The two in the tight toilet rooms between the exam rooms are a poor example and give only 2 of the 5. At 0 |
-| lavatory | 5 | 0.30 | This one is meant to show you a limit. A lavatory is a 37 x 42 px rounded box on a sheet covered in rounded boxes, so the model finds all five and hands you abo |
-
 Tasks in the key:
 
 1. Box the printed 10'-0" dimension on the top dimension string, arrowhead to arrowhead (label: scale: printed 10'-0" dimension).
 2. Box the 0-16 ft graphic bar at the top right, from its 0' mark to its 16' mark (label: scale: 0-16 ft graphic scale bar). The two scales will not agree - work out which one is wrong and by how much before you measure anything.
 3. Box at least six rooms (label: room). Their measured area is net floor area: the model cuts the furniture out of the mask, so expect to read about 10 % low in a furnished room and closer in an empty one.
-4. Box ONE water closet with the label 'example: water closet' and SAM 3 counts them all.
-5. Box ONE lavatory (the small wash basin next to a water closet) with the label 'example: lavatory' and count those the same way.
 
 ### What SAM 3 measures (boxes taken from the key, each side moved by a few percent)
 
@@ -169,20 +162,13 @@ Scale used: 21.86 px/ft.
 | 13 | PACT TEAM WORK SPACE (left) | 467.7 | 457 | +2 % |  |
 13 rooms: median error 3.2 %, worst 11 %.
 
-| one example box of | confidence | regions returned | found / on the sheet | missed | extra |
-|---|---|---|---|---|---|
-| water closet | 0.50 | 5 | 5/5 | 0 | 0 |
-| lavatory | 0.30 | 7 | 3/5 | 2 | 4 |
-
 ### What phrases find (the phrase cells 2b, 3b and 4b, confidence 0.3)
 
-| phrase | regions | scored against | result |
+| phrase | regions | scored against (the key category the regions match best) | result |
 |---|---|---|---|
 | room | 13 | room | 10/13 found, 3 extra; areas median 7 %, worst 58 % |
-| toilet | 7 | water closet | 5/5 found, 2 extra |
-| sink | 0 | lavatory | 0/5 found, 0 extra |
-| door | 0 | - | not scored (nothing of that kind in the key) |
-| curved line | 12 | - | not scored (nothing of that kind in the key) |
+| door | 0 | room | 0/13 found, 0 extra |
+| curved line | 12 | room | 0/13 found, 12 extra |
 
 ## va_ceiling - VA outpatient clinic, lease module: reflected ceiling plan (light fixture count)
 
@@ -221,9 +207,9 @@ Tasks in the key:
 
 | scale box | px | px/ft | vs the key |
 |---|---|---|---|
-| ten ceiling grid cells (2 ft each) = 20 ft | 453 | 22.63 | +4.5 % |
-| 0-16 ft graphic scale bar | 696 | 43.52 | +0.6 % |
-Scale used: 22.63 px/ft.
+| ten ceiling grid cells (2 ft each) = 20 ft | 440 | 21.99 | +1.6 % |
+| 0-16 ft graphic scale bar | 702 | 43.89 | +1.5 % |
+Scale used: 21.99 px/ft.
 
 | one example box of | confidence | regions returned | found / on the sheet | missed | extra |
 |---|---|---|---|---|---|
@@ -233,14 +219,14 @@ Scale used: 22.63 px/ft.
 
 ### What phrases find (the phrase cells 2b, 3b and 4b, confidence 0.3)
 
-| phrase | regions | scored against | result |
+| phrase | regions | scored against (the key category the regions match best) | result |
 |---|---|---|---|
 | light fixture | 0 | 2x4 light fixture | 0/41 found, 0 extra |
-| diffuser | 0 | - | not scored (nothing of that kind in the key) |
+| diffuser | 0 | 2x4 light fixture | 0/41 found, 0 extra |
 | rectangle | 31 | 2x4 light fixture | 7/41 found, 24 extra |
 | rectangle with a diagonal line | 0 | 2x4 light fixture | 0/41 found, 0 extra |
-| small circle | 45 | recessed light | 0/14 found, 45 extra |
-| square | 0 | 2x2 light fixture | 0/8 found, 0 extra |
+| small circle | 45 | 2x4 light fixture | 0/41 found, 45 extra |
+| square | 0 | 2x4 light fixture | 0/41 found, 0 extra |
 
 ## test_fp - Foundation plan: 12 ft square spread footings around an equipment pit
 
@@ -289,30 +275,30 @@ Tasks in the key:
 
 | scale box | px | px/ft | vs the key |
 |---|---|---|---|
-| spread footing, 12'-0" wide | 100 | 8.30 | +1.6 % |
-Scale used: 8.30 px/ft.
+| spread footing, 12'-0" wide | 98 | 8.19 | +0.3 % |
+Scale used: 8.19 px/ft.
 
 | # | footing (key) | measured sq ft | true sq ft | error | note |
 |---|---|---|---|---|---|
-| 1 | F12.0 (B2) | 134.1 | 144 | -7 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 2 | F12.0 (B3) | 135.0 | 144 | -6 % | the mask fills 94 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 3 | F12.0 (B4) | 135.6 | 144 | -6 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 4 | F12.0 (B5) | 137.4 | 144 | -5 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 5 | F12.0 (B6) | 142.0 | 144 | -1 % | the mask fills 97 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 6 | F12.0 (C2) | 132.0 | 144 | -8 % |  |
-| 7 | F12.0 (C3) | 129.5 | 144 | -10 % |  |
-| 8 | F12.0 (C4) | 135.8 | 144 | -6 % | the mask fills 93 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 9 | F12.0 (C5) | 137.5 | 144 | -5 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 10 | F12.0 (C6) | 136.3 | 144 | -5 % | the mask fills 96 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-10 footings: median error 5.8 %, worst 10 %.
+| 1 | F12.0 (B2) | 139.0 | 144 | -4 % |  |
+| 2 | F12.0 (B3) | 138.5 | 144 | -4 % | the mask fills 94 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 3 | F12.0 (B4) | 139.1 | 144 | -3 % | the mask fills 93 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 4 | F12.0 (B5) | 141.0 | 144 | -2 % | the mask fills 95 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 5 | F12.0 (B6) | 140.2 | 144 | -3 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 6 | F12.0 (C2) | 135.4 | 144 | -6 % |  |
+| 7 | F12.0 (C3) | 132.7 | 144 | -8 % |  |
+| 8 | F12.0 (C4) | 139.4 | 144 | -3 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 9 | F12.0 (C5) | 141.0 | 144 | -2 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 10 | F12.0 (C6) | 140.0 | 144 | -3 % | the mask fills 93 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+10 footings: median error 3.3 %, worst 8 %.
 
 | one example box of | confidence | regions returned | found / on the sheet | missed | extra |
 |---|---|---|---|---|---|
-| footing | 0.30 | 15 | 10/10 | 0 | 4 |
+| footing | 0.30 | 16 | 10/10 | 0 | 4 |
 
 ### What phrases find (the phrase cells 2b, 3b and 4b, confidence 0.3)
 
-| phrase | regions | scored against | result |
+| phrase | regions | scored against (the key category the regions match best) | result |
 |---|---|---|---|
 | footing | 0 | footing | 0/10 found, 0 extra |
 | foundation | 0 | footing | 0/10 found, 0 extra |
@@ -380,37 +366,37 @@ Tasks in the key:
 
 | scale box | px | px/ft | vs the key |
 |---|---|---|---|
-| printed 14'-0" bay X2-X3 | 218 | 15.59 | +2.0 % |
-| F4.0 footing, 4'-0" wide | 63 | 15.82 | +0.4 % |
-Scale used: 15.59 px/ft.
+| printed 14'-0" bay X2-X3 | 219 | 15.65 | +2.4 % |
+| F4.0 footing, 4'-0" wide | 63 | 15.80 | +0.3 % |
+Scale used: 15.65 px/ft.
 
 | # | footing (key) | measured sq ft | true sq ft | error | note |
 |---|---|---|---|---|---|
-| 1 | R1-1 | 19.8 | 20 | -2 % | the mask fills 93 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 2 | R1-2 | 20.0 | 20 | -1 % | the mask fills 94 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 3 | R1-3 | 20.2 | 20 | -0 % | the mask fills 93 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 1 | R1-1 | 19.7 | 20 | -3 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 2 | R1-2 | 19.9 | 20 | -2 % | the mask fills 94 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 3 | R1-3 | 20.0 | 20 | -1 % | the mask fills 94 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
 | 4 | R1-4 | 15.2 | 20 | -25 % |  |
-| 5 | R1-5 | 20.0 | 20 | -1 % | the mask fills 93 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 6 | R1-6 | 22.7 | 23 | -3 % | the mask fills 91 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 7 | R1-7 | 24.4 | 25 | -3 % | the mask fills 91 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 8 | R1-8 | 21.5 | 22 | -1 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 9 | R2-1 | 20.1 | 20 | -1 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 10 | R2-2 | 20.1 | 20 | -1 % | the mask fills 93 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 11 | R2-3 | 20.4 | 20 | +1 % | the mask fills 96 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 12 | R2-4 | 20.6 | 20 | +2 % | the mask fills 96 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 13 | R2-5 | 20.2 | 20 | -0 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 14 | R2-6 | 21.6 | 22 | -1 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 15 | R2-7 | 24.7 | 25 | -1 % | the mask fills 95 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 16 | R2-8 | 20.0 | 20 | -1 % | the mask fills 91 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 17 | R2-9 | 20.2 | 20 | -0 % | the mask fills 91 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 18 | F40-1 | 16.2 | 16 | +1 % | the mask fills 99 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 19 | F40-2 | 16.5 | 16 | +3 % | the mask fills 96 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-19 footings: median error 1.2 %, worst 25 %.
+| 5 | R1-5 | 19.8 | 20 | -2 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 6 | R1-6 | 22.5 | 23 | -4 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 7 | R1-7 | 24.0 | 25 | -4 % | the mask fills 93 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 8 | R1-8 | 21.4 | 22 | -2 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 9 | R2-1 | 19.9 | 20 | -2 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 10 | R2-2 | 20.0 | 20 | -1 % | the mask fills 93 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 11 | R2-3 | 20.3 | 20 | +0 % | the mask fills 93 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 12 | R2-4 | 20.5 | 20 | +1 % | the mask fills 94 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 13 | R2-5 | 20.0 | 20 | -1 % | the mask fills 94 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 14 | R2-6 | 21.5 | 22 | -2 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 15 | R2-7 | 24.6 | 25 | -2 % | the mask fills 94 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 16 | R2-8 | 19.8 | 20 | -2 % | the mask fills 94 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 17 | R2-9 | 20.0 | 20 | -1 % | the mask fills 93 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 18 | F40-1 | 16.2 | 16 | +1 % | the mask fills 94 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 19 | F40-2 | 16.4 | 16 | +2 % | the mask fills 96 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+19 footings: median error 1.7 %, worst 25 %.
 
 | # | pit (key) | measured sq ft | true sq ft | error | note |
 |---|---|---|---|---|---|
-| 1 | elevator shaft opening | 48.9 | 48 | +2 % | the mask fills 102 % of your box - look at the outline: if it is a rounded copy of your box rather than the th |
-1 pit: median error 1.5 %, worst 2 %.
+| 1 | elevator shaft opening | 47.6 | 48 | -1 % | the mask fills 102 % of your box - look at the outline: if it is a rounded copy of your box rather than the th |
+1 pit: median error 1.3 %, worst 1 %.
 
 | one example box of | confidence | regions returned | found / on the sheet | missed | extra |
 |---|---|---|---|---|---|
@@ -418,10 +404,10 @@ Scale used: 15.59 px/ft.
 
 ### What phrases find (the phrase cells 2b, 3b and 4b, confidence 0.3)
 
-| phrase | regions | scored against | result |
+| phrase | regions | scored against (the key category the regions match best) | result |
 |---|---|---|---|
 | footing | 0 | footing | 0/19 found, 0 extra |
-| square | 42 | footing | 19/19 found, 4 extra; areas median 10 %, worst 17 % |
+| square | 42 | footing | 19/19 found, 23 extra; areas median 10 %, worst 17 % |
 | hatched square | 0 | footing | 0/19 found, 0 extra |
 | rectangle | 25 | footing | 19/19 found, 6 extra; areas median 11 %, worst 15 % |
 
@@ -489,51 +475,51 @@ Tasks in the key:
 
 | scale box | px | px/ft | vs the key |
 |---|---|---|---|
-| printed 15'-0" bay D-E | 187 | 12.44 | +1.4 % |
-| printed 79'-8" overall dimension | 984 | 12.35 | +0.5 % |
-Scale used: 12.44 px/ft.
+| printed 15'-0" bay D-E | 189 | 12.60 | +2.7 % |
+| printed 79'-8" overall dimension | 1000 | 12.55 | +2.1 % |
+Scale used: 12.60 px/ft.
 
 | # | footing (key) | measured sq ft | true sq ft | error | note |
 |---|---|---|---|---|---|
-| 1 | F60 | 25.9 | 36 | -28 % |  |
-| 2 | F126 | 114.8 | 119 | -3 % |  |
-| 3 | F66 | 45.9 | 42 | +9 % |  |
-| 4 | F66 | 43.3 | 42 | +3 % |  |
-| 5 | F66 | 43.9 | 42 | +4 % |  |
-| 6 | F70 | 49.1 | 49 | +0 % | the mask fills 95 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 7 | F70 | 60.7 | 49 | +24 % |  |
-| 8 | F80 | 62.3 | 64 | -3 % |  |
-| 9 | F80 | 63.9 | 64 | -0 % |  |
-| 10 | F70 | 48.0 | 49 | -2 % |  |
-| 11 | F80 | 61.9 | 64 | -3 % | the mask fills 90 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 12 | F80 | 62.0 | 64 | -3 % |  |
-| 13 | F96 | 88.5 | 90 | -2 % | the mask fills 91 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 14 | F96 | 89.5 | 90 | -1 % | the mask fills 98 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 15 | F60 | 35.0 | 36 | -3 % |  |
-| 16 | F126 | 118.6 | 119 | -0 % |  |
-| 17 | F66 | 46.5 | 42 | +10 % | the mask fills 91 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 18 | F66 | 45.2 | 42 | +7 % |  |
-| 19 | F66 | 46.2 | 42 | +9 % | the mask fills 93 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-| 20 | F70 | 48.6 | 49 | -1 % | the mask fills 94 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
-20 footings: median error 3.0 %, worst 28 %.
+| 1 | F60 | 25.4 | 36 | -30 % |  |
+| 2 | F126 | 112.0 | 119 | -6 % |  |
+| 3 | F66 | 44.7 | 42 | +6 % | the mask fills 91 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 4 | F66 | 42.4 | 42 | +0 % |  |
+| 5 | F66 | 42.8 | 42 | +1 % |  |
+| 6 | F70 | 47.8 | 49 | -2 % | the mask fills 97 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 7 | F70 | 59.7 | 49 | +22 % |  |
+| 8 | F80 | 60.7 | 64 | -5 % |  |
+| 9 | F80 | 62.3 | 64 | -3 % | the mask fills 91 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 10 | F70 | 47.0 | 49 | -4 % |  |
+| 11 | F80 | 60.5 | 64 | -5 % |  |
+| 12 | F80 | 60.3 | 64 | -6 % |  |
+| 13 | F96 | 86.3 | 90 | -4 % | the mask fills 91 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 14 | F96 | 87.4 | 90 | -3 % | the mask fills 95 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 15 | F60 | 33.4 | 36 | -7 % |  |
+| 16 | F126 | 115.5 | 119 | -3 % | the mask fills 92 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 17 | F66 | 45.4 | 42 | +7 % |  |
+| 18 | F66 | 44.2 | 42 | +5 % |  |
+| 19 | F66 | 45.3 | 42 | +7 % | the mask fills 91 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+| 20 | F70 | 47.3 | 49 | -3 % | the mask fills 94 % of your box - look at the outline: if it is a rounded copy of your box rather than the thi |
+20 footings: median error 4.9 %, worst 30 %.
 
 | # | pit (key) | measured sq ft | true sq ft | error | note |
 |---|---|---|---|---|---|
-| 1 | house trap pit 2'-0"x2'-6" | 10.5 | 5 | +110 % | your box is only 37 px across, and under about 60 px a symbol is too small for the model on this sheet: the nu |
-| 2 | oil separator pit 5'-4 1/2"x3'-4" | 28.7 | 18 | +60 % | your box is only 46 px across, and under about 60 px a symbol is too small for the model on this sheet: the nu |
-2 pits: median error 85.0 %, worst 110 %.
+| 1 | house trap pit 2'-0"x2'-6" | 10.0 | 5 | +100 % | your box is only 36 px across, and under about 60 px a symbol is too small for the model on this sheet: the nu |
+| 2 | oil separator pit 5'-4 1/2"x3'-4" | 28.8 | 18 | +61 % | your box is only 46 px across, and under about 60 px a symbol is too small for the model on this sheet: the nu |
+2 pits: median error 80.3 %, worst 100 %.
 
 | one example box of | confidence | regions returned | found / on the sheet | missed | extra |
 |---|---|---|---|---|---|
-| footing | 0.30 | 26 | 19/20 | 1 | 5 |
+| footing | 0.30 | 25 | 19/20 | 1 | 4 |
 | grid bubble | 0.50 | 34 | 32/32 | 0 | 2 |
 
 ### What phrases find (the phrase cells 2b, 3b and 4b, confidence 0.3)
 
-| phrase | regions | scored against | result |
+| phrase | regions | scored against (the key category the regions match best) | result |
 |---|---|---|---|
 | footing | 0 | footing | 0/20 found, 0 extra |
-| square | 19 | footing | 12/20 found, 5 extra; areas median 3 %, worst 93 % |
+| square | 19 | footing | 9/20 found, 10 extra; areas median 2 %, worst 6 % |
 | rectangle | 11 | footing | 7/20 found, 4 extra; areas median 2 %, worst 6 % |
 | circle | 38 | grid bubble | 32/32 found, 6 extra |
 
@@ -570,9 +556,9 @@ Tasks in the key:
 
 | scale box | px | px/ft | vs the key |
 |---|---|---|---|
-| printed 16'-0" bay PF20-PF21 | 171 | 10.68 | +1.1 % |
-| printed 164'-0" overall dimension | 1758 | 10.72 | +1.8 % |
-Scale used: 10.68 px/ft.
+| printed 16'-0" bay PF20-PF21 | 170 | 10.65 | +0.8 % |
+| printed 164'-0" overall dimension | 1755 | 10.70 | +1.6 % |
+Scale used: 10.65 px/ft.
 
 | one example box of | confidence | regions returned | found / on the sheet | missed | extra |
 |---|---|---|---|---|---|
@@ -580,7 +566,7 @@ Scale used: 10.68 px/ft.
 
 ### What phrases find (the phrase cells 2b, 3b and 4b, confidence 0.3)
 
-| phrase | regions | scored against | result |
+| phrase | regions | scored against (the key category the regions match best) | result |
 |---|---|---|---|
 | footing | 0 | pile footing | 0/29 found, 0 extra |
 | square | 0 | pile footing | 0/29 found, 0 extra |

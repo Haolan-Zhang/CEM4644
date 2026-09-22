@@ -24,10 +24,10 @@ DOCS = REPO / "docs"
 KEYS = DOCS / "keys"
 MAX_SIDE = 1200
 
-# the phrases the homework suggests, and the key category each is scored against (None = shown, not scored)
+# the phrases the homework suggests; the second value is the key category the phrase is expected to hit (None = nothing)
 PHRASES = {
     "usda_5542": [("room", "room"), ("bedroom", "room"), ("door", None), ("window", None), ("curved line", None)],
-    "va_floor": [("room", "room"), ("toilet", "water closet"), ("sink", "lavatory"), ("door", None), ("curved line", None)],
+    "va_floor": [("room", "room"), ("door", None), ("curved line", None)],
     "test_fp": [("footing", "footing"), ("foundation", "footing"), ("square", "footing"), ("hatched square", "footing"), ("rectangle", "footing")],
     "test_fp_2": [("footing", "footing"), ("square", "footing"), ("hatched square", "footing"), ("rectangle", "footing")],
     "uscg_motorpool": [("footing", "footing"), ("square", "footing"), ("rectangle", "footing"), ("circle", "grid bubble")],
@@ -97,14 +97,14 @@ def phrase_rows(sheet):
     rows = []
     for phrase, cat in PHRASES.get(sheet.id, []):
         with contextlib.redirect_stdout(io.StringIO()):
-            rec = ui.phrase_check(lab, sheet.id, phrase, 0.3, cat or "(nothing)") or {}
+            rec = ui.phrase_check(lab, sheet.id, phrase, 0.3) or {}
         if rec.get("compare"):
             score = f"{rec['found']}/{rec['truth']} found, {rec['extra']} extra"
             if rec.get("median_err") is not None:
                 score += f"; areas median {rec['median_err']:.0f} %, worst {rec['worst_err']:.0f} %"
         else:
-            score = "not scored (nothing of that kind in the key)"
-        rows.append((phrase, rec.get("regions", 0), cat or "-", score))
+            score = "not scored (nothing in the key to score against)"
+        rows.append((phrase, rec.get("regions", 0), rec.get("compare") or "-", score))
     return rows
 
 
@@ -167,7 +167,7 @@ def sheet_section(sheet) -> tuple:
     rows = phrase_rows(sheet)
     if rows:
         md += ["### What phrases find (the phrase cells 2b, 3b and 4b, confidence 0.3)", "",
-               table(rows, ["phrase", "regions", "scored against", "result"]), ""]
+               table(rows, ["phrase", "regions", "scored against (the key category the regions match best)", "result"]), ""]
         summary["phrases"] = rows
     return "\n".join(md), summary
 
