@@ -56,7 +56,7 @@ From Step 4c: which of your own words found something that the name of the thing
 
 ## Question 7
 
-Test one drawing of your own (any floor plan or construction drawing). What phrase did you use, what did it find, and was the mask right? Then: where in a project would a take-off like this be useful, and where would it mislead you? What would you need (clean drawings, a known dimension, a room schedule, a person checking) before you would put these numbers in an estimate?
+Test one drawing of your own (any floor plan or construction drawing). Which phrase or box did you use, what did it find, and was the result right? Then: where in a project would a take-off like this be useful, and where would it mislead you? What would you need (clean drawings, a known dimension, a room schedule, a person checking) before you would put these numbers in an estimate?
 
 *Your answer:*
 

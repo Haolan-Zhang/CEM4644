@@ -28,7 +28,7 @@ in MP4: SAM 3 is used as it comes.
    door on the sheet (the key marks found / missed / extra). Doors, not windows: from any example box the model
    finds a median 11/17, 14/14 and 11/11 doors, but only 2/9 windows on the first sheet.
 4. **Where it goes wrong**: wording, the region inspector, words of their own.
-5. **Their own drawing** in a small Gradio app, opened from a link.
+5. **Their own drawing** in a small Gradio app, opened from a link: the scale from a box along a printed dimension, then a phrase, a box for an area, or one example box for a count.
 
 **Homework (about 2.5 h).** No SAM 3 teaching: straight into a take-off across disciplines, two ways on each.
 1. **The drawings**: all seven, what each one is, and the MEP symbol legend.

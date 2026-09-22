@@ -313,13 +313,13 @@ what it *means*.
 
     cells.append(md("## Part 5 - Your own drawing"))
     cells.append(form("Your drawing, your words", "lab.upload_app()",
-                      notes=["This cell prints a **link**: open it in a new tab (it works on a phone too). Upload a floor plan "
-                             "(a photograph of a drawing works), type what to find, move the threshold.",
-                             "To get square feet, measure a printed dimension on your own sheet first: count the pixels along it, "
-                             "divide by its length in feet, and type that number in. Test at least one drawing of your own and "
-                             "take screenshots. Needs the live model."]))
-    cells.append(q.add("Test one drawing of your own (any floor plan or construction drawing). What phrase did you use, what did "
-                       "it find, and was the mask right? Then: where in a project would a take-off like this be useful, and where "
+                      notes=["This cell prints a **link**: open it in a new tab (it works on a phone too). Upload a drawing, then ask "
+                             "the three ways of this lab: a box for the scale (a printed dimension, plus its length in feet), a "
+                             "box for a room or an object, one example box that SAM 3 finds the rest of, or a phrase. A box is two "
+                             "clicks on the drawing: top-left, then bottom-right. Test at least one drawing of your own and take "
+                             "screenshots. Needs the live model."]))
+    cells.append(q.add("Test one drawing of your own (any floor plan or construction drawing). Which phrase or box did you use, "
+                       "what did it find, and was the result right? Then: where in a project would a take-off like this be useful, and where "
                        "would it mislead you? What would you need (clean drawings, a known dimension, a room schedule, a person "
                        "checking) before you would put these numbers in an estimate?"))
 
@@ -440,10 +440,10 @@ question: which way gets you a number you would put in an estimate, and which wa
 
     cells.append(md("## Part 5 - Your own drawing"))
     cells.append(form("Your drawing, your words", "lab.upload_app()",
-                      notes=["This cell prints a **link**: open it in a new tab (it works on a phone too). Upload a drawing of your "
-                             "own, type what to find, move the threshold.",
-                             "To get square feet, measure a printed dimension on your sheet first: count the pixels along it, divide "
-                             "by its length in feet, and type that number in. Test at least three drawings of your own, from at "
+                      notes=["This cell prints a **link**: open it in a new tab (it works on a phone too). Upload a drawing, then ask "
+                             "the three ways of this lab: a box for the scale (a printed dimension, plus its length in feet), a "
+                             "box for a room or an object, one example box that SAM 3 finds the rest of, or a phrase. A box is two "
+                             "clicks on the drawing: top-left, then bottom-right. Test at least three drawings of your own, from at "
                              "least two disciplines, and take screenshots. Needs the live model."]))
     cells.append(q.add("Test three drawings of your own, from at least two disciplines (a floor plan, a structural plan, an MEP "
                        "sheet, a section, a site plan...). For each: the phrase or box you used, what came back, and whether it is "

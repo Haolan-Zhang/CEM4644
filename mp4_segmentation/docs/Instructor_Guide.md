@@ -180,7 +180,7 @@ the object (+4 %).
 | 32–62 | Part 3 | Do Step 3a together, slowly: the scale box from arrowhead to arrowhead (zoom in), then the second dimension down the side, then every room; Submit; read the two scale lines and the room table. Then let them do 3b and 3c on their own (about 12 min each). Walk around: the two things that go wrong are a loose room box and boxing the *dimension line* instead of the span between the arrowheads. |
 | 62–70 | Step 3d | One box round one door on `usda_5540` (arc included): 14/14. Then the same on `usda_5544`: 11 or so of 17, the double door and the closet doors missed. Pick a poor example on purpose (a closet door in the corner) and watch the count collapse: the example is the prompt. Windows were left out on purpose: a median 2/9 on `usda_5544` (faint, varying lengths). |
 | 70–80 | Part 4 | Step 4a with *door*: *door* finds nothing, *curved line* finds the swings. Step 4b: weak regions and what they sit on. Step 4c: *thick black line*, *circle*, *hatched square*. |
-| 80–90 | Part 5 + wrap-up | The upload app from the link (a photo of any drawing works). Point at `lab.report_summary()` for the numbers and at `docs/MP4_Workshop_Report_Template.md`. |
+| 80–90 | Part 5 + wrap-up | The upload app from the link (a photo of any drawing works): a box is two clicks, the scale comes from a box along a printed dimension plus its length in feet, and the three ways of asking are the notebook's (phrase, box for an area, one example box for a count). Point at `lab.report_summary()` for the numbers and at `docs/MP4_Workshop_Report_Template.md`. |
 
 If you are short of time, drop Step 3c (`usda_5539`) and set it as homework; it is the drawing where the L-shaped
 footprint and the porches make the take-off hardest.
