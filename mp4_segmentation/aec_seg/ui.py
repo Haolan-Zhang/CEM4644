@@ -907,10 +907,8 @@ def takeoff(lab, sheet_id: str):
     if cats:                                  # only a sheet with something to count needs the confidence
         sl0 = float(sheet.hint(cats[0])["threshold"])
         sl = w.FloatSlider(value=sl0, min=0.1, max=0.9, step=0.05, description="confidence >=",
-                           continuous_update=False, readout_format=".2f")
-        controls.append(w.HBox([sl, w.HTML("&nbsp;how sure SAM 3 must be to keep something it found from your "
-                                           "<b>example:</b> box. Leave it alone and each thing is counted at the "
-                                           "confidence suggested for it.")]))
+                           continuous_update=False, readout_format=".2f", style={"description_width": "110px"}, layout=w.Layout(width="420px"))
+        controls.append(sl)
 
     guided = getattr(lab.spec, "guided", True)
     todo = "<br>".join(f"<b>{i + 1}.</b> {t}" for i, t in enumerate(sheet.tasks))   # shown only when guided
@@ -942,7 +940,7 @@ def takeoff(lab, sheet_id: str):
         msg.value = "" if not guided else ("Done. Adjust the boxes and submit again; a tight box gives a cleaner mask. "
                      "Copy the numbers into your report, then go to the next drawing.")
 
-    display(w.VBox([msg, widget, *controls, out]))
+    display(w.VBox([msg, *controls, widget, out]))
 
 
 def find_like(lab, sheet_id: str):
@@ -963,7 +961,7 @@ def find_like(lab, sheet_id: str):
     widget.image_bytes = buf.getvalue()
     sl0 = float(sheet.hint(cats[0])["threshold"])
     sl = w.FloatSlider(value=sl0, min=0.1, max=0.9, step=0.05, description="confidence >=",
-                       continuous_update=False, readout_format=".2f")
+                       continuous_update=False, readout_format=".2f", style={"description_width": "110px"}, layout=w.Layout(width="420px"))
     guided = getattr(lab.spec, "guided", True)
     what = " and ".join(plural(len(sheet.counts[c]), c) for c in cats)
     msg = w.HTML("" if not guided else f"<b>{sheet.id} - {sheet.title}</b>: the drawing has {what}.<br>"
@@ -995,4 +993,4 @@ def find_like(lab, sheet_id: str):
         msg.value = "" if not guided else ("Done. Try another example (one in a cluttered corner, one drawn the other way round), move the "
                      "confidence, then do the next drawing. Every run is kept for the summary.")
 
-    display(w.VBox([msg, widget, w.HBox([sl]), out]))
+    display(w.VBox([msg, sl, widget, out]))
