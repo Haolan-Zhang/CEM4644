@@ -22,6 +22,19 @@ def _cost_line(r) -> str:
 
 
 # ----------------------------------------------------------------------------- Part 1
+def show_one(lab, which: str, width: int = 900):
+    """One example, the picture and nothing else (for looking at it and copying it into a chat window)."""
+    ex = lab.examples
+    for finder in (ex.photo, ex.site, ex.plan):
+        try:
+            item = finder(which)
+        except KeyError:
+            continue
+        viz.show_image(item.load(), width)
+        return
+    raise KeyError(f"no example called '{which}'")
+
+
 def show_examples(lab, which: str):
     ex = lab.examples
     if which.startswith("photo"):
@@ -109,7 +122,7 @@ def classify(lab, prompt_choice: str, schema: bool, show_mistakes: bool = True):
     ex = lab.examples
     key = C.CLASSIFY_PROMPTS.get(prompt_choice, prompt_choice)
     text = C.fill(key, lab.spec)
-    print(f"Prompt '{prompt_choice}'" + (" with the JSON schema enforced" if schema else " (JSON only asked for)") + f":\n{text}\n")
+    print(text + "\n")
     rows = tasks.classify(lab.client, ex.photos, text, ex.photo_classes, schema, log=print)
     print()
     summ = _classify_report(lab, rows, f"Gemini, prompt '{prompt_choice}'{' + schema' if schema else ''}", show_mistakes)

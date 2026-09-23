@@ -11,7 +11,7 @@
   "Contemporary Curtain Wall",
   "Industrial Warehouse"
  ],
- "specialist_name": "MP2 course model (ConvNeXt V2 femto trained on 380 photos)",
+ "specialist_name": "image classification model from previous class",
  "items": [
   {
    "file": "bauhaus_international_1.jpg",

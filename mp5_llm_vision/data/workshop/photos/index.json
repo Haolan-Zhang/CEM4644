@@ -8,7 +8,7 @@
   "stain",
   "algae / biological growth"
  ],
- "specialist_name": "MP2 course model (ConvNeXt V2 femto trained on 1,400 photos)",
+ "specialist_name": "image classification model from previous class",
  "items": [
   {
    "file": "plain_1.jpg",

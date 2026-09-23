@@ -95,7 +95,7 @@ register(LabSpec(
             "algae / biological growth": "green, black or dark grey biological growth, usually where the wall stays damp",
         },
         source="BD3 Building Defect Dataset (CC-BY-4.0), the test photos of MP2",
-        specialist="MP2 course model (ConvNeXt V2 femto trained on 1,400 photos)",
+        specialist="image classification model from previous class",
         rules=("Rules: look for the most severe defect first; a crack you could put a coin into is 'major crack' even if it is short; "
                "if the surface is only discoloured and nothing is broken or lifting, it is 'stain' or 'algae / biological growth' "
                "(green or black growth = algae); if nothing at all is wrong, 'plain wall (no defect)'."),
@@ -143,7 +143,7 @@ register(LabSpec(
             "Industrial Warehouse": "brick or steel shed with large repeated windows or loading doors, functional",
         },
         source="Jonathandav/facade-styles (MIT licence; computer-generated images, no real building), the test images of MP2",
-        specialist="MP2 course model (ConvNeXt V2 femto trained on 380 photos)",
+        specialist="image classification model from previous class",
         rules=("Rules: judge by the façade itself (ornament, window rhythm, materials), not by the weather or the age of the photo; "
                "a glass skin over the whole façade is 'Contemporary curtain wall' even next to old buildings; raw concrete without ornament is "
                "'Brutalist'; columns and a pediment are 'Neoclassical' unless the windows are pointed (then 'Gothic Revival')."),
@@ -175,13 +175,13 @@ PROMPTS: Dict[str, str] = {
     "describe": "{intro} {question}",
     # classification: three wordings the students compare, and one JSON-in-the-prompt version for the structured-output step
     "classify_basic": ("{intro} Classify it into exactly one of these categories: {classes}. "
-                       "Reply with JSON only, no other text, in this form: "
+                       "Reply in this form: "
                        "{{\"label\": <one category, spelled exactly as in the list>, \"confidence\": <a number from 0 to 1>, \"reason\": <one short sentence>}}"),
     "classify_described": ("{intro} Classify it into exactly one of these categories:\n{hints}\n"
-                           "Reply with JSON only, no other text, in this form: "
+                           "Reply in this form: "
                            "{{\"label\": <one category, spelled exactly as in the list>, \"confidence\": <a number from 0 to 1>, \"reason\": <one short sentence>}}"),
     "classify_careful": ("{intro} Classify it into exactly one of these categories:\n{hints}\n{rules} "
-                         "Reply with JSON only, no other text, in this form: "
+                         "Reply in this form: "
                          "{{\"label\": <one category, spelled exactly as in the list>, \"confidence\": <a number from 0 to 1>, \"reason\": <one short sentence>}}"),
     # detection
     "detect": ("{intro} Output a JSON list where each entry has \"label\" (one of: {classes}) and \"box_2d\" as [ymin, xmin, ymax, xmax] "

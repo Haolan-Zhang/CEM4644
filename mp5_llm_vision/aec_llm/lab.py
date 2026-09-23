@@ -102,6 +102,10 @@ class LLMLab:
         print(f"■ SAM 3 (for the 'LLM + SAM 3' step): {'loaded' if self.sam else 'not loaded'}")
 
     # ------------------------------------------------------------------ steps (Part 1: talk to the model)
+    def show_image(self, which, width=900):
+        """The picture of one built-in example (a photo, a site photo or a plan), nothing else."""
+        self._need(); ui.show_one(self, which, int(width))
+
     def show_examples(self, which: str = "photos"):
         self._need(); ui.show_examples(self, which)
 
