@@ -5,6 +5,7 @@ import json
 import re
 from typing import List, Optional, Sequence
 
+from . import ui
 from . import config as C
 from . import tasks, viz
 from .client import Reply, parse_json
@@ -167,7 +168,7 @@ def paste_step(lab, image, path, kind: str, prompt: str, on_score, what: str, ex
             except Exception:
                 print(f"Not in Colab: save the picture from the browser, or download it here: {url}")
     dl.on_click(_dl)
-    prompt_box = w.Textarea(value=prompt, layout=w.Layout(width="100%", height="120px"), description="prompt", style={"description_width": "60px"})
+    prompt_box = w.Textarea(value=ui.student_prompt(prompt), layout=w.Layout(width="100%", height="120px"), description="prompt", style={"description_width": "60px"})
     reply_box = w.Textarea(placeholder="paste the chat model's reply here (all of it; fences and extra words are fine)",
                            layout=w.Layout(width="100%", height="160px"), description="reply", style={"description_width": "60px"})
     btn = w.Button(description=f"Score the reply ({what})", button_style="primary")

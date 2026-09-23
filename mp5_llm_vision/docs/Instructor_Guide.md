@@ -23,12 +23,13 @@ furniture holes: 7–14 % median error on the USDA plans, 19–21 % on the scans
 ## 1b. The chat-window variants (`*_chat.ipynb`)
 
 The `_chat` notebooks send the single-example steps through **hokie.ai** (https://hokie.ai.vt.edu/, VT login), so
-students meet the ordinary chat interface and see that a general chat model does these tasks too: Step 1b (describe),
-1c (JSON asked nicely), 3a (boxes on one photo), 3c (the count) and 4a (the rooms of one plan from the model's own
-polygons). Nothing done in the chat is repeated on the API: the API keeps the batch steps (2a, 2b, 3b and **4b**, which
+students meet the ordinary chat interface and see that a general chat model does these tasks too: Step 1c (describe),
+1d (the category asked for), 3b (boxes on one photo), 3d (the count) and 4b (the rooms of one plan from the model's
+own polygons); Steps 1b, 3a and 4a just show the chosen picture for saving (2026-09-23). Nothing done in the chat is
+repeated on the API: the API keeps the batch steps (2a, 2b, 3c and **4c**, which
 segments every plan at once with `lab.segment_all` and is the point of the batch route: three or four plans that would
 each cost a round of copying by hand) and the prompt lab, and the schema contrast comes from Step 2a's *schema* switch
-and Step 4b's (question 1 and question 6 point there). There is no SAM 3 route in
+and Step 4c's (question 1 and question 6 point there). There is no SAM 3 route in
 these notebooks and Step 0 does not load it, so they need no GPU. Each paste-back cell shows the image with a download
 button, the prompt to copy, a box for the reply and a *Score* button; the reply is parsed with the same tolerant parser
 as the API replies, drawn and scored the same way, and shown next to the earlier lab's specialist for the same image
@@ -161,3 +162,10 @@ See `README.md`. Prompts live in `aec_llm/config.py` (`PROMPTS`, filled with eac
 `rules`). After changing a prompt, rerun `build/precompute.py` with a key in `GEMINI_API_KEY` (only the missing replies
 are requested; delete the stale files in `data/cache/<variant>` if you want the folder tidy) and
 `build/make_notebooks.py`. To change the examples, edit the specs in `config.py` and rerun `build/prepare_data.py`.
+
+**JSON in the students' eyes (2026-09-23).** The prompts sent to Gemini and the cache are unchanged, but every prompt the
+students see (printed in a cell, or in the copy box of a chat step) goes through `ui.student_prompt`, which rewrites
+"Reply with JSON only, no other text, in this form:" to "Reply in this form:" and "Output a JSON list ..." to "Output
+in the form of a list ...". In the chat notebooks that rewritten text is what the students paste into hokie.ai; the
+reply parser is tolerant of fenced or prose JSON, but a chat model may answer a JSON-free prompt with a bullet list,
+which the Score button then cannot read. Watch for that in class.

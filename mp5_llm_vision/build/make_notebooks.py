@@ -1,5 +1,6 @@
 """Generates the MP5 Workshop and Homework notebooks (+ report templates) from one template."""
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -103,6 +104,10 @@ def build(variant, chat=False):
     photos = [p.label for p in ex.photos]
     sites = [s.label for s in ex.sites]
     plans = [p.label for p in ex.plans]
+    files = [p.file for p in ex.photos]; site_files = [s.file for s in ex.sites]; plan_ids = [p.id for p in ex.plans]
+    # the chat notebooks get a picture-picking cell before each chat task, so their later steps move one letter down
+    CHAT_STEPS = {"1b": "1c", "1c": "1d", "3a": "3b", "3b": "3c", "3c": "3d", "4a": "4b", "4b": "4c"}
+    renum = (lambda s: re.sub(r"Step (1b|1c|3a|3b|3c|4a|4b)\b", lambda m: "Step " + CHAT_STEPS[m.group(1)], s)) if chat else (lambda s: s)
     questions, cells = [], []
     own_template = C.PROMPTS["classify_basic"].replace("{intro}", "{intro}").replace("{{", "{").replace("}}", "}")
 
@@ -158,9 +163,12 @@ A vision-language model reads an image and text and answers in text. Whatever st
     cells.append(form("▶ Step 1a · The examples and their answer keys", "lab.show_examples(which)",
                       params=[f'which = "photos" #@param {jlist(["photos", "site photos", "plans"])}']))
     if chat:
-        cells.append(form("▶ Step 1b · Ask the chat anything about a photo", "lab.chat_describe(photo, question)",
+        cells.append(form("▶ Step 1b · Pick a photo and look at it", "lab.show_image(photo)",
+                          notes=["The picture and nothing else: save it or screenshot it for the chat window."],
+                          params=[f'photo = "{files[0]}" #@param {jlist(files)}']))
+        cells.append(form("▶ Step 1c · Ask the chat anything about a photo", "lab.chat_describe(photo, question)",
                           params=[f'photo = "{photos[0]}" #@param {jlist(photos)}', f'question = "{C.DESCRIBE_QUESTIONS[0]}" #@param {jlist(C.DESCRIBE_QUESTIONS)} {{allow-input: true}}']))
-        cells.append(form("▶ Step 1c · JSON, way A: ask the chat nicely", "lab.chat_classify(photo)",
+        cells.append(form("▶ Step 1d · Ask the chat for the category", "lab.chat_classify(photo)",
                           notes=["Paste the reply back. Do it two or three times (a new chat each time)."],
                           params=[f'photo = "{photos[0]}" #@param {jlist(photos)}']))
         questions.append((1, "From Step 1c: across your tries, how many of the chat replies were valid JSON, was the label always one of the categories, and did it stay the same? "
@@ -199,16 +207,18 @@ The MP2 photos ({len(ex.photo_classes)} classes), three prompts: the class names
 The MP3 photos. Boxes come back as `[ymin, xmin, ymax, xmax]` on a 0–1000 grid and are scored like MP3: right label and an overlap of at least half (IoU ≥ 0.5).
 """))
     if chat:
-        cells.append(form("▶ Step 3a · Boxes on one photo, from the chat", "lab.chat_detect(site)",
+        cells.append(form("▶ Step 3a · Pick a site photo", "lab.show_image(site)",
+                          params=[f'site = "{site_files[0]}" #@param {jlist(site_files)}']))
+        cells.append(form("▶ Step 3b · Boxes on one photo, from the chat", "lab.chat_detect(site)",
                           notes=["If the boxes land in the wrong place, change *box order* or *numbers are* and score again."],
                           params=[f'site = "{sites[0]}" #@param {jlist(sites)}']))
     else:
         cells.append(form("▶ Step 3a · Boxes on one photo", "lab.detect(site, schema)",
                           params=[f'site = "{sites[0]}" #@param {jlist(sites)}', 'schema = True #@param {type:"boolean"}']))
-    cells.append(form("▶ Step 3b · All the photos, scored", "lab.detect_all(schema)",
+    cells.append(form(renum("▶ Step 3b · All the photos, scored"), "lab.detect_all(schema)",
                       params=['schema = True #@param {type:"boolean"}']))
     if chat:
-        cells.append(form("▶ Step 3c · Just ask the chat for the number", "lab.chat_count(site)",
+        cells.append(form("▶ Step 3d · Just ask the chat for the number", "lab.chat_count(site)",
                           params=[f'site = "{sites[0]}" #@param {jlist(sites)}']))
     else:
         cells.append(form("▶ Step 3c · Just ask for the number", "lab.count(site, schema)",
@@ -228,10 +238,12 @@ The MP3 photos. Boxes come back as `[ymin, xmin, ymax, xmax]` on a 0–1000 grid
 The MP4 plans, in {unit}. {"One plan from the chat's polygons, then every plan at once through the API." if chat else "Two routes: the model's own polygons, or its boxes handed to SAM 3."} Every room is scored against the drawing, next to MP4's SAM 3 by phrase.
 """))
     if chat:
-        cells.append(form("▶ Step 4a · Rooms from the chat's polygons (one plan)", "lab.chat_rooms(plan)",
+        cells.append(form("▶ Step 4a · Pick a plan", "lab.show_image(plan)",
+                          params=[f'plan = "{plan_ids[0]}" #@param {jlist(plan_ids)}']))
+        cells.append(form("▶ Step 4b · Rooms from the chat's polygons (one plan)", "lab.chat_rooms(plan)",
                           notes=["If the shapes sit in the wrong place, change *box order* or *numbers are* and score again."],
                           params=[f'plan = "{plans[0]}" #@param {jlist(plans)}']))
-        cells.append(form(f"▶ Step 4b · All {len(plans)} plans at once (the API)", "lab.segment_all(schema)",
+        cells.append(form(f"▶ Step 4c · All {len(plans)} plans at once (the API)", "lab.segment_all(schema)",
                           notes=["Untick *schema* to see the same prompt without the enforced structure."],
                           params=['schema = True #@param {type:"boolean"}']))
     else:
@@ -272,6 +284,7 @@ A small app for your own image and your own prompt. Needs your key.
     questions = []                                             # from the cells: an edited question is kept
     for c in cells:
         if c.cell_type == "markdown" and c.source.startswith("> ### 📝 Report question "):
+            c.source = renum(c.source)
             head, _, body = c.source.partition("\n")
             questions.append((int(head.rsplit(" ", 1)[1]), body[2:].strip() if body.startswith("> ") else body.strip()))
     nb = new_notebook(cells=cells)

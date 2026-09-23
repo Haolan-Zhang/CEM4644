@@ -8,7 +8,7 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-From Step 1c: across your tries, how many of the chat replies were valid JSON, was the label always one of the categories, and did it stay the same? In Step 2a, run the *basic* prompt with the schema off and on: what does the schema change in the replies, and what does it not change (the label can still be wrong)? Why does a program that has to read the reply (to fill a table, to count, to draw a box) need the schema rather than a polite request?
+From Step 1d: across your tries, how many of the chat replies were valid JSON, was the label always one of the categories, and did it stay the same? In Step 2a, run the *basic* prompt with the schema off and on: what does the schema change in the replies, and what does it not change (the label can still be wrong)? Why does a program that has to read the reply (to fill a table, to count, to draw a box) need the schema rather than a polite request?
 
 *Your answer:*
 
@@ -32,7 +32,7 @@ From Step 2b: what did you change in the prompt and what accuracy did you get? I
 
 ## Question 4
 
-From Step 3b: Gemini's recall and precision against the MP3 YOLO model's on the machinery photos. Which machine is hardest and why? From Step 3c: does the model's count of excavators agree with its own boxes and with the answer key? Also: on the photo you gave the chat in Step 3a, how did its boxes compare with the MP3 model's on the same photo, and what coordinate convention did the chat use?
+From Step 3c: Gemini's recall and precision against the MP3 YOLO model's on the machinery photos. Which machine is hardest and why? From Step 3d: does the model's count of excavators agree with its own boxes and with the answer key? Also: on the photo you gave the chat in Step 3b, how did its boxes compare with the MP3 model's on the same photo, and what coordinate convention did the chat use?
 
 *Your answer:*
 
@@ -40,7 +40,7 @@ From Step 3b: Gemini's recall and precision against the MP3 YOLO model's on the 
 
 ## Question 5
 
-From Step 3c on two photos: the chat's count, the number of boxes it gave you in Step 3a, and the answer key. When they disagree, which one is wrong and how would you know on a site where there is no answer key? Which of the two ways of counting would you trust on a site camera, and why?
+From Step 3d on two photos: the chat's count, the number of boxes it gave you in Step 3b, and the answer key. When they disagree, which one is wrong and how would you know on a site where there is no answer key? Which of the two ways of counting would you trust on a site camera, and why?
 
 *Your answer:*
 
@@ -48,7 +48,7 @@ From Step 3c on two photos: the chat's count, the number of boxes it gave you in
 
 ## Question 6
 
-From Step 4a on plan 8138 and on plan 11615 (scanned drawings with furniture and dimension strings): copy the per-room tables from your pasted replies. What does the scan's clutter do to the chat model's polygons? Then from Step 4b: the table for all four plans from the API, including the two-storey sheet 5018. Where is the API's batch result better or worse than your chat replies, and how does either compare with MP4's SAM 3 by phrase?
+From Step 4b on plan 8138 and on plan 11615 (scanned drawings with furniture and dimension strings): copy the per-room tables from your pasted replies. What does the scan's clutter do to the chat model's polygons? Then from Step 4c: the table for all four plans from the API, including the two-storey sheet 5018. Where is the API's batch result better or worse than your chat replies, and how does either compare with MP4's SAM 3 by phrase?
 
 *Your answer:*
 

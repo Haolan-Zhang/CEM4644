@@ -22,9 +22,11 @@ def _cost_line(r) -> str:
 
 
 def student_prompt(text: str) -> str:
-    """The prompt as it is shown to students: the sentence about JSON-only output is left out of the printout (it
-    confuses more than it explains); the model still receives the full text."""
-    return text.replace("Reply with JSON only, no other text, in this form: ", "Reply in this form: ")
+    """The prompt as it is shown to students: the words about JSON are left out of the printout (they confuse more
+    than they explain); the model still receives the full text."""
+    return (text.replace("Reply with JSON only, no other text, in this form: ", "Reply in this form: ")
+                .replace("Output a JSON list of segmentation masks where each entry contains", "Output in the form of a list of segmentation masks where each entry contains")
+                .replace("Output a JSON list where each entry has", "Output in the form of a list where each entry has"))
 
 
 # ----------------------------------------------------------------------------- Part 1
@@ -65,7 +67,7 @@ def describe(lab, photo: str, question: str):
     prompt = C.fill("describe", lab.spec, question=question)
     r = lab.client.ask(ph.load(), prompt, image_key=ph.cache_key)
     viz.show_image(ph.load(), 320)
-    print(f"Prompt: {prompt}\n")
+    print(f"Prompt: {student_prompt(prompt)}\n")
     if r.error and not r.text:
         print("⚠️", r.error); return
     print("Reply:\n" + (r.text or "").strip())
@@ -79,7 +81,7 @@ def json_lab(lab, photo: str, repeats: int = 3):
     prompt = C.fill("classify_basic", lab.spec)
     schema = C.classify_schema(classes)
     viz.show_image(img, 260)
-    print(f"Prompt (both ways use exactly this text):\n{prompt}\n")
+    print(f"Prompt (both ways use exactly this text):\n{student_prompt(prompt)}\n")
     results = {}
     for mode, use_schema in (("A · JSON asked for in the prompt, nothing enforces it", False), ("B · the same prompt, JSON schema enforced by the API", True)):
         print(f"\n{'=' * 100}\n{mode}\n{'=' * 100}")
@@ -182,7 +184,7 @@ def detect(lab, site: str, schema: bool):
 def detect_all(lab, schema: bool):
     ex = lab.examples
     prompt = C.fill("detect", lab.spec)
-    print(f"Prompt{' + schema' if schema else ''}:\n{prompt}\n")
+    print(f"Prompt{' + schema' if schema else ''}:\n{student_prompt(prompt)}\n")
     rows = tasks.detect(lab.client, ex.sites, prompt, ex.site_classes, schema, log=print)
     sp_rows = tasks.specialist_det_rows(ex.sites)
     g, sp = tasks.det_summary(rows, ex.site_classes), tasks.det_summary(sp_rows, ex.site_classes)
@@ -252,7 +254,7 @@ def segment(lab, plan: str, mode_name: str, schema: bool):
     prompt = C.fill("rooms_masks" if mode == "llm" else "rooms_boxes", lab.spec)
     rows, r, skipped = tasks.segment_rooms(lab.client, p, prompt, mode, schema, sam=lab.sam)
     viz.show_image(_seg_image(p, rows, mode), 820)
-    print(f"Prompt{' + schema' if schema else ''}: {prompt}\n")
+    print(f"Prompt{' + schema' if schema else ''}: {student_prompt(prompt)}\n")
     if r.error:
         print("⚠️", r.error, "\n   raw:", _snippet(r.text, 300), "\n")
     table_rows = [(rw.label, rw.how, f"{rw.area:.1f}", (rw.truth["label"] or rw.truth["type"]) if rw.truth else "—", f"{rw.truth_area:.1f}" if rw.truth else "—",
