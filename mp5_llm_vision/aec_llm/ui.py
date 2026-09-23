@@ -21,6 +21,12 @@ def _cost_line(r) -> str:
     return f"{r.seconds:.1f} s, tokens in {r.tokens_in} / out {r.tokens_out} / thinking {r.tokens_thought} ({src}, {r.model})"
 
 
+def student_prompt(text: str) -> str:
+    """The prompt as it is shown to students: the sentence about JSON-only output is left out of the printout (it
+    confuses more than it explains); the model still receives the full text."""
+    return text.replace("Reply with JSON only, no other text, in this form: ", "Reply in this form: ")
+
+
 # ----------------------------------------------------------------------------- Part 1
 def show_one(lab, which: str, width: int = 900):
     """One example, the picture and nothing else (for looking at it and copying it into a chat window)."""
@@ -122,7 +128,7 @@ def classify(lab, prompt_choice: str, schema: bool, show_mistakes: bool = True):
     ex = lab.examples
     key = C.CLASSIFY_PROMPTS.get(prompt_choice, prompt_choice)
     text = C.fill(key, lab.spec)
-    print(text + "\n")
+    print(student_prompt(text) + "\n")
     rows = tasks.classify(lab.client, ex.photos, text, ex.photo_classes, schema, log=print)
     print()
     summ = _classify_report(lab, rows, f"Gemini, prompt '{prompt_choice}'{' + schema' if schema else ''}", show_mistakes)

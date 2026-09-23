@@ -175,13 +175,13 @@ PROMPTS: Dict[str, str] = {
     "describe": "{intro} {question}",
     # classification: three wordings the students compare, and one JSON-in-the-prompt version for the structured-output step
     "classify_basic": ("{intro} Classify it into exactly one of these categories: {classes}. "
-                       "Reply in this form: "
+                       "Reply with JSON only, no other text, in this form: "
                        "{{\"label\": <one category, spelled exactly as in the list>, \"confidence\": <a number from 0 to 1>, \"reason\": <one short sentence>}}"),
     "classify_described": ("{intro} Classify it into exactly one of these categories:\n{hints}\n"
-                           "Reply in this form: "
+                           "Reply with JSON only, no other text, in this form: "
                            "{{\"label\": <one category, spelled exactly as in the list>, \"confidence\": <a number from 0 to 1>, \"reason\": <one short sentence>}}"),
     "classify_careful": ("{intro} Classify it into exactly one of these categories:\n{hints}\n{rules} "
-                         "Reply in this form: "
+                         "Reply with JSON only, no other text, in this form: "
                          "{{\"label\": <one category, spelled exactly as in the list>, \"confidence\": <a number from 0 to 1>, \"reason\": <one short sentence>}}"),
     # detection
     "detect": ("{intro} Output a JSON list where each entry has \"label\" (one of: {classes}) and \"box_2d\" as [ymin, xmin, ymax, xmax] "
