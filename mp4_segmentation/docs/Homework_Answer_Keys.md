@@ -9,12 +9,12 @@ chose these sheets live in `_candidates/sam3_eval/` (not in the repository); the
 
 | sheet | discipline | areas (measured) | counts from one example (found / on the sheet, extras) | phrases that work |
 |---|---|---|---|---|
-| usda_5542 | floor plan | room n=10, median 6.8 %, worst 31 % | - | *room*: 10/14 found, 0 extra; *bedroom*: 6/14 found, 0 extra; *curved line*: 1/14 found, 30 extra |
-| va_floor | floor plan + plumbing | room n=19, median 3.1 %, worst 9 % | - | *room*: 13/22 found, 0 extra |
+| usda_5542 | floor plan | room n=10, median 6.5 %, worst 29 % | - | *room*: 10/14 found, 0 extra; *bedroom*: 6/14 found, 0 extra; *curved line*: 1/14 found, 30 extra |
+| va_floor | floor plan + plumbing | room n=19, median 3.4 %, worst 6 % | - | *room*: 13/22 found, 0 extra |
 | va_ceiling | electrical | - | 2x4 light fixture 40/41 (+0); 2x2 light fixture 7/8 (+0); recessed light 14/14 (+0) | *rectangle*: 7/41 found, 24 extra |
-| test_fp | structural | footing n=10, median 2.8 %, worst 7 % | footing 10/10 (+4) | *square*: 10/10 found, 5 extra; *rectangle*: 10/10 found, 9 extra |
-| test_fp_2 | structural | footing n=19, median 3.2 %, worst 22 % | footing 19/19 (+1) | *square*: 19/19 found, 23 extra; *rectangle*: 19/19 found, 6 extra |
-| uscg_motorpool | structural | footing n=20, median 1.9 %, worst 27 %; pit n=2, median 88.2 %, worst 114 % | footing 19/20 (+5); grid bubble 32/32 (+2) | *square*: 9/20 found, 10 extra; *rectangle*: 7/20 found, 4 extra; *circle*: 32/32 found, 6 extra |
+| test_fp | structural | footing n=10, median 3.2 %, worst 8 % | footing 10/10 (+3) | *square*: 10/10 found, 5 extra; *rectangle*: 10/10 found, 9 extra |
+| test_fp_2 | structural | footing n=19, median 2.4 %, worst 23 %; pit n=1, median 4.7 %, worst 5 % | footing 19/19 (+1) | *square*: 19/19 found, 23 extra; *rectangle*: 19/19 found, 6 extra |
+| uscg_motorpool | structural | footing n=20, median 3.3 %, worst 28 %; pit n=2, median 86.3 %, worst 107 % | footing 19/20 (+5); grid bubble 32/32 (+2) | *square*: 9/20 found, 10 extra; *rectangle*: 7/20 found, 4 extra; *circle*: 32/32 found, 6 extra |
 | uscg_pile | structural | - | pile footing 29/29 (+2) | *rectangle*: 29/29 found, 8 extra |
 
 ## usda_5542 - Five-room farmhouse, 32 ft x 29 ft (USDA design 710-5542)
@@ -32,7 +32,6 @@ Scale: 26.80 px/ft. the 32'-0" overall dimension across the top measures 857.5 p
 | scale reference | feet | px in the key | px/ft | used for the take-off | note |
 |---|---|---|---|---|---|
 | 32'-0" dimension | 32 | 858 | 26.81 | yes | box it from the tip of the left arrowhead to the tip of the right one |
-| 29'-0" dimension | 29 | 766 | 26.41 | check only | 765 px / 29 ft = 26.38 px per ft, 1.6 % less than the 32'-0" line; areas here use the 32'-0" line |
 
 | # | label | type | category | printed size | true sq ft | in the take-off | note |
 |---|---|---|---|---|---|---|---|
@@ -56,9 +55,8 @@ Scale: 26.80 px/ft. the 32'-0" overall dimension across the top measures 857.5 p
 Tasks in the key:
 
 1. Set the scale: box the 32'-0" dimension at the top from arrowhead tip to arrowhead tip (label: scale: 32'-0" dimension).
-2. Box the 29'-0" dimension down the left side as well (label: scale: 29'-0" dimension) and compare the two readings.
-3. Box every room, porch and hall (label: room).
-4. Careful: the sizes printed on this sheet do not agree with the drawing. The bedroom lettered 10' x 11' and the one lettered 11' x 11' are drawn in the same 10.4 ft wide column, and the BATH is lettered 5' x 7' but drawn 6.9 ft x 4.7 ft. The answer key is the area you measure off the drawing, not the lettered size; say in your report which rooms disagree and by how much.
+2. Box every room, porch and hall (label: room).
+3. Careful: the sizes printed on this sheet do not agree with the drawing. The bedroom lettered 10' x 11' and the one lettered 11' x 11' are drawn in the same 10.4 ft wide column, and the BATH is lettered 5' x 7' but drawn 6.9 ft x 4.7 ft. The answer key is the area you measure off the drawing, not the lettered size; say in your report which rooms disagree and by how much.
 
 ### What SAM 3 measures (boxes taken from the key, each side moved by a few percent)
 
@@ -67,22 +65,21 @@ Tasks in the key:
 | scale box | px | px/ft | vs the key |
 |---|---|---|---|
 | 32'-0" dimension | 881 | 27.53 | +2.7 % |
-| 29'-0" dimension | 773 | 26.67 | +1.0 % |
 Scale used: 27.53 px/ft.
 
 | # | room (key) | measured sq ft | true sq ft | error | note |
 |---|---|---|---|---|---|
-| 1 | BEDROOM | 104.7 | 107 | -2 % |  |
-| 2 | BEDROOM | 106.8 | 111 | -4 % |  |
-| 3 | KITCHEN | 78.1 | 84 | -7 % |  |
-| 4 | BATH | 30.4 | 32 | -6 % |  |
-| 5 | DINETTE | 48.5 | 55 | -12 % |  |
-| 6 | HALL | 32.1 | 46 | -31 % |  |
-| 7 | BEDROOM | 105.9 | 115 | -8 % |  |
-| 8 | LIVING ROOM | 175.7 | 179 | -2 % |  |
-| 9 | WORK PORCH | 46.7 | 51 | -8 % |  |
-| 10 | PORCH | 192.5 | 205 | -6 % |  |
-10 rooms: median error 6.8 %, worst 31 %.
+| 1 | BEDROOM | 100.6 | 107 | -6 % |  |
+| 2 | BEDROOM | 110.3 | 111 | -1 % |  |
+| 3 | KITCHEN | 77.5 | 84 | -8 % |  |
+| 4 | BATH | 30.5 | 32 | -6 % |  |
+| 5 | DINETTE | 48.6 | 55 | -12 % |  |
+| 6 | HALL | 33.1 | 46 | -29 % |  |
+| 7 | BEDROOM | 105.6 | 115 | -9 % |  |
+| 8 | LIVING ROOM | 175.2 | 179 | -2 % |  |
+| 9 | WORK PORCH | 47.2 | 51 | -7 % |  |
+| 10 | PORCH | 192.3 | 205 | -6 % |  |
+10 rooms: median error 6.5 %, worst 29 %.
 
 ### What phrases find (the phrase cells 2b, 3b and 4b, confidence 0.3)
 
@@ -148,31 +145,31 @@ Tasks in the key:
 
 | scale box | px | px/ft | vs the key |
 |---|---|---|---|
-| printed 10'-0" dimension | 219 | 21.86 | +1.2 % |
-Scale used: 21.86 px/ft.
+| printed 10'-0" dimension | 217 | 21.73 | +0.6 % |
+Scale used: 21.73 px/ft.
 
 | # | room (key) | measured sq ft | true sq ft | error | note |
 |---|---|---|---|---|---|
-| 1 | TOILET TNPG1 (top left) | 68.9 | 69 | -1 % |  |
-| 2 | EXAM EXPA1 (top, 1st) | 117.2 | 125 | -6 % |  |
-| 3 | EXAM EXPA1 (top, 2nd) | 127.3 | 125 | +2 % |  |
-| 4 | EXAM EXPA1 (top, 3rd) | 126.3 | 125 | +1 % |  |
-| 5 | WOMEN'S EXAM EXW01 (top, left) | 113.2 | 125 | -9 % |  |
-| 6 | WOMEN'S EXAM EXW01 (top, right) | 124.2 | 125 | -1 % |  |
-| 7 | EXAM EXPA01 (bottom, 1st) | 119.6 | 125 | -4 % |  |
-| 8 | EXAM EXPA01 (bottom, 2nd) | 117.0 | 125 | -6 % |  |
-| 9 | CLEAN UCCL1 | 73.4 | 75 | -2 % |  |
-| 10 | PROCEDURE TRPR1 | 165.2 | 175 | -6 % |  |
-| 11 | TOILET TNPG1 (bottom right) | 66.3 | 69 | -4 % |  |
-| 12 | FLEX OFFICE FA01 | 109.9 | 111 | -1 % |  |
-| 13 | PACT TEAM WORK SPACE (left) | 461.3 | 457 | +1 % |  |
-| 14 | TOILET TPG01 (top, upper) | 48.0 | 49 | -2 % |  |
-| 15 | TOILET TPG01 (top, lower) | 47.6 | 51 | -7 % |  |
-| 16 | EXAM EXPA01 (bottom, 3rd) | 116.4 | 122 | -5 % |  |
-| 17 | EXAM EXPA01 (bottom, 4th) | 118.6 | 122 | -3 % |  |
-| 18 | PACT TEAM WORK SPACE (right) | 417.9 | 422 | -1 % |  |
-| 19 | TOILET TNPG1 (middle right) | 47.0 | 50 | -6 % |  |
-19 rooms: median error 3.1 %, worst 9 %.
+| 1 | TOILET TNPG1 (top left) | 69.1 | 69 | -0 % |  |
+| 2 | EXAM EXPA1 (top, 1st) | 119.7 | 125 | -4 % |  |
+| 3 | EXAM EXPA1 (top, 2nd) | 120.3 | 125 | -4 % |  |
+| 4 | EXAM EXPA1 (top, 3rd) | 130.5 | 125 | +4 % |  |
+| 5 | WOMEN'S EXAM EXW01 (top, left) | 117.3 | 125 | -6 % |  |
+| 6 | WOMEN'S EXAM EXW01 (top, right) | 119.3 | 125 | -5 % |  |
+| 7 | EXAM EXPA01 (bottom, 1st) | 128.8 | 125 | +3 % |  |
+| 8 | EXAM EXPA01 (bottom, 2nd) | 118.1 | 125 | -5 % |  |
+| 9 | CLEAN UCCL1 | 74.8 | 75 | -0 % |  |
+| 10 | PROCEDURE TRPR1 | 170.8 | 175 | -3 % |  |
+| 11 | TOILET TNPG1 (bottom right) | 67.1 | 69 | -3 % |  |
+| 12 | FLEX OFFICE FA01 | 109.7 | 111 | -1 % |  |
+| 13 | PACT TEAM WORK SPACE (left) | 446.1 | 457 | -2 % | 15 % of this area is drawn over (furniture, a stair, door swings) and was filled back in from the outline of t |
+| 14 | TOILET TPG01 (top, upper) | 47.4 | 49 | -3 % |  |
+| 15 | TOILET TPG01 (top, lower) | 49.9 | 51 | -2 % |  |
+| 16 | EXAM EXPA01 (bottom, 3rd) | 118.6 | 122 | -3 % |  |
+| 17 | EXAM EXPA01 (bottom, 4th) | 115.8 | 122 | -5 % |  |
+| 18 | PACT TEAM WORK SPACE (right) | 430.2 | 422 | +2 % |  |
+| 19 | TOILET TNPG1 (middle right) | 47.1 | 50 | -6 % |  |
+19 rooms: median error 3.4 %, worst 6 %.
 
 ### What phrases find (the phrase cells 2b, 3b and 4b, confidence 0.3)
 
@@ -196,6 +193,7 @@ Scale: 21.63 px/ft. there is NO printed dimension on this sheet, so use a length
 
 | scale reference | feet | px in the key | px/ft | used for the take-off | note |
 |---|---|---|---|---|---|
+| ten ceiling grid cells (2 ft each) = 20 ft | 20 | 433 | 21.65 | yes | Count the cells before you box them: the box must run from one grid line to the grid line ten cells away. |
 
 | counted from one example | how many on the sheet | confidence the key suggests | tip |
 |---|---|---|---|
@@ -205,9 +203,10 @@ Scale: 21.63 px/ft. there is NO printed dimension on this sheet, so use a length
 
 Tasks in the key:
 
-1. Box ONE 2x4 light fixture - a horizontal one, in a clear part of the ceiling - with the label 'example: 2x4 light fixture' and SAM 3 counts them all.
-2. Do the same for the 2x2 light fixtures (label: example: 2x2 light fixture) and for the small round recessed lights (label: example: recessed light).
-3. There are no air diffusers, no return registers and no sprinkler heads anywhere on this sheet. Check the legend before you go looking for them.
+1. There is no printed dimension on this sheet. Box ten cells of the 2 ft x 2 ft ceiling grid (label: scale: ten ceiling grid cells (2 ft each) = 20 ft) - that is 20 ft.
+2. Box ONE 2x4 light fixture - a horizontal one, in a clear part of the ceiling - with the label 'example: 2x4 light fixture' and SAM 3 counts them all.
+3. Do the same for the 2x2 light fixtures (label: example: 2x2 light fixture) and for the small round recessed lights (label: example: recessed light).
+4. There are no air diffusers, no return registers and no sprinkler heads anywhere on this sheet. Check the legend before you go looking for them.
 
 ### What SAM 3 measures (boxes taken from the key, each side moved by a few percent)
 
@@ -215,7 +214,8 @@ Tasks in the key:
 
 | scale box | px | px/ft | vs the key |
 |---|---|---|---|
-Scale used: 21.63 px/ft.
+| ten ceiling grid cells (2 ft each) = 20 ft | 438 | 21.92 | +1.2 % |
+Scale used: 21.92 px/ft.
 
 | one example box of | confidence | regions returned | found / on the sheet | missed | extra |
 |---|---|---|---|---|---|
@@ -248,6 +248,7 @@ Scale: 8.17 px/ft. you are told that the square spread footings on this plan are
 
 | scale reference | feet | px in the key | px/ft | used for the take-off | note |
 |---|---|---|---|---|---|
+| spread footing, 12'-0" wide | 12 | 98 | 8.17 | yes | Box one footing outside edge to outside edge. Use an isolated one, not one with a tie beam running into it. |
 
 | # | label | type | category | printed size | true sq ft | in the take-off | note |
 |---|---|---|---|---|---|---|---|
@@ -271,7 +272,7 @@ Scale: 8.17 px/ft. you are told that the square spread footings on this plan are
 Tasks in the key:
 
 1. Every square footing on this sheet is marked F12.0, which means 12'-0" x 12'-0" (144 sq ft).
-2. Box ONE footing (label: footing) - an isolated one, outside edge to outside edge. SAM 3 finds all the others like it and counts them (there are 10), and the footing you boxed is measured in square feet with the drawing's scale. Box more footings to measure more of them.
+2. Box ONE footing (label: footing) - an isolated one, outside edge to outside edge. That box does three jobs: it sets the scale (the footing is 12'-0" wide), it is measured in square feet, and it is the example SAM 3 uses to count all the footings (there are 10). Box more footings to measure more of them.
 3. The thing in the middle is a pair of equipment pits, not a footing.
 
 ### What SAM 3 measures (boxes taken from the key, each side moved by a few percent)
@@ -280,25 +281,26 @@ Tasks in the key:
 
 | scale box | px | px/ft | vs the key |
 |---|---|---|---|
-Scale used: 8.17 px/ft.
+| spread footing, 12'-0" wide | 98 | 8.19 | +0.3 % |
+Scale used: 8.19 px/ft.
 
 | # | footing (key) | measured sq ft | true sq ft | error | note |
 |---|---|---|---|---|---|
-| 1 | F12.0 (B2) | 138.4 | 144 | -4 % |  |
-| 2 | F12.0 (B3) | 139.3 | 144 | -3 % |  |
-| 3 | F12.0 (B4) | 139.9 | 144 | -3 % |  |
-| 4 | F12.0 (B5) | 141.8 | 144 | -2 % |  |
-| 5 | F12.0 (B6) | 146.6 | 144 | +2 % |  |
-| 6 | F12.0 (C2) | 136.3 | 144 | -5 % |  |
-| 7 | F12.0 (C3) | 133.6 | 144 | -7 % |  |
-| 8 | F12.0 (C4) | 140.2 | 144 | -3 % |  |
-| 9 | F12.0 (C5) | 141.8 | 144 | -2 % |  |
-| 10 | F12.0 (C6) | 140.6 | 144 | -2 % |  |
-10 footings: median error 2.8 %, worst 7 %.
+| 1 | F12.0 (B2) | 138.2 | 144 | -4 % |  |
+| 2 | F12.0 (B3) | 138.9 | 144 | -4 % |  |
+| 3 | F12.0 (B4) | 139.1 | 144 | -3 % |  |
+| 4 | F12.0 (B5) | 141.0 | 144 | -2 % |  |
+| 5 | F12.0 (B6) | 145.6 | 144 | +1 % |  |
+| 6 | F12.0 (C2) | 135.5 | 144 | -6 % |  |
+| 7 | F12.0 (C3) | 132.9 | 144 | -8 % |  |
+| 8 | F12.0 (C4) | 139.5 | 144 | -3 % |  |
+| 9 | F12.0 (C5) | 140.7 | 144 | -2 % |  |
+| 10 | F12.0 (C6) | 140.0 | 144 | -3 % |  |
+10 footings: median error 3.2 %, worst 8 %.
 
 | one example box of | confidence | regions returned | found / on the sheet | missed | extra |
 |---|---|---|---|---|---|
-| footing | 0.30 | 15 | 10/10 | 0 | 4 |
+| footing | 0.30 | 15 | 10/10 | 0 | 3 |
 
 ### What phrases find (the phrase cells 2b, 3b and 4b, confidence 0.3)
 
@@ -324,6 +326,7 @@ Scale: 15.29 px/ft. the printed 14'-0" bay between grid lines X2 and X3 on the b
 
 | scale reference | feet | px in the key | px/ft | used for the take-off | note |
 |---|---|---|---|---|---|
+| printed 14'-0" bay X2-X3 | 14 | 214 | 15.29 | yes | The longest printed dimension you can reach is the best ruler on any sheet. |
 
 | # | label | type | category | printed size | true sq ft | in the take-off | note |
 |---|---|---|---|---|---|---|---|
@@ -346,8 +349,10 @@ Scale: 15.29 px/ft. the printed 14'-0" bay between grid lines X2 and X3 on the b
 | 17 | R2-9 | footing | footing | E4'-6" | 20.2 | yes |  |
 | 18 | F40-1 | footing | footing | F4.0 | 16.0 | yes |  |
 | 19 | F40-2 | footing | footing | F4.0 | 16.0 | yes |  |
+| 20 | elevator shaft opening | pit | pit | None | 48.2 | yes | no printed size: this is the drawn opening measured with the sheet scale, so treat it as +/-5 %. |
 
 - 19 footings in the take-off, 392 sq ft together.
+- 1 pit in the take-off, 48 sq ft together.
 
 | counted from one example | how many on the sheet | confidence the key suggests | tip |
 |---|---|---|---|
@@ -355,8 +360,10 @@ Scale: 15.29 px/ft. the printed 14'-0" bay between grid lines X2 and X3 on the b
 
 Tasks in the key:
 
-1. The hexagon next to each footing gives its size: E4'-6", E4'-8", E4'-10", E5'-0", and F4.0 (4'-0" square) for the two heavy black ones.
-2. Box ONE grey footing (label: footing), outside edge to outside edge. SAM 3 finds all the others like it and counts them (there are 19: 17 grey ones and the 2 heavy black F4.0), and the footing you boxed is measured in square feet with the drawing's scale. Box more footings to measure more of them.
+1. Box the printed 14'-0" bay X2-X3 on the bottom dimension string, tick to tick (label: scale: printed 14'-0" bay X2-X3). That sets the scale for every area on this sheet.
+2. The hexagon next to each footing gives its size: E4'-6", E4'-8", E4'-10", E5'-0", and F4.0 (4'-0" square) for the two heavy black ones.
+3. Box ONE grey footing (label: footing), outside edge to outside edge. SAM 3 finds all the others like it and counts them (there are 19: 17 grey ones and the 2 heavy black F4.0), and the footing you boxed is measured in square feet with the drawing's scale. Box more footings to measure more of them.
+4. Box the elevator shaft opening (label: pit).
 
 ### What SAM 3 measures (boxes taken from the key, each side moved by a few percent)
 
@@ -364,30 +371,36 @@ Tasks in the key:
 
 | scale box | px | px/ft | vs the key |
 |---|---|---|---|
-Scale used: 15.29 px/ft.
+| printed 14'-0" bay X2-X3 | 215 | 15.35 | +0.4 % |
+Scale used: 15.35 px/ft.
 
 | # | footing (key) | measured sq ft | true sq ft | error | note |
 |---|---|---|---|---|---|
-| 1 | R1-1 | 20.6 | 20 | +2 % |  |
-| 2 | R1-2 | 20.8 | 20 | +3 % |  |
-| 3 | R1-3 | 21.0 | 20 | +3 % |  |
-| 4 | R1-4 | 15.9 | 20 | -22 % |  |
-| 5 | R1-5 | 20.8 | 20 | +3 % |  |
-| 6 | R1-6 | 23.6 | 23 | +1 % |  |
-| 7 | R1-7 | 25.2 | 25 | +1 % |  |
-| 8 | R1-8 | 22.4 | 22 | +3 % |  |
-| 9 | R2-1 | 20.9 | 20 | +3 % |  |
-| 10 | R2-2 | 21.0 | 20 | +3 % |  |
-| 11 | R2-3 | 21.3 | 20 | +5 % |  |
-| 12 | R2-4 | 21.5 | 20 | +6 % |  |
-| 13 | R2-5 | 21.0 | 20 | +4 % |  |
-| 14 | R2-6 | 22.5 | 22 | +3 % |  |
-| 15 | R2-7 | 25.7 | 25 | +3 % |  |
-| 16 | R2-8 | 20.8 | 20 | +3 % |  |
-| 17 | R2-9 | 20.9 | 20 | +3 % |  |
-| 18 | F40-1 | 17.0 | 16 | +6 % |  |
-| 19 | F40-2 | 17.1 | 16 | +7 % |  |
-19 footings: median error 3.2 %, worst 22 %.
+| 1 | R1-1 | 20.4 | 20 | +1 % |  |
+| 2 | R1-2 | 20.7 | 20 | +2 % |  |
+| 3 | R1-3 | 20.8 | 20 | +3 % |  |
+| 4 | R1-4 | 15.7 | 20 | -23 % |  |
+| 5 | R1-5 | 20.6 | 20 | +2 % |  |
+| 6 | R1-6 | 23.4 | 23 | +0 % |  |
+| 7 | R1-7 | 25.1 | 25 | +1 % |  |
+| 8 | R1-8 | 22.2 | 22 | +2 % |  |
+| 9 | R2-1 | 20.7 | 20 | +2 % |  |
+| 10 | R2-2 | 20.8 | 20 | +3 % |  |
+| 11 | R2-3 | 21.1 | 20 | +4 % |  |
+| 12 | R2-4 | 21.3 | 20 | +5 % |  |
+| 13 | R2-5 | 20.8 | 20 | +3 % |  |
+| 14 | R2-6 | 22.3 | 22 | +2 % |  |
+| 15 | R2-7 | 25.5 | 25 | +2 % |  |
+| 16 | R2-8 | 20.6 | 20 | +2 % |  |
+| 17 | R2-9 | 20.8 | 20 | +3 % |  |
+| 18 | F40-1 | 16.7 | 16 | +5 % |  |
+| 19 | F40-2 | 17.0 | 16 | +6 % |  |
+19 footings: median error 2.4 %, worst 23 %.
+
+| # | pit (key) | measured sq ft | true sq ft | error | note |
+|---|---|---|---|---|---|
+| 1 | elevator shaft opening | 50.5 | 48 | +5 % |  |
+1 pit: median error 4.7 %, worst 5 %.
 
 | one example box of | confidence | regions returned | found / on the sheet | missed | extra |
 |---|---|---|---|---|---|
@@ -417,7 +430,6 @@ Scale: 12.27 px/ft. the printed 15'-0" bay D-E on the top dimension string measu
 | scale reference | feet | px in the key | px/ft | used for the take-off | note |
 |---|---|---|---|---|---|
 | printed 15'-0" bay D-E | 15 | 184 | 12.27 | yes |  |
-| printed 79'-8" overall dimension | 79.667 | 979 | 12.29 | check only | The longer ruler is the safer one. It agrees with the single bay to 0.2 % here, but on a hand-inked sheet a single bay can be 1.5 % out on its own. |
 
 | # | label | type | category | printed size | true sq ft | in the take-off | note |
 |---|---|---|---|---|---|---|---|
@@ -454,7 +466,7 @@ Scale: 12.27 px/ft. the printed 15'-0" bay D-E on the top dimension string measu
 
 Tasks in the key:
 
-1. Box the printed 15'-0" bay D-E on the top dimension string (label: scale: printed 15'-0" bay D-E), then the 79'-8" overall as a check.
+1. Box the printed 15'-0" bay D-E on the top dimension string (label: scale: printed 15'-0" bay D-E).
 2. Read the FOOTING SCHEDULE at the top right: F60 is 6'-0" square, F66 6'-6", F70 7'-0", F80 8'-0", F96 9'-6" and F126 is 12'-6" x 9'-6".
 3. Box several of the scheduled footings (label: footing) and compare your measured area with the schedule size.
 4. The two X-crossed pits (label: pit) are in the key as well, but they are only about 40 px across on this sheet. Measure one and watch what the warning says.
@@ -466,39 +478,38 @@ Tasks in the key:
 
 | scale box | px | px/ft | vs the key |
 |---|---|---|---|
-| printed 15'-0" bay D-E | 185 | 12.36 | +0.8 % |
-| printed 79'-8" overall dimension | 1005 | 12.62 | +2.7 % |
-Scale used: 12.36 px/ft.
+| printed 15'-0" bay D-E | 187 | 12.44 | +1.4 % |
+Scale used: 12.44 px/ft.
 
 | # | footing (key) | measured sq ft | true sq ft | error | note |
 |---|---|---|---|---|---|
-| 1 | F60 | 26.3 | 36 | -27 % |  |
-| 2 | F126 | 116.4 | 119 | -2 % |  |
-| 3 | F66 | 46.5 | 42 | +10 % |  |
-| 4 | F66 | 43.8 | 42 | +4 % |  |
-| 5 | F66 | 44.4 | 42 | +5 % |  |
-| 6 | F70 | 49.8 | 49 | +2 % |  |
-| 7 | F70 | 61.7 | 49 | +26 % |  |
-| 8 | F80 | 63.2 | 64 | -1 % |  |
-| 9 | F80 | 64.8 | 64 | +1 % |  |
-| 10 | F70 | 48.7 | 49 | -1 % |  |
-| 11 | F80 | 62.8 | 64 | -2 % |  |
-| 12 | F80 | 62.7 | 64 | -2 % |  |
-| 13 | F96 | 89.7 | 90 | -1 % |  |
-| 14 | F96 | 90.7 | 90 | +0 % |  |
-| 15 | F60 | 35.6 | 36 | -1 % |  |
-| 16 | F126 | 120.0 | 119 | +1 % |  |
-| 17 | F66 | 46.9 | 42 | +11 % |  |
-| 18 | F66 | 45.9 | 42 | +9 % |  |
-| 19 | F66 | 47.2 | 42 | +12 % |  |
-| 20 | F70 | 49.1 | 49 | +0 % |  |
-20 footings: median error 1.9 %, worst 27 %.
+| 1 | F60 | 25.9 | 36 | -28 % |  |
+| 2 | F126 | 114.7 | 119 | -3 % |  |
+| 3 | F66 | 46.0 | 42 | +9 % |  |
+| 4 | F66 | 43.3 | 42 | +3 % |  |
+| 5 | F66 | 43.6 | 42 | +3 % |  |
+| 6 | F70 | 49.2 | 49 | +0 % |  |
+| 7 | F70 | 60.8 | 49 | +24 % |  |
+| 8 | F80 | 62.2 | 64 | -3 % |  |
+| 9 | F80 | 63.9 | 64 | -0 % |  |
+| 10 | F70 | 48.2 | 49 | -2 % |  |
+| 11 | F80 | 61.9 | 64 | -3 % |  |
+| 12 | F80 | 61.9 | 64 | -3 % |  |
+| 13 | F96 | 88.7 | 90 | -2 % |  |
+| 14 | F96 | 89.5 | 90 | -1 % |  |
+| 15 | F60 | 34.4 | 36 | -4 % |  |
+| 16 | F126 | 118.7 | 119 | -0 % |  |
+| 17 | F66 | 46.4 | 42 | +10 % |  |
+| 18 | F66 | 45.2 | 42 | +7 % |  |
+| 19 | F66 | 46.6 | 42 | +10 % |  |
+| 20 | F70 | 48.1 | 49 | -2 % |  |
+20 footings: median error 3.3 %, worst 28 %.
 
 | # | pit (key) | measured sq ft | true sq ft | error | note |
 |---|---|---|---|---|---|
-| 1 | house trap pit 2'-0"x2'-6" | 10.7 | 5 | +114 % | your box is only 37 px across, and under about 60 px a symbol is too small for the model on this sheet: the nu |
-| 2 | oil separator pit 5'-4 1/2"x3'-4" | 29.1 | 18 | +62 % | your box is only 45 px across, and under about 60 px a symbol is too small for the model on this sheet: the nu |
-2 pits: median error 88.2 %, worst 114 %.
+| 1 | house trap pit 2'-0"x2'-6" | 10.4 | 5 | +107 % | your box is only 37 px across, and under about 60 px a symbol is too small for the model on this sheet: the nu |
+| 2 | oil separator pit 5'-4 1/2"x3'-4" | 29.6 | 18 | +65 % | your box is only 46 px across, and under about 60 px a symbol is too small for the model on this sheet: the nu |
+2 pits: median error 86.3 %, worst 107 %.
 
 | one example box of | confidence | regions returned | found / on the sheet | missed | extra |
 |---|---|---|---|---|---|
@@ -528,6 +539,7 @@ Scale: 10.53 px/ft. the printed 16'-0" bay between pile footings PF20 and PF21 o
 
 | scale reference | feet | px in the key | px/ft | used for the take-off | note |
 |---|---|---|---|---|---|
+| printed 16'-0" bay PF20-PF21 | 16 | 169 | 10.56 | yes |  |
 
 | counted from one example | how many on the sheet | confidence the key suggests | tip |
 |---|---|---|---|
@@ -535,8 +547,9 @@ Scale: 10.53 px/ft. the printed 16'-0" bay between pile footings PF20 and PF21 o
 
 Tasks in the key:
 
-1. Box ONE pile cap with the label 'example: pile footing' and SAM 3 counts them all. There are 29 and they are numbered PF1 to PF29, so you can check yourself.
-2. There is no area task on this sheet, on purpose. Each cap is 2'-6" x 5'-0" (read the PILE FOOTING SCHEDULE at the bottom left) and is drawn only 27 x 53 px, well under the ~60 px SAM 3 needs. Every attempt in the feasibility test came out 12 % to 35 % too big, because below that size the mask stops following the drawn rectangle and becomes a rounded copy of the box you drew. Take the 12.5 sq ft from the schedule instead.
+1. Box the printed 16'-0" bay PF20-PF21 on the bottom dimension string (label: scale: printed 16'-0" bay PF20-PF21).
+2. Box ONE pile cap with the label 'example: pile footing' and SAM 3 counts them all. There are 29 and they are numbered PF1 to PF29, so you can check yourself.
+3. There is no area task on this sheet, on purpose. Each cap is 2'-6" x 5'-0" (read the PILE FOOTING SCHEDULE at the bottom left) and is drawn only 27 x 53 px, well under the ~60 px SAM 3 needs. Every attempt in the feasibility test came out 12 % to 35 % too big, because below that size the mask stops following the drawn rectangle and becomes a rounded copy of the box you drew. Take the 12.5 sq ft from the schedule instead.
 
 ### What SAM 3 measures (boxes taken from the key, each side moved by a few percent)
 
@@ -544,7 +557,8 @@ Tasks in the key:
 
 | scale box | px | px/ft | vs the key |
 |---|---|---|---|
-Scale used: 10.53 px/ft.
+| printed 16'-0" bay PF20-PF21 | 172 | 10.73 | +1.6 % |
+Scale used: 10.73 px/ft.
 
 | one example box of | confidence | regions returned | found / on the sheet | missed | extra |
 |---|---|---|---|---|---|

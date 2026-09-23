@@ -338,14 +338,17 @@ GROUP_TEXT = {
               "you get is the *net* floor area: what the drawing puts on the floor (a counter, a bathtub) is cut out of "
               "the mask unless the room is a plain rectangle."),
     "structural": ("Structural (foundation) plans",
-                   "On a foundation plan you take off a **count of footings** and their **areas**. One box around one footing is "
-                   "all it takes: SAM 3 uses it as the example to find and count all the others, and measures the footing you "
-                   "boxed in square feet with the drawing's own scale. Box more footings to measure more of them. Read the "
+                   "On a foundation plan you take off a **count of footings** and their **areas**. Set the scale where the sheet "
+                   "prints a dimension (a bay of the grid); where it prints none, the footing's own mark gives its size. Then one "
+                   "box around one footing is all it takes: SAM 3 uses it as the example to find and count all the others, and "
+                   "measures the footing you boxed in square feet. Box more footings to measure more of them, and the elevator "
+                   "shaft where there is one. Read the "
                    "*same* edge of the ink at both ends (outside-to-outside, not one of each), and remember that a symbol "
                    "smaller than about 60 pixels on the sheet is too small for the model - the mask becomes a rounded copy "
                    "of your box, and the 'area' you get is the area you drew."),
     "mep": ("MEP plans",
-            "On an MEP sheet almost nothing is measured and almost everything is **counted**. The trade words - *light "
+            "On an MEP sheet almost nothing is measured and almost everything is **counted**. The scale comes from the "
+            "ceiling grid (ten 2 ft cells). The trade words - *light "
             "fixture*, *diffuser*, *sprinkler* - return nothing at all from the model, so counting is done the other way "
             "round: box **one** example of the symbol, labelled *example: 2x4 light fixture*, and the model finds every "
             "other symbol like it. Pick an example that is clean and lying the same way as most of the others; a rotated "

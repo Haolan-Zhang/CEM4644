@@ -17,9 +17,11 @@ box-drawing tool, tables of square feet next to the drawing's own numbers, and a
 | Report questions | 7 | 5 |
 | Time | about 90 min | about 2.5 h |
 
-Everything is in feet and square feet. The homework floor plan asks for one scale box (the printed 10'-0"
-dimension) and uses it, but prints no SCALE CHECK lines (`SheetSet.scale_check=False`, 2026-09-22); the footing
-sheets and the ceiling plan use the scale stored in their key. The workshop keeps the full scale exercise. On a
+Everything is in feet and square feet. Every homework sheet asks for one scale box, the first of the two it
+originally had (the 10'-0" dimension on `va_floor`, the 32'-0" dimension on `usda_5542`, the 14'-0" bay on `test_fp_2`, the
+15'-0" bay on `uscg_motorpool`, the 16'-0" bay on `uscg_pile`, ten grid cells on `va_ceiling`; on `test_fp`, which prints no dimension, the first footing box is the scale). The box
+is used for every area but the SCALE CHECK lines are not printed (`SheetSet.scale_check=False`, 2026-09-23). The
+workshop keeps the full scale exercise with both references. On a
 foundation plan one `footing` box is the whole task: it is the example SAM 3 counts from and the footing whose area
 is measured. The VA sheets' wrong 0–16 ft graphic bar was dropped from the tasks on 2026-09-22 at the instructor's
 request.
@@ -89,12 +91,13 @@ of the model, so the lab no longer asks for one.
 | `usda_5544` | −0.6 % / +0.6 % | Step 3d, door (0.4): median **11/17** over all 17 possible examples (1–17), 0 extra; only 1 example finds all 17 | room n=9 (closets are not in the take-off), **median 3.9 %**, worst 21 % (the hall) |
 | `usda_5540` | −0.3 % / +0.5 % | Step 3d, door (0.4): median **14/14** (1–14), 2 extra; 9 of 14 examples find all | room n=7, **median 0.6 %**, worst 26 % (the hall) |
 | `usda_5539` | −0.3 % / +0.4 % | Step 3d, door (0.4): median **11/11** (1–11), 4 extra; 6 of 11 examples find all | room n=9, **median 2.6 %**, worst 20 % (the hall) |
-| `usda_5542` | −0.4 % / +0.5 % | – (rooms only) | room n=10 (closets are not in the take-off), **median 2.6 %**, worst 23 % (the hall) |
+| `usda_5542` | −0.4 % (boxed, not printed) | – (rooms only) | room n=10 (closets are not in the take-off), **median 2.6 %**, worst 23 % (the hall) |
 | `va_floor` | −1.4 % (boxed, not printed) | – (rooms only) | room n=19 (22 spaces in the key, 3 open alcoves left out), **median 2.0 %**, worst 7 % |
-| `va_ceiling` | – (no scale) | 2×4 (0.4) **39/41, 0 ex**; 2×2 (0.4) 8/8, 1 ex; cans (0.5) **14/14, 0 ex** | – (nothing to measure) |
-| `test_fp` | – (known scale) | footing (0.3) **10/10**, 3–5 ex | footing n=10, **median 4.3 %**, worst 8.5 % |
-| `test_fp_2` | – (known scale) | footing (0.4) **19/19**, 1 ex | footing n=19, median 6.2 %, worst 19 % |
-| `uscg_pile` | −1.8 % / −0.1 % | pile footing (0.3) **29/29**, 2 ex | – (the caps are too small to measure) |
+| `va_ceiling` | −0.7 % (boxed, not printed) | 2×4 (0.4) **39/41, 0 ex**; 2×2 (0.4) 8/8, 1 ex; cans (0.5) **14/14, 0 ex** | – (nothing to measure) |
+| `test_fp` | −3.2 % (the footing box, not printed) | footing (0.3) **10/10**, 3–5 ex | footing n=10, **median 4.3 %**, worst 8.5 % |
+| `test_fp_2` | −1.4 % (boxed, not printed) | footing (0.4) **19/19**, 1 ex | footing n=19, median 6.2 %, worst 19 %; pit n=1, 5.2 % |
+| `uscg_motorpool` | −1.7 % (boxed, not printed) | footing (0.3) 19/20, 2–5 ex; grid bubble (0.5) **32/32**, 2 ex | footing n=20, median 6.0 %, worst 32 %; **pit n=2, median 92 %** |
+| `uscg_pile` | −1.8 % (boxed, not printed) | pile footing (0.3) **29/29**, 2 ex | – (the caps are too small to measure) |
 
 The counting categories are named after the same object as the area category, so a sheet that has both reads
 `footing`, whose first box is also the counting example (no `example: footing` label, and no `spread footing` beside `footing`); `uscg_motorpool` keeps a second category,
@@ -107,7 +110,7 @@ Three of those numbers are **designed failures** and are the teaching points of 
   footing around it and the cell prints "your box is only 36 px across… the number is your box, not the pit."
 
 Room totals against the answer key, same run: `usda_5544` −3.5 %, `usda_5540` −1.5 %, `usda_5539` −3.9 %,
-`usda_5542` −2.6 %, `va_floor` −7.3 %. Footing totals: `test_fp` −3 %, `test_fp_2` +2 %.
+`usda_5542` −2.6 %, `va_floor` −7.3 %. Footing totals: `test_fp` −3 %, `test_fp_2` +2 %, `uscg_motorpool` +3 %.
 
 ### 2.3 Asking by name on the homework sheets (Steps 2b, 3b, 4b) — regions at confidence ≥ 0.3 (≥ 0.5), found / key, extras, median area error of the regions found
 
