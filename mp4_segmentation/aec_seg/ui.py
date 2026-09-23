@@ -192,7 +192,7 @@ def truth_line(sheet, thing: Thing, res: SegResult, threshold: float) -> str:
 def compare_text(n_true: int, cat: str, ok: int, missed: int, extra: int) -> str:
     w = words(n_true, cat)
     return (f"Compared with the {n_true} actual {w}:\n  Found: {ok} of {n_true}\n  Missed: {missed}\n"
-            f"  Extra: {extra} region{'' if extra == 1 else 's'} that {'was' if extra == 1 else 'were'} not {w}")
+            f"  Extra: {extra} region{'' if extra == 1 else 's'} that {'was not a ' + cat if extra == 1 else 'were not ' + w}")
 
 
 def result_text(res: SegResult, threshold: float) -> str:
@@ -541,7 +541,7 @@ def phrase_html(phrase: str, res: SegResult, threshold: float, cmp) -> str:
         w = words(n_true, cat)
         lines += [f"<b>Compared with the {n_true} actual {html.escape(w)}:</b>",
                   f"<b>Found:</b> {ok} of {n_true}", f"<b>Missed:</b> {missed}",
-                  f"<b>Extra:</b> {extra} region{'' if extra == 1 else 's'} that {'was' if extra == 1 else 'were'} not {html.escape(w)}",
+                  f"<b>Extra:</b> {extra} region{'' if extra == 1 else 's'} that {'was not a ' + html.escape(cat) if extra == 1 else 'were not ' + html.escape(w)}",
                   f"<span style='color:#666'>{LEGEND}</span>"]
     return "<div style='font-family:monospace;white-space:pre-wrap;line-height:1.5'>" + "\n".join(lines) + "</div>"
 
@@ -694,6 +694,8 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
                 row.update(label=a["label"], true_sqft=float(a["true_sqft"]), printed=a.get("printed"),
                            indoor=bool(a.get("indoor")),
                            err_pct=(row["your_sqft"] - float(a["true_sqft"])) / float(a["true_sqft"]) * 100)
+                if "rounded copy" in (row["note"] or "") and abs(row["err_pct"]) < 15:
+                    row["note"] = ""                     # the reading agrees with the drawing: no need to doubt it
             rows.append(row)
             layers.append((str(i), mask, AREA_FILL))
         rep["areas"][cat] = rows
@@ -770,14 +772,14 @@ def count_lines(rep, tips: bool = True, bold=lambda s: s):
         if "error" in c:
             lines.append(f"{cat}: {c['error']}"); continue
         n = c["found"]; ne = len(c["extra"]); nm = len(c["missed"])
-        real = plural(c["truth"], cat).split(" ", 1)[1]                      # "doors", "pile footings"
-        source = f"your first {c['example_from']} box as the example" if c.get("example_from") else "your example box"
-        lines.append(f"{cat} (confidence >= {c['threshold']:.2f}): Using {source} (purple), SAM 3 returned "
-                     f"{bold(f'{n} region' + ('' if n == 1 else 's'))} in {c['seconds']:.1f} s. "
-                     f"Of the {bold(f"{c['truth']} actual {real}")}, it identified "
-                     f"{bold(str(c['matched']))} (green) and missed {bold(str(nm))} (red). "
-                     f"It also identified {bold(f'{ne} extra region' + ('' if ne == 1 else 's'))} that "
-                     f"{'was not a ' + cat if ne == 1 else 'were not ' + real} (blue).")
+        real = words(c["truth"], cat)                                        # "footings", "pile footings"
+        source = f"your first {c['example_from']} box" if c.get("example_from") else "your example box"
+        lines += [f"{bold('EXAMPLE BOX')}: {source} (purple), confidence >= {c['threshold']:.2f}",
+                  f"SAM 3 segmented {bold(f'{n} region' + ('' if n == 1 else 's'))} at the selected confidence threshold.",
+                  bold(f"Compared with the {c['truth']} actual {real}:"),
+                  f"{bold('Found:')} {c['matched']} of {c['truth']}",
+                  f"{bold('Missed:')} {nm}",
+                  f"{bold('Extra:')} {ne} region{'' if ne == 1 else 's'} that {'was not a ' + cat if ne == 1 else 'were not ' + real}"]
         if c.get("extra_examples"):
             lines.append(f"   You drew {c['extra_examples'] + 1} boxes labelled 'example: {cat}'. "
                          "Only the first one was used - one example is all the model needs.")
@@ -789,24 +791,30 @@ def count_lines(rep, tips: bool = True, bold=lambda s: s):
                      "the count comes from the model, not from your boxes.")
     if rep["counts"]:
         lines.append(LEGEND + "; purple = your example box")
-    return "WHAT SAM 3 COUNTED FROM YOUR EXAMPLE BOX", lines
+    return "", lines
 
 
 def print_counts(rep, tips: bool = True):
+    """The counts as HTML when a notebook is listening (bold numbers), plain text otherwise."""
     head, lines = count_lines(rep, tips)
-    if head:
-        print("\n" + head)
-        for l in lines:
-            print("  " + l)
+    if not lines:
+        return
+    try:
+        from IPython import get_ipython
+        from IPython.display import HTML, display
+        if get_ipython() is not None:
+            display(HTML(counts_html(rep, tips))); return
+    except Exception:  # noqa: BLE001
+        pass
+    print("\n" + "\n".join(lines))
 
 
 def counts_html(rep, tips: bool = True) -> str:
     import html
     head, lines = count_lines(rep, tips, bold=lambda s: f"<b>{html.escape(s)}</b>")
-    if not head:
+    if not lines:
         return ""
-    return (f"<div style='font-family:monospace;white-space:pre-wrap;line-height:1.4'><b>{head}</b>\n"
-            + "\n".join("  " + l for l in lines) + "</div>")
+    return "<div style='font-family:monospace;white-space:pre-wrap;line-height:1.5'>" + "\n".join(lines) + "</div>"
 
 
 def print_areas(sheet, rep):
@@ -866,7 +874,7 @@ def takeoff(lab, sheet_id: str):
                                            "confidence suggested for it.")]))
 
     guided = getattr(lab.spec, "guided", True)
-    todo = "<br>".join(f"<b>{i + 1}.</b> {t}" for i, t in enumerate(sheet.tasks))
+    todo = "<br>".join(f"<b>{i + 1}.</b> {t}" for i, t in enumerate(sheet.tasks))   # shown only when guided
     msg = w.HTML("" if not guided else f"<b>{sheet.id} - {sheet.title}</b><br>{todo}<br>"
                  "Pick the label above the picture before each box. Zoom with the mouse wheel. Then <b>Submit</b>."
                  + ("<br>A count is never a tally of your boxes: draw <b>one</b> box labelled "

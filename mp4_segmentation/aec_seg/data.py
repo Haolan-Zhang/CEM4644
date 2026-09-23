@@ -239,9 +239,7 @@ def check_key(key: dict, folder: Path) -> List[str]:
     if not (isinstance(key.get("scale"), dict) and isinstance(key["scale"].get("px_per_ft"), (int, float))
             and key["scale"]["px_per_ft"] > 0):
         bad.append("scale.px_per_ft is missing or not a positive number")
-    refs = key.get("scale_refs") or []
-    if not refs and key.get("areas"):
-        bad.append("scale_refs is empty but the sheet has areas to measure: the student has nothing to box for the scale")
+    refs = key.get("scale_refs") or []           # may be empty: the sheet's known px_per_ft is then used silently
     used = [r for r in refs if r.get("use")]
     if refs and len(used) != 1:
         bad.append(f"{len(used)} scale_refs have use=true, exactly one must")

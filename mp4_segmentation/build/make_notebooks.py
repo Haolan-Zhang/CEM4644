@@ -338,12 +338,12 @@ GROUP_TEXT = {
               "you get is the *net* floor area: what the drawing puts on the floor (a counter, a bathtub) is cut out of "
               "the mask unless the room is a plain rectangle."),
     "structural": ("Structural (foundation) plans",
-                   "On a foundation plan you take off **areas of footings** and a **count of them**. The scale comes from a "
-                   "printed bay dimension or from a footing whose width its mark gives you (F4.0 = 4'-0\" wide). The count "
-                   "is made by the model from your first *footing* box, which it uses as the example - you never count them yourself. Two "
-                   "things to watch: read the *same* edge of the ink at both ends (outside-to-outside or centre-to-centre, "
-                   "not one of each), and remember that a symbol smaller than about 60 pixels on the sheet is too small for "
-                   "the model - the mask becomes a rounded copy of your box, and the 'area' you get is the area you drew."),
+                   "On a foundation plan you take off a **count of footings** and their **areas**. One box around one footing is "
+                   "all it takes: SAM 3 uses it as the example to find and count all the others, and measures the footing you "
+                   "boxed in square feet with the drawing's own scale. Box more footings to measure more of them. Read the "
+                   "*same* edge of the ink at both ends (outside-to-outside, not one of each), and remember that a symbol "
+                   "smaller than about 60 pixels on the sheet is too small for the model - the mask becomes a rounded copy "
+                   "of your box, and the 'area' you get is the area you drew."),
     "mep": ("MEP plans",
             "On an MEP sheet almost nothing is measured and almost everything is **counted**. The trade words - *light "
             "fixture*, *diffuser*, *sprinkler* - return nothing at all from the model, so counting is done the other way "
@@ -456,12 +456,11 @@ QUESTION_BY_GROUP = {
     "floor": ("From Step 2a: your scale reading and how far it is from the drawing's known scale. Then the room table: "
               "your square feet, the drawing's, the error. Which rooms are worst and why? Then from Step 2b: what did *room* find on each sheet (found / missed / extra, and the median error of the areas "
               "it measured) against the rooms from your boxes? What did *door* and *window* return, and what did *curved line*?"),
-    "structural": ("From Step 3a: for each sheet, the scale and how you set it, the areas of the footings you measured against "
-                   "the sizes their marks give, and the count SAM 3 made from your first *footing* box, its example (found / missed / "
-                   "extra). One sheet asks you only to count, because its pile caps are too small to measure - what happens to the "
+    "structural": ("From Step 3a: for each sheet, the count SAM 3 made from your one *footing* box (found / missed / extra) and the "
+                   "area of the footings you boxed against the sizes their marks give. One sheet asks you only to count, because its pile caps are too small to measure - what happens to the "
                    "measured area of something that small, and why? Then from Step 3b: does *footing* find anything? Which shape "
                    "word finds the footings, on which sheet, with how many extras, and how do the areas it measures compare with "
-                   "the ones from your boxes? Did any phrase find the grid bubbles or the pile caps?"),
+                   "the ones from your boxes? Did any phrase find the pile caps?"),
     "mep": ("From Step 4a: the count of each symbol that SAM 3 made from your one example box (found / missed / extra), the "
             "confidence you used, and what the extras were. Try a second example box of the same symbol, one that is rotated or "
             "sits in a cluttered spot, and report how the count changes. Then from Step 4b: which words find any light fixture at "
