@@ -13,8 +13,8 @@ chose these sheets live in `_candidates/sam3_eval/` (not in the repository); the
 | va_floor | floor plan + plumbing | room n=19, median 3.4 %, worst 6 % | - | *room*: 13/22 found, 0 extra |
 | va_ceiling | electrical | - | 2x4 light fixture 40/41 (+0); 2x2 light fixture 7/8 (+0); recessed light 14/14 (+0) | *rectangle*: 7/41 found, 24 extra |
 | test_fp | structural | footing n=10, median 3.2 %, worst 8 % | footing 10/10 (+3) | *square*: 10/10 found, 5 extra; *rectangle*: 10/10 found, 9 extra |
-| test_fp_2 | structural | footing n=19, median 2.4 %, worst 23 %; pit n=1, median 4.7 %, worst 5 % | footing 19/19 (+1) | *square*: 19/19 found, 23 extra; *rectangle*: 19/19 found, 6 extra |
-| uscg_motorpool | structural | footing n=20, median 3.3 %, worst 28 %; pit n=2, median 86.3 %, worst 107 % | footing 19/20 (+5); grid bubble 32/32 (+2) | *square*: 9/20 found, 10 extra; *rectangle*: 7/20 found, 4 extra; *circle*: 32/32 found, 6 extra |
+| test_fp_2 | structural | footing n=19, median 2.4 %, worst 23 %; elevator shaft n=1, median 4.7 %, worst 5 % | footing 19/19 (+1) | *square*: 19/19 found, 23 extra; *rectangle*: 19/19 found, 6 extra |
+| uscg_motorpool | structural | footing n=20, median 3.3 %, worst 28 %; equipment pit n=2, median 86.3 %, worst 107 % | footing 19/20 (+5); grid bubble 32/32 (+2) | *square*: 9/20 found, 10 extra; *rectangle*: 7/20 found, 4 extra; *circle*: 32/32 found, 6 extra |
 | uscg_pile | structural | - | pile footing 29/29 (+2) | *rectangle*: 29/29 found, 8 extra |
 
 ## usda_5542 - Five-room farmhouse, 32 ft x 29 ft (USDA design 710-5542)
@@ -349,10 +349,10 @@ Scale: 15.29 px/ft. the printed 14'-0" bay between grid lines X2 and X3 on the b
 | 17 | R2-9 | footing | footing | E4'-6" | 20.2 | yes |  |
 | 18 | F40-1 | footing | footing | F4.0 | 16.0 | yes |  |
 | 19 | F40-2 | footing | footing | F4.0 | 16.0 | yes |  |
-| 20 | elevator shaft opening | pit | pit | None | 48.2 | yes | no printed size: this is the drawn opening measured with the sheet scale, so treat it as +/-5 %. |
+| 20 | elevator shaft opening | elevator shaft | elevator shaft | None | 48.2 | yes | no printed size: this is the drawn opening measured with the sheet scale, so treat it as +/-5 %. |
 
 - 19 footings in the take-off, 392 sq ft together.
-- 1 pit in the take-off, 48 sq ft together.
+- 1 elevator shaft in the take-off, 48 sq ft together.
 
 | counted from one example | how many on the sheet | confidence the key suggests | tip |
 |---|---|---|---|
@@ -363,7 +363,7 @@ Tasks in the key:
 1. Box the printed 14'-0" bay X2-X3 on the bottom dimension string, tick to tick (label: scale: printed 14'-0" bay X2-X3). That sets the scale for every area on this sheet.
 2. The hexagon next to each footing gives its size: E4'-6", E4'-8", E4'-10", E5'-0", and F4.0 (4'-0" square) for the two heavy black ones.
 3. Box ONE grey footing (label: footing), outside edge to outside edge. SAM 3 finds all the others like it and counts them (there are 19: 17 grey ones and the 2 heavy black F4.0), and the footing you boxed is measured in square feet with the drawing's scale. Box more footings to measure more of them.
-4. Box the elevator shaft opening (label: pit).
+4. Box the elevator shaft opening (label: elevator shaft).
 
 ### What SAM 3 measures (boxes taken from the key, each side moved by a few percent)
 
@@ -397,10 +397,10 @@ Scale used: 15.35 px/ft.
 | 19 | F40-2 | 17.0 | 16 | +6 % |  |
 19 footings: median error 2.4 %, worst 23 %.
 
-| # | pit (key) | measured sq ft | true sq ft | error | note |
+| # | elevator shaft (key) | measured sq ft | true sq ft | error | note |
 |---|---|---|---|---|---|
 | 1 | elevator shaft opening | 50.5 | 48 | +5 % |  |
-1 pit: median error 4.7 %, worst 5 %.
+1 elevator shaft: median error 4.7 %, worst 5 %.
 
 | one example box of | confidence | regions returned | found / on the sheet | missed | extra |
 |---|---|---|---|---|---|
@@ -453,11 +453,11 @@ Scale: 12.27 px/ft. the printed 15'-0" bay D-E on the top dimension string measu
 | 18 | F66 | footing | footing | 6'-6" x 6'-6" | 42.2 | yes |  |
 | 19 | F66 | footing | footing | 6'-6" x 6'-6" | 42.2 | yes |  |
 | 20 | F70 | footing | footing | 7'-0" x 7'-0" | 49.0 | yes |  |
-| 21 | house trap pit 2'-0"x2'-6" | pit | pit | 2'-0" x 2'-6" | 5.0 | yes | too small for the model on this sheet: about 40 px across, where SAM 3 needs roughly 60 px. The number you get back is t |
-| 22 | oil separator pit 5'-4 1/2"x3'-4" | pit | pit | 5'-4 1/2" x 3'-4" | 17.9 | yes | too small for the model on this sheet: about 40 px across, where SAM 3 needs roughly 60 px. The number you get back is t |
+| 21 | house trap pit 2'-0"x2'-6" | equipment pit | equipment pit | 2'-0" x 2'-6" | 5.0 | yes | too small for the model on this sheet: about 40 px across, where SAM 3 needs roughly 60 px. The number you get back is t |
+| 22 | oil separator pit 5'-4 1/2"x3'-4" | equipment pit | equipment pit | 5'-4 1/2" x 3'-4" | 17.9 | yes | too small for the model on this sheet: about 40 px across, where SAM 3 needs roughly 60 px. The number you get back is t |
 
 - 20 footings in the take-off, 1,196 sq ft together.
-- 2 pits in the take-off, 23 sq ft together.
+- 2 equipment pits in the take-off, 23 sq ft together.
 
 | counted from one example | how many on the sheet | confidence the key suggests | tip |
 |---|---|---|---|
@@ -469,7 +469,7 @@ Tasks in the key:
 1. Box the printed 15'-0" bay D-E on the top dimension string (label: scale: printed 15'-0" bay D-E).
 2. Read the FOOTING SCHEDULE at the top right: F60 is 6'-0" square, F66 6'-6", F70 7'-0", F80 8'-0", F96 9'-6" and F126 is 12'-6" x 9'-6".
 3. Box several of the scheduled footings (label: footing) and compare your measured area with the schedule size.
-4. The two X-crossed pits (label: pit) are in the key as well, but they are only about 40 px across on this sheet. Measure one and watch what the warning says.
+4. The two X-crossed pits (label: equipment pit) are in the key as well, but they are only about 40 px across on this sheet. Measure one and watch what the warning says.
 5. Your first footing box is also the example SAM 3 uses to count all the footings (there are 20). The grid bubbles are counted the same way from ONE box labelled 'example: grid bubble' (there are 32).
 
 ### What SAM 3 measures (boxes taken from the key, each side moved by a few percent)
@@ -505,11 +505,11 @@ Scale used: 12.44 px/ft.
 | 20 | F70 | 48.1 | 49 | -2 % |  |
 20 footings: median error 3.3 %, worst 28 %.
 
-| # | pit (key) | measured sq ft | true sq ft | error | note |
+| # | equipment pit (key) | measured sq ft | true sq ft | error | note |
 |---|---|---|---|---|---|
 | 1 | house trap pit 2'-0"x2'-6" | 10.4 | 5 | +107 % | your box is only 37 px across, and under about 60 px a symbol is too small for the model on this sheet: the nu |
 | 2 | oil separator pit 5'-4 1/2"x3'-4" | 29.6 | 18 | +65 % | your box is only 46 px across, and under about 60 px a symbol is too small for the model on this sheet: the nu |
-2 pits: median error 86.3 %, worst 107 %.
+2 equipment pits: median error 86.3 %, worst 107 %.
 
 | one example box of | confidence | regions returned | found / on the sheet | missed | extra |
 |---|---|---|---|---|---|

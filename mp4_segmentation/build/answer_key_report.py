@@ -35,7 +35,7 @@ PHRASES = {
     "va_ceiling": [("light fixture", "2x4 light fixture"), ("diffuser", None), ("rectangle", "2x4 light fixture"),
                    ("rectangle with a diagonal line", "2x4 light fixture"), ("small circle", "recessed light"), ("square", "2x2 light fixture")],
 }
-CAT_COLORS = {"room": "#2a9d8f", "footing": "#e63946", "pit": "#f4a261"}
+CAT_COLORS = {"room": "#2a9d8f", "footing": "#e63946", "pit": "#f4a261", "elevator shaft": "#f4a261", "equipment pit": "#f4a261"}
 
 
 def jitter(b, f=0.015):

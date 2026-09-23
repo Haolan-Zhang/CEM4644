@@ -95,8 +95,8 @@ of the model, so the lab no longer asks for one.
 | `va_floor` | −1.4 % (boxed, not printed) | – (rooms only) | room n=19 (22 spaces in the key, 3 open alcoves left out), **median 2.0 %**, worst 7 % |
 | `va_ceiling` | −0.7 % (boxed, not printed) | 2×4 (0.4) **39/41, 0 ex**; 2×2 (0.4) 8/8, 1 ex; cans (0.5) **14/14, 0 ex** | – (nothing to measure) |
 | `test_fp` | −3.2 % (the footing box, not printed) | footing (0.3) **10/10**, 3–5 ex | footing n=10, **median 4.3 %**, worst 8.5 % |
-| `test_fp_2` | −1.4 % (boxed, not printed) | footing (0.4) **19/19**, 1 ex | footing n=19, median 6.2 %, worst 19 %; pit n=1, 5.2 % |
-| `uscg_motorpool` | −1.7 % (boxed, not printed) | footing (0.3) 19/20, 2–5 ex; grid bubble (0.5) **32/32**, 2 ex | footing n=20, median 6.0 %, worst 32 %; **pit n=2, median 92 %** |
+| `test_fp_2` | −1.4 % (boxed, not printed) | footing (0.4) **19/19**, 1 ex | footing n=19, median 6.2 %, worst 19 %; elevator shaft n=1, 5.2 % |
+| `uscg_motorpool` | −1.7 % (boxed, not printed) | footing (0.3) 19/20, 2–5 ex; grid bubble (0.5) **32/32**, 2 ex | footing n=20, median 6.0 %, worst 32 %; **equipment pit n=2, median 92 %** |
 | `uscg_pile` | −1.8 % (boxed, not printed) | pile footing (0.3) **29/29**, 2 ex | – (the caps are too small to measure) |
 
 The counting categories are named after the same object as the area category, so a sheet that has both reads

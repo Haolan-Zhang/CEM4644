@@ -396,7 +396,8 @@ You already met SAM 3 in the workshop, so this notebook goes straight to the wor
 
 Each of the next three parts has two cells. The first is the **take-off**: pick the drawing, then pick the label above
 the picture before each box you draw (the labels are the things that sheet asks for), then *Submit*. Three kinds of
-label: **scale: ...** for a length whose size the sheet gives you, the plain word (**room**, **footing**, **pit**) for
+label: **scale: ...** for a length whose size the sheet gives you, the plain word (**room**, **footing**,
+**elevator shaft**) for
 something you want the area of, and **example: ...** for something you want counted. One box labelled *example: pile
 footing* is all a count needs: SAM 3 goes and finds every other symbol on the sheet that looks like it, and that is how
 a count of 41 light fixtures or 29 pile footings is made. Where the thing counted is also measured (the footings), there is
