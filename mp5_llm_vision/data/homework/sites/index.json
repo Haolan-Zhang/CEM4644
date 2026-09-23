@@ -4,7 +4,7 @@
   "dump truck",
   "wheel loader"
  ],
- "specialist_name": "MP3 course model (YOLO11n trained on the machinery set)",
+ "specialist_name": "object detection model from previous class (YOLO11n trained on the machinery set)",
  "items": [
   {
    "file": "site_1.jpg",
