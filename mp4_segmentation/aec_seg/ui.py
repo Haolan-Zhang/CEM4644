@@ -697,8 +697,12 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
                 if "rounded copy" in (row["note"] or "") and abs(row["err_pct"]) < 15:
                     row["note"] = ""                     # the reading agrees with the drawing: no need to doubt it
             rows.append(row)
-            layers.append((str(i), mask, AREA_FILL))
+            layers.append((str(i), mask, GREEN if row["label"] else BLUE))
         rep["areas"][cat] = rows
+        # the real ones nobody boxed get a red outline, except where the category is also counted from one example:
+        # there the count's green masks already cover them, and measuring more of them is optional
+        rep.setdefault("areas_missed", {})[cat] = ([] if cat in sheet.count_categories else
+                                                   [a["box"] for j, a in enumerate(key_areas) if j not in used and a.get("takeoff", True)])
         if cat == "room":
             indoor = sheet.areas("room", indoor_only=True, takeoff_only=True)
             boxed = {key_areas[j]["label"] for j in used}
@@ -725,8 +729,10 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
         d.rectangle(c["example"], outline=PURPLE, width=w_thin + 2)
     for cat, rows in rep["areas"].items():
         for r in rows:
-            d.rectangle(r["box"], outline="black", width=w_thin + 1)
-            d.text((r["box"][0] + 4, r["box"][1] + 4), str(r["n"]), fill="black")
+            d.rectangle(r["box"], outline=GREEN if r.get("label") else BLUE, width=w_thin)
+            d.text((r["box"][0] + 4, r["box"][1] + 4), str(r["n"]), fill="black", font=viz._font(max(14, img.width // 90)))
+        for tb in rep.get("areas_missed", {}).get(cat, []):
+            d.rectangle(tb, outline=RED, width=w_thin)
     for row in rep["scale"]["refs"]:
         if row["drawn"]:
             d.rectangle(row["box"], outline=PURPLE, width=w_thin + 2)
@@ -817,8 +823,45 @@ def counts_html(rep, tips: bool = True) -> str:
     return "<div style='font-family:monospace;white-space:pre-wrap;line-height:1.5'>" + "\n".join(lines) + "</div>"
 
 
+def area_lines(sheet, rep, cat, bold=lambda s: s):
+    """The summary of one measured category, in the same shape as the count summary."""
+    rows = [r for r in rep["areas"][cat] if "error" not in r]
+    key_areas = sheet.areas(cat, takeoff_only=True)
+    matched = [r for r in rows if r.get("label")]
+    on_key = len({r["label"] for r in matched})
+    errs = [abs(r["err_pct"]) for r in matched if r.get("err_pct") is not None]
+    w = words(len(key_areas), cat)
+    lines = [f"{bold('MEASURED AREAS')}: {cat}",
+             f"SAM 3 measured {bold(f'{len(rows)} region' + ('' if len(rows) == 1 else 's'))} from your boxes.",
+             bold(f"Compared with the {len(key_areas)} actual {w}:"),
+             f"{bold('Boxed and measured:')} {on_key} of {len(key_areas)}" + (" (box more to measure more)" if cat in sheet.count_categories else ""),
+             *([] if cat in sheet.count_categories else [f"{bold('Not boxed:')} {len(key_areas) - on_key}"]),
+             f"{bold('Boxes that were not a ' + cat + ':')} {len(rows) - len(matched)}"]
+    if errs:
+        lines.append(f"{bold('Error of the areas:')} median {np.median(errs):.0f} %, worst {max(errs):.0f} %")
+    if cat == "room" and rep.get("rooms"):
+        rm = rep["rooms"]
+        gap = (rm["total"] - rm["key_total"]) / rm["key_total"] * 100 if rm["key_total"] else 0.0
+        lines.append(f"{bold('Total:')} {rm['total']:,.0f} sq ft measured vs {rm['key_total']:,.0f} sq ft on the drawing ({gap:+.0f} %)"
+                     + (f"; porches and other outdoor spaces you boxed, {rm['outdoor']:,.0f} sq ft, are not in that total" if rm["outdoor"] else ""))
+    elif (rep.get("totals") or {}).get(cat, {}).get("key"):
+        t = rep["totals"][cat]
+        lines.append(f"{bold('Total:')} {t['yours']:,.1f} sq ft measured vs {t['key']:,.1f} sq ft on the drawing ({(t['yours'] - t['key']) / t['key'] * 100:+.0f} %)")
+    if cat not in sheet.count_categories:
+        lines.append(LEGEND.replace("a real one the model found", "a box on a real one").replace("a real one it missed", "a real one you did not box").replace("a region that is not one", "a box on nothing"))
+    return lines
+
+
+def areas_html(sheet, rep) -> str:
+    import html
+    blocks = []
+    for cat in rep["areas"]:
+        blocks.append("\n".join(area_lines(sheet, rep, cat, bold=lambda s: f"<b>{html.escape(s)}</b>")))
+    return "<div style='font-family:monospace;white-space:pre-wrap;line-height:1.5'>" + "\n\n".join(blocks) + "</div>"
+
+
 def print_areas(sheet, rep):
-    """The measuring part of a report: every area, the room total, the footing total."""
+    """The measuring part of a report: the table of every box, then the summary."""
     for cat, rows in rep["areas"].items():
         print(f"\nAREAS - {cat.upper()}")
         print(f"  {'#':>2} {'your sq ft':>11s} {'drawing':>9s} {'error':>7s}  what the sheet prints / note")
@@ -833,21 +876,17 @@ def print_areas(sheet, rep):
             if r["note"]:
                 tail += f" -- {r['note']}"
             print(f"  {r['n']:>2} {r['your_sqft']:11,.1f} {true} {err}  {tail}")
-        errs = [abs(r["err_pct"]) for r in rows if r.get("err_pct") is not None]
-        if errs:
-            print(f"  Median error {np.median(errs):.0f} %, worst {max(errs):.0f} %.")
-    rm = rep.get("rooms")
-    if rm:
-        gap = (rm["total"] - rm["key_total"]) / rm["key_total"] * 100 if rm["key_total"] else 0.0
-        print(f"\n  Your {rm['n']} indoor room(s) add up to {rm['total']:,.0f} sq ft; the drawing's {rm['key_n']} indoor rooms "
-              f"measure {rm['key_total']:,.0f} sq ft ({gap:+.0f} %)."
-              + (f" Rooms you did not box: {', '.join(rm['not_boxed'])}." if rm["not_boxed"] else " You boxed every room.")
-              + (f" (Porches and other outdoor spaces you boxed: {rm['outdoor']:,.0f} sq ft, not counted in that total.)"
-                 if rm["outdoor"] else ""))
-    for cat, t in (rep.get("totals") or {}).items():
-        if t["key"]:
-            print(f"\n  Your {cat}s add up to {t['yours']:,.1f} sq ft; the same ones measure {t['key']:,.1f} sq ft on the drawing "
-                  f"({(t['yours'] - t['key']) / t['key'] * 100:+.0f} %).")
+    if not rep["areas"]:
+        return
+    try:
+        from IPython import get_ipython
+        from IPython.display import HTML, display
+        if get_ipython() is not None:
+            display(HTML(areas_html(sheet, rep))); return
+    except Exception:  # noqa: BLE001
+        pass
+    for cat in rep["areas"]:
+        print("\n" + "\n".join(area_lines(sheet, rep, cat)))
 
 
 def takeoff(lab, sheet_id: str):

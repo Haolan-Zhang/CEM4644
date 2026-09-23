@@ -8,7 +8,7 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-From Step 2a: your scale reading and how far it is from the drawing's known scale. Then the room table: your square feet, the drawing's, the error. Which rooms are worst and why? Then from Step 2b: what did *room* find on each sheet (found / missed / extra, and the median error of the areas it measured) against the rooms from your boxes? What did *door* and *window* return, and what did *curved line*?
+From Step 2a: the room summary and the room table: your square feet, the drawing's, the error. Which rooms are worst and why? Then from Step 2b: what did *room* find on each sheet (found / missed / extra, and the median error of the areas it measured) against the rooms from your boxes? What did *door* and *window* return, and what did *curved line*?
 
 *Your answer:*
 

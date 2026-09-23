@@ -10,8 +10,8 @@ notebook cell is a Colab form and the code is hidden in `aec_seg/`.
 | `MP4_Workshop_Segmentation.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp4_segmentation/MP4_Workshop_Segmentation.ipynb) | three 1940 USDA farmhouse floor plans (easy, medium, L-shaped) |
 | `MP4_Homework_Segmentation.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp4_segmentation/MP4_Homework_Segmentation.ipynb) | seven sheets from three disciplines: 2 floor plans, 4 structural foundation plans, 1 reflected ceiling plan |
 
-Everything is in feet and square feet. **The scale is always set by the student**, from a printed dimension or from
-something whose real size the sheet states. A sheet where things are only counted sets no scale at all. There is no training exercise
+Everything is in feet and square feet. In the workshop **the scale is set by the student** from a printed dimension;
+the homework sheets use the scale stored with each drawing, so a homework take-off is boxes and nothing else. There is no training exercise
 in MP4: SAM 3 is used as it comes.
 
 ## What the students do

@@ -334,7 +334,7 @@ what it *means*.
 # --------------------------------------------------------------------------- the homework notebook
 GROUP_TEXT = {
     "floor": ("Floor plans",
-              "On a floor plan you take off **areas of rooms**. Set the scale from the printed dimension, then box every room. The number "
+              "On a floor plan you take off **areas of rooms**: box every room, and each one is measured with the drawing's scale. The number "
               "you get is the *net* floor area: what the drawing puts on the floor (a counter, a bathtub) is cut out of "
               "the mask unless the room is a plain rectangle."),
     "structural": ("Structural (foundation) plans",
@@ -453,7 +453,7 @@ question: which way gets you a number you would put in an estimate, and which wa
 
 
 QUESTION_BY_GROUP = {
-    "floor": ("From Step 2a: your scale reading and how far it is from the drawing's known scale. Then the room table: "
+    "floor": ("From Step 2a: the room summary and the room table: "
               "your square feet, the drawing's, the error. Which rooms are worst and why? Then from Step 2b: what did *room* find on each sheet (found / missed / extra, and the median error of the areas "
               "it measured) against the rooms from your boxes? What did *door* and *window* return, and what did *curved line*?"),
     "structural": ("From Step 3a: for each sheet, the count SAM 3 made from your one *footing* box (found / missed / extra) and the "

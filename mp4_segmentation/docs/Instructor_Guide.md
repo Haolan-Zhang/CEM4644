@@ -17,8 +17,8 @@ box-drawing tool, tables of square feet next to the drawing's own numbers, and a
 | Report questions | 7 | 5 |
 | Time | about 90 min | about 2.5 h |
 
-Everything is in feet and square feet. Only the floor plan asks for a scale box (its printed 10'-0" dimension);
-the structural sheets and the ceiling plan use the scale stored in their key and print no SCALE CHECK. On a
+Everything is in feet and square feet. No homework sheet asks for a scale box any more (2026-09-22): every sheet
+uses the scale stored in its key and prints no SCALE CHECK; the workshop keeps the scale exercise. On a
 foundation plan one `footing` box is the whole task: it is the example SAM 3 counts from and the footing whose area
 is measured. The VA sheets' wrong 0–16 ft graphic bar was dropped from the tasks on 2026-09-22 at the instructor's
 request.
@@ -89,7 +89,7 @@ of the model, so the lab no longer asks for one.
 | `usda_5540` | −0.3 % / +0.5 % | Step 3d, door (0.4): median **14/14** (1–14), 2 extra; 9 of 14 examples find all | room n=7, **median 0.6 %**, worst 26 % (the hall) |
 | `usda_5539` | −0.3 % / +0.4 % | Step 3d, door (0.4): median **11/11** (1–11), 4 extra; 6 of 11 examples find all | room n=9, **median 2.6 %**, worst 20 % (the hall) |
 | `usda_5542` | −0.4 % / +0.5 % | – (rooms only) | room n=10 (closets are not in the take-off), **median 2.6 %**, worst 23 % (the hall) |
-| `va_floor` | −1.4 % | – (rooms only) | room n=19 (22 spaces in the key, 3 open alcoves left out), **median 2.0 %**, worst 7 % |
+| `va_floor` | – (known scale) | – (rooms only) | room n=19 (22 spaces in the key, 3 open alcoves left out), **median 2.0 %**, worst 7 % |
 | `va_ceiling` | – (no scale) | 2×4 (0.4) **39/41, 0 ex**; 2×2 (0.4) 8/8, 1 ex; cans (0.5) **14/14, 0 ex** | – (nothing to measure) |
 | `test_fp` | – (known scale) | footing (0.3) **10/10**, 3–5 ex | footing n=10, **median 4.3 %**, worst 8.5 % |
 | `test_fp_2` | – (known scale) | footing (0.4) **19/19**, 1 ex | footing n=19, median 6.2 %, worst 19 % |
