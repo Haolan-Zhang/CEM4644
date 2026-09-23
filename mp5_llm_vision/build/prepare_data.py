@@ -148,7 +148,7 @@ def plans(spec, out: Path):
             spec_rooms.append({"label": r["label"], "type": r["type"], "truth_area": r["area"],
                                "sam_area": round(sh.sqft(res.masks[bi].sum()), 1) if best >= 0.3 else None})
         items.append({"id": pid, "file": sh.path.name, "key": f"{pid}.key.json", "title": sh.title,
-                      "specialist": {"name": "MP4: SAM 3 asked for 'room' (confidence 0.3)", "rooms": spec_rooms}})
+                      "specialist": {"name": "SAM 3 asked for 'room' (confidence 0.3)", "rooms": spec_rooms}})
         credits.append(sh.credit_line())
         found = sum(r["sam_area"] is not None for r in spec_rooms)
         print(f"{spec.key}/plans: {pid} {sh.title}: {len(rooms)} rooms in the key, SAM 3 'room' found {found}/{len(spec_rooms)} indoor rooms")

@@ -6,7 +6,7 @@
    "key": "usda_5544.key.json",
    "title": "Five-room farmhouse, 27 ft x 34 ft (USDA design 710-5544)",
    "specialist": {
-    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "name": "SAM 3 asked for 'room' (confidence 0.3)",
     "rooms": [
      {
       "label": "BEDROOM",
@@ -101,7 +101,7 @@
    "key": "usda_5540.key.json",
    "title": "Four-room and attic farmhouse, 36 ft x 28 ft (USDA design 710-5540)",
    "specialist": {
-    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "name": "SAM 3 asked for 'room' (confidence 0.3)",
     "rooms": [
      {
       "label": "BEDROOM",
@@ -178,7 +178,7 @@
    "key": "usda_5539.key.json",
    "title": "Four-room farmhouse, 38 ft x 28 ft (USDA design 710-5539)",
    "specialist": {
-    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "name": "SAM 3 asked for 'room' (confidence 0.3)",
     "rooms": [
      {
       "label": "KITCHEN",

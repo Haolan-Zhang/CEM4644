@@ -302,6 +302,6 @@ def chat_rooms(lab, plan: str):
         if rows and summ["rooms_found"] == 0:
             print("Nothing matched: if the shapes sit in the wrong place, try the other box order or scale above and score again.")
         sf, st, se = ui._specialist_seg(p)
-        print(f"MP4's specialist (SAM 3 asked for 'room' by phrase): {sf}/{st} rooms found" + (f", median error {se:.0f} %." if se is not None else "."))
+        print(f"SAM 3 asked for 'room' by phrase (previous class): {sf}/{st} rooms found" + (f", median error {se:.0f} %." if se is not None else "."))
         lab.results.setdefault(("chat", "rooms"), {})[p.id] = summ
     paste_step(lab, p.load(), p.path, "plans", prompt, score, "rooms", extra_controls=[order, scale])

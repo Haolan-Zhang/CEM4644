@@ -112,7 +112,7 @@ register(LabSpec(
         count_question="How many workers in this photo are NOT wearing a helmet, and how many workers are there in total?",
         count_field="workers_without_helmet", count_class="no-helmet",
         source="Roboflow 100 'construction-safety' (CC-BY-4.0), the test photos of MP3",
-        specialist="object detection model from previous class (YOLO11n trained on 300 photos)",
+        specialist="object detection model from previous class",
         mp3_key="construction_safety", mp3_model="models/construction_safety_yolo11n.pt",
         mp3_map={"person": "person", "helmet": "helmet", "no-helmet": "no-helmet", "vest": "vest", "no-vest": "no-vest"},
     ),

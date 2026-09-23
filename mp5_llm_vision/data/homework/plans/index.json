@@ -6,7 +6,7 @@
    "key": "8138.key.json",
    "title": "apartment with bold walls and furniture",
    "specialist": {
-    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "name": "SAM 3 asked for 'room' (confidence 0.3)",
     "rooms": [
      {
       "label": "OH",
@@ -53,7 +53,7 @@
    "key": "10715.key.json",
    "title": "apartment (bold walls)",
    "specialist": {
-    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "name": "SAM 3 asked for 'room' (confidence 0.3)",
     "rooms": [
      {
       "label": "OH",
@@ -106,7 +106,7 @@
    "key": "11615.key.json",
    "title": "small flat A3 with printed room areas",
    "specialist": {
-    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "name": "SAM 3 asked for 'room' (confidence 0.3)",
     "rooms": [
      {
       "label": "ET",
@@ -153,7 +153,7 @@
    "key": "5018.key.json",
    "title": "two-storey house: ground floor (left) and upper floor (right)",
    "specialist": {
-    "name": "MP4: SAM 3 asked for 'room' (confidence 0.3)",
+    "name": "SAM 3 asked for 'room' (confidence 0.3)",
     "rooms": [
      {
       "label": "OH",

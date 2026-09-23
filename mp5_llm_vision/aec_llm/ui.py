@@ -266,7 +266,7 @@ def segment(lab, plan: str, mode_name: str, schema: bool):
           + (f"median error {summ['median_err']:.0f} % (worst {summ['max_err']:.0f} %); " if summ["median_err"] is not None else "")
           + f"model total {summ['total_model']:.1f} vs floor area {summ['floor_area']:.1f} {p.unit_label}."
           + (f" {skipped} unusable entries in the reply." if skipped else ""))
-    print(f"MP4's specialist (SAM 3 asked for 'room'): {sf}/{st} rooms found" + (f", median error {se:.0f} %." if se is not None else "."))
+    print(f"SAM 3 asked for 'room' (previous class): {sf}/{st} rooms found" + (f", median error {se:.0f} %." if se is not None else "."))
     print(_cost_line(r))
     lab.results[("segment", p.id, mode)] = summ
 
@@ -295,7 +295,7 @@ def segment_all(lab, schema: bool = True):
                       + (f", median {summ['median_err']:.0f} %" if summ["median_err"] is not None else ""))
     viz.show(viz.image_grid(ims, titles, ncols=min(3, len(ims)), size=4.4,
                             suptitle=f"The model's own room polygons on all {len(ims)} plans" + (" (schema enforced)" if schema else " (JSON only asked for)")))
-    print(viz.table(rows, ["plan", "rooms found", "rooms in the reply", "median error", "worst", f"model / drawing {ex.plans[0].unit_label}", "MP4 SAM 3 'room'", "note"],
+    print(viz.table(rows, ["plan", "rooms found", "rooms in the reply", "median error", "worst", f"model / drawing {ex.plans[0].unit_label}", "SAM 3 'room'", "note"],
                     [7, 12, 22, 13, 7, 19, 17, 46]))
     if all_err:
         print(f"\nOver all {len(all_err)} matched rooms of {len(ims)} plans: median error {np.median(all_err):.0f} %, "
@@ -329,9 +329,9 @@ def segment_compare(lab, plan: str):
                 e = (val - room["area"]) / room["area"] * 100; errs[key].append(abs(e)); cells.append(f"{val:.1f} ({e:+.0f} %)")
         table_rows.append(cells)
     print(f"Plan {p.id}: {p.title}\n")
-    print(viz.table(table_rows, ["room", f"drawing {p.unit_label}", "LLM polygons", "LLM boxes + SAM 3", "MP4: SAM 3 'room'"], [12, 10, 18, 18, 18]))
+    print(viz.table(table_rows, ["room", f"drawing {p.unit_label}", "LLM polygons", "LLM boxes + SAM 3", "SAM 3 'room'"], [12, 10, 18, 18, 18]))
     med = lambda k: f"median error {np.median(errs[k]):.0f} % on {len(errs[k])} rooms" if errs[k] else "no room matched"
-    print(f"\nLLM polygons: {med('llm')}.   LLM boxes + SAM 3: {med('sam')}.   MP4's SAM 3 by phrase: {med('spec')}.")
+    print(f"\nLLM polygons: {med('llm')}.   LLM boxes + SAM 3: {med('sam')}.   SAM 3 by phrase: {med('spec')}.")
     viz.show(viz.image_grid([_seg_image(p, rows_llm, "llm"), _seg_image(p, rows_sam, "llm+sam")], ["LLM polygons", "LLM boxes + SAM 3"], ncols=2, size=5.2))
 
 
@@ -355,8 +355,8 @@ def summary(lab, chat: bool = False):
             ("detection (API, batch)", f"recall / precision, {det['truth']} boxes", f"{det['recall']:.0f} % / {det['precision']:.0f} %", f"{sp_det['recall']:.0f} % / {sp_det['precision']:.0f} %", f"{det['seconds']:.0f} s, {det['tokens']} tokens"),
             ("rooms (chat, polygons)", "median area error per plan", rooms_cell, m(seg_spec) + " (SAM 3 'room')", "your time in the chat window"),
         ]
-        print(viz.table(rows, ["task", "measure", "generalist", "specialist from MP2/MP3/MP4", "cost"], [28, 30, 44, 28, 32]))
-        print("\nSpecialists: " + ex.photo_specialist + "; " + ex.site_specialist + "; MP4's SAM 3 asked for 'room'.")
+        print(viz.table(rows, ["task", "measure", "generalist", "specialist model from the previous classes", "cost"], [28, 30, 44, 28, 32]))
+        print("\nSpecialists: " + ex.photo_specialist + "; " + ex.site_specialist + "; SAM 3 asked for 'room'.")
         return
     seg_llm, seg_sam, seg_spec, secs, toks = [], [], [], 0.0, 0
     for p in ex.plans:
@@ -376,8 +376,8 @@ def summary(lab, chat: bool = False):
         ("rooms: LLM polygons", "median area error per plan", m(seg_llm), m(seg_spec) + " (SAM 3 'room')", f"{secs:.0f} s, {toks} tokens (both modes)"),
         ("rooms: LLM boxes + SAM 3", "median area error per plan", m(seg_sam), "", ""),
     ]
-    print(viz.table(rows, ["task", "measure", "Gemini (one prompt each)", "specialist from MP2/MP3/MP4", "Gemini time and tokens"], [24, 30, 24, 28, 30]))
-    print("\nSpecialists: " + ex.photo_specialist + "; " + ex.site_specialist + "; MP4's SAM 3 asked for 'room'.")
+    print(viz.table(rows, ["task", "measure", "Gemini (one prompt each)", "specialist model from the previous classes", "Gemini time and tokens"], [24, 30, 24, 28, 30]))
+    print("\nSpecialists: " + ex.photo_specialist + "; " + ex.site_specialist + "; SAM 3 asked for 'room'.")
 
 
 def report_summary(lab):

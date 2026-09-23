@@ -6,7 +6,7 @@
   "vest",
   "no-vest"
  ],
- "specialist_name": "object detection model from previous class (YOLO11n trained on 300 photos)",
+ "specialist_name": "object detection model from previous class",
  "items": [
   {
    "file": "site_1.jpg",
