@@ -58,6 +58,7 @@ class SheetSet:
     default_sheet: str = ""              # "" = the first one in credits.json
     takeoff_counts: bool = True          # False: the take-off cells measure only; counting from one example has its own step
     guided: bool = True                  # False: the cells and widgets do not repeat each sheet's tasks (the notebook text says it once)
+    scale_check: bool = True             # False: the student's scale box is used but the SCALE CHECK lines are not printed
     things: List[Thing] = field(default_factory=lambda: list(THINGS))
 
     def thing(self, name_or_key: str) -> Thing:
@@ -96,6 +97,7 @@ register(SheetSet(
 
 register(SheetSet(
     key="homework",
+    scale_check=False,                   # the scale box is drawn and used; only its printout is left out
     guided=False,                        # the Part texts explain each sheet once; cells, widgets and Step 0 stay clean
     title="Seven sheets from three disciplines",
     folder="data/sheets/homework",

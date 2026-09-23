@@ -739,12 +739,12 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
     return over, rep
 
 
-def print_takeoff(sheet, rep, guided: bool = True):
+def print_takeoff(sheet, rep, guided: bool = True, scale_check: bool = True):
     """The report of `takeoff_compute` in plain words. `guided` adds the answer key's notes on the scale references
     (the homework's wrong scale bar is explained there); the workshop prints the numbers only."""
     sc = rep["scale"]
     drawn = [r for r in sc["refs"] if r["drawn"]]
-    if not sc["refs"]:                       # a counting-only sheet: nothing is measured, so no scale is set
+    if not sc["refs"] or not scale_check:    # nothing to set, or a set that keeps the scale lines out of the printout
         print_counts(rep, tips=guided); print_areas(sheet, rep); return
     print("SCALE CHECK")
     for r in drawn:
@@ -937,7 +937,7 @@ def takeoff(lab, sheet_id: str):
         with out:
             out.clear_output(wait=True)
             viz.show_image(over, 1100)
-            print_takeoff(sheet, rep, guided=guided)
+            print_takeoff(sheet, rep, guided=guided, scale_check=getattr(lab.spec, "scale_check", True))
         lab.takeoffs[sheet.id] = rep
         msg.value = "" if not guided else ("Done. Adjust the boxes and submit again; a tight box gives a cleaner mask. "
                      "Copy the numbers into your report, then go to the next drawing.")
