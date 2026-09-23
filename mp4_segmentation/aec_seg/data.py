@@ -189,7 +189,6 @@ class Sheet:
         for c, boxes in self.counts.items():
             if c not in self.area_categories:                # a footing is listed once, under its areas
                 bits.append(plural(len(boxes), c))
-        bits.append(f"1 ft = {self.px_per_ft:.1f} px")
         return "; ".join(bits)
 
     def task_text(self) -> str:

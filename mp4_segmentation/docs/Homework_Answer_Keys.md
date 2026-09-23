@@ -10,7 +10,7 @@ chose these sheets live in `_candidates/sam3_eval/` (not in the repository); the
 | sheet | discipline | areas (measured) | counts from one example (found / on the sheet, extras) | phrases that work |
 |---|---|---|---|---|
 | usda_5542 | floor plan | room n=10, median 6.5 %, worst 29 % | - | *room*: 10/14 found, 0 extra; *bedroom*: 6/14 found, 0 extra; *curved line*: 1/14 found, 30 extra |
-| va_floor | floor plan + plumbing | room n=19, median 3.4 %, worst 6 % | - | *room*: 13/22 found, 0 extra |
+| va_floor | floor plan | room n=19, median 3.4 %, worst 6 % | - | *room*: 13/22 found, 0 extra |
 | va_ceiling | electrical | - | 2x4 light fixture 40/41 (+0); 2x2 light fixture 7/8 (+0); recessed light 14/14 (+0) | *rectangle*: 7/41 found, 24 extra |
 | test_fp | structural | footing n=10, median 3.2 %, worst 8 % | footing 10/10 (+3) | *square*: 10/10 found, 5 extra; *rectangle*: 10/10 found, 9 extra |
 | test_fp_2 | structural | footing n=19, median 2.4 %, worst 23 %; elevator shaft n=1, median 4.7 %, worst 5 % | footing 19/19 (+1) | *square*: 19/19 found, 23 extra; *rectangle*: 19/19 found, 6 extra |
@@ -91,9 +91,9 @@ Scale used: 27.53 px/ft.
 | window | 0 | room | 0/14 found, 0 extra |
 | curved line | 31 | room | 1/14 found, 30 extra; areas median 96 %, worst 96 % |
 
-## va_floor - VA outpatient clinic, lease module: floor plan (rooms and plumbing fixtures)
+## va_floor - VA outpatient clinic, lease module: floor plan (rooms)
 
-*floor plan + plumbing.* Outpatient / PACT Clinic, lease module (CBOC-L.pdf), VA Technical Information Library room templates. US Department of Veterans Affairs, Office of Construction & Facilities Management (2018), Public domain (work of the US federal government). https://www.cfm.va.gov/til/rTemplate/documents/CBOC-L.pdf
+*floor plan.* Outpatient / PACT Clinic, lease module (CBOC-L.pdf), VA Technical Information Library room templates. US Department of Veterans Affairs, Office of Construction & Facilities Management (2018), Public domain (work of the US federal government). https://www.cfm.va.gov/til/rTemplate/documents/CBOC-L.pdf
 
 **The answer key drawn on the sheet** (areas filled with their true sq ft, scale references in blue, every counted symbol in purple):
 
