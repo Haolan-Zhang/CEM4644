@@ -40,9 +40,6 @@ class LLMLab:
             self._load_sam()
         self.ready = True
         print(f"✅ Ready in {time.time() - t0:.0f} s.")
-        if not self.client.live:
-            print("No Gemini key found: the precomputed answers work, your own prompts and images will not run "
-                  "(add the Colab secret GEMINI_API_KEY and run this cell again).")
 
     def _ensure_packages(self, load_sam: bool) -> bool:
         need, restart = [], False
