@@ -39,28 +39,31 @@ def show_table(lab, rows: int = 10):
 
 
 def guess_game(lab):
-    """Five rows without their answer: the student types a guess for each, the notebook scores it."""
+    """Five rows without their answer: the student picks a grade for each, the notebook scores it."""
     import ipywidgets as w
     spec, df = lab.table_spec, lab.df
     _, Xte, _, yte = models.split(df, spec)
     rng = np.random.default_rng(7)
     idx = rng.choice(len(Xte), size=spec.guess_n, replace=False)
     rows = Xte.iloc[idx]; truth = yte.iloc[idx]
+    grades = [g[0] for g in spec.grades]
     view = rows.copy(); view.columns = [spec.label(c) for c in view.columns]; view.index = [f"{spec.row_word} {i + 1}" for i in range(len(view))]
     table(view)
-    boxes = [w.FloatText(value=0.0, description=f"{spec.row_word} {i + 1}", layout=w.Layout(width="200px")) for i in range(len(rows))]
+    picks = [w.Dropdown(options=grades, value=grades[len(grades) // 2], description=f"{spec.row_word} {i + 1}", layout=w.Layout(width="330px")) for i in range(len(rows))]
     btn = w.Button(description="Check my guesses", button_style="primary"); out = w.Output()
 
     def go(_):
-        g = np.array([b.value for b in boxes]); t = truth.values
-        lab.guesses = {"rows": rows.index.tolist(), "guess": g.tolist(), "truth": t.tolist(), "mae": float(np.mean(np.abs(g - t)))}
+        g = [b.value for b in picks]; tg = [spec.grade_of(v) for v in truth.values]
+        right = sum(a == b for a, b in zip(g, tg))
+        lab.guesses = {"rows": rows.index.tolist(), "guess": g, "truth_grade": tg, "truth": truth.values.tolist(), "right": right}
         with out:
             out.clear_output(wait=True)
-            res = pd.DataFrame({"your guess": g, "measured": t, "off by": np.round(g - t, 1)}, index=view.index)
+            res = pd.DataFrame({"your grade": g, "really": tg, f"measured ({spec.unit})": np.round(truth.values, 1), "": ["✓" if a == b else "✗" for a, b in zip(g, tg)]}, index=view.index)
             table(res)
-            print(f"Your average miss: {lab.guesses['mae']:.1f} {spec.unit}. The model's miss on the same {spec.rows} appears in Step 2a.")
+            print(f"You put {right} of {len(g)} {spec.rows} in the right grade. Step 2a shows what the model does with the same {spec.rows}.")
     btn.on_click(go)
-    display(w.VBox([w.HTML(f"Type your guess of the {spec.label(spec.target)} for each {spec.row_word} ({spec.unit}), then click the button."), *boxes, btn, out]))
+    display(w.VBox([w.HTML(f"Which grade of {spec.target_label} does each {spec.row_word} reach? Pick one per {spec.row_word}, then click the button. "
+                           f"The grades: {', '.join(grades)}."), *picks, btn, out]))
 
 
 # ----------------------------------------------------------------------------- Part 2: regression and classification
@@ -79,7 +82,9 @@ def regression_view(lab, kind: str):
     if lab.guesses:
         p = model.predict(df.loc[lab.guesses["rows"], spec.features])
         m = float(np.mean(np.abs(p - np.array(lab.guesses["truth"]))))
-        print(f"  On the {len(p)} {spec.rows} you guessed in Step 1b: the model misses by {m:.1f} {spec.unit} on average, you by {lab.guesses['mae']:.1f}.")
+        right = sum(spec.grade_of(v) == g for v, g in zip(p, lab.guesses["truth_grade"]))
+        print(f"  On the {len(p)} {spec.rows} you graded in Step 1b: the model's numbers are off by {m:.1f} {spec.unit} on average, "
+              f"and turned into grades they put {right} of {len(p)} right (you: {lab.guesses['right']}).")
     w_ = r.worst.copy(); w_.columns = [spec.label(c) if c in spec.features else c for c in w_.columns]
     print(f"\nThe {len(r.worst)} worst misses:"); table(w_.reset_index(drop=True))
 
@@ -94,6 +99,10 @@ def classification_view(lab, kind: str, task: str, threshold: float):
         print(f"{kind}, {len(spec.grades)} grades of {spec.label(spec.target)}: {r.accuracy * 100:.0f} % of the {len(Xte)} unseen {spec.rows} put in the right grade.")
         table(r.matrix)
         print("Rows are the truth, columns what the model said; the diagonal is right, everything else is a mistake.")
+        if lab.guesses:
+            p = model.predict(df.loc[lab.guesses["rows"], spec.features])
+            right = sum(a == b for a, b in zip(p, lab.guesses["truth_grade"]))
+            print(f"  On the {len(p)} {spec.rows} you graded in Step 1b: the model puts {right} of {len(p)} in the right grade, you put {lab.guesses['right']}.")
     else:
         model = models.fit_classifier(kind, Xtr, ytr.values >= threshold)
         r = models.passfail_result(model, kind, Xte, yte, spec, threshold)
@@ -265,6 +274,6 @@ def report_summary(lab):
         elif kind == "buildings_game":
             print(f"  which building is which: {v} of 4")
     if lab.guesses:
-        print(f"  your own guesses in Step 1b: average miss {lab.guesses['mae']:.1f} {spec.unit}")
+        print(f"  your own grades in Step 1b: {lab.guesses['right']} of {len(lab.guesses['guess'])} right")
     if not lab.results:
         print("  Nothing run yet: go back to the steps above.")

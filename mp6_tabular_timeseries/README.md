@@ -13,10 +13,10 @@ really happened. Students need **no programming**: every cell is a Colab form an
 
 ## What the students do
 
-1. **A table**: look at it, guess five answers yourself (workshop).
-2. **Two questions, one table**: regression (a straight line vs gradient-boosted trees, scored on rows the model never
-   saw) and classification (strength grades, or pass / fail against a specification the student sets; false passes
-   counted separately).
+1. **A table**: look at it, then put five mixes in their strength grade yourself (workshop).
+2. **Two questions, one table**: classification first (strength grades, the game they just played, or pass / fail
+   against a specification the student sets; false passes counted separately), then regression (a straight line vs
+   gradient-boosted trees, scored on rows the model never saw).
 3. **What the model learned**: which columns matter, and what-if sliders on a mix of their choosing.
 4. **A time series**: four buildings unlabelled, a week and a year each: which is the office, the school, the residence
    hall, the assembly hall? Then the anatomy of one building's year.

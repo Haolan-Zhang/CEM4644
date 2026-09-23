@@ -6,7 +6,7 @@
 |---|---|---|
 | Table | 1,030 real concrete mixes → compressive strength (MPa) | 768 simulated building shapes → heating load (kWh/m²) |
 | Series | `Hog_office_Marlena` (office), `Bear_education_Lila` (school), `Bear_lodging_Evan` (residence hall), `Bear_assembly_Jose` (assembly hall) | `Hog_office_Gustavo`, `Moose_education_Leland`, `Robin_lodging_Janie`, `Rat_assembly_Rolland` (a swimming pool) |
-| Guess game | yes (Step 1b) | no |
+| Guess game | yes (Step 1b: pick the strength grade of five mixes; classification comes first in Part 2 because a class is easier to guess and to judge than a number) | no |
 | Report questions | 6 | 6 (own data is the main deliverable) |
 | Time | about 90 min | about 90 min |
 

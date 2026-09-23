@@ -8,7 +8,7 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-From Step 2a: the average miss of the straight line and of the trees, in MPa, and what the worst misses have in common. From Step 2b: how many mixes land in the right grade, and at your pass / fail threshold how many false passes and false fails there are. What is the difference between predicting 33 MPa and predicting 'pass', and which of the two mistakes costs more on a real project?
+From Step 2a: how many mixes the model puts in the right grade against your own score in Step 1b, and at your pass / fail threshold how many false passes and false fails there are. From Step 2b: the average miss of the straight line and of the trees, in MPa, and what the worst misses have in common. What is the difference between predicting 'pass' and predicting 33 MPa, and which of the two mistakes costs more on a real project?
 
 *Your answer:*
 

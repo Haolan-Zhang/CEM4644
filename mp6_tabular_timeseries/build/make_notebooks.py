@@ -121,24 +121,25 @@ lab.setup(dataset="{variant}", load_forecaster=load_forecaster)""",
     cells.append(form("▶ Step 1a · Look at the table", "lab.show_table(rows)", params=['rows = 10 #@param [5, 10, 20] {type:"raw"}']))
     if v["guess"]:
         cells.append(form("▶ Step 1b · Guess it yourself", "lab.guess()",
-                          notes=[f"Five {t.rows} without their answer. Type your guess for each and click the button; Step 2a shows what the model makes of the same {t.rows}."]))
+                          notes=[f"Five {t.rows} without their answer: which grade of {t.target_label} does each one reach? Pick, click the button, and see. "
+                                 f"Step 2a shows what the model makes of the same {t.rows}."]))
 
     # ------------------------------------------------------------------ Part 2
     cells.append(md(f"""
 ## Part 2 · Two questions, one table
 
-The same table can answer **how much?** (a number: *regression*) or **which class?** (a category: *classification*). Both models train on 80 % of the rows and are scored on the 20 % they never saw.
+The same table can answer **which class?** (a category: *classification*, the question you just answered yourself) or **how much?** (a number: *regression*). Both models train on 80 % of the rows and are scored on the 20 % they never saw.
 """))
-    cells.append(form("▶ Step 2a · Regression: predict the number", "lab.regression(model)",
-                      params=[choice("model", list(KINDS)[1], list(KINDS))]))
-    cells.append(form("▶ Step 2b · Classification: predict the class", "lab.classification(model, task, threshold)",
-                      notes=[f"*grades* puts each {t.row_word} in one of {len(t.grades)} bands of {t.target_label}; *pass / fail* asks whether it reaches the *threshold* you set."],
+    cells.append(form("▶ Step 2a · Classification: predict the class", "lab.classification(model, task, threshold)",
+                      notes=[f"*grades* puts each {t.row_word} in one of {len(t.grades)} bands of {t.target_label}, the game of Step 1b; *pass / fail* asks whether it reaches the *threshold* you set."],
                       params=[choice("model", list(KINDS)[1], list(KINDS)), choice("task", "grades", ["grades", "pass / fail against a specification"]),
                               f'threshold = {t.spec_default:g} #@param {{type:"slider", min:{t.spec_range[0]:g}, max:{t.spec_range[1]:g}, step:{t.spec_range[2]:g}}}']))
+    cells.append(form("▶ Step 2b · Regression: predict the number", "lab.regression(model)",
+                      params=[choice("model", list(KINDS)[1], list(KINDS))]))
     n = 1
-    cells.append(q(n, (f"From Step 2a: the average miss of the straight line and of the trees, in {t.unit}, and what the worst misses have in common. "
-                       f"From Step 2b: how many {t.rows} land in the right grade, and at your pass / fail threshold how many false passes and false fails there are. "
-                       f"What is the difference between predicting 33 {t.unit} and predicting 'pass', and which of the two mistakes costs more on a real project?")
+    cells.append(q(n, (f"From Step 2a: how many {t.rows} the model puts in the right grade against your own score in Step 1b, and at your pass / fail threshold how many false passes and false fails there are. "
+                       f"From Step 2b: the average miss of the straight line and of the trees, in {t.unit}, and what the worst misses have in common. "
+                       f"What is the difference between predicting 'pass' and predicting 33 {t.unit}, and which of the two mistakes costs more on a real project?")
                    if variant == "workshop" else
                    (f"From Step 2a and 2b: the average miss and the share of {t.rows} in the right band. These numbers are far better than the concrete table's in the workshop. "
                     "What is different about this table (read the description in Part 1), and why does that make it easier for a model? Would you trust a model trained on it for a real building?")))
