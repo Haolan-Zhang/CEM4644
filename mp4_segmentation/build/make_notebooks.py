@@ -110,7 +110,7 @@ def step0(set_key):
     return form(
         "Step 0 - Run me first (2-3 minutes)",
         STEP0.format(url=GITHUB_URL, set=set_key),
-        notes=["Click the play button and wait for the 'Ready' line. This downloads the drawings with their answer keys "
+        notes=["Click the play button and wait for the 'Ready' line. This downloads the drawings and what is really on them "
                "and loads SAM 3 (about 3 GB).",
                "Untick *load_model* only if you have no GPU and want to skip the steps that need the live model."],
         params=['load_model = True #@param {type:"boolean"}'],
@@ -164,7 +164,7 @@ def build_workshop():
     things = spec.names
     q = Questions()
     cells = [header("workshop", 90, """1. Meet SAM 3 on an ordinary site photo: ask by name, draw a box, tap an object. Then look at the three drawings.
-2. Ask for rooms, doors and windows **by name** on a drawing, and check the rooms against the drawing's own answer key.
+2. Ask for rooms, doors and windows **by name** on a drawing, and check the rooms against what is really on the drawing.
 3. Do the **take-off**: set the scale from a printed dimension, then measure every room in square feet - one cell per drawing.
    Then box **one** door and let SAM 3 find all the others.
 4. Look at where the model goes wrong: the words, the weak regions, and words of your own.
@@ -211,26 +211,25 @@ quarter-circle arcs that are door swings.
 """))
     cells.append(form("Step 1c - Browse the drawings", "lab.show_sheets(drawing)",
                       notes=["*all drawings* shows all three with what is on them and what you will take off from each. "
-                             "These facts come from the answer key the notebook checks your measurements against."],
+                             "These facts are what is really on each drawing, which the notebook checks your measurements against."],
                       params=[param_choice("drawing", "all drawings", ["all drawings"] + labels)]))
 
     cells.append(md("""
 ## Part 2 - Ask for something by name
 
 Pick a drawing and a thing. You get three panels: the drawing, the **mask** (white = the model says *this is it*), and
-the **overlay**. Below them: how many regions, how many pixels, how many square feet, and what the **drawing's own
-answer key** says. The **confidence slider** hides the regions the model is unsure about: watch the count change.
+the **overlay**. Below them: how many regions, and how they compare with **what is really on the drawing**. The **confidence slider** hides the regions the model is unsure about: watch the count change.
 """))
     cells.append(form("Step 2a - Original, mask, overlay", "lab.segment(drawing, thing, confidence)",
                       notes=["Try *room (any)* first, then *bedroom*, then *kitchen*, *porch*, *door*, *window*. Some words work, "
                              "some find nothing at all: that is the lesson of this part."],
                       params=[param_choice("drawing", d0, labels), param_choice("thing", "room (any)", things), CONF]))
     cells.append(form("Step 2b - Hits, misses and extras", "lab.count(drawing, thing, confidence)",
-                      notes=["The answer key drawn on the drawing: green = a real one the model found, red = a real one it missed, "
+                      notes=["The real ones marked on the drawing: green = a real one the model found, red outline = a real one it missed, "
                              "blue = a region that is not one at all."],
                       params=[param_choice("drawing", d0, labels), param_choice("thing", "room (any)", things), CONF]))
     cells.append(q.add("From Steps 2a and 2b: which words found what they should (rooms? bedrooms? kitchens? doors? windows?), and "
-                       "which found nothing or something else? These drawings' answer keys measure rooms, so the hit / miss / extra "
+                       "which found nothing or something else? These drawings have their rooms measured, so the found / missed / extra "
                        "overlay of Step 2b works on the room words: give the found / missed / extra numbers for two room words on one "
                        "drawing at confidence 0.3. Then say what the words that found nothing have in common."))
 
@@ -243,15 +242,15 @@ the label above the picture before you draw, and draw in this order:
 1. **the scale**: one box exactly along the printed overall dimension, from arrowhead to arrowhead. Only the length along
    that dimension is used. *A 1 % error in the scale is a 2 % error in every area, because area is scale squared.*
 2. **the second dimension** down the side of the plan, as a check. The two readings never agree exactly, and the report
-   tells you by how much they differ and which one the answer key trusts.
+   tells you by how much they differ and which one is used.
 3. **every room**: a tight box each, the edges on the **inside faces** of the walls - rooms, porches and halls.
 
 Then press *Submit*.
 
 The take-off cells measure rooms and nothing else. Counting is a separate job, and it is a job for the model, not for
-your pencil: boxing every door yourself and ticking the boxes off against an answer key would tell you nothing about
+your pencil: boxing every door yourself and ticking the boxes off against the real doors would tell you nothing about
 SAM 3. So Step 3d does it the model's way - you draw **one** box around one door and SAM 3 finds all the others -
-and the answer key tells you how many it got. On the homework's structural and MEP sheets the same one box counts
+and the notebook tells you how many of the real doors it got. On the homework's structural and MEP sheets the same one box counts
 footings and light fixtures.
 
 How a *room* box becomes square feet: a box on its own makes SAM 3 cut out the *furniture symbols* inside it rather than
@@ -263,7 +262,7 @@ swings take out of a rectangular room, and converts the pixels with **your** sca
         letter = "abc"[i] if i < 3 else str(i)
         cells.append(form(f"Step 3{letter} - Take-off: {s.id}, {s.title}", f'lab.takeoff({json.dumps(s.label)})'))
     cells.append(q.add("From Step 3 on all three drawings: your two scale readings on each drawing, how far each one is from the "
-                       "answer key and how far they are from each other; and the room table (your square feet, the drawing's, the "
+                       "drawing's known scale and how far they are from each other; and the room table (your square feet, the drawing's, the "
                        "error) for the drawing you did best on. What is the total of your rooms against the drawing's indoor total?"))
     cells.append(q.add("Which rooms came out worst, and why? Look at the pictures and name the reason for at least three of them "
                        "(a loose box, a kitchen counter or a bathtub eaten out of the mask, a hall that is really a set of "
@@ -274,7 +273,7 @@ swings take out of a rectangular room, and converts the pixels with **your** sca
 
 In Step 2 the word *door* found nothing. Now give the model an **example** instead of a word: one box around one door,
 the opening and its swing arc together. SAM 3 looks at what is inside your box and returns everything on the sheet that
-looks like it - the fourth way of asking from Part 1. The answer key marks what it found and what it missed, so the
+looks like it - the fourth way of asking from Part 1. The picture marks what it found and what it missed, so the
 count is checked, not taken on trust. Which door you pick matters: a clean single door in a quiet spot is a good
 example; a double door or a closet door in a cluttered corner is a poor one, and the count drops.
 """))
@@ -335,9 +334,7 @@ what it *means*.
 # --------------------------------------------------------------------------- the homework notebook
 GROUP_TEXT = {
     "floor": ("Floor plans",
-              "On a floor plan you take off **areas of rooms**. Set the scale from a printed dimension, never from a scale "
-              "bar: one of these two sheets carries a graphic scale bar that is wrong by a factor of two, and boxing it as "
-              "well as the printed dimension is how you find that out. Then box every room the task asks for. The number "
+              "On a floor plan you take off **areas of rooms**. Set the scale from the printed dimension, then box every room. The number "
               "you get is the *net* floor area: what the drawing puts on the floor (a counter, a bathtub) is cut out of "
               "the mask unless the room is a plain rectangle."),
     "structural": ("Structural (foundation) plans",
@@ -375,12 +372,12 @@ def build_homework():
 
 You already met SAM 3 in the workshop, so this notebook goes straight to the work. What stays the same on every sheet:
 
-- **you** set the scale, from a dimension the sheet prints or from something whose size the sheet tells you. Never from a
-  scale bar you have not checked.
+- **you** set the scale where something is measured, from a dimension the sheet prints or from something whose size the
+  sheet tells you. A sheet where things are only counted needs no scale.
 - **you** draw the boxes. The model turns a box into an outline; it does not know what a footing or a diffuser is.
 - **counts come from the model, never from a tally of your own boxes**: where a sheet asks for a count you box ONE
   example of the symbol, labelled *example: ...*, and SAM 3 finds all the others like it.
-- everything you measure and everything you count is checked against an answer key, so you always see how far off you are.
+- everything you measure and everything you count is checked against what is really on the drawing, so you always see how far off you are.
 """))
     cells.append(form("Step 1a - Browse the seven drawings", "lab.show_sheets(drawing)",
                       notes=["*all drawings* shows all seven; pick one to see it large."],
@@ -395,7 +392,7 @@ You already met SAM 3 in the workshop, so this notebook goes straight to the wor
 ## Two ways of asking, on every discipline
 
 Each of the next three parts has two cells. The first is the **take-off**: pick the drawing, then pick the label above
-the picture before each box you draw (the labels come from that sheet's answer key), then *Submit*. Three kinds of
+the picture before each box you draw (the labels are the things that sheet asks for), then *Submit*. Three kinds of
 label: **scale: ...** for a length whose size the sheet gives you, the plain word (**room**, **footing**, **pit**) for
 something you want the area of, and **example: ...** for something you want counted. One box labelled *example: pile
 footing* is all a count needs: SAM 3 goes and finds every other symbol on the sheet that looks like it, and that is how
@@ -404,7 +401,7 @@ no separate example label: your **first** *footing* box is the example. The slid
 before it keeps one of them.
 
 The second cell is the other way of asking: **type a phrase** and SAM 3 looks for it on the whole sheet, with no box
-from you at all. The regions are scored against the answer key: green for a real one found, red for one missed, blue
+from you at all. The regions are compared with what is really on the drawing: green for a real one found, red outline for one missed, blue
 for a region that is not one; for rooms and footings the notebook also measures every region the phrase found. Try the trade word first (*footing*, *light fixture*), then a word for the **shape on the paper**
 (*square*, *circle*, *rectangle with a diagonal line*), and move the confidence. Both cells feed the same report
 question: which way gets you a number you would put in an estimate, and which way is quicker?
@@ -456,9 +453,7 @@ question: which way gets you a number you would put in an estimate, and which wa
 
 
 QUESTION_BY_GROUP = {
-    "floor": ("From Step 2a: your scale reading on each sheet and how far it is from the answer key. On the VA clinic sheet you "
-              "were asked to box the graphic scale bar as well as the printed dimension - what did the two give, and which one "
-              "is right? (Work out what the areas would have been if you had trusted the bar.) Then the room table of one sheet: "
+    "floor": ("From Step 2a: your scale reading and how far it is from the drawing's known scale. Then the room table: "
               "your square feet, the drawing's, the error. Which rooms are worst and why? Then from Step 2b: what did *room* find on each sheet (found / missed / extra, and the median error of the areas "
               "it measured) against the rooms from your boxes? What did *door* and *window* return, and what did *curved line*?"),
     "structural": ("From Step 3a: for each sheet, the scale and how you set it, the areas of the footings you measured against "

@@ -240,10 +240,10 @@ def check_key(key: dict, folder: Path) -> List[str]:
             and key["scale"]["px_per_ft"] > 0):
         bad.append("scale.px_per_ft is missing or not a positive number")
     refs = key.get("scale_refs") or []
-    if not refs:
-        bad.append("scale_refs is empty: the student has nothing to box for the scale")
+    if not refs and key.get("areas"):
+        bad.append("scale_refs is empty but the sheet has areas to measure: the student has nothing to box for the scale")
     used = [r for r in refs if r.get("use")]
-    if len(used) != 1:
+    if refs and len(used) != 1:
         bad.append(f"{len(used)} scale_refs have use=true, exactly one must")
     for i, r in enumerate(refs):
         for f in ("label", "feet", "box", "axis"):

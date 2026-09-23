@@ -74,6 +74,27 @@ def multi_overlay(image: Image.Image, layers: Sequence[Tuple[str, np.ndarray, st
     return Image.fromarray(np.clip(im, 0, 255).astype(np.uint8))
 
 
+def judged_image(image: Image.Image, masks, judged: Sequence[bool], missed_boxes, alpha: float = 0.45,
+                 good: str = "#2a9d8f", bad: str = "#457b9d", missed: str = "#e76f51", example=None) -> Image.Image:
+    """Every region's mask in ONE of three colours: green when it is a real one, blue when it is not, and a red
+    outline around every real one the model missed. No numbers, no palette: the colour is the verdict."""
+    im = np.asarray(image.convert("RGB")).astype(np.float32)
+    for m, ok in zip(masks, judged):
+        m = np.asarray(m).astype(bool)
+        if not m.any():
+            continue
+        rgb = np.array(hex_rgb(good if ok else bad), dtype=np.float32)
+        im[m] = im[m] * (1 - alpha) + rgb * alpha
+    out = Image.fromarray(np.clip(im, 0, 255).astype(np.uint8))
+    d = ImageDraw.Draw(out)
+    w = max(3, out.width // 500)
+    for b in missed_boxes:
+        d.rectangle([float(v) for v in b], outline=missed, width=w)
+    if example is not None:
+        d.rectangle([float(v) for v in example], outline="#7b2cbf", width=w + 2)
+    return out
+
+
 def mask_image(mask: np.ndarray, color: str = "#ffffff") -> Image.Image:
     h, w = mask.shape
     out = np.zeros((h, w, 3), dtype=np.uint8)

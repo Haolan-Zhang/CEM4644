@@ -89,8 +89,8 @@ register(SheetSet(
     description=("Three small farmhouse floor plans published by the U.S. Department of Agriculture in 1940 (public domain). "
                  "Black walls, drawn windows and door swings, a printed size inside most rooms and overall dimension lines "
                  "along two sides. There is no scale bar on any of them: you set the scale yourself from a printed dimension. "
-                 "Each drawing comes with an answer key - every room's drawn area, measured off the drawing - that the "
-                 "notebook checks your measurements against."),
+                 "Every room\'s real area was measured off each drawing, so the notebook can check "
+                 "your measurements."),
     default_sheet="usda_5544",
 ))
 
@@ -99,9 +99,9 @@ register(SheetSet(
     guided=False,                        # the Part texts explain each sheet once; cells, widgets and Step 0 stay clean
     title="Seven sheets from three disciplines",
     folder="data/sheets/homework",
-    description=("Seven real drawings: two floor plans (a 1940 farmhouse and a modern VA clinic), four structural foundation "
-                 "plans and one reflected ceiling plan. Each one carries a different take-off task - areas of rooms, areas of "
-                 "footings, counts of repeated symbols - and each one has an answer key."),
+    description=("Five real drawings: a floor plan (a modern VA clinic), three structural foundation plans and one reflected "
+                 "ceiling plan. Each one carries a different take-off task - areas of rooms, areas of footings, counts of "
+                 "repeated symbols - and each one comes with what is really on it, so every number you get is checked."),
 ))
 
 # How the homework groups its sheets into the three take-off steps (2a floor plans, 2b structural, 2c MEP).

@@ -8,7 +8,7 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-From Steps 2a and 2b: which words found what they should (rooms? bedrooms? kitchens? doors? windows?), and which found nothing or something else? These drawings' answer keys measure rooms, so the hit / miss / extra overlay of Step 2b works on the room words: give the found / missed / extra numbers for two room words on one drawing at confidence 0.3. Then say what the words that found nothing have in common.
+From Steps 2a and 2b: which words found what they should (rooms? bedrooms? kitchens? doors? windows?), and which found nothing or something else? These drawings have their rooms measured, so the found / missed / extra overlay of Step 2b works on the room words: give the found / missed / extra numbers for two room words on one drawing at confidence 0.3. Then say what the words that found nothing have in common.
 
 *Your answer:*
 
@@ -16,7 +16,7 @@ From Steps 2a and 2b: which words found what they should (rooms? bedrooms? kitch
 
 ## Question 2
 
-From Step 3 on all three drawings: your two scale readings on each drawing, how far each one is from the answer key and how far they are from each other; and the room table (your square feet, the drawing's, the error) for the drawing you did best on. What is the total of your rooms against the drawing's indoor total?
+From Step 3 on all three drawings: your two scale readings on each drawing, how far each one is from the drawing's known scale and how far they are from each other; and the room table (your square feet, the drawing's, the error) for the drawing you did best on. What is the total of your rooms against the drawing's indoor total?
 
 *Your answer:*
 

@@ -14,7 +14,9 @@ from .config import Thing
 from .data import plural
 from .engine import SegResult
 
-GREEN, RED, BLUE, PURPLE = "#2a9d8f", "#e76f51", "#457b9d", "#7b2cbf"
+GREEN, RED, BLUE, PURPLE = "#2a9d8f", "#e76f51", "#457b9d", "#7b2cbf"      # found / missed / not one / your example
+LEGEND = "green = a real one the model found, red outline = a real one it missed, blue = a region that is not one"
+AREA_FILL = "#f4a261"     # every measured area in one colour: a number, not a verdict
 AREA_COLORS = ["#e63946", "#4cc9f0", "#ffd166", "#06d6a0", "#7b2cbf", "#f4a261", "#457b9d", "#2a9d8f",
                "#e9c46a", "#8d6e63", "#ff70a6", "#9aa5b1"]
 
@@ -160,42 +162,52 @@ def best_area(sheet, mask: np.ndarray) -> Tuple[Optional[dict], float]:
     return best, frac
 
 
+def words(n: int, cat: str) -> str:
+    """The plural word alone: 'pile footings', 'rooms'."""
+    return plural(2, cat).split(" ", 1)[1] if n != 1 else cat
+
+
 def truth_line(sheet, thing: Thing, res: SegResult, threshold: float) -> str:
-    """One sentence comparing what SAM 3 returned with the drawing's answer key."""
+    """What SAM 3 returned against the real things on the drawing, in the student's words."""
     if thing.truth is None:
-        return (f"This drawing's answer key does not list '{thing.name}', so there is nothing to count against: "
-                "look at the picture and judge the regions yourself.")
+        return (f"Nothing on this drawing to compare '{thing.name}' regions with: look at the picture and judge "
+                "them yourself.")
     what, sub = thing.truth
     keep = res.scores >= threshold
     pred = [list(map(float, b)) for b in res.boxes[keep]]
     if what == "areas":
         rooms = sheet.areas("room", sub)
-        if not rooms:
-            return f"The drawing has no {sub or 'room'} in its answer key: every region above is extra."
-        true_sqft = sum(a["true_sqft"] for a in rooms)
-        ok, missed, extra, _, _ = match_boxes(pred, [a["box"] for a in rooms], iou=0.3)
         label = sub or "room"
-        return (f"The drawing has {len(rooms)} {label}{'s' if len(rooms) != 1 else ''}, {true_sqft:,.0f} sq ft in total. "
-                f"Regions that sit on a real {label}: {ok} found, {missed} missed, {extra} extra.")
+        if not rooms:
+            return f"There is no {label} on this drawing: every region above is not one."
+        ok, missed, extra, _, _ = match_boxes(pred, [a["box"] for a in rooms], iou=0.3)
+        return compare_text(len(rooms), label, ok, missed, extra)
     truth = sheet.truth_boxes("counts", sub)
     if not truth:
-        return (f"The answer key of this drawing does not list every {sub} one by one, so there is nothing to check "
-                "these regions against: look at the picture and judge them yourself.")
+        return f"Nothing on this drawing to compare '{sub}' regions with: look at the picture and judge them yourself."
     ok, missed, extra, _, _ = match_boxes(pred, truth, iou=0.2)
-    return (f"The drawing has {len(truth)} {sub}{'s' if len(truth) != 1 else ''}: {ok} found, {missed} missed, "
-            f"{extra} extra region(s) that are not one.")
+    return compare_text(len(truth), sub, ok, missed, extra)
 
 
-def print_result(sheet, thing_name: str, res: SegResult, threshold: float):
+def compare_text(n_true: int, cat: str, ok: int, missed: int, extra: int) -> str:
+    w = words(n_true, cat)
+    return (f"Compared with the {n_true} actual {w}:\n  Found: {ok} of {n_true}\n  Missed: {missed}\n"
+            f"  Extra: {extra} region{'' if extra == 1 else 's'} that {'was' if extra == 1 else 'were'} not {w}")
+
+
+def result_text(res: SegResult, threshold: float) -> str:
     keep = res.scores >= threshold
     n = int(keep.sum())
     if n == 0:
-        print(f"'{res.prompt}': nothing found at confidence >= {threshold * 100:.0f}%"
-              + (f" (the model proposed {len(res)} weak region(s) below that)." if len(res) else "."))
-        return
-    px = int(res.union(threshold).sum())
-    print(f"'{res.prompt}' ({thing_name}): {n} region(s), {px:,} pixels = {sheet.sqft(px):,.0f} sq ft. "
-          "Confidence of each region: " + ", ".join(f"{s * 100:.0f}%" for s in res.scores[keep][:8]) + (" ..." if n > 8 else ""))
+        return (f"SAM 3 segmented nothing at the selected confidence threshold"
+                + (f" (it proposed {len(res)} weak region{'' if len(res) == 1 else 's'} below it)." if len(res) else "."))
+    return (f"SAM 3 segmented {n} region{'' if n == 1 else 's'} at the selected confidence threshold "
+            "(confidence of each: " + ", ".join(f"{s * 100:.0f}%" for s in res.scores[keep][:8]) + (", ..." if n > 8 else "") + ").")
+
+
+def print_result(sheet, thing_name: str, res: SegResult, threshold: float):
+    print(f"TEXT PROMPT: '{res.prompt}'")
+    print(result_text(res, threshold))
 
 
 # --------------------------------------------------------------------------- Part 1: the photos
@@ -244,7 +256,7 @@ def intro_prompts_compute(lab, img, prompts):
             marks.append(("box", b, color))
         m = res.masks[0]
         layers.append((str(i + 1), m, color))
-        lines.append(f"{i + 1}. {what}: one object of {int(m.sum()):,} px = {m.mean() * 100:.1f} % of the photo "
+        lines.append(f"{i + 1}. {what}: one object covering {m.mean() * 100:.1f} % of the photo "
                      f"(the model's own confidence {res.scores[0]:.2f}).")
     over = viz.multi_overlay(img, layers, alpha=0.55) if layers else img.copy()
     d = ImageDraw.Draw(over)
@@ -361,31 +373,24 @@ def count_view(lab, sheet_id: str, thing_name: str, threshold: float):
     sheet = lab.sheets[sheet_id]
     t = lab.spec.thing(thing_name)
     if t.truth is None:
-        print(f"The answer key does not list '{t.name}', so hits and misses cannot be drawn. "
+        print(f"Nothing on the drawings to compare '{t.name}' regions with, so found and missed cannot be drawn. "
               "Pick a room type."); return
     what, sub = t.truth
     truth = [a["box"] for a in sheet.areas("room", sub)] if what == "areas" else sheet.truth_boxes("counts", sub)
-    if not truth:
-        print(f"The answer key of this drawing does not list every {sub or 'room'} one by one, so hits and misses "
-              "cannot be drawn on it. Pick a room type here, and look at the picture for the rest."); return
-    res = lab.get(sheet.id, t)
-    keep = res.scores >= threshold
-    pred = [list(map(float, b)) for b in res.boxes[keep]]
-    iou = 0.3 if what == "areas" else 0.2
-    img = viz.instances_image(sheet.load(), res, threshold, alpha=0.35)
-    d = ImageDraw.Draw(img)
-    hits = misses = extra = 0
-    for tb in truth:
-        found = any(box_hit(tb, p, iou) for p in pred)
-        hits += found; misses += (not found)
-        d.rectangle(tb, outline=GREEN if found else RED, width=4)
-    for p in pred:
-        if not any(box_hit(tb, p, iou) for tb in truth):
-            extra += 1; d.rectangle(p, outline=BLUE, width=3)
-    viz.show_image(img, 1000)
     label = sub or "room"
-    print(f"'{t.prompt}' at confidence >= {threshold * 100:.0f}%: {len(pred)} region(s). The drawing has {len(truth)} {label}(s). "
-          f"Found {hits} (green), missed {misses} (red), {extra} extra region(s) that are not a {label} (blue).")
+    if not truth:
+        print(f"There is no {label} on this drawing, so found and missed cannot be drawn. Pick a room type here, "
+              "and look at the picture for the rest."); return
+    res = lab.get(sheet.id, t)
+    keep = [int(i) for i in np.where(res.scores >= threshold)[0]]
+    pred = [list(map(float, res.boxes[i])) for i in keep]
+    iou = 0.3 if what == "areas" else 0.2
+    ok, missed, extra, found_flags, extra_flags = match_boxes(pred, truth, iou=iou)
+    img = viz.judged_image(sheet.load(), [res.masks[i] for i in keep], [not e for e in extra_flags],
+                           [tb for tb, f in zip(truth, found_flags) if not f])
+    viz.show_image(img, 1000)
+    print(f"TEXT PROMPT: '{t.prompt}'"); print(result_text(res, threshold)); print(compare_text(len(truth), label, ok, missed, extra))
+    print(LEGEND)
 
 
 # --------------------------------------------------------------------------- Part 4 workshop: where it goes wrong
@@ -421,14 +426,13 @@ def inspector(lab, sheet_id: str, thing_name: str):
             out.clear_output(wait=True)
             viz.show_image(viz.instances_image(img, res, sl.value), 1000)
             keep = res.scores >= sl.value
-            print(f"'{t.prompt}': {int(keep.sum())} region(s) kept of {len(res)} proposed; together "
-                  f"{sheet.sqft(res.union(sl.value).sum()):,.0f} sq ft.")
+            print(f"'{t.prompt}': {int(keep.sum())} region(s) kept of {len(res)} proposed.")
             for k, i in enumerate(np.where(keep)[0]):
                 m = res.masks[i]
                 area, frac = best_area(sheet, m)
                 where = (f"mostly on the {area['type']} '{area['label']}' ({area['true_sqft']:,.0f} sq ft)"
-                         if area and frac > 0.5 else "not on any one room of the answer key")
-                print(f"  #{k + 1}: confidence {res.scores[i] * 100:.0f}%, {sheet.sqft(m.sum()):,.0f} sq ft, {where}")
+                         if area and frac > 0.5 else "not on any one room of the drawing")
+                print(f"  #{k + 1}: confidence {res.scores[i] * 100:.0f}%, {where}")
 
     sl.observe(render, names="value")
     display(w.VBox([sl, out]))
@@ -476,27 +480,21 @@ def phrase_check(lab, sheet_id: str, phrase: str, threshold: float):
         if best:
             cat = best
     rec = {"sheet": sheet.id, "phrase": phrase, "threshold": float(threshold), "regions": len(pred), "proposed": len(res),
-           "sqft": sheet.sqft(int(res.union(threshold).sum())) if pred else 0.0, "compare": cat}
+           "compare": cat}
+    from IPython.display import HTML, display
     if cat is None:
         viz.show(viz.three_panel(img, res, "#ff70a6", f"{sheet.id} - '{phrase}'", threshold, what="drawing"))
-        print_result(sheet, phrase, res, threshold)
+        display(HTML(phrase_html(phrase, res, threshold, None)))
     else:
         is_area = cat in sheet.area_categories
         truth_items = sheet.areas(cat) if is_area else [{"box": b} for b in sheet.counts[cat]]
         truth = [list(t["box"]) for t in truth_items]
         iou = 0.3 if is_area else 0.2
         ok, n_missed, n_extra, found_flags, extra_flags = match_boxes(pred, truth, iou=iou)
-        over = viz.instances_image(img, res, threshold, alpha=0.35)
-        d = ImageDraw.Draw(over)
-        for tb, f in zip(truth, found_flags):
-            d.rectangle(tb, outline=GREEN if f else RED, width=4)
-        for p, e in zip(pred, extra_flags):
-            if e:
-                d.rectangle(p, outline=BLUE, width=3)
+        over = viz.judged_image(img, [res.masks[i] for i in idx], [not e for e in extra_flags],
+                                [tb for tb, f in zip(truth, found_flags) if not f])
         viz.show_image(over, 1000)
-        print_result(sheet, phrase, res, threshold)
-        print(f"Answer key '{cat}': {len(truth)} on the drawing. Found {ok} (green), missed {n_missed} (red), "
-              f"{n_extra} extra region(s) that are not one (blue).")
+        display(HTML(phrase_html(phrase, res, threshold, (len(truth), cat, ok, n_missed, n_extra))))
         rec.update(truth=len(truth), found=ok, missed=n_missed, extra=n_extra)
         if is_area and ok:
             rows = []
@@ -512,9 +510,9 @@ def phrase_check(lab, sheet_id: str, phrase: str, threshold: float):
                     rows.append((t.get("label") or t.get("type") or cat, mine, tru, (mine - tru) / tru * 100))
             if rows:
                 print(f"\n  Each {cat} the phrase found, measured as the region comes (no box of yours, no clean-up):")
-                print(f"  {'':24} {'phrase sq ft':>12} {'drawing':>9} {'error':>7}")
+                print(f"  {'':24} {'phrase sq ft':>12} {'drawing sq ft':>13} {'error':>7}")
                 for name, mine, tru, e in rows[:15]:
-                    print(f"  {str(name)[:24]:24} {mine:12,.1f} {tru:9,.1f} {e:+6.0f} %")
+                    print(f"  {str(name)[:24]:24} {mine:12,.1f} {tru:13,.1f} {e:+6.0f} %")
                 if len(rows) > 15:
                     print(f"  ... and {len(rows) - 15} more")
                 errs = [abs(e) for *_, e in rows]
@@ -523,6 +521,29 @@ def phrase_check(lab, sheet_id: str, phrase: str, threshold: float):
     print(f"(SAM 3 took {res.seconds:.1f} s)")
     lab.phrases[(sheet.id, phrase.lower())] = rec
     return rec
+
+
+def phrase_html(phrase: str, res: SegResult, threshold: float, cmp) -> str:
+    """The phrase cell's result: the prompt, what was segmented, and (when the drawing has such things) the comparison."""
+    import html
+    keep = res.scores >= threshold
+    n = int(keep.sum())
+    lines = [f"<b>TEXT PROMPT</b>: \u201c{html.escape(phrase)}\u201d"]
+    if n == 0:
+        lines.append("SAM 3 segmented <b>no region</b> at the selected confidence threshold"
+                     + (f" (it proposed {len(res)} weak region{'' if len(res) == 1 else 's'} below it)." if len(res) else "."))
+    else:
+        lines.append(f"SAM 3 segmented <b>{n} region{'' if n == 1 else 's'}</b> at the selected confidence threshold.")
+    if cmp is None:
+        lines.append("Nothing on this drawing to compare them with: look at the picture and judge the regions yourself.")
+    else:
+        n_true, cat, ok, missed, extra = cmp
+        w = words(n_true, cat)
+        lines += [f"<b>Compared with the {n_true} actual {html.escape(w)}:</b>",
+                  f"<b>Found:</b> {ok} of {n_true}", f"<b>Missed:</b> {missed}",
+                  f"<b>Extra:</b> {extra} region{'' if extra == 1 else 's'} that {'was' if extra == 1 else 'were'} not {html.escape(w)}",
+                  f"<span style='color:#666'>{LEGEND}</span>"]
+    return "<div style='font-family:monospace;white-space:pre-wrap;line-height:1.5'>" + "\n".join(lines) + "</div>"
 
 
 # --------------------------------------------------------------------------- Part 3 / Part 2: the take-off cell
@@ -551,7 +572,7 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
            "areas": {}, "rooms": None}
 
     # ---------------------------------------------------------------- 1. the scale
-    px_per_ft, source = sheet.px_per_ft, "the answer key"
+    px_per_ft, source = sheet.px_per_ft, "the drawing's known scale"
     student_values = []
     for ref in sheet.scale_refs:
         label = sheet.scale_label(ref)
@@ -589,6 +610,7 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
 
     # ---------------------------------------------------------------- 2. counts: one example box, SAM 3 finds the rest
     rep["todo_labels"] = {}
+    count_masks = {}
     for cat in (sheet.count_categories if count_categories is None else count_categories):
         mine = drawn.get(sheet.example_label(cat), [])
         via = None
@@ -614,6 +636,7 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
             info.update(found=len(pred), matched=ok, pred=pred, extra_flags=extra_flags, seconds=res.seconds,
                         missed=[list(t) for t, f in zip(truth, found_flags) if not f],
                         extra=[list(p) for p, e in zip(pred, extra_flags) if e])
+            count_masks[cat] = res.masks
         rep["counts"][cat] = info
 
     # ---------------------------------------------------------------- 3. areas
@@ -672,7 +695,7 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
                            indoor=bool(a.get("indoor")),
                            err_pct=(row["your_sqft"] - float(a["true_sqft"])) / float(a["true_sqft"]) * 100)
             rows.append(row)
-            layers.append((str(i), mask, AREA_COLORS[(i - 1) % len(AREA_COLORS)]))
+            layers.append((str(i), mask, AREA_FILL))
         rep["areas"][cat] = rows
         if cat == "room":
             indoor = sheet.areas("room", indoor_only=True, takeoff_only=True)
@@ -688,14 +711,15 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
                                                  "key": sum(r["true_sqft"] for r in rows if r["true_sqft"])}
 
     # ---------------------------------------------------------------- the picture
-    over = viz.multi_overlay(img, layers, alpha=0.5) if layers else img.copy()
+    for cat, c in rep["counts"].items():
+        for m, e in zip(count_masks.get(cat, []), c["extra_flags"]):
+            layers.append(("", m, BLUE if e else GREEN))
+    over = viz.multi_overlay(img, layers, alpha=0.45) if layers else img.copy()
     d = ImageDraw.Draw(over)
-    w_thin = max(2, img.width // 700)
+    w_thin = max(3, img.width // 500)
     for cat, c in rep["counts"].items():
         for tb in c["missed"]:
             d.rectangle(tb, outline=RED, width=w_thin)
-        for b, e in zip(c["pred"], c["extra_flags"]):
-            d.rectangle(b, outline=BLUE if e else GREEN, width=w_thin)
         d.rectangle(c["example"], outline=PURPLE, width=w_thin + 2)
     for cat, rows in rep["areas"].items():
         for r in rows:
@@ -711,12 +735,14 @@ def print_takeoff(sheet, rep, guided: bool = True):
     """The report of `takeoff_compute` in plain words. `guided` adds the answer key's notes on the scale references
     (the homework's wrong scale bar is explained there); the workshop prints the numbers only."""
     sc = rep["scale"]
-    print("SCALE CHECK")
     drawn = [r for r in sc["refs"] if r["drawn"]]
+    if not sc["refs"]:                       # a counting-only sheet: nothing is measured, so no scale is set
+        print_counts(rep, tips=guided); print_areas(sheet, rep); return
+    print("SCALE CHECK")
     for r in drawn:
         print(f"  {r['label']}: {r['px']:.0f} px \u00f7 {r['feet']:g} ft = {r['px_per_ft']:.2f} px/ft")
     if not drawn:
-        print("  No scale box drawn: the answer key's scale is used.")
+        print("  No scale box drawn: the drawing's known scale is used.")
     if sc.get("disagree_pct") is not None:
         print(f"  Your two scale estimates differ by {sc['disagree_pct']:.0f}%. For more accurate results, draw the scale box precisely.")
     if guided:
@@ -729,7 +755,7 @@ def print_takeoff(sheet, rep, guided: bool = True):
     elif trusted:
         print(f"  Scale used for takeoff: {sc['used_px_per_ft']:.2f} px/ft (from the first scale box: {trusted['label']})")
     else:
-        print(f"  Scale used for takeoff: {sc['used_px_per_ft']:.2f} px/ft (from the answer key)")
+        print(f"  Scale used for takeoff: {sc['used_px_per_ft']:.2f} px/ft (the drawing's known scale)")
     print_counts(rep, tips=guided)
     print_areas(sheet, rep)
 
@@ -761,6 +787,8 @@ def count_lines(rep, tips: bool = True, bold=lambda s: s):
         label = (rep.get("todo_labels") or {}).get(cat, f"example: {cat}")
         lines.append(f"{cat}: not counted. Draw ONE clean box labelled '{label}' and submit again; "
                      "the count comes from the model, not from your boxes.")
+    if rep["counts"]:
+        lines.append(LEGEND + "; purple = your example box")
     return "WHAT SAM 3 COUNTED FROM YOUR EXAMPLE BOX", lines
 
 
@@ -791,7 +819,7 @@ def print_areas(sheet, rep):
                 print(f"  {r['n']:>2} {r['error']}"); continue
             true = f"{r['true_sqft']:9,.0f}" if r["true_sqft"] else f"{'-':>9s}"
             err = f"{r['err_pct']:+6.0f} %" if r["err_pct"] is not None else f"{'':>7s}"
-            tail = r["label"] or "does not sit on anything in the answer key"
+            tail = r["label"] or f"does not sit on any {cat} of the drawing"
             if r.get("printed"):
                 tail += f" (the sheet prints {r['printed']})"
             if r["note"]:
@@ -835,7 +863,7 @@ def takeoff(lab, sheet_id: str):
                            continuous_update=False, readout_format=".2f")
         controls.append(w.HBox([sl, w.HTML("&nbsp;how sure SAM 3 must be to keep something it found from your "
                                            "<b>example:</b> box. Leave it alone and each thing is counted at the "
-                                           "confidence its own answer key suggests.")]))
+                                           "confidence suggested for it.")]))
 
     guided = getattr(lab.spec, "guided", True)
     todo = "<br>".join(f"<b>{i + 1}.</b> {t}" for i, t in enumerate(sheet.tasks))
@@ -879,7 +907,7 @@ def find_like(lab, sheet_id: str):
     sheet = lab.sheets[sheet_id]
     cats = sheet.count_categories
     if not cats:
-        print(f"{sheet.id} has nothing to count in its answer key."); return
+        print(f"{sheet.id} has nothing to count."); return
     img = sheet.load()
     disp = img.copy(); disp.thumbnail((1400, 1400)); scale = img.width / disp.width
     buf = io.BytesIO(); disp.save(buf, "PNG")
@@ -891,10 +919,10 @@ def find_like(lab, sheet_id: str):
                        continuous_update=False, readout_format=".2f")
     guided = getattr(lab.spec, "guided", True)
     what = " and ".join(plural(len(sheet.counts[c]), c) for c in cats)
-    msg = w.HTML("" if not guided else f"<b>{sheet.id} - {sheet.title}</b>: the answer key lists {what}.<br>"
+    msg = w.HTML("" if not guided else f"<b>{sheet.id} - {sheet.title}</b>: the drawing has {what}.<br>"
                  "Draw <b>ONE</b> box around one of them - a door is the opening <i>and</i> its swing arc - with the "
                  "<b>example:</b> label above the picture, then <b>Submit</b>. SAM 3 looks for everything like it; the "
-                 "answer key marks the real ones found (green), missed (red) and the regions that are not one (blue). "
+                 "picture marks the real ones found (green), missed (red outline) and the regions that are not one (blue). "
                  "Zoom with the mouse wheel.")
     out = w.Output()
 

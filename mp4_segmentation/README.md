@@ -11,8 +11,7 @@ notebook cell is a Colab form and the code is hidden in `aec_seg/`.
 | `MP4_Homework_Segmentation.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp4_segmentation/MP4_Homework_Segmentation.ipynb) | seven sheets from three disciplines: 2 floor plans, 4 structural foundation plans, 1 reflected ceiling plan |
 
 Everything is in feet and square feet. **The scale is always set by the student**, from a printed dimension or from
-something whose real size the sheet states — never trusted from a scale bar (one homework sheet carries a graphic
-bar that is wrong by a factor of two, and finding that out is one of the exercises). There is no training exercise
+something whose real size the sheet states. A sheet where things are only counted sets no scale at all. There is no training exercise
 in MP4: SAM 3 is used as it comes.
 
 ## What the students do

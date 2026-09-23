@@ -17,11 +17,11 @@ box-drawing tool, tables of square feet next to the drawing's own numbers, and a
 | Report questions | 7 | 5 |
 | Time | about 90 min | about 2.5 h |
 
-Everything is in feet and square feet. **The scale is never taken from a scale bar.** On every sheet the student
-boxes a printed dimension (or something whose size the sheet states, such as a footing mark `F4.0` = 4'-0" wide).
-Both VA sheets carry a graphic 0–16 ft bar that is exactly twice too long — it is the ¼" = 1'-0" bar left on a
-sheet plotted at ⅛" = 1'-0" — and their tasks ask the student to box *both* the bar and a printed dimension, so
-that the 2× (i.e. 4× on area) disagreement is found rather than believed.
+Everything is in feet and square feet. On a sheet where something is measured the student boxes one printed
+dimension (or something whose size the sheet states, such as a footing mark `F4.0` = 4'-0" wide); `test_fp_2` keeps a
+second reference as a cross-check. Counting-only sheets (`va_ceiling`, `uscg_pile`) set no scale and print no
+SCALE CHECK. The VA sheets' wrong 0–16 ft graphic bar (exactly 2× too long) was dropped from the tasks on 2026-09-22
+at the instructor's request: one scale reference per floor plan.
 
 **A count is always a model result.** There is no task anywhere in the lab where the student boxes every instance of
 something and the boxes are then tallied against the answer key: a row of hand-drawn boxes ticked off against a key
@@ -105,9 +105,6 @@ Three of those numbers are **designed failures** and are the teaching points of 
 - `va_floor` had two fixture counts (water closets, lavatories) in an earlier version; they were dropped so that the floor plans are room areas and nothing else.
 - `uscg_motorpool` **pits +92 %**: a 2'-0" × 2'-6" pit is 36 × 39 px on a 2270 px sheet. The mask leaks into the wall
   footing around it and the cell prints "your box is only 36 px across… the number is your box, not the pit."
-- `va_floor` / `va_ceiling` **the graphic scale bar**: boxing it gives 43.1 px/ft against the printed dimension's
-  21.3. The take-off cell prints "your two readings disagree by 102 %. On an AREA that is about 308 %" and names
-  which one to use.
 
 Room totals against the answer key, same run: `usda_5544` −3.5 %, `usda_5540` −1.5 %, `usda_5539` −3.9 %,
 `usda_5542` −2.6 %, `va_floor` −7.3 %. Footing totals: `test_fp` −3 %, `test_fp_2` +2 %, `uscg_motorpool` +3 %.
@@ -226,9 +223,8 @@ produces, with a few percent of variation because the boxes are drawn by hand.
 
 ### Homework
 
-1. **Floor plans (22).** Both sheets' scales, and on `va_floor` the two readings: the printed 10'-0" dimension gives
-   about 21.6 px/ft, the graphic bar about 43.3 px/ft. The bar is twice too long, so areas taken from it are **four
-   times** too small; the printed dimension is right. The room table of one sheet with the worst rooms named. From Step 2b: *room* finds 10/14 and 10/13
+1. **Floor plans (22).** The scale from the printed 10'-0" dimension (about 21.6 px/ft) and the room table with the
+   worst rooms named. From Step 2b: *room* finds 10/14 and 10/13
    rooms at 0.3 with areas a few percent under the ones from the student's boxes (raw masks, furniture bitten out;
    the hall on `usda_5542` is the worst); *door* and *window* return nothing; *curved line* returns the swings.
 2. **Structural plans (22).** Per sheet the scale route and the footing areas against the sizes the marks give
@@ -263,9 +259,9 @@ produces, with a few percent of variation because the boxes are drawn by hand.
   outside the box*; and, at over 90 % fill, *look at the outline: if it is a rounded copy of your box…*. The third
   one fires on correct readings too (a tight box round a footing is 92–101 % filled), so tell the students it is a
   "check the picture" prompt, not a verdict.
-- **The wrong scale bar.** `va_floor` and `va_ceiling` carry a 0–16 ft graphic bar that is exactly 2× too long.
-  Boxing it gives about 43 px/ft against the printed dimension's 21.6. A student who trusts the bar gets every area
-  four times too small. This is the designed lesson of Step 2a; the answer key's note explains it in the printout.
+- **The wrong scale bar.** `va_floor` and `va_ceiling` carry a 0–16 ft graphic bar that is exactly 2× too long
+  (about 43 px/ft against the printed dimension's 21.6). It is no longer a task; a student who boxes it anyway as the
+  scale gets every area four times too small, which is worth a word in class.
 - **A rotated example box.** `segment_like` generalises to the symbol *family*, but a rotated example costs about
   40 % of the count on the ceiling plan and starts returning the stipple-hatched toilet ceilings as extras. Tell
   the students to pick a clean example lying the same way as most of the others.
