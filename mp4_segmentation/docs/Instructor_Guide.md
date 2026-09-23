@@ -89,7 +89,7 @@ of the model, so the lab no longer asks for one.
 | `usda_5540` | −0.3 % / +0.5 % | Step 3d, door (0.4): median **14/14** (1–14), 2 extra; 9 of 14 examples find all | room n=7, **median 0.6 %**, worst 26 % (the hall) |
 | `usda_5539` | −0.3 % / +0.4 % | Step 3d, door (0.4): median **11/11** (1–11), 4 extra; 6 of 11 examples find all | room n=9, **median 2.6 %**, worst 20 % (the hall) |
 | `usda_5542` | −0.4 % / +0.5 % | – (rooms only) | room n=10 (closets are not in the take-off), **median 2.6 %**, worst 23 % (the hall) |
-| `va_floor` | −1.4 % / −0.4 % (the bar) | – (rooms only) | room n=13, **median 4.3 %**, worst 11 % |
+| `va_floor` | −1.4 % | – (rooms only) | room n=19 (22 spaces in the key, 3 open alcoves left out), **median 2.0 %**, worst 7 % |
 | `va_ceiling` | −0.7 % / −0.4 % (the bar) | 2×4 (0.4) **39/41, 0 ex**; 2×2 (0.4) 8/8, 1 ex; cans (0.5) **14/14, 0 ex** | – (nothing to measure) |
 | `test_fp` | −3.2 % (a 95 px footing is a short ruler) | footing (0.3) **10/10**, 3–5 ex | footing n=10, **median 4.3 %**, worst 8.5 % |
 | `test_fp_2` | −1.4 % / −3.2 % (the F4.0) | footing (0.4) **19/19**, 1 ex | footing n=19, median 6.2 %, worst 19 %; pit n=1, 5.2 % |
@@ -118,7 +118,7 @@ mask, which on a furnished room runs a few percent low). Measured 2026-09-19 wit
 | sheet | works | finds nothing |
 |---|---|---|
 | `usda_5542` | *room* **10/14**, 0 extra, areas median 3 % (worst 45 %, the L-shaped hall); at 0.5 only 5/14. *bedroom* 6/14 at 0.3. *curved line* 31 regions = the door swings (no key) | *door*, *window* |
-| `va_floor` | *room* **10/13**, 3 extra, median 7 % (worst 58 %); at 0.5 nothing survives. *curved line* 12 regions | *door*, *window* |
+| `va_floor` | *room* **13/22**, 0 extra, median 4 %; at 0.5 nothing survives. *curved line* 12 regions | *door*, *window* |
 | `test_fp` | *square* → footings **10/10**, 5 extra, areas median 2 % (at 0.5: 7/10, 2 extra, median 1 %). *rectangle* 10/10 but 9 extra | *footing*, *foundation*, *column*, *hatched square* |
 | `test_fp_2` | *square* **19/19**, 4 extra, areas median 10 % (the E-footings are drawn smaller than their mark; at 0.5 still 19/19, 1 extra). *rectangle* 19/19, 6 extra | *footing*, *hatched square* |
 | `uscg_motorpool` | *circle* → grid bubbles **32/32**, 6 extra (3 at 0.5). *square* → footings 12/20, 5 extra, median 3 %; *rectangle* 7/20 | *footing*, *hatched square* |
@@ -128,7 +128,7 @@ mask, which on a furnished room runs a few percent low). Measured 2026-09-19 wit
 So the phrase route gives the students two real findings: a shape word gets the plain symbols of a foundation plan
 (and their areas, within a few percent), and it gets nothing at all on the ceiling plan, where the example box in
 Step 4a counts 39/41. The trade words fail everywhere. The confidence slider is the other lesson here: 0.3 keeps the
-extras, 0.5 loses real ones (`va_floor` *room* goes from 10/13 to 0).
+extras, 0.5 loses real ones (`va_floor` *room* goes from 13/22 to 0).
 
 ### 2.4 How a room mask becomes an area, and why (the "fill the bites" rule)
 
@@ -142,7 +142,7 @@ of the five sheets that have rooms, with the same student-like boxes (median and
 | `usda_5540` | 7.7 % / 13.8 % | **3.5 % / 24.6 %** | 2.1 % / **49.3 %** |
 | `usda_5539` | 6.5 % / 13.4 % | **3.8 % / 11.0 %** | 1.5 % / 23.9 % |
 | `usda_5542` | 7.3 % / 30.3 % | **4.0 % / 28.9 %** | 3.0 % / 23.0 % |
-| `va_floor` | 8.9 % / 16.6 % | **2.8 % / 7.1 %** | 3.4 % / 7.2 % |
+| `va_floor` | 8.9 % / 16.6 % | **2.0 % / 7 %** (19 rooms, key completed 2026-09-22) | 3.4 % / 7.2 % |
 
 Split by shape (the answer key's polygon tells which rooms are not rectangles):
 
@@ -224,8 +224,8 @@ produces, with a few percent of variation because the boxes are drawn by hand.
 ### Homework
 
 1. **Floor plans (22).** The scale from the printed 10'-0" dimension (about 21.6 px/ft) and the room table with the
-   worst rooms named. From Step 2b: *room* finds 10/14 and 10/13
-   rooms at 0.3 with areas a few percent under the ones from the student's boxes (raw masks, furniture bitten out;
+   worst rooms named. From Step 2b: *room* finds 13 of the 22
+   spaces at 0.3 with areas a few percent under the ones from the student's boxes (raw masks, furniture bitten out;
    the hall on `usda_5542` is the worst); *door* and *window* return nothing; *curved line* returns the swings.
 2. **Structural plans (22).** Per sheet the scale route and the footing areas against the sizes the marks give
    (`F12.0` = 12 ft, `E4'-6"` = 4 ft 6 in, and the `FOOTING SCHEDULE` on `uscg_motorpool`), plus the count SAM 3 made
