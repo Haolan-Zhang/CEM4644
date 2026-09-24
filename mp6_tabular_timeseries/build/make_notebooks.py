@@ -46,6 +46,21 @@ Knock on a wall and you can hear whether a stud is behind it; inspectors do the 
 
 Report which surfaces get confused, which measurements matter, and whether the model would still work in another room, with another phone or with another person tapping.
 """
+ACTIVITY = """
+### 🚶 Activity recognition: data you collect yourself
+
+Researchers put motion sensors on construction workers to tell, minute by minute, whether they are walking, climbing, carrying or idle, for productivity and safety studies. Your phone has the same sensor. Here you record your own movements, cut each recording into short windows, and train a model to name the activity in each window.
+
+1. **Plan.** Pick 4–5 activities you can repeat (for example standing, walking, going up stairs, going down stairs, carrying a heavy bag or box).
+2. **Record.** In the free *phyphox* app, choose *Acceleration (without g)* and put the phone in the same pocket every time. Do each activity for about 2 minutes, in 3 separate sessions (different days, places or shoes): one recording per activity and session, exported as CSV and named by what it is (`stairs_up_session2.csv`).
+3. **Make the table.** Upload the recordings to the notebook. It cuts each into 2-second windows and measures each window's average, spread, peak and rhythm (steps per second): one row per window, with the session and the activity. Download the table: it is your dataset.
+4. **Look first.** Write down what you expect (is climbing slower? is carrying smoother?), then check it against a few seconds of each activity and a scatter plot of two measurements.
+5. **Train and test twice:** once with the windows split at random, once with whole sessions held out. Why do the two scores differ, and which would you believe?
+6. **Blind test.** Record one mixed sequence (walk, stairs, stand) and write down when you switched; see whether the model finds when each activity starts.
+7. **Ask the chat.** Give hokie.ai your table, ask it to do the same with its analysis tool, and compare.
+
+Report which activities get confused, which measurements matter, and whether the model would still work for another person, with the phone in another pocket, or on a real site.
+"""
 PART_NAME = {"tabular": ("MP6A", "Tables", "📊"), "series": ("MP6B", "Time series", "📈")}
 
 
@@ -298,6 +313,8 @@ Every building has a usual day for each weekday. A day that leaves the pattern i
 
 A small app, opened from a link: upload any CSV with a time column and a value column, and it forecasts the last period from the data before it.
 """))
+    if variant == "homework":
+        cells.append(md(ACTIVITY))
     cells.append(form("▶ Step 5 · Your own time series", "lab.upload_app()", notes=["Open the printed link in a new tab."]))
     cells.append(q(5, ("Upload one time series of your own (a utility bill history, a site's weather, daily deliveries, anything with a date and a number) and report what the app found: "
                        "the forecast, its average miss, and whether you believe it.")
