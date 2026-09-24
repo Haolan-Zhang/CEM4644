@@ -31,6 +31,21 @@ VARIANTS = {
     ("series", "workshop"): dict(file="MP6B_Workshop_TimeSeries.ipynb", label="Workshop (in class)", minutes=75),
     ("series", "homework"): dict(file="MP6B_Homework_TimeSeries.ipynb", label="Homework (individual)", minutes=75),
 }
+TAP_TEST = """
+### 🔨 The tap test: data you collect yourself
+
+Knock on a wall and you can hear whether a stud is behind it; inspectors do the same on concrete and tile to find hollow, delaminated spots (a *sounding test*). Here you record taps with your phone, turn each tap into one row of a table, and train a model to tell the surfaces apart.
+
+1. **Plan.** Pick 4–5 surfaces (for example drywall between studs, drywall over a stud, concrete or masonry, a wooden door, glass or tile) and 3–4 separate spots of each. To be sure a spot is over a stud, use the magnetometer in the free *phyphox* app: it jumps at the drywall screws.
+2. **Record.** At each spot, tap 10 times, about a second apart, always with the same object (a coin or a pen cap). Hold the phone about 20 cm away in a quiet room and use its voice recorder: one recording per spot, named by what it is (`hollow_bedroom_1.m4a`). About 200 taps in all.
+3. **Make the table.** Upload the recordings to the notebook. It finds each tap and measures its pitch, brightness, ring time, loudness and low / mid / high energy: one row per tap, with the spot and the surface. Download the table: it is your dataset.
+4. **Look first.** Write down what you expect (does hollow sound lower? ring longer?), then check it against each surface's average spectrum and a scatter plot of two measurements.
+5. **Train and test twice:** once with the taps split at random, once with whole spots held out. Why do the two scores differ, and which would you believe?
+6. **Blind test.** Tap a spot you did not record, let the model name the surface, and check.
+7. **Ask the chat.** Give hokie.ai your table, ask it to do the same with its analysis tool, and compare.
+
+Report which surfaces get confused, which measurements matter, and whether the model would still work in another room, with another phone or with another person tapping.
+"""
 PART_NAME = {"tabular": ("MP6A", "Tables", "📊"), "series": ("MP6B", "Time series", "📈")}
 
 
@@ -191,6 +206,8 @@ A model that scores well may still have learned the wrong thing. Two checks: whi
 
 A small app, opened from a link: upload any CSV, pick the column to predict, and it fits decision trees and scores them on held-out rows.
 """))
+    if variant == "homework":
+        cells.append(md(TAP_TEST))
     cells.append(form("▶ Step 5 · Your own table", "lab.upload_app()", notes=["Open the printed link in a new tab."]))
     cells.append(q(4, ("Upload one table of your own (a cost table, a bid tabulation, anything with a numeric column and 30+ rows) and report what the app found: "
                        "the score, the columns that mattered, and whether you believe it.")
