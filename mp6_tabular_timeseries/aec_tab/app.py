@@ -82,7 +82,7 @@ def fit_series(df: pd.DataFrame, time_col: str, value_col: str):
     return fig_png(fig), txt
 
 
-def build():
+def build(kind=None):
     import gradio as gr
     with gr.Blocks(title="Your own table or time series") as demo:
         gr.Markdown("## Your own table or time series\nUpload a CSV. **Table**: pick the column to predict; decision trees are fitted on 80 % of the rows and scored on the rest. "
@@ -91,7 +91,7 @@ def build():
         with gr.Row():
             with gr.Column(scale=1):
                 up = gr.File(label="CSV file", file_types=[".csv"])
-                mode = gr.Radio(["table", "time series"], value="table", label="what is it")
+                mode = gr.Radio(["table", "time series"], value=kind or "table", label="what is it")
                 target = gr.Dropdown([], label="column to predict (table)")
                 tcol = gr.Dropdown([], label="time column (time series)"); vcol = gr.Dropdown([], label="value column (time series)")
                 run = gr.Button("Run", variant="primary")
@@ -113,8 +113,8 @@ def build():
     return demo
 
 
-def launch(share=None):
-    demo = build()
+def launch(share=None, kind=None):
+    demo = build(kind)
     sink = io.StringIO()
     with contextlib.redirect_stdout(sink), contextlib.redirect_stderr(sink):
         demo.launch(share=True if share is None else share, inline=False, debug=False, quiet=True, show_error=True, prevent_thread_lock=True)

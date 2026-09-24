@@ -26,6 +26,8 @@ class TableSpec:
     row_word: str = "mix"                               # what one row is
     guess_n: int = 5
     description: str = ""
+    chat_about: str = ""                                # the table in words, for the chat prompt ("824 " + this)
+    close_enough: float = 5.0                           # a miss this small counts as close, in the chat steps
 
     @property
     def rows(self) -> str:
@@ -68,6 +70,10 @@ CONCRETE = TableSpec(
     grades=[("low (< 25 MPa)", 0, 25), ("normal (25-45 MPa)", 25, 45), ("high (> 45 MPa)", 45, 1e9)],
     spec_default=30, spec_range=(15, 60, 5), whatif=["cement", "water", "age_days", "superplasticizer"], row_word="mix",
     description="1,030 concrete mixes tested in a laboratory: what went into each cubic metre, how old the sample was, and the strength it reached.",
+    chat_about=("concrete mixes that were tested in a laboratory: the amount of each ingredient in kg per cubic metre of concrete "
+                "(cement, blast-furnace slag, fly ash, water, superplasticizer, coarse aggregate, fine aggregate), the age of the "
+                "sample when it was tested (age_days), and the compressive strength it reached (strength_MPa)"),
+    close_enough=5.0,
 )
 
 ENERGY = TableSpec(
@@ -80,6 +86,11 @@ ENERGY = TableSpec(
     grades=[("A (< 12)", 0, 12), ("B (12-20)", 12, 20), ("C (20-30)", 20, 30), ("D (> 30)", 30, 1e9)],
     spec_default=20, spec_range=(8, 40, 2), whatif=["compactness", "glazing_area", "height", "surface_area"], row_word="building",
     description="768 simulated residential buildings of the same volume but different shapes, glazing and orientation, with the heating load a building-energy simulator computed for each.",
+    chat_about=("residential buildings of the same volume but different shapes, simulated with a building-energy program: relative "
+                "compactness, surface area, wall area and roof area (m²), overall height (m), orientation (2 = north, 3 = east, "
+                "4 = south, 5 = west), glazing area (as a share of the floor area), glazing distribution (0-5), and the heating "
+                "load the simulator computed (heating_load, kWh per m² of floor)"),
+    close_enough=2.0,
 )
 
 SPECS: Dict[str, LabSpec] = {

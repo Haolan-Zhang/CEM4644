@@ -38,20 +38,28 @@ class TabLab:
         self.guesses: Optional[dict] = None
         self.game_order = [2, 0, 3, 1]
         self.apps: dict = {}
+        self.part = "both"
+        self.chat_runs: dict = {}                       # every reply pasted back, per task, so two chats can be compared
+        self.chat_cache: dict = {}                      # the files handed to the chat
 
     @property
     def table_spec(self) -> C.TableSpec:
         return self.spec.table
 
     # ------------------------------------------------------------------ setup
-    def setup(self, dataset: str = "workshop", load_forecaster: bool = True, install: bool = True):
+    def setup(self, dataset: str = "workshop", part: str = "both", load_forecaster: bool = True, install: bool = True):
+        """part: "tabular" (the table only), "series" (the meters only) or "both"."""
         t0 = time.time()
+        self.part = part
+        load_forecaster = load_forecaster and part != "tabular"
         if install:
             self._install_missing({"gradio": GRADIO_PIN, "chronos": CHRONOS_PIN} if load_forecaster else {"gradio": GRADIO_PIN})
         self.spec = C.SPECS[dataset]
+        self.models, self.results, self.guesses, self.chat_runs, self.chat_cache = {}, {}, None, {}, {}
+        self.forecaster = None
         with quiet():
-            self.df = load_table(self.root, self.spec.table)
-            self.meters = load_meters(self.root, self.spec.series.meters)
+            self.df = load_table(self.root, self.spec.table) if part != "series" else None
+            self.meters = load_meters(self.root, self.spec.series.meters) if part != "tabular" else {}
         if load_forecaster:
             try:
                 from .series import Forecaster
@@ -116,12 +124,28 @@ class TabLab:
     def odd_days(self, building, threshold=3.5):
         self._need(); from . import ui; ui.oddday_view(self, building, float(threshold))
 
+    # ------------------------------------------------------------------ the chat (hokie.ai) steps
+    def chat_table(self, give="attach the files"):
+        self._need(); from . import chat; chat.chat_table(self, give)
+
+    def chat_table_tool(self, model="gradient-boosted trees"):
+        self._need(); from . import chat; chat.chat_table_tool(self, model)
+
+    def chat_forecast(self, building, give="attach the files"):
+        self._need(); from . import chat; chat.chat_forecast(self, building, give)
+
+    def chat_forecast_tool(self, building, model="gradient-boosted trees"):
+        self._need(); from . import chat; chat.chat_forecast_tool(self, building, model)
+
+    def chat_odd_days(self, building, give="attach the files"):
+        self._need(); from . import chat; chat.chat_odd_days(self, building, give)
+
     def upload_app(self):
         self._need()
         if os.environ.get("AEC_LAB_NO_APP"):
             print("(upload app skipped: AEC_LAB_NO_APP is set)"); return
         from . import app
-        self.apps["upload"] = app.launch()
+        self.apps["upload"] = app.launch(kind={"tabular": "table", "series": "time series"}.get(self.part))
 
     def report_summary(self):
         self._need(); from . import ui; ui.report_summary(self)

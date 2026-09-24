@@ -1,17 +1,32 @@
 # MP6 · Instructor guide
 
+MP6 comes in two parts, each with a workshop and a homework notebook: **MP6A · Tables** and **MP6B · Time series**.
+Both end with a section in which the students give the same job to a chat model (hokie.ai) and paste its reply back.
+
 ## 1. What the students get
 
 | | Workshop | Homework |
 |---|---|---|
-| Table | 1,030 real concrete mixes → compressive strength (MPa) | 768 simulated building shapes → heating load (kWh/m²) |
-| Series | `Hog_office_Marlena` (office), `Bear_education_Lila` (school), `Bear_lodging_Evan` (residence hall), `Bear_assembly_Jose` (assembly hall) | `Hog_office_Gustavo`, `Moose_education_Leland`, `Robin_lodging_Janie`, `Rat_assembly_Rolland` (a swimming pool) |
-| Guess game | yes (Step 1b: pick the strength grade of five mixes; classification comes first in Part 2 because a class is easier to guess and to judge than a number) | no |
-| Report questions | 6 | 6 (own data is the main deliverable) |
-| Time | about 90 min | about 90 min |
+| **MP6A** table | 1,030 real concrete mixes → compressive strength (MPa) | 768 simulated building shapes → heating load (kWh/m²) |
+| MP6A steps | 1a look, 1b guess five grades, 2a classification, 2b regression, 3a importance, 3b what-if, **4a chat, 4b chat + analysis tool**, 5 own table | the same without 1b |
+| **MP6B** series | `Hog_office_Marlena` (office), `Bear_education_Lila` (school), `Bear_lodging_Evan` (residence hall), `Bear_assembly_Jose` (assembly hall) | `Hog_office_Gustavo`, `Moose_education_Leland`, `Robin_lodging_Janie`, `Rat_assembly_Rolland` (a swimming pool) |
+| MP6B steps | 1a-1b which building is which, 1c anatomy, 2a forecast three ways, 3a odd days, **4a chat forecast, 4b chat + analysis tool, 4c chat odd days**, 5 own series | the same |
+| Report questions | MP6A 4, MP6B 5 | MP6A 4, MP6B 5 (own data is the main deliverable) |
+| Time | about 75 min each | about 75 min each |
 
-Step 0 clones only this folder, installs `gradio` and `chronos-forecasting` quietly, loads the tables and meters and
-(if ticked) downloads Chronos-Bolt-small (about 190 MB) and prints one line. Nothing needs a GPU.
+Step 0 clones only this folder and prints one line. MP6A installs `gradio` and loads the table; MP6B also installs
+`chronos-forecasting` and (if ticked) downloads Chronos-Bolt-small (about 190 MB). Nothing needs a GPU.
+
+**The chat steps.** Each shows download buttons for the files, a link to hokie.ai, the prompt to copy, a box for the
+reply and a *Score* button (the MP5 pattern). The files are made from the lab's own data when the cell runs:
+`<table>_train.csv` (the 80 % training split, with the answer) and `<table>_test.csv` (30 of the held-out rows, balanced
+across the grades, ids T01-T30, no answer), the same for every student; for a building, `<id>_last_4_weeks.csv`
+(hourly kWh and temperature, 18 September to 15 October 2017), `<id>_next_week_temperature.csv` and
+`<id>_daily_2017.csv`. A form option puts the data inside the prompt instead, for when attaching fails. The reply is
+read loosely (one line or many, tables, fences, extra words); a short reply is scored on the rows or hours it gave.
+Every reply scored stays in the step's table, so two new chats with the same prompt can be compared; the analysis-tool
+steps let the student pick the model the chat should train (gradient-boosted trees, a random forest, a straight line,
+a small neural network).
 
 ## 2. Measured numbers (the answer keys)
 
@@ -52,22 +67,53 @@ Here the pretrained model wins on all four buildings, most clearly on the large 
 **Odd days** (office, threshold 3.5): 25 days flagged, 9 on public holidays (New Year, MLK, Memorial, 3-4 July, Labor Day,
 Thanksgiving, Christmas), plus a Saturday spike on 22 April, a dip on 8 August and a three-day dip in mid September.
 
+**The chat on the concrete table** (hokie.ai, September 2026, the 30 test mixes; trees on the same 30: MAE 2.7 MPa,
+27 of 30 grades; straight line 8.5 MPa):
+
+| | average miss | worst miss | right grade |
+|---|---|---|---|
+| chat on its own, first new chat | 2.9 MPa | 13.0 | 28 of 30 |
+| chat on its own, second new chat | 3.3 MPa | 15.3 | 26 of 30 |
+| chat asked for grades directly | | | 27 of 30 |
+| chat + analysis tool (it said HistGradientBoostingRegressor) | 2.7 MPa | 11.6 | 27 of 30 |
+
+On its own the chat copies the strength of the most similar training mix (its two-decimal answers are exact training
+values; the UCI table records some mixes twice with rounded numbers, which also flatters the trees). It is close to
+the trees but gives a different number for about half the mixes in a second chat, and misses badly when no training
+mix is close. With the analysis tool it fits the same kind of model as the notebook and misses the same mixes.
+
 ## 3. Marking notes
+
+MP6A:
 
 1. Regression vs classification: trees beat the line by a factor of nearly three; the worst misses are high-strength
    mixes at unusual ages. Predicting 33 MPa says how far above 30 the mix is; "pass" does not. A false pass is the
    dangerous mistake; the model's probability shows which mixes to send for a test cube.
 2. The model agrees with the textbook on water, age and cement; a slider beyond the data (water 230+, age 365) flattens
    or wanders, because the trees cannot extrapolate.
-3. The office has flat weekends and a summer that looks like the rest of the year; the school has the flattest profile;
+3. The chat on its own is about as good as the trees on concrete and inconsistent between chats; asked how, it should
+   describe finding similar mixes. With the analysis tool it runs the notebook's method (same family, same misses),
+   which is the answer to "why does it agree". Not yet measured: the other tool models (a straight line should land
+   near the notebook's 8.5 MPa), the chat's column ranking against Step 3a, and the homework table, where the trees
+   are near perfect and the test is whether the chat on its own gets anywhere close.
+4. Own data: any table with a numeric answer column and 30+ rows works.
+
+MP6B:
+
+1. The office has flat weekends and a summer that looks like the rest of the year; the school has the flattest profile;
    the residence hall has an evening peak and empties in December; the assembly hall is the noisiest.
-4. Last week is hard to beat on regular buildings; trees win on three of four; the pretrained model is close with no
+2. Last week is hard to beat on regular buildings; trees win on three of four; the pretrained model is close with no
    training at all, and its band is the honest answer to "how sure are you".
-5. Holidays explain about a third of the flags; the rest need a question to the building. A threshold of 3 to 4.
-6. Own data: any table with a numeric answer column and 30+ rows works; a series needs a time column.
+3. Holidays explain about a third of the flags; the rest need a question to the building. A threshold of 3 to 4.
+4. Not yet measured with hokie.ai. The chat sees only four weeks (the notebook's methods see the year), and 168 values
+   is a long reply: look for a stopped or drifting list (the notebook says how many hours it read). For odd days,
+   compare its list with the rule's flags and the holiday column; a plausible reason for a day the rule does not flag
+   (a heat wave, an event) still needs checking, which is the point of the question.
+5. Own data: a series needs a time column and a value column.
 
 ## 4. Rebuilding
 
 `build/prepare_data.py` reads the downloads in `_candidates/` (gitignored; `LAB_OUTLINE.md` there records how the
-buildings were chosen) and writes `data/`. `build/make_notebooks.py` keeps text edited in the notebooks unless
-`--fresh-text` is passed.
+buildings were chosen) and writes `data/`. `build/make_notebooks.py` builds the four notebooks and their report
+templates (`python build/make_notebooks.py tabular` or `series` for one part) and keeps text edited in the notebooks
+unless `--fresh-text` is passed.

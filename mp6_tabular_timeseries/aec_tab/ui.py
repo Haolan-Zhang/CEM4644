@@ -260,8 +260,9 @@ def oddday_view(lab, meter_id: str, threshold: float):
 # ----------------------------------------------------------------------------- wrap-up
 def report_summary(lab):
     spec = lab.table_spec
-    print(f"Table: {spec.title}.")
-    for (kind, *rest), v in sorted(lab.results.items(), key=lambda kv: str(kv[0])):
+    print(f"Table: {spec.title}." if lab.part != "series" else f"Time series: {lab.spec.series.title}.")
+    for key, v in sorted(lab.results.items(), key=lambda kv: str(kv[0])):
+        kind, *rest = key if isinstance(key, tuple) else (key,)
         if kind == "reg":
             print(f"  regression, {rest[0]}: MAE {v['mae']:.2f} {spec.unit}, R² {v['r2']:.3f}")
         elif kind == "cls":
@@ -273,6 +274,12 @@ def report_summary(lab):
             print(f"  odd days on {rest[0]} at threshold {rest[1]:g}: {v}")
         elif kind == "buildings_game":
             print(f"  which building is which: {v} of 4")
+        elif kind == "chat_table":
+            print(f"  {rest[0]}: MAE {v['mae']:.2f} {spec.unit}, right grade {v['grades']} of {v['n']}")
+        elif kind == "chat_forecast":
+            print(f"  forecast {rest[0]} by {rest[1]}: MAE {v:.1f} kWh/h")
+        elif kind == "chat_odd":
+            print(f"  odd days on {rest[0]} by the chat: listed {v['listed']}, found {v['found']} of the rule's {v['flagged']}, added {v['extra']}")
     if lab.guesses:
         print(f"  your own grades in Step 1b: {lab.guesses['right']} of {len(lab.guesses['guess'])} right")
     if not lab.results:

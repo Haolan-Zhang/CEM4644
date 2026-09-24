@@ -1,6 +1,6 @@
-"""Generates the MP6 Workshop and Homework notebooks (+ report templates).
+"""Generates the MP6 notebooks (+ report templates): MP6A (tables) and MP6B (time series), each a workshop and a homework.
 
-    python build/make_notebooks.py [workshop] [homework] [--fresh-text]
+    python build/make_notebooks.py [tabular|series] [workshop|homework] [--fresh-text]
 
 The notebooks are where the wording lives: a rebuild keeps every markdown cell and every cell's #@markdown notes it
 finds in the existing notebook (matched by the cell's first line / title) and only regenerates the code. Pass
@@ -19,15 +19,19 @@ from aec_tab import config as C  # noqa: E402
 from aec_tab.data import load_meters  # noqa: E402
 from aec_tab.models import KINDS  # noqa: E402
 from aec_tab.series import METHODS  # noqa: E402
+from aec_tab.chat import CHAT_URL, GIVE, TEST_N, TOOL_MODELS  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
 KEEP_TEXT = True
 EXISTING = {}
 
 VARIANTS = {
-    "workshop": dict(file="MP6_Workshop_Tabular_TimeSeries.ipynb", label="Workshop (in class)", minutes=90, guess=True),
-    "homework": dict(file="MP6_Homework_Tabular_TimeSeries.ipynb", label="Homework (individual)", minutes=90, guess=False),
+    ("tabular", "workshop"): dict(file="MP6A_Workshop_Tabular.ipynb", label="Workshop (in class)", minutes=75, guess=True),
+    ("tabular", "homework"): dict(file="MP6A_Homework_Tabular.ipynb", label="Homework (individual)", minutes=75, guess=False),
+    ("series", "workshop"): dict(file="MP6B_Workshop_TimeSeries.ipynb", label="Workshop (in class)", minutes=75),
+    ("series", "homework"): dict(file="MP6B_Homework_TimeSeries.ipynb", label="Homework (individual)", minutes=75),
 }
+PART_NAME = {"tabular": ("MP6A", "Tables", "📊"), "series": ("MP6B", "Time series", "📈")}
 
 
 def load_existing(path: Path):
@@ -68,26 +72,8 @@ def choice(name, value, options):
     return f'{name} = {json.dumps(value, ensure_ascii=False)} #@param {jlist(options)}'
 
 
-def build(variant):
-    v = VARIANTS[variant]
-    spec = C.SPECS[variant]; t = spec.table
-    meters = load_meters(REPO, spec.series.meters)
-    labels = [m.label for m in meters.values()]
-    uses = sorted({m.use for m in meters.values()})
-    load_existing(REPO / v["file"])
-    cells = []
-
-    cells.append(md(f"""
-# 📊 CEM4644 · MP6 — Tables and time series
-## {v['label']}: *{spec.title}*
-
-**No coding needed.** Each grey box is one step: click ▶, wait, read the result, answer the report question. Run from top to bottom.
-
-Photos and drawings were the last four labs. Most construction data is neither: it is a **table** (one row per mix, per building, per bid) or a **time series** (one value per hour, per day). This lab does the same things with them: predict a number, predict a class, forecast what comes next, and check every answer against what really happened. About {v['minutes']} minutes. No GPU needed.
-"""))
-    cells.append(form(
-        "▶ Step 0 · Run me first (1–2 minutes)",
-        f"""import importlib, os, shutil, subprocess, sys
+def step0(variant, part):
+    body = f"""import importlib, os, shutil, subprocess, sys
 REPO, FOLDER, PKG = "CEM4644", "mp6_tabular_timeseries", "aec_tab"
 FOLDERS = ["mp6_tabular_timeseries"]          # only this lab folder is downloaded, not the whole course repository
 
@@ -107,12 +93,33 @@ for _m in [m for m in list(sys.modules) if m == PKG or m.startswith(PKG + ".")]:
 importlib.invalidate_caches()
 sys.path.insert(0, os.path.abspath(os.path.join(REPO, FOLDER)))
 from aec_tab import lab
-lab.setup(dataset="{variant}", load_forecaster=load_forecaster)""",
-        notes=["Click ▶ and wait for the ✅ line. Untick *load_forecaster* to skip the pretrained forecasting model (Step 5 then has two methods instead of three)."],
-        params=['load_forecaster = True #@param {type:"boolean"}'],
-    ))
+"""
+    if part == "tabular":
+        return form("▶ Step 0 · Run me first (1 minute)", body + f'lab.setup(dataset="{variant}", part="tabular")',
+                    notes=["Click ▶ and wait for the ✅ line."])
+    return form("▶ Step 0 · Run me first (1–2 minutes)", body + f'lab.setup(dataset="{variant}", part="series", load_forecaster=load_forecaster)',
+                notes=["Click ▶ and wait for the ✅ line. Untick *load_forecaster* to skip the pretrained forecasting model (Step 2a then has two methods instead of three)."],
+                params=['load_forecaster = True #@param {type:"boolean"}'])
 
-    # ------------------------------------------------------------------ Part 1
+
+def chat_md(what):
+    return (f"**hokie.ai** ({CHAT_URL}, Virginia Tech's free access to GPT models, sign in with your VT account) {what} "
+            "You paste its reply back into the notebook, which scores it against what really happened, next to the notebook's own models. "
+            "First the chat on its own, then the chat told to use its **data-analysis tool** (it writes and runs code on the files).")
+
+
+def build_tabular(variant, v, spec, cells):
+    t = spec.table
+    cells.append(md(f"""
+# 📊 CEM4644 · MP6A — Tables
+## {v['label']}: *{t.title}*
+
+**No coding needed.** Each grey box is one step: click ▶, wait, read the result, answer the report question. Run from top to bottom.
+
+Photos and drawings were the last four labs. Most construction data is neither: it is a **table** (one row per mix, per building, per bid) or a **time series** (one value per hour, per day; that is MP6B). This part does the table: predict a number, predict a class, see what the model learned, then give the same job to a chat model. Every answer is checked against what really happened. About {v['minutes']} minutes. No GPU needed.
+"""))
+    cells.append(step0(variant, "tabular"))
+
     cells.append(md(f"""
 ## Part 1 · A table
 
@@ -124,7 +131,6 @@ lab.setup(dataset="{variant}", load_forecaster=load_forecaster)""",
                           notes=[f"Five {t.rows} without their answer: which grade of {t.target_label} does each one reach? Pick, click the button, and see. "
                                  f"Step 2a shows what the model makes of the same {t.rows}."]))
 
-    # ------------------------------------------------------------------ Part 2
     cells.append(md(f"""
 ## Part 2 · Two questions, one table
 
@@ -136,16 +142,14 @@ The same table can answer **which class?** (a category: *classification*, the qu
                               f'threshold = {t.spec_default:g} #@param {{type:"slider", min:{t.spec_range[0]:g}, max:{t.spec_range[1]:g}, step:{t.spec_range[2]:g}}}']))
     cells.append(form("▶ Step 2b · Regression: predict the number", "lab.regression(model)",
                       params=[choice("model", list(KINDS)[1], list(KINDS))]))
-    n = 1
-    cells.append(q(n, (f"From Step 2a: how many {t.rows} the model puts in the right grade against your own score in Step 1b, and at your pass / fail threshold how many false passes and false fails there are. "
+    cells.append(q(1, (f"From Step 2a: how many {t.rows} the model puts in the right grade against your own score in Step 1b, and at your pass / fail threshold how many false passes and false fails there are. "
                        f"From Step 2b: the average miss of the straight line and of the trees, in {t.unit}, and what the worst misses have in common. "
                        f"What is the difference between predicting 'pass' and predicting 33 {t.unit}, and which of the two mistakes costs more on a real project?")
                    if variant == "workshop" else
                    (f"From Step 2a and 2b: the average miss and the share of {t.rows} in the right band. These numbers are far better than the concrete table's in the workshop. "
                     "What is different about this table (read the description in Part 1), and why does that make it easier for a model? Would you trust a model trained on it for a real building?")))
 
-    # ------------------------------------------------------------------ Part 3
-    cells.append(md(f"""
+    cells.append(md("""
 ## Part 3 · What the model learned
 
 A model that scores well may still have learned the wrong thing. Two checks: which columns it leans on, and how its prediction moves when you change one input at a time.
@@ -154,80 +158,159 @@ A model that scores well may still have learned the wrong thing. Two checks: whi
     cells.append(form("▶ Step 3b · What if…", "lab.whatif(start_from)",
                       notes=["Move a slider; the prediction updates. Everything not on a slider stays as it is in the chosen row."],
                       params=[choice("start_from", "a typical row", ["a typical row", "row 12", "row 100", "row 500"])]))
-    n += 1
-    cells.append(q(n, (f"From Step 3: the three columns that matter most. Does the model agree with what you know about concrete (more water, longer curing, more cement)? "
+    cells.append(q(2, ("From Step 3: the three columns that matter most. Does the model agree with what you know about concrete (more water, longer curing, more cement)? "
                        "Push one slider to the edge of its range: where does the prediction stop making sense, and why can a model not know that?")
                    if variant == "workshop" else
                    ("From Step 3: which two columns decide the heating load, and in which direction? Set the sliders to a building you would design yourself and report its predicted load. "
                     "Does the model tell you anything a building-energy simulator would not?")))
 
-    # ------------------------------------------------------------------ Part 4
     cells.append(md(f"""
-## Part 4 · A time series
+## Part 4 · The same job, by a chat model
 
-{spec.series.title}: electricity, hour by hour, from {len(meters)} real buildings on North American campuses, with the site's air temperature. A time series has a **rhythm** (days, weeks, seasons) that a table does not, and a model that knows the rhythm can say what comes next.
+{chat_md(f"gets the same training {t.rows} the models above learned from, and {TEST_N} of the held-out {t.rows} without their {t.target_label}.")} The {TEST_N} {t.rows} are the same for everyone, so you can compare with your neighbours.
 """))
-    cells.append(form("▶ Step 4a · Which building is which?", "lab.buildings()",
-                      notes=[f"Four buildings, no names: a week and a year each. They are, in some order, {', '.join(uses)}."]))
-    cells.append(form("▶ Step 4b · Your answer", "lab.buildings_answer(a, b, c, d)",
-                      params=[choice(k, uses[0], uses) for k in "abcd"]))
-    cells.append(form("▶ Step 4c · The anatomy of one building's year", "lab.anatomy(building)",
-                      params=[choice("building", labels[0], labels)]))
-    n += 1
-    cells.append(q(n, "From Step 4: which buildings did you get right, and from what (the shape of the day, the weekend, the summer)? "
-                      "Pick one building in Step 4c and describe its week in three sentences a facilities manager would recognise."))
+    cells.append(form("▶ Step 4a · Ask the chat", "lab.chat_table(give)",
+                      notes=["Run the same prompt in **two** new chats and score both replies: the table then compares them. "
+                             "If attaching files does not work, choose *paste the data into the prompt* and run the cell again."],
+                      params=[choice("give", list(GIVE)[0], list(GIVE))]))
+    cells.append(form("▶ Step 4b · Ask the chat to use its analysis tool", "lab.chat_table_tool(model)",
+                      notes=["Pick the model the chat should train, run the cell, and follow the steps. If the reply shows no code or analysis panel, "
+                             "ask it again to *use your data-analysis tool*. Then try a second model: every reply you score stays in the table."],
+                      params=[choice("model", list(TOOL_MODELS)[0], list(TOOL_MODELS))]))
+    cells.append(q(3, (f"From Step 4a: the chat's average miss and right grades next to the trees', and how many numbers changed between your two new chats. "
+                       "Ask the chat how it made those predictions: what does it say it did? From Step 4b: the model you asked for, its average miss, and why it lands where it does "
+                       "against the notebook's trees and straight line (Step 2b). Compare the three columns the chat said mattered most with Step 3a. "
+                       "When would you trust a chat's numbers on a real project, and what would you check first?")
+                   if variant == "workshop" else
+                   (f"From Step 4a and 4b: the chat's average miss on its own and with its analysis tool (two models), against the notebook's trees. "
+                    "This table comes from a simulator and the trees nearly get it perfect (question 1): did the chat on its own come close? "
+                    "What does that tell you about the difference between reasoning about a table and fitting a model to it?")))
 
-    # ------------------------------------------------------------------ Part 5
     cells.append(md("""
-## Part 5 · Next week
+## Part 5 · Your own table
+
+A small app, opened from a link: upload any CSV, pick the column to predict, and it fits decision trees and scores them on held-out rows.
+"""))
+    cells.append(form("▶ Step 5 · Your own table", "lab.upload_app()", notes=["Open the printed link in a new tab."]))
+    cells.append(q(4, ("Upload one table of your own (a cost table, a bid tabulation, anything with a numeric column and 30+ rows) and report what the app found: "
+                       "the score, the columns that mattered, and whether you believe it.")
+                   if variant == "workshop" else
+                   ("The main deliverable: find or make a table of your own (a bid tabulation, a materials price list, anything with a numeric column to predict and 30+ rows). "
+                    "Run it through Step 5 and report what the data is, what the app found, and what you would need to trust the numbers. "
+                    "Then give the same file to the chat and ask it to use its analysis tool to do the same: does it agree with the app?")))
+    return ["table"]
+
+
+def build_series(variant, v, spec, cells):
+    meters = load_meters(REPO, spec.series.meters)
+    labels = [m.label for m in meters.values()]
+    uses = sorted({m.use for m in meters.values()})
+    cells.append(md(f"""
+# 📈 CEM4644 · MP6B — Time series
+## {v['label']}: *{spec.series.title}*
+
+**No coding needed.** Each grey box is one step: click ▶, wait, read the result, answer the report question. Run from top to bottom.
+
+MP6A was a table: one row per thing. This part is a **time series**: one value per hour, from the electricity meters of {len(meters)} real buildings on North American campuses, with the site's air temperature. A time series has a **rhythm** (days, weeks, seasons) that a table does not, and a model that knows the rhythm can say what comes next. You will tell the buildings apart, forecast a week three ways, find the days that do not fit, then give the same jobs to a chat model. About {v['minutes']} minutes. No GPU needed.
+"""))
+    cells.append(step0(variant, "series"))
+
+    cells.append(md(f"""
+## Part 1 · A time series
+
+{spec.series.title}. Each building uses its electricity to its own rhythm: who is in it, when, and for what.
+"""))
+    cells.append(form("▶ Step 1a · Which building is which?", "lab.buildings()",
+                      notes=[f"Four buildings, no names: a week and a year each. They are, in some order, {', '.join(uses)}."]))
+    cells.append(form("▶ Step 1b · Your answer", "lab.buildings_answer(a, b, c, d)",
+                      params=[choice(k, uses[0], uses) for k in "abcd"]))
+    cells.append(form("▶ Step 1c · The anatomy of one building's year", "lab.anatomy(building)",
+                      params=[choice("building", labels[0], labels)]))
+    cells.append(q(1, "From Step 1: which buildings did you get right, and from what (the shape of the day, the weekend, the summer)? "
+                      "Pick one building in Step 1c and describe its week in three sentences a facilities manager would recognise."))
+
+    cells.append(md("""
+## Part 2 · Next week
 
 Three ways to forecast a week: copy last week; decision trees that learned from the past weeks, the calendar and the temperature; and a **pretrained forecasting model** that has seen millions of other time series and none of ours. Each is scored against what really happened.
 """))
-    cells.append(form("▶ Step 5a · Forecast one week", "lab.forecast(building, method)",
+    cells.append(form("▶ Step 2a · Forecast one week", "lab.forecast(building, method)",
                       params=[choice("building", labels[0], labels), choice("method", "all three", ["all three"] + list(METHODS))]))
-    n += 1
-    cells.append(q(n, ("From Step 5a on all four buildings: the average miss of each method (copy the tables). Which method wins where, and is 'same hour last week' ever hard to beat? "
+    cells.append(q(2, ("From Step 2a on all four buildings: the average miss of each method (copy the tables). Which method wins where, and is 'same hour last week' ever hard to beat? "
                        "What does the shaded band of the pretrained model mean, and how would you use it when planning a site's power supply?")
                    if variant == "workshop" else
-                   ("From Step 5a on all four buildings: the average miss of each method. One of these buildings forecasts far worse than the others, whichever method you use: "
-                    "which one, why (look at Step 4c), and what extra information would a forecaster need?")))
+                   ("From Step 2a on all four buildings: the average miss of each method. One of these buildings forecasts far worse than the others, whichever method you use: "
+                    "which one, why (look at Step 1c), and what extra information would a forecaster need?")))
 
-    # ------------------------------------------------------------------ Part 6
     cells.append(md("""
-## Part 6 · The odd days
+## Part 3 · The odd days
 
 Every building has a usual day for each weekday. A day that leaves the pattern is either explained (a holiday, a closure) or worth a phone call (a fault, a meter, something left running).
 """))
-    cells.append(form("▶ Step 6a · Days that do not fit", "lab.odd_days(building, threshold)",
+    cells.append(form("▶ Step 3a · Days that do not fit", "lab.odd_days(building, threshold)",
                       notes=["Lower the threshold and more days are flagged; raise it and only the strangest remain."],
                       params=[choice("building", labels[0], labels), 'threshold = 3.5 #@param {type:"slider", min:2, max:6, step:0.5}']))
-    n += 1
-    cells.append(q(n, "From Step 6a on two buildings: the flagged days at threshold 3.5. Which have an obvious cause (the calendar column), which do not? "
+    cells.append(q(3, "From Step 3a on two buildings: the flagged days at threshold 3.5. Which have an obvious cause (the calendar column), which do not? "
                       "For one unexplained day, say what you would check first. What threshold would you set for an automatic alert, and why?"))
 
-    # ------------------------------------------------------------------ Part 7
-    cells.append(md("""
-## Part 7 · Your own table or time series
+    cells.append(md(f"""
+## Part 4 · The same jobs, by a chat model
 
-A small app, opened from a link: upload any CSV. A table gets decision trees and a score on held-out rows; a time series gets a forecast of its last period.
+{chat_md("gets four weeks of one building's hourly electricity and next week's temperature, and forecasts the week the notebook forecast in Step 2a; then the building's daily totals for the year, to find the odd days of Step 3a.")}
 """))
-    cells.append(form("▶ Step 7 · Your own data", "lab.upload_app()", notes=["Open the printed link in a new tab."]))
-    n += 1
-    cells.append(q(n, ("Upload one table or one time series of your own (a cost table, a utility bill history, anything with numbers) and report what the app found: "
-                       "the score, the columns that mattered or the forecast, and whether you believe it.")
+    cells.append(form("▶ Step 4a · Ask the chat for next week", "lab.chat_forecast(building, give)",
+                      notes=["The reply must list all 168 hours; if the chat stops early, ask it to continue and paste every part. "
+                             "Run the same prompt in two new chats and score both. If attaching files does not work, choose *paste the data into the prompt*."],
+                      params=[choice("building", labels[0], labels), choice("give", list(GIVE)[0], list(GIVE))]))
+    cells.append(form("▶ Step 4b · Ask the chat to use its analysis tool", "lab.chat_forecast_tool(building, model)",
+                      notes=["Pick the model the chat should train. If the reply shows no code or analysis panel, ask it again to *use your data-analysis tool*."],
+                      params=[choice("building", labels[0], labels), choice("model", list(TOOL_MODELS)[0], list(TOOL_MODELS))]))
+    cells.append(form("▶ Step 4c · Ask the chat for the odd days", "lab.chat_odd_days(building, give)",
+                      notes=["The notebook compares the chat's days with the days its own rule flags in Step 3a (threshold 3.5) and with the public holidays."],
+                      params=[choice("building", labels[0], labels), choice("give", list(GIVE)[0], list(GIVE))]))
+    cells.append(q(4, ("From Step 4a and 4b on one building: the chat's average miss on its own and with its analysis tool, next to the three methods of Step 2a (copy the table). "
+                       "Did it give all 168 hours, and did two new chats agree? From Step 4c: how many of the notebook's flagged days the chat found, which days it added, "
+                       "and whether its reasons are believable (check one against the calendar). Which job suits the chat better, forecasting numbers or explaining odd days, and why?")
                    if variant == "workshop" else
-                   ("The main deliverable: find or make two datasets of your own, one table and one time series (a bid tabulation, a materials price list, a utility bill history, "
-                    "weather at a site, anything with numbers). Run both through Step 7 and report: what the data is, what the app found, and what you would need to trust the numbers.")))
+                   ("Steps 4a to 4c on the building that forecast worst in Step 2a and on one other: the chat's average miss on its own and with its analysis tool against Step 2a's methods, "
+                    "and the odd days it found. Does the chat do better than the notebook on the hard building? Does its explanation of that building's pattern help you, "
+                    "and how would you check whether it is true?")))
+
+    cells.append(md("""
+## Part 5 · Your own time series
+
+A small app, opened from a link: upload any CSV with a time column and a value column, and it forecasts the last period from the data before it.
+"""))
+    cells.append(form("▶ Step 5 · Your own time series", "lab.upload_app()", notes=["Open the printed link in a new tab."]))
+    cells.append(q(5, ("Upload one time series of your own (a utility bill history, a site's weather, daily deliveries, anything with a date and a number) and report what the app found: "
+                       "the forecast, its average miss, and whether you believe it.")
+                   if variant == "workshop" else
+                   ("The main deliverable: find or make a time series of your own (a utility bill history, a site's weather, daily progress or deliveries). "
+                    "Run it through Step 5 and report what the data is, what the app found, and what you would need to trust the forecast. "
+                    "Then give the same file to the chat and ask it to use its analysis tool to forecast the same period: does it agree with the app?")))
+    return ["meters", "forecaster"]
+
+
+def build(part, variant):
+    v = VARIANTS[(part, variant)]
+    spec = C.SPECS[variant]
+    load_existing(REPO / v["file"])
+    cells = []
+    uses = (build_tabular if part == "tabular" else build_series)(variant, v, spec, cells)
 
     cells.append(md("## Wrap-up"))
     cells.append(form("▶ Numbers for your report", "lab.report_summary()"))
     cr = json.loads((REPO / "data" / "credits.json").read_text())
-    tk = t.key
-    cells.append(md("### Credits\n"
-                    f"- Table: {cr[tk]['title']}, {cr[tk]['author']}, {cr[tk]['license']}, {cr[tk]['source']}.\n"
-                    f"- Meters: {cr['meters']['title']}, {cr['meters']['author']}, {cr['meters']['license']}, {cr['meters']['source']}.\n"
-                    f"- Pretrained forecaster: {cr['forecaster']['title']} ({cr['forecaster']['author']}, {cr['forecaster']['license']}).\n"
-                    "- Lab code: https://github.com/Haolan-Zhang/CEM4644 (folder `mp6_tabular_timeseries`).\n"))
+    lines = ["### Credits"]
+    if "table" in uses:
+        tk = spec.table.key
+        lines.append(f"- Table: {cr[tk]['title']}, {cr[tk]['author']}, {cr[tk]['license']}, {cr[tk]['source']}.")
+    if "meters" in uses:
+        lines.append(f"- Meters: {cr['meters']['title']}, {cr['meters']['author']}, {cr['meters']['license']}, {cr['meters']['source']}.")
+        lines.append(f"- Pretrained forecaster: {cr['forecaster']['title']} ({cr['forecaster']['author']}, {cr['forecaster']['license']}).")
+    lines.append("- Chat model: the GPT models behind hokie.ai (Virginia Tech).")
+    lines.append("- Lab code: https://github.com/Haolan-Zhang/CEM4644 (folder `mp6_tabular_timeseries`).")
+    cells.append(md("\n".join(lines) + "\n"))
 
     questions = []
     for c in cells:
@@ -239,17 +322,20 @@ A small app, opened from a link: upload any CSV. A table gets decision trees and
                         "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"}, "language_info": {"name": "python"}})
     out = REPO / v["file"]
     nbformat.write(nb, str(out)); print("wrote", out)
-    lines = [f"# CEM4644 · MP6 report — {v['label']}", "", "Name: ______________________    Date: ____________", "",
-             f"Notebook: `{v['file']}` — data: *{spec.title}*.", "",
+    code, name, _ = PART_NAME[part]
+    data_title = spec.table.title if part == "tabular" else spec.series.title
+    lines = [f"# CEM4644 · {code} ({name}) report — {v['label']}", "", "Name: ______________________    Date: ____________", "",
+             f"Notebook: `{v['file']}` — data: *{data_title}*.", "",
              "Answer every question in a few sentences. Paste screenshots where the question asks for pictures or tables. "
              "Numbers must come from **your** run of the notebook.", ""]
     for num, text in questions:
         lines += [f"## Question {num}", "", text, "", "*Your answer:*", "", "", ""]
-    p = REPO / "docs" / f"MP6_{variant.capitalize()}_Report_Template.md"
+    p = REPO / "docs" / f"{code}_{variant.capitalize()}_Report_Template.md"
     p.parent.mkdir(exist_ok=True); p.write_text("\n".join(lines)); print("wrote", p)
-
 
 if __name__ == "__main__":
     KEEP_TEXT = "--fresh-text" not in sys.argv
-    for variant in ([a for a in sys.argv[1:] if not a.startswith("--")] or VARIANTS):
-        build(variant)
+    want = [a for a in sys.argv[1:] if not a.startswith("--")]
+    for part, variant in VARIANTS:
+        if not want or part in want or variant in want:
+            build(part, variant)
