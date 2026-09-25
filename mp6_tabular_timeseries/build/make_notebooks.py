@@ -385,6 +385,8 @@ def build(part, variant):
 if __name__ == "__main__":
     KEEP_TEXT = "--fresh-text" not in sys.argv
     want = [a for a in sys.argv[1:] if not a.startswith("--")]
+    parts = [a for a in want if a in ("tabular", "series")] or ["tabular", "series"]
+    variants = [a for a in want if a in ("workshop", "homework")] or ["workshop", "homework"]
     for part, variant in VARIANTS:
-        if not want or part in want or variant in want:
+        if part in parts and variant in variants:
             build(part, variant)
