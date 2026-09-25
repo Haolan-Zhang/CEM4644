@@ -7,6 +7,7 @@ finds in the existing notebook (matched by the cell's first line / title) and on
 --fresh-text to start again from the defaults in this file.
 """
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -20,10 +21,12 @@ from aec_tab.data import load_meters  # noqa: E402
 from aec_tab.models import KINDS  # noqa: E402
 from aec_tab.series import METHODS  # noqa: E402
 from aec_tab.chat import CHAT_URL, GIVE, TEST_N, TOOL_MODELS  # noqa: E402
+from aec_tab.ui import REGRESSION_TEXT  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
 KEEP_TEXT = True
 EXISTING = {}
+EXISTING_TEXTS = {}          # cell title -> {name: text} for the result wordings written in a cell (name_text = """...""")
 
 VARIANTS = {
     ("tabular", "workshop"): dict(file="MP6A_Workshop_Tabular.ipynb", label="Workshop (in class)", minutes=75, guess=True),
@@ -65,7 +68,7 @@ PART_NAME = {"tabular": ("MP6A", "Tables", "📊"), "series": ("MP6B", "Time ser
 
 
 def load_existing(path: Path):
-    EXISTING.clear()
+    EXISTING.clear(); EXISTING_TEXTS.clear()
     if not (KEEP_TEXT and path.exists()):
         return
     for c in nbformat.read(str(path), as_version=4).cells:
@@ -74,13 +77,21 @@ def load_existing(path: Path):
             EXISTING[first] = c.source
         elif first.startswith("#@title"):
             EXISTING[first] = [l[len("#@markdown "):] for l in c.source.split("\n") if l.startswith("#@markdown ")]
+            EXISTING_TEXTS[first] = dict(re.findall(r'^(\w+_text) = """(.*?)"""', c.source, re.S | re.M))
 
 
-def form(title, body, notes=(), params=()):
+def form(title, body, notes=(), params=(), texts=None):
+    """texts: {name: wording} written into the cell as name = \"\"\"...\"\"\" (visible under Show code, kept on a rebuild)."""
     head = f'#@title {title} {{ display-mode: "form" }}'
     if head in EXISTING:
         notes = EXISTING[head]
-    src = head + "\n" + "".join(f"#@markdown {n}\n" for n in notes) + "".join(p + "\n" for p in params) + body.rstrip() + "\n"
+    words = ""
+    if texts:
+        kept = EXISTING_TEXTS.get(head, {})
+        words = ("# The wording of the result: edit the text between the triple quotes. Words in {braces} are filled in by the notebook;\n"
+                 "# **bold** works, and each line is shown as its own line.\n"
+                 + "".join(f'{k} = """{kept.get(k, v)}"""\n' for k, v in texts.items()))
+    src = head + "\n" + "".join(f"#@markdown {n}\n" for n in notes) + "".join(p + "\n" for p in params) + words + body.rstrip() + "\n"
     c = new_code_cell(src); c.metadata["cellView"] = "form"
     return c
 
@@ -157,9 +168,15 @@ Photos and drawings were the last four labs. Most construction data is neither: 
 """))
     cells.append(form("▶ Step 1a · Look at the table", "lab.show_table(rows)", params=['rows = 10 #@param [5, 10, 20] {type:"raw"}']))
     if v["guess"]:
-        cells.append(form("▶ Step 1b · Guess it yourself", "lab.guess()",
-                          notes=[f"Five {t.rows} without their answer: which grade of {t.target_label} does each one reach? Pick, click the button, and see. "
-                                 f"Step 2a shows what the model makes of the same {t.rows}."]))
+        hints = ([f"Five {t.rows} without their answer: which grade of {t.target_label} does each one reach? Two rules of thumb help:",
+                  "1. Look at the **water / cement** column: the water divided by the cement, already worked out for you.",
+                  "2. Below 0.5 is probably **high**, 0.5 to 1.0 **normal**, above 1.0 **low**.",
+                  "3. Check the **age**: a sample 7 days old or younger has not reached its strength yet, so drop it one grade.",
+                  f"Pick a grade for each {t.row_word}, click the button, and see. Step 2a shows what the model makes of the same {t.rows}."]
+                 if t.guess_ratio else
+                 [f"Five {t.rows} without their answer: which grade of {t.target_label} does each one reach? Pick, click the button, and see. "
+                  f"Step 2a shows what the model makes of the same {t.rows}."])
+        cells.append(form("▶ Step 1b · Guess it yourself", "lab.guess()", notes=hints))
 
     cells.append(md(f"""
 ## Part 2 · Two questions, one table
@@ -170,8 +187,9 @@ The same table can answer **which class?** (a category: *classification*, the qu
                       notes=[f"*grades* puts each {t.row_word} in one of {len(t.grades)} bands of {t.target_label}, the game of Step 1b; *pass / fail* asks whether it reaches the *threshold* you set."],
                       params=[choice("model", list(KINDS)[1], list(KINDS)), choice("task", "grades", ["grades", "pass / fail against a specification"]),
                               f'threshold = {t.spec_default:g} #@param {{type:"slider", min:{t.spec_range[0]:g}, max:{t.spec_range[1]:g}, step:{t.spec_range[2]:g}}}']))
-    cells.append(form("▶ Step 2b · Regression: predict the number", "lab.regression(model)",
-                      params=[choice("model", list(KINDS)[1], list(KINDS))]))
+    cells.append(form("▶ Step 2b · Regression: predict the number", "lab.regression(model, result_text)",
+                      params=[choice("model", list(KINDS)[1], list(KINDS))],
+                      texts={"result_text": REGRESSION_TEXT.replace("{rows}", t.rows)}))
     cells.append(q(1, (f"From Step 2a: how many {t.rows} the model puts in the right grade against your own score in Step 1b, and at your pass / fail threshold how many false passes and false fails there are. "
                        f"From Step 2b: the average miss of the straight line and of the trees, in {t.unit}, and what the worst misses have in common. "
                        f"What is the difference between predicting 'pass' and predicting 33 {t.unit}, and which of the two mistakes costs more on a real project?")
@@ -216,20 +234,17 @@ A model that scores well may still have learned the wrong thing. Two checks: whi
                     "This table comes from a simulator and the trees nearly get it perfect (question 1): did the chat on its own come close? "
                     "What does that tell you about the difference between reasoning about a table and fitting a model to it?")))
 
-    cells.append(md("""
+    if variant == "homework":                  # the workshop ends with the chat; the students' own table is homework
+        cells.append(md("""
 ## Part 5 · Your own table
 
 A small app, opened from a link: upload any CSV, pick the column to predict, and it fits decision trees and scores them on held-out rows.
 """))
-    if variant == "homework":
         cells.append(md(TAP_TEST))
-    cells.append(form("▶ Step 5 · Your own table", "lab.upload_app()", notes=["Open the printed link in a new tab."]))
-    cells.append(q(4, ("Upload one table of your own (a cost table, a bid tabulation, anything with a numeric column and 30+ rows) and report what the app found: "
-                       "the score, the columns that mattered, and whether you believe it.")
-                   if variant == "workshop" else
-                   ("The main deliverable: find or make a table of your own (a bid tabulation, a materials price list, anything with a numeric column to predict and 30+ rows). "
-                    "Run it through Step 5 and report what the data is, what the app found, and what you would need to trust the numbers. "
-                    "Then give the same file to the chat and ask it to use its analysis tool to do the same: does it agree with the app?")))
+        cells.append(form("▶ Step 5 · Your own table", "lab.upload_app()", notes=["Open the printed link in a new tab."]))
+        cells.append(q(4, "The main deliverable: find or make a table of your own (a bid tabulation, a materials price list, anything with a numeric column to predict and 30+ rows). "
+                          "Run it through Step 5 and report what the data is, what the app found, and what you would need to trust the numbers. "
+                          "Then give the same file to the chat and ask it to use its analysis tool to do the same: does it agree with the app?"))
     return ["table"]
 
 

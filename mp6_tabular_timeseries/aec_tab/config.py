@@ -28,6 +28,7 @@ class TableSpec:
     description: str = ""
     chat_about: str = ""                                # the table in words, for the chat prompt ("824 " + this)
     close_enough: float = 5.0                           # a miss this small counts as close, in the chat steps
+    guess_ratio: Optional[Tuple[str, str, str]] = None  # (label, numerator, denominator) worked out for the guessing game
 
     @property
     def rows(self) -> str:
@@ -73,7 +74,7 @@ CONCRETE = TableSpec(
     chat_about=("concrete mixes that were tested in a laboratory: the amount of each ingredient in kg per cubic metre of concrete "
                 "(cement, blast-furnace slag, fly ash, water, superplasticizer, coarse aggregate, fine aggregate), the age of the "
                 "sample when it was tested (age_days), and the compressive strength it reached (strength_MPa)"),
-    close_enough=5.0,
+    close_enough=5.0, guess_ratio=("water / cement", "water", "cement"),
 )
 
 ENERGY = TableSpec(

@@ -19,7 +19,8 @@ hidden. No GPU needed.
 
 **MP6A · Tables**
 
-1. **A table**: look at it, then put five mixes in their strength grade yourself (workshop).
+1. **A table**: look at it, then put five mixes in their strength grade yourself, with a water / cement rule of thumb
+   (workshop).
 2. **Two questions, one table**: classification first (strength grades, the game they just played, or pass / fail
    against a specification the student sets; false passes counted separately), then regression (a straight line vs
    gradient-boosted trees, scored on rows the model never saw).
@@ -27,7 +28,8 @@ hidden. No GPU needed.
 4. **The same job, by a chat model**: the training rows and 30 held-out rows go to hokie.ai, first with a plain
    prompt (twice, in two new chats, to see whether the numbers stay the same), then with the chat told to train a
    model of the student's choice with its data-analysis tool; each reply is scored next to the trees and the line.
-5. **Their own table** in a small app opened from a link: trees and a score on held-out rows.
+5. **Their own table** (homework): the tap test (phone recordings of taps on different surfaces, one row per tap) or
+   any CSV, in a small app opened from a link: trees and a score on held-out rows.
 
 **MP6B · Time series**
 
@@ -55,10 +57,11 @@ build/            instructor-side scripts: prepare_data.py (from the raw downloa
 docs/             report templates, instructor guide
 ```
 
-**Editing the text.** The notebooks are where the wording lives. Edit any markdown cell or any cell's `#@markdown`
-notes in Colab (*Show code* on a form cell), then *File → Save a copy in GitHub* (clear the outputs first). A later
-`make_notebooks.py` run keeps every markdown cell and every note it finds in the existing notebook and rebuilds only
-the code; `--fresh-text` starts again from the generator's defaults. Step 0 prints only the ✅ line.
+**Editing the text.** The notebooks are where the wording lives. Edit any markdown cell, any cell's `#@markdown`
+notes, or a result wording written in a cell (`result_text = """..."""`, Step 2b of MP6A) in Colab (*Show code* on
+a form cell), then *File → Save a copy in GitHub* (clear the outputs first). A later `make_notebooks.py` run keeps
+every markdown cell, note and result wording it finds in the existing notebook and rebuilds only the code;
+`--fresh-text` starts again from the generator's defaults. Step 0 prints only the ✅ line.
 
 ## Rebuilding (instructors only)
 

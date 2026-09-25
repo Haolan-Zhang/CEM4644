@@ -48,6 +48,9 @@ def guess_game(lab):
     rows = Xte.iloc[idx]; truth = yte.iloc[idx]
     grades = [g[0] for g in spec.grades]
     view = rows.copy(); view.columns = [spec.label(c) for c in view.columns]; view.index = [f"{spec.row_word} {i + 1}" for i in range(len(view))]
+    if spec.guess_ratio:
+        name, top, bottom = spec.guess_ratio
+        view[name] = (rows[top] / rows[bottom]).round(2).values
     table(view)
     picks = [w.Dropdown(options=grades, value=grades[len(grades) // 2], description=f"{spec.row_word} {i + 1}", layout=w.Layout(width="330px")) for i in range(len(rows))]
     btn = w.Button(description="Check my guesses", button_style="primary"); out = w.Output()
@@ -67,7 +70,21 @@ def guess_game(lab):
 
 
 # ----------------------------------------------------------------------------- Part 2: regression and classification
-def regression_view(lab, kind: str):
+REGRESSION_TEXT = ("**{model}:**\nTrained on **{n_train}** {rows}, tested on **{n_test}** it never saw.\n**Average miss (MAE):** {mae} {unit}\n"
+                   "**R²:** {r2} (1.0 would be perfect; 0 is no better than guessing the average)")
+
+
+def md_text(template: str, **values):
+    """A result written in the notebook (markdown, one line per line), with the numbers filled in."""
+    from IPython.display import Markdown
+    try:
+        text = template.format(**values)
+    except (KeyError, IndexError, ValueError) as e:
+        text = template + f"\n\n*(the text has a placeholder the notebook does not know: {e})*"
+    display(Markdown("  \n".join(text.strip().split("\n"))))
+
+
+def regression_view(lab, kind: str, result_text: Optional[str] = None):
     spec, df = lab.table_spec, lab.df
     Xtr, Xte, ytr, yte = models.split(df, spec)
     model = models.fit_regressor(kind, Xtr, ytr)
@@ -77,8 +94,8 @@ def regression_view(lab, kind: str):
     ax.scatter(r.y_true, r.y_pred, s=14, alpha=0.6, color=BLUE); lim = [min(r.y_true.min(), r.y_pred.min()), max(r.y_true.max(), r.y_pred.max())]
     ax.plot(lim, lim, "k--", lw=1); ax.set_xlabel(f"measured {spec.label(spec.target)}"); ax.set_ylabel("predicted"); ax.set_title(f"{len(Xte)} {spec.rows} the model never saw", fontsize=10)
     show(fig)
-    print(f"{kind}: trained on {len(Xtr)} {spec.rows}, scored on {len(Xte)} it never saw.")
-    print(f"  Average miss (MAE): {r.mae:.2f} {spec.unit}   |   R²: {r.r2:.3f}   (1.0 would be perfect; 0 is no better than always guessing the average)")
+    md_text(result_text or REGRESSION_TEXT, model=kind[:1].upper() + kind[1:], n_train=len(Xtr), n_test=len(Xte), rows=spec.rows,
+            mae=f"{r.mae:.2f}", unit=spec.unit, r2=f"{r.r2:.3f}")
     if lab.guesses:
         p = model.predict(df.loc[lab.guesses["rows"], spec.features])
         m = float(np.mean(np.abs(p - np.array(lab.guesses["truth"]))))
@@ -130,7 +147,6 @@ def importance_view(lab):
     ax.barh([spec.label(f) for f, _ in imp][::-1], [v for _, v in imp][::-1], color=BLUE)
     ax.set_xlabel("how much the model's accuracy drops when this column is scrambled"); show(fig)
     lab.results["importance"] = imp
-    print("The columns the model leans on most are at the top. A column near zero could be removed without the model noticing.")
 
 
 def whatif(lab, start_from: str = "a typical row"):
@@ -163,9 +179,8 @@ def whatif(lab, start_from: str = "a typical row"):
             ax.plot(xs, ys, color=BLUE); ax.scatter([row[f0]], [pred], color=RED, zorder=3)
             ax.set_xlabel(spec.label(f0)); ax.set_ylabel(f"predicted {spec.label(spec.target)}"); ax.set_title(f"predicted {spec.target_label}: {pred:.1f} {spec.unit}", fontsize=11)
             show(fig)
-            lo, hi = df[spec.target].min(), df[spec.target].max()
             inside = all(df[f].min() <= row[f] <= df[f].max() for f in spec.whatif)
-            print(f"Predicted {spec.target_label}: {pred:.1f} {spec.unit} (the data runs from {lo:.0f} to {hi:.0f})."
+            print(f"Predicted {spec.target_label}: {pred:.1f} {spec.unit}."
                   + ("" if inside else " At least one slider is outside anything the model was trained on: treat this number as a guess."))
     for s in sliders.values():
         s.observe(render, names="value")

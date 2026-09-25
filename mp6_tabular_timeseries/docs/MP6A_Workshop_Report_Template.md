@@ -29,11 +29,3 @@ From Step 4a: the chat's average miss and right grades next to the trees', and h
 *Your answer:*
 
 
-
-## Question 4
-
-Upload one table of your own (a cost table, a bid tabulation, anything with a numeric column and 30+ rows) and report what the app found: the score, the columns that mattered, and whether you believe it.
-
-*Your answer:*
-
-

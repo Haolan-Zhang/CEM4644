@@ -8,10 +8,10 @@ Both end with a section in which the students give the same job to a chat model 
 | | Workshop | Homework |
 |---|---|---|
 | **MP6A** table | 1,030 real concrete mixes → compressive strength (MPa) | 768 simulated building shapes → heating load (kWh/m²) |
-| MP6A steps | 1a look, 1b guess five grades, 2a classification, 2b regression, 3a importance, 3b what-if, **4a chat, 4b chat + analysis tool**, 5 own table | the same without 1b |
+| MP6A steps | 1a look, 1b guess five grades (with a water / cement rule of thumb), 2a classification, 2b regression, 3a importance, 3b what-if, **4a chat, 4b chat + analysis tool** | the same without 1b, plus 5: the tap test and their own table |
 | **MP6B** series | `Hog_office_Marlena` (office), `Bear_education_Lila` (school), `Bear_lodging_Evan` (residence hall), `Bear_assembly_Jose` (assembly hall) | `Hog_office_Gustavo`, `Moose_education_Leland`, `Robin_lodging_Janie`, `Rat_assembly_Rolland` (a swimming pool) |
 | MP6B steps | 1a-1b which building is which, 1c anatomy, 2a forecast three ways, 3a odd days, **4a chat forecast, 4b chat + analysis tool, 4c chat odd days**, 5 own series | the same |
-| Report questions | MP6A 4, MP6B 5 | MP6A 4, MP6B 5 (own data is the main deliverable) |
+| Report questions | MP6A 3, MP6B 5 | MP6A 4, MP6B 5 (own data is the main deliverable) |
 | Time | about 75 min each | about 75 min each |
 
 Step 0 clones only this folder and prints one line. MP6A installs `gradio` and loads the table; MP6B also installs
@@ -29,6 +29,9 @@ steps let the student pick the model the chat should train (gradient-boosted tre
 a small neural network).
 
 ## 2. Measured numbers (the answer keys)
+
+**Step 1b rule of thumb** (water / cement below 0.5 high, 0.5-1.0 normal, above 1.0 low; 7 days or younger one grade
+lower): 4 of the 5 game mixes right, about 57 % of the 206 held-out mixes, against the trees' 83 %.
 
 **Concrete, 206 held-out mixes (split seed 4644):** straight line MAE 7.8 MPa (R² 0.69); trees **MAE 2.8 MPa (R² 0.94)**.
 Importance: age, cement, then slag and water, then superplasticizer; the aggregates and fly ash near zero. What-if on the
@@ -96,7 +99,7 @@ MP6A:
    which is the answer to "why does it agree". Not yet measured: the other tool models (a straight line should land
    near the notebook's 8.5 MPa), the chat's column ranking against Step 3a, and the homework table, where the trees
    are near perfect and the test is whether the chat on its own gets anywhere close.
-4. Own data: any table with a numeric answer column and 30+ rows works.
+4. (Homework) Own data: any table with a numeric answer column and 30+ rows works; the tap test is described in Part 5.
 
 MP6B:
 

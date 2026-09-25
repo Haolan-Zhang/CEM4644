@@ -96,8 +96,8 @@ class TabLab:
     def guess(self):
         self._need(); from . import ui; ui.guess_game(self)
 
-    def regression(self, model="decision trees (gradient boosting)"):
-        self._need(); from . import ui; ui.regression_view(self, model)
+    def regression(self, model="decision trees (gradient boosting)", result_text=None):
+        self._need(); from . import ui; ui.regression_view(self, model, result_text)
 
     def classification(self, model="decision trees (gradient boosting)", task="grades", threshold=None):
         self._need(); from . import ui
