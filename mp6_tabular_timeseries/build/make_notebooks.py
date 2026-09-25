@@ -20,7 +20,7 @@ from aec_tab import config as C  # noqa: E402
 from aec_tab.data import load_meters  # noqa: E402
 from aec_tab.models import KINDS  # noqa: E402
 from aec_tab.series import METHODS  # noqa: E402
-from aec_tab.chat import CHAT_URL, GIVE, TEST_N, TOOL_MODELS  # noqa: E402
+from aec_tab.chat import CHAT_URL, GIVE, TEST_N, TOOL_MODELS, steps_default  # noqa: E402
 from aec_tab.ui import REGRESSION_TEXT  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
@@ -88,8 +88,8 @@ def form(title, body, notes=(), params=(), texts=None):
     words = ""
     if texts:
         kept = EXISTING_TEXTS.get(head, {})
-        words = ("# The wording of the result: edit the text between the triple quotes. Words in {braces} are filled in by the notebook;\n"
-                 "# **bold** works, and each line is shown as its own line.\n"
+        words = ("# The wording the notebook shows: edit the text between the triple quotes. Words in {braces} are filled in by the notebook;\n"
+                 "# **bold** and *italic* work, and each line is shown as its own line.\n"
                  + "".join(f'{k} = """{kept.get(k, v)}"""\n' for k, v in texts.items()))
     src = head + "\n" + "".join(f"#@markdown {n}\n" for n in notes) + "".join(p + "\n" for p in params) + words + body.rstrip() + "\n"
     c = new_code_cell(src); c.metadata["cellView"] = "form"
@@ -217,11 +217,13 @@ A model that scores well may still have learned the wrong thing. Two checks: whi
 
 {chat_md(f"gets the same training {t.rows} the models above learned from, and {TEST_N} of the held-out {t.rows} without their {t.target_label}.")} The {TEST_N} {t.rows} are the same for everyone, so you can compare with your neighbours.
 """))
-    cells.append(form("▶ Step 4a · Ask the chat", "lab.chat_table(give)",
+    cells.append(form("▶ Step 4a · Ask the chat", "lab.chat_table(give, steps_text, paste_steps_text)",
+                      texts={"steps_text": steps_default(2, True), "paste_steps_text": steps_default(2, False)},
                       notes=["Run the same prompt in **two** new chats and score both replies: the table then compares them. "
                              "If attaching files does not work, choose *paste the data into the prompt* and run the cell again."],
                       params=[choice("give", list(GIVE)[0], list(GIVE))]))
-    cells.append(form("▶ Step 4b · Ask the chat to use its analysis tool", "lab.chat_table_tool(model)",
+    cells.append(form("▶ Step 4b · Ask the chat to use its analysis tool", "lab.chat_table_tool(model, steps_text)",
+                      texts={"steps_text": steps_default(2, True)},
                       notes=["Pick the model the chat should train, run the cell, and follow the steps. If the reply shows no code or analysis panel, "
                              "ask it again to *use your data-analysis tool*. Then try a second model: every reply you score stays in the table."],
                       params=[choice("model", list(TOOL_MODELS)[0], list(TOOL_MODELS))]))
@@ -305,14 +307,17 @@ Every building has a usual day for each weekday. A day that leaves the pattern i
 
 {chat_md("gets four weeks of one building's hourly electricity and next week's temperature, and forecasts the week the notebook forecast in Step 2a; then the building's daily totals for the year, to find the odd days of Step 3a.")}
 """))
-    cells.append(form("▶ Step 4a · Ask the chat for next week", "lab.chat_forecast(building, give)",
+    cells.append(form("▶ Step 4a · Ask the chat for next week", "lab.chat_forecast(building, give, steps_text, paste_steps_text)",
+                      texts={"steps_text": steps_default(2, True), "paste_steps_text": steps_default(2, False)},
                       notes=["The reply must list all 168 hours; if the chat stops early, ask it to continue and paste every part. "
                              "Run the same prompt in two new chats and score both. If attaching files does not work, choose *paste the data into the prompt*."],
                       params=[choice("building", labels[0], labels), choice("give", list(GIVE)[0], list(GIVE))]))
-    cells.append(form("▶ Step 4b · Ask the chat to use its analysis tool", "lab.chat_forecast_tool(building, model)",
+    cells.append(form("▶ Step 4b · Ask the chat to use its analysis tool", "lab.chat_forecast_tool(building, model, steps_text)",
+                      texts={"steps_text": steps_default(2, True)},
                       notes=["Pick the model the chat should train. If the reply shows no code or analysis panel, ask it again to *use your data-analysis tool*."],
                       params=[choice("building", labels[0], labels), choice("model", list(TOOL_MODELS)[0], list(TOOL_MODELS))]))
-    cells.append(form("▶ Step 4c · Ask the chat for the odd days", "lab.chat_odd_days(building, give)",
+    cells.append(form("▶ Step 4c · Ask the chat for the odd days", "lab.chat_odd_days(building, give, steps_text, paste_steps_text)",
+                      texts={"steps_text": steps_default(1, True), "paste_steps_text": steps_default(1, False)},
                       notes=["The notebook compares the chat's days with the days its own rule flags in Step 3a (threshold 3.5) and with the public holidays."],
                       params=[choice("building", labels[0], labels), choice("give", list(GIVE)[0], list(GIVE))]))
     cells.append(q(4, ("From Step 4a and 4b on one building: the chat's average miss on its own and with its analysis tool, next to the three methods of Step 2a (copy the table). "

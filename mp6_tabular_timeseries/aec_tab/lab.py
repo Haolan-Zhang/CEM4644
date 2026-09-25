@@ -125,20 +125,20 @@ class TabLab:
         self._need(); from . import ui; ui.oddday_view(self, building, float(threshold))
 
     # ------------------------------------------------------------------ the chat (hokie.ai) steps
-    def chat_table(self, give="attach the files"):
-        self._need(); from . import chat; chat.chat_table(self, give)
+    def chat_table(self, give="attach the files", steps_text=None, paste_steps_text=None):
+        self._need(); from . import chat; chat.chat_table(self, give, steps_text, paste_steps_text)
 
-    def chat_table_tool(self, model="gradient-boosted trees"):
-        self._need(); from . import chat; chat.chat_table_tool(self, model)
+    def chat_table_tool(self, model="gradient-boosted trees", steps_text=None):
+        self._need(); from . import chat; chat.chat_table_tool(self, model, steps_text)
 
-    def chat_forecast(self, building, give="attach the files"):
-        self._need(); from . import chat; chat.chat_forecast(self, building, give)
+    def chat_forecast(self, building, give="attach the files", steps_text=None, paste_steps_text=None):
+        self._need(); from . import chat; chat.chat_forecast(self, building, give, steps_text, paste_steps_text)
 
-    def chat_forecast_tool(self, building, model="gradient-boosted trees"):
-        self._need(); from . import chat; chat.chat_forecast_tool(self, building, model)
+    def chat_forecast_tool(self, building, model="gradient-boosted trees", steps_text=None):
+        self._need(); from . import chat; chat.chat_forecast_tool(self, building, model, steps_text)
 
-    def chat_odd_days(self, building, give="attach the files"):
-        self._need(); from . import chat; chat.chat_odd_days(self, building, give)
+    def chat_odd_days(self, building, give="attach the files", steps_text=None, paste_steps_text=None):
+        self._need(); from . import chat; chat.chat_odd_days(self, building, give, steps_text, paste_steps_text)
 
     def upload_app(self):
         self._need()

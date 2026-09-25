@@ -47,19 +47,37 @@ def _save(name: str, df: pd.DataFrame, index: bool = False) -> Path:
     return p
 
 
-def _box(files: List[Path], prompt: str, what: str, on_score: Callable[[str], None], attach: bool = True):
+def steps_default(n_files: int = 2, attach: bool = True) -> str:
+    """The instructions above the prompt box (the notebook cell carries its own copy, which the teacher can edit)."""
+    s = "s" if n_files > 1 else ""
+    first = (f"1. Download {{files}} with the button{s} below.\n2. Open {{url}} (sign in with your VT account), start a new chat, "
+             f"attach the file{s}, paste the prompt, send.\n" if attach else
+             "1. The data is already inside the prompt below.\n2. Open {url} (sign in with your VT account), start a new chat, "
+             "paste the prompt, send.\n")
+    return first + "3. Copy the whole reply and paste it into the second box.\n4. Click *Score*."
+
+
+def _md_html(text: str) -> str:
+    """The little markdown the instructions use: **bold**, *italic*, links, one line per line."""
+    import html
+    t = html.escape(text.strip())
+    t = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", t)
+    t = re.sub(r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])", r"<i>\1</i>", t)
+    t = re.sub(r"(https?://[^\s<]+[^\s<.,;)])", r"<a href='\1' target='_blank'>\1</a>", t)
+    return "<br>".join(t.split("\n"))
+
+
+def _box(files: List[Path], prompt: str, what: str, on_score: Callable[[str], None], attach: bool = True, steps: str = None):
     """Download buttons, the prompt to copy, a box for the reply, a Score button (the MP5 chat steps' pattern)."""
     import ipywidgets as w
     from IPython.display import display
-    many = len(files) > 1
-    names = " and ".join(f"<i>{p.name}</i>" for p in files)
-    how = (f"<b>1.</b> Download {names} with the button{'s' if many else ''} below. "
-           f"<b>2.</b> Open <a href='{CHAT_URL}' target='_blank'>{CHAT_URL}</a> (sign in with your VT account), start a new chat, "
-           f"attach the file{'s' if many else ''}, paste the prompt, send. "
-           if attach else
-           f"<b>1.</b> The data is already inside the prompt below. "
-           f"<b>2.</b> Open <a href='{CHAT_URL}' target='_blank'>{CHAT_URL}</a> (sign in with your VT account), start a new chat, paste the prompt, send. ")
-    how += "<b>3.</b> Copy the whole reply and paste it into the second box. <b>4.</b> Click <i>Score</i>."
+    names = " and ".join(f"*{p.name}*" for p in files)
+    template = steps or steps_default(len(files), attach)
+    try:
+        text = template.format(files=names, url=CHAT_URL)
+    except (KeyError, IndexError, ValueError) as e:
+        text = template + f"\n(the text has a placeholder the notebook does not know: {e})"
+    how = _md_html(text)
     rows = []
     if attach:
         for p in files:
@@ -252,16 +270,20 @@ def table_score(lab, text: str, name: str):
     print(f"\nThe {len(worst)} {spec.rows} {run} missed most:"); ui.table(view.reset_index(drop=True))
 
 
-def chat_table(lab, give: str = "attach the files"):
+def _steps(give: str, steps_text, paste_steps_text):
+    return steps_text if _attach(give) else paste_steps_text
+
+
+def chat_table(lab, give: str = "attach the files", steps_text=None, paste_steps_text=None):
     d = table_files(lab)
     _box([d["tr_path"], d["te_path"]], table_prompt(lab, give), "the chat on its own",
-         lambda text: table_score(lab, text, "chat"), attach=_attach(give))
+         lambda text: table_score(lab, text, "chat"), attach=_attach(give), steps=_steps(give, steps_text, paste_steps_text))
 
 
-def chat_table_tool(lab, model: str):
+def chat_table_tool(lab, model: str, steps_text=None):
     d = table_files(lab)
     _box([d["tr_path"], d["te_path"]], table_tool_prompt(lab, model), "chat + analysis tool",
-         lambda text: table_score(lab, text, f"chat + analysis tool, {model}"), attach=True)
+         lambda text: table_score(lab, text, f"chat + analysis tool, {model}"), attach=True, steps=steps_text)
 
 
 # ============================================================================ the time series
@@ -377,16 +399,16 @@ def forecast_score(lab, meter_id: str, text: str, name: str):
           + ("All are scored on the same hours." if n == len(actual) else f"The notebook's methods are scored on the {int(ok.sum())} hours this reply gave."))
 
 
-def chat_forecast(lab, meter_id: str, give: str = "attach the files"):
+def chat_forecast(lab, meter_id: str, give: str = "attach the files", steps_text=None, paste_steps_text=None):
     d = series_files(lab, meter_id)
     _box([d["hist_path"], d["next_path"]], forecast_prompt(lab, meter_id, give), "the chat on its own",
-         lambda text: forecast_score(lab, meter_id, text, "chat"), attach=_attach(give))
+         lambda text: forecast_score(lab, meter_id, text, "chat"), attach=_attach(give), steps=_steps(give, steps_text, paste_steps_text))
 
 
-def chat_forecast_tool(lab, meter_id: str, model: str):
+def chat_forecast_tool(lab, meter_id: str, model: str, steps_text=None):
     d = series_files(lab, meter_id)
     _box([d["hist_path"], d["next_path"]], forecast_tool_prompt(lab, meter_id, model), "chat + analysis tool",
-         lambda text: forecast_score(lab, meter_id, text, f"chat + analysis tool, {model}"), attach=True)
+         lambda text: forecast_score(lab, meter_id, text, f"chat + analysis tool, {model}"), attach=True, steps=steps_text)
 
 
 # ---------------------------------------------------------------------------- odd days
@@ -452,7 +474,7 @@ def oddday_score(lab, meter_id: str, text: str, threshold: float = 3.5):
     ui.table(pd.DataFrame(rows), max_rows=80)
 
 
-def chat_odd_days(lab, meter_id: str, give: str = "attach the files"):
+def chat_odd_days(lab, meter_id: str, give: str = "attach the files", steps_text=None, paste_steps_text=None):
     d = series_files(lab, meter_id)
     _box([d["daily_path"]], oddday_prompt(lab, meter_id, give), "odd days",
-         lambda text: oddday_score(lab, meter_id, text), attach=_attach(give))
+         lambda text: oddday_score(lab, meter_id, text), attach=_attach(give), steps=_steps(give, steps_text, paste_steps_text))

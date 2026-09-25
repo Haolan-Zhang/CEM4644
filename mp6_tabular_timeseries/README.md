@@ -58,7 +58,7 @@ docs/             report templates, instructor guide
 ```
 
 **Editing the text.** The notebooks are where the wording lives. Edit any markdown cell, any cell's `#@markdown`
-notes, or a result wording written in a cell (`result_text = """..."""`, Step 2b of MP6A) in Colab (*Show code* on
+notes, or a wording written in a cell (`result_text = """..."""` in MP6A Step 2b, `steps_text = """..."""` in the chat steps) in Colab (*Show code* on
 a form cell), then *File → Save a copy in GitHub* (clear the outputs first). A later `make_notebooks.py` run keeps
 every markdown cell, note and result wording it finds in the existing notebook and rebuilds only the code;
 `--fresh-text` starts again from the generator's defaults. Step 0 prints only the ✅ line.
