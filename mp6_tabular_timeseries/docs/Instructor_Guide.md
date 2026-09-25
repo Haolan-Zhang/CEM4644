@@ -10,8 +10,8 @@ Both end with a section in which the students give the same job to a chat model 
 | **MP6A** table | 1,030 real concrete mixes → compressive strength (MPa) | 768 simulated building shapes → heating load (kWh/m²) |
 | MP6A steps | 1a look, 1b guess five grades (with a water / cement rule of thumb), 2a classification, 2b regression, 3a importance, 3b what-if, **4a chat, 4b chat + analysis tool** | the same without 1b, plus 5: the tap test and their own table |
 | **MP6B** series | `Hog_office_Marlena` (office), `Bear_education_Lila` (school), `Bear_lodging_Evan` (residence hall), `Bear_assembly_Jose` (assembly hall) | `Hog_office_Gustavo`, `Moose_education_Leland`, `Robin_lodging_Janie`, `Rat_assembly_Rolland` (a swimming pool) |
-| MP6B steps | 1a-1b which building is which, 1c anatomy, 2a forecast three ways, 3a odd days, **4a chat forecast, 4b chat + analysis tool, 4c chat odd days**, 5 own series | the same |
-| Report questions | MP6A 3, MP6B 5 | MP6A 4, MP6B 5 (own data is the main deliverable) |
+| MP6B steps | 1a-1b which building is which, 1c anatomy, 2a forecast three ways, 3a odd days, **4a chat forecast, 4b chat + analysis tool, 4c chat odd days** | the same, plus 5: activity recognition and their own series |
+| Report questions | MP6A 3, MP6B 4 | MP6A 4, MP6B 5 (own data is the main deliverable) |
 | Time | about 75 min each | about 75 min each |
 
 Step 0 clones only this folder and prints one line. MP6A installs `gradio` and loads the table; MP6B also installs
@@ -112,7 +112,7 @@ MP6B:
    is a long reply: look for a stopped or drifting list (the notebook says how many hours it read). For odd days,
    compare its list with the rule's flags and the holiday column; a plausible reason for a day the rule does not flag
    (a heat wave, an event) still needs checking, which is the point of the question.
-5. Own data: a series needs a time column and a value column.
+5. (Homework) Own data: a series needs a time column and a value column; activity recognition is described in Part 5.
 
 ## 4. Rebuilding
 

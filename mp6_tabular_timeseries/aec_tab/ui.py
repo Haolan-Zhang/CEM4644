@@ -201,8 +201,6 @@ def buildings_game(lab):
         for ax in axes[k]:
             ax.set_ylabel("kWh"); ax.tick_params(labelsize=8)
     fig.tight_layout(); show(fig)
-    uses = sorted({m.use for m in ms})
-    print("The four buildings are, in some order: " + ", ".join(uses) + ". Say which is which in the next cell.")
 
 
 def buildings_check(lab, **answer):
@@ -218,7 +216,11 @@ def buildings_check(lab, **answer):
     lab.results["buildings_game"] = right
 
 
-def anatomy(lab, meter_id: str):
+ANATOMY_TEXT = ("Mean **{mean}** kWh per hour; the busiest hour of a typical week runs at **{busiest}**, the quietest at **{quietest}**.\n"
+                "Site air temperature ran from {temp_min} to {temp_max} °C.")
+
+
+def anatomy(lab, meter_id: str, anatomy_text: Optional[str] = None):
     m = lab.meter(meter_id); s = m.kwh
     fig, ax = plt.subplots(3, 1, figsize=(14, 9))
     ax[0].plot(s.index, s.values, lw=0.4, color=BLUE); ax[0].set_title(f"{m.label}: the year, hour by hour (kWh)")
@@ -229,8 +231,8 @@ def anatomy(lab, meter_id: str):
     ax[2].legend(ncol=7, fontsize=8); ax[2].set_xlabel("hour of the day"); ax[2].set_title("the usual day: median of every weekday over the year")
     fig.tight_layout(); show(fig)
     t = m.temp
-    print(f"Mean {s.mean():.0f} kWh per hour; the busiest hour of a typical week runs at {prof.max().max():.0f}, the quietest at {prof.min().min():.0f}. "
-          f"Site air temperature ran from {t.min():.0f} to {t.max():.0f} °C.")
+    md_text(anatomy_text or ANATOMY_TEXT, building=m.label, mean=f"{s.mean():.0f}", busiest=f"{prof.max().max():.0f}",
+            quietest=f"{prof.min().min():.0f}", temp_min=f"{t.min():.0f}", temp_max=f"{t.max():.0f}")
 
 
 # ----------------------------------------------------------------------------- Part 5: next week

@@ -115,8 +115,8 @@ class TabLab:
     def buildings_answer(self, a="?", b="?", c="?", d="?"):
         self._need(); from . import ui; ui.buildings_check(self, a=a, b=b, c=c, d=d)
 
-    def anatomy(self, building):
-        self._need(); from . import ui; ui.anatomy(self, building)
+    def anatomy(self, building, anatomy_text=None):
+        self._need(); from . import ui; ui.anatomy(self, building, anatomy_text)
 
     def forecast(self, building, method="all three"):
         self._need(); from . import ui; ui.forecast_view(self, building, method)

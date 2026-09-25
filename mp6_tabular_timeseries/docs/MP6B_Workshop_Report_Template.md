@@ -37,11 +37,3 @@ From Step 4a and 4b on one building: the chat's average miss on its own and with
 *Your answer:*
 
 
-
-## Question 5
-
-Upload one time series of your own (a utility bill history, a site's weather, daily deliveries, anything with a date and a number) and report what the app found: the forecast, its average miss, and whether you believe it.
-
-*Your answer:*
-
-

@@ -41,7 +41,8 @@ hidden. No GPU needed.
 4. **The same jobs, by a chat model**: four weeks of a building's meter and next week's temperature go to hokie.ai for
    a 168-hour forecast (on its own, then with its analysis tool), and the year's daily totals for the odd days; each is
    scored next to the notebook's methods.
-5. **Their own time series** in the same app: a forecast of its last period.
+5. **Their own time series** (homework): activity recognition (the phone's accelerometer in a pocket, one row per
+   2-second window) or any CSV with a time column, in the same app: a forecast of its last period.
 
 ## What is in this folder
 
@@ -58,7 +59,7 @@ docs/             report templates, instructor guide
 ```
 
 **Editing the text.** The notebooks are where the wording lives. Edit any markdown cell, any cell's `#@markdown`
-notes, or a wording written in a cell (`result_text = """..."""` in MP6A Step 2b, `steps_text = """..."""` in the chat steps) in Colab (*Show code* on
+notes, or a wording written in a cell (`result_text = """..."""` in MP6A Step 2b, `anatomy_text` in MP6B Step 1c, `steps_text` in the chat steps) in Colab (*Show code* on
 a form cell), then *File → Save a copy in GitHub* (clear the outputs first). A later `make_notebooks.py` run keeps
 every markdown cell, note and result wording it finds in the existing notebook and rebuilds only the code;
 `--fresh-text` starts again from the generator's defaults. Step 0 prints only the ✅ line.

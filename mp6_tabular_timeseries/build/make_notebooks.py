@@ -21,7 +21,7 @@ from aec_tab.data import load_meters  # noqa: E402
 from aec_tab.models import KINDS  # noqa: E402
 from aec_tab.series import METHODS  # noqa: E402
 from aec_tab.chat import CHAT_URL, GIVE, TEST_N, TOOL_MODELS, steps_default  # noqa: E402
-from aec_tab.ui import REGRESSION_TEXT  # noqa: E402
+from aec_tab.ui import ANATOMY_TEXT, REGRESSION_TEXT  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
 KEEP_TEXT = True
@@ -273,8 +273,8 @@ MP6A was a table: one row per thing. This part is a **time series**: one value p
                       notes=[f"Four buildings, no names: a week and a year each. They are, in some order, {', '.join(uses)}."]))
     cells.append(form("▶ Step 1b · Your answer", "lab.buildings_answer(a, b, c, d)",
                       params=[choice(k, uses[0], uses) for k in "abcd"]))
-    cells.append(form("▶ Step 1c · The anatomy of one building's year", "lab.anatomy(building)",
-                      params=[choice("building", labels[0], labels)]))
+    cells.append(form("▶ Step 1c · The anatomy of one building's year", "lab.anatomy(building, anatomy_text)",
+                      params=[choice("building", labels[0], labels)], texts={"anatomy_text": ANATOMY_TEXT}))
     cells.append(q(1, "From Step 1: which buildings did you get right, and from what (the shape of the day, the weekend, the summer)? "
                       "Pick one building in Step 1c and describe its week in three sentences a facilities manager would recognise."))
 
@@ -328,20 +328,17 @@ Every building has a usual day for each weekday. A day that leaves the pattern i
                     "and the odd days it found. Does the chat do better than the notebook on the hard building? Does its explanation of that building's pattern help you, "
                     "and how would you check whether it is true?")))
 
-    cells.append(md("""
+    if variant == "homework":                  # the workshop ends with the chat; the students' own series is homework
+        cells.append(md("""
 ## Part 5 · Your own time series
 
 A small app, opened from a link: upload any CSV with a time column and a value column, and it forecasts the last period from the data before it.
 """))
-    if variant == "homework":
         cells.append(md(ACTIVITY))
-    cells.append(form("▶ Step 5 · Your own time series", "lab.upload_app()", notes=["Open the printed link in a new tab."]))
-    cells.append(q(5, ("Upload one time series of your own (a utility bill history, a site's weather, daily deliveries, anything with a date and a number) and report what the app found: "
-                       "the forecast, its average miss, and whether you believe it.")
-                   if variant == "workshop" else
-                   ("The main deliverable: find or make a time series of your own (a utility bill history, a site's weather, daily progress or deliveries). "
-                    "Run it through Step 5 and report what the data is, what the app found, and what you would need to trust the forecast. "
-                    "Then give the same file to the chat and ask it to use its analysis tool to forecast the same period: does it agree with the app?")))
+        cells.append(form("▶ Step 5 · Your own time series", "lab.upload_app()", notes=["Open the printed link in a new tab."]))
+        cells.append(q(5, "The main deliverable: find or make a time series of your own (a utility bill history, a site's weather, daily progress or deliveries). "
+                          "Run it through Step 5 and report what the data is, what the app found, and what you would need to trust the forecast. "
+                          "Then give the same file to the chat and ask it to use its analysis tool to forecast the same period: does it agree with the app?"))
     return ["meters", "forecaster"]
 
 
