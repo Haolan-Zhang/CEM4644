@@ -163,14 +163,15 @@ def importance_view(lab):
     lab.results["importance"] = imp
 
 
-def whatif(lab, start_from: str = "a typical row"):
+def whatif(lab, sample: str = "a typical row"):
+    """sample: "a typical <row>" (the median of every column) or "<row> N" (row N of the table)."""
     """Sliders on the chosen inputs; everything else stays at the chosen row's values."""
     import ipywidgets as w
     spec, df = lab.table_spec, lab.df
     Xtr, Xte, ytr, yte = models.split(df, spec)
     model = lab.models.get(("reg", "trees")) or models.fit_regressor("trees", Xtr, ytr)
     lab.models[("reg", "trees")] = model
-    base = df.median() if start_from.startswith("a typical") else df.loc[int(start_from.split()[-1])]
+    base = df.median() if sample.startswith("a typical") else df.loc[int(sample.split()[-1])]
     sliders = {}
     for f in spec.whatif:
         lo, hi = float(df[f].quantile(0.01)), float(df[f].quantile(0.99))

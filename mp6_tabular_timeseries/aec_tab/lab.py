@@ -106,8 +106,8 @@ class TabLab:
     def importance(self):
         self._need(); from . import ui; ui.importance_view(self)
 
-    def whatif(self, start_from="a typical row"):
-        self._need(); from . import ui; ui.whatif(self, start_from)
+    def whatif(self, sample="a typical row"):
+        self._need(); from . import ui; ui.whatif(self, sample)
 
     def buildings(self):
         self._need(); from . import ui; ui.buildings_game(self)

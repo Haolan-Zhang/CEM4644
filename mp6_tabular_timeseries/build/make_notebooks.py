@@ -203,13 +203,13 @@ The same table can answer **which class?** (a category: *classification*, the qu
 A model that scores well may still have learned the wrong thing. Two checks: which columns it leans on, and how its prediction moves when you change one input at a time.
 """))
     cells.append(form("▶ Step 3a · Which columns matter", "lab.importance()"))
-    cells.append(form("▶ Step 3b · What if…", "lab.whatif(start_from)",
+    cells.append(form("▶ Step 3b · What if…", "lab.whatif(sample)",
                       notes=[f"- The trees of Step 2b predict the {t.target_label} of one {t.row_word}.",
-                             f"- *start_from*: *a typical row* (the middle value of every column) or a real row of the table.",
+                             f"- *sample*: the {t.row_word} the sliders start from: *a typical {t.row_word}* (the middle value of every column) or one real {t.row_word} from the table.",
                              "- Each slider changes one input; everything else stays fixed.",
                              f"- The curve: the prediction as {t.label(t.whatif[0]).split(' (')[0]} goes from low to high. The red dot: the current {t.row_word}.",
                              "- Check that the model behaves as you expect, and where it stops making sense."],
-                      params=[choice("start_from", "a typical row", ["a typical row", "row 12", "row 100", "row 500"])]))
+                      params=[choice("sample", f"a typical {t.row_word}", [f"a typical {t.row_word}"] + [f"{t.row_word} {i}" for i in (12, 100, 500)])]))
     cells.append(q(2, ("From Step 3: the three columns that matter most. Does the model agree with what you know about concrete (more water, longer curing, more cement)? "
                        "Push one slider to the edge of its range: where does the prediction stop making sense, and why can a model not know that?")
                    if variant == "workshop" else
