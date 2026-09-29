@@ -11,7 +11,7 @@ hidden. No GPU needed.
 | Notebook | Open | Data |
 |---|---|---|
 | `MP6A_Workshop_Tabular.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp6_tabular_timeseries/MP6A_Workshop_Tabular.ipynb) | 1,030 concrete mixes and their strength (lb/yd³, psi) |
-| `MP6A_Homework_Tabular.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp6_tabular_timeseries/MP6A_Homework_Tabular.ipynb) | 768 simulated building shapes and their heating load |
+| `MP6A_Homework_Tabular.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp6_tabular_timeseries/MP6A_Homework_Tabular.ipynb) | 768 simulated building shapes and their heating load (ft², kBtu/ft²) |
 | `MP6B_Workshop_TimeSeries.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp6_tabular_timeseries/MP6B_Workshop_TimeSeries.ipynb) | four campus buildings' electricity in 2017 |
 | `MP6B_Homework_TimeSeries.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp6_tabular_timeseries/MP6B_Homework_TimeSeries.ipynb) | four other buildings' electricity in 2017 |
 
@@ -52,7 +52,7 @@ MP6B_Workshop_TimeSeries.ipynb, MP6B_Homework_TimeSeries.ipynb   student noteboo
 aec_tab/          the hidden code: config (what each notebook works on), data, models (regression / classification),
                   series (forecasts, odd days), ui (what each step shows), chat (the hokie.ai steps: files, prompts,
                   reading and scoring the pasted replies), app (the upload app), lab (the one object)
-data/             concrete.csv, energy_efficiency.csv, meters/<building>.csv (2017, hourly kWh + air temperature),
+data/             concrete.csv, energy_efficiency.csv, meters/<building>.csv (2017, hourly kWh + air temperature in °F),
                   meters.json, credits.json  (2.3 MB in total)
 build/            instructor-side scripts: prepare_data.py (from the raw downloads), make_notebooks.py
 docs/             report templates, instructor guide
@@ -76,8 +76,8 @@ python build/make_notebooks.py     # the four notebooks + report templates (add 
 | Item | Source | License |
 |---|---|---|
 | Concrete compressive strength (converted to lb/yd³ and psi) | I-Cheng Yeh (1998), [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/165/concrete+compressive+strength) | CC BY 4.0 |
-| Energy efficiency | A. Tsanas and A. Xifara (2012), [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/242/energy+efficiency) | CC BY 4.0 |
-| Building electricity meters and site weather (2017) | [Building Data Genome Project 2](https://github.com/buds-lab/building-data-genome-project-2), Miller et al. (2020) | MIT |
+| Energy efficiency (converted to ft² and kBtu/ft²) | A. Tsanas and A. Xifara (2012), [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/242/energy+efficiency) | CC BY 4.0 |
+| Building electricity meters and site weather (2017; temperature in °F, floor areas in ft²) | [Building Data Genome Project 2](https://github.com/buds-lab/building-data-genome-project-2), Miller et al. (2020) | MIT |
 | Chronos-Bolt (small) | [Amazon Science](https://huggingface.co/amazon/chronos-bolt-small), loaded in Step 0 | Apache-2.0 |
 | Models | scikit-learn (linear / logistic regression, gradient-boosted trees) | BSD-3 |
 | Chat model | hokie.ai (Virginia Tech's access to GPT models), used by the students in their browser | — |

@@ -223,13 +223,13 @@ def buildings_check(lab, **answer):
         yours = answer.get(letter.lower(), "?")
         ok = yours == use; right += ok
         m = ms[order["ABCD".index(letter)]]
-        print(f"  building {letter}: you said {yours:15} -> it is the {use} ({m.id}, {m.info['sqm']:,} m², mean {m.info['mean_kWh']} kWh/h)  {'✓' if ok else '✗'}")
+        print(f"  building {letter}: you said {yours:15} -> it is the {use} ({m.id}, {m.info['sqft']:,.0f} ft², mean {m.info['mean_kWh']:,} kWh/h)  {'✓' if ok else '✗'}")
     print(f"{right} of 4 right.")
     lab.results["buildings_game"] = right
 
 
 ANATOMY_TEXT = ("Mean **{mean}** kWh per hour; the busiest hour of a typical week runs at **{busiest}**, the quietest at **{quietest}**.\n"
-                "Site air temperature ran from {temp_min} to {temp_max} °C.")
+                "Site air temperature ran from {temp_min} to {temp_max} °F.")
 
 
 def anatomy(lab, meter_id: str, anatomy_text: Optional[str] = None):

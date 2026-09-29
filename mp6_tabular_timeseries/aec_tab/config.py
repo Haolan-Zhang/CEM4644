@@ -84,19 +84,19 @@ CONCRETE = TableSpec(
 
 ENERGY = TableSpec(
     key="energy_efficiency", title="Building shapes and their heating load", file="energy_efficiency.csv", target="heating_load",
-    unit="kWh/m²", target_label="heating load",
+    unit="kBtu/ft²", target_label="heating load",
     features=["compactness", "surface_area", "wall_area", "roof_area", "height", "orientation", "glazing_area", "glazing_distribution"],
-    labels={"compactness": "relative compactness", "surface_area": "surface area (m²)", "wall_area": "wall area (m²)", "roof_area": "roof area (m²)",
-            "height": "overall height (m)", "orientation": "orientation (2 = N, 3 = E, 4 = S, 5 = W)", "glazing_area": "glazing area (share of floor)",
-            "glazing_distribution": "glazing distribution (0-5)", "heating_load": "heating load (kWh/m²)"},
-    grades=[("A (< 12)", 0, 12), ("B (12-20)", 12, 20), ("C (20-30)", 20, 30), ("D (> 30)", 30, 1e9)],
-    spec_default=20, spec_range=(8, 40, 2), whatif=["compactness", "glazing_area", "height", "surface_area"], row_word="building",
+    labels={"compactness": "relative compactness", "surface_area": "surface area (ft²)", "wall_area": "wall area (ft²)", "roof_area": "roof area (ft²)",
+            "height": "overall height (ft)", "orientation": "orientation (2 = N, 3 = E, 4 = S, 5 = W)", "glazing_area": "glazing area (share of floor)",
+            "glazing_distribution": "glazing distribution (0-5)", "heating_load": "heating load (kBtu/ft²)"},
+    grades=[("A (< 4)", 0, 4), ("B (4-6.5)", 4, 6.5), ("C (6.5-9.5)", 6.5, 9.5), ("D (> 9.5)", 9.5, 1e9)],
+    spec_default=6.5, spec_range=(2.5, 12.5, 0.5), whatif=["compactness", "glazing_area", "height", "surface_area"], row_word="building",
     description="768 simulated residential buildings of the same volume but different shapes, glazing and orientation, with the heating load a building-energy simulator computed for each.",
     chat_about=("residential buildings of the same volume but different shapes, simulated with a building-energy program: relative "
-                "compactness, surface area, wall area and roof area (m²), overall height (m), orientation (2 = north, 3 = east, "
+                "compactness, surface area, wall area and roof area (ft²), overall height (ft), orientation (2 = north, 3 = east, "
                 "4 = south, 5 = west), glazing area (as a share of the floor area), glazing distribution (0-5), and the heating "
-                "load the simulator computed (heating_load, kWh per m² of floor)"),
-    close_pct=10,
+                "load the simulator computed (heating_load, kBtu per ft² of floor)"),
+    close_pct=10, decimals=2,
 )
 
 SPECS: Dict[str, LabSpec] = {

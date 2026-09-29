@@ -7,7 +7,7 @@ Both end with a section in which the students give the same job to a chat model 
 
 | | Workshop | Homework |
 |---|---|---|
-| **MP6A** table | 1,030 real concrete mixes (lb/yd³) → compressive strength (psi) | 768 simulated building shapes → heating load (kWh/m²) |
+| **MP6A** table | 1,030 real concrete mixes (lb/yd³) → compressive strength (psi) | 768 simulated building shapes (ft²) → heating load (kBtu/ft²) |
 | MP6A steps | 1a look, 1b guess five grades (with a water / cement rule of thumb), 2a classification, 2b regression, 3a importance, 3b what-if, **4a chat, 4b chat + analysis tool** | the same without 1b, plus 5: the tap test and their own table |
 | **MP6B** series | `Hog_office_Marlena` (office), `Bear_education_Lila` (school), `Bear_lodging_Evan` (residence hall), `Bear_assembly_Jose` (assembly hall) | `Hog_office_Gustavo`, `Moose_education_Leland`, `Robin_lodging_Janie`, `Rat_assembly_Rolland` (a swimming pool) |
 | MP6B steps | 1a-1b which building is which, 1c anatomy, 2a forecast three ways, 3a odd days, **4a chat forecast, 4b chat + analysis tool, 4c chat odd days** | the same, plus 5: activity recognition and their own series |
@@ -42,8 +42,9 @@ gives about 2,600 → 5,300 → 6,800 psi. Grades (< 3,500 / 3,500-6,500 / > 6,5
 mistakes only between neighboring grades. Pass / fail at 4,000 psi: **95 %**, 8 false passes, 2 false fails, 5 uncertain
 mixes; at 6,000 psi 92 %, 6 and 11.
 
-**Energy efficiency, 154 held-out buildings:** trees MAE 0.35 (R² 0.998), 98 % in the right band, 100 % at the 20 kWh/m²
-threshold. That is the homework's question 1: the loads come from a simulator, so there is no measurement noise and the
+**Energy efficiency, 154 held-out buildings** (US units: areas in ft², height in ft, heating load in kBtu/ft², converted
+from the UCI m² and kWh/m²; bands A < 4, B 4-6.5, C 6.5-9.5, D > 9.5): trees MAE 0.11 kBtu/ft² (R² 0.998), straight
+line 0.72 (R² 0.91), 97 % in the right band, 100 % at the 6.5 kBtu/ft² threshold. That is the homework's question 1: the loads come from a simulator, so there is no measurement noise and the
 same eight inputs fully determine the answer. Compactness and glazing area decide it.
 
 **Forecasts, week of 16-22 October 2017, MAE in kWh per hour** (mean load in brackets):
@@ -52,7 +53,7 @@ same eight inputs fully determine the answer. Compactness and glazing area decid
 |---|---|---|---|
 | Hog_office_Marlena (80) | 3.5 | **2.5** | 4.7 |
 | Bear_education_Lila (202) | 10.1 | **9.1** | 9.6 |
-| Bear_lodging_Evan (182) | 7.9 | 6.6 | **6.3** |
+| Bear_lodging_Evan (182) | 7.9 | 6.4 | **6.3** |
 | Bear_assembly_Jose (274) | 20.6 | **17.5** | 21.9 |
 
 Chronos-Bolt's 80 % band covers 66-92 % of the hours.

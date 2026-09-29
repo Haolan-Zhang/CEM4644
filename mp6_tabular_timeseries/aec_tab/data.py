@@ -17,7 +17,7 @@ def load_table(root: Path, spec: TableSpec) -> pd.DataFrame:
 @dataclass
 class Meter:
     id: str
-    df: pd.DataFrame                # index: hourly timestamps; columns kWh, air_temp_C
+    df: pd.DataFrame                # index: hourly timestamps; columns kWh, air_temp_F
     info: dict
 
     @property
@@ -26,7 +26,7 @@ class Meter:
 
     @property
     def temp(self) -> pd.Series:
-        return self.df["air_temp_C"]
+        return self.df["air_temp_F"]
 
     @property
     def use(self) -> str:
@@ -34,7 +34,7 @@ class Meter:
 
     @property
     def label(self) -> str:
-        return f"{self.id}: {self.use}, {self.info['sqm']:,} m²"
+        return f"{self.id}: {self.use}, {self.info['sqft']:,.0f} ft²"
 
 
 def load_meters(root: Path, ids: List[str]) -> Dict[str, Meter]:

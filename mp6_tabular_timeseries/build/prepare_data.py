@@ -16,6 +16,9 @@ C = REPO / "_candidates"
 D = REPO / "data"
 LB_YD3_PER_KG_M3 = 1.685555
 PSI_PER_MPA = 145.0377
+FT2_PER_M2 = 10.76391
+FT_PER_M = 3.28084
+KBTU_FT2_PER_KWH_M2 = 3.412142 / 10.76391
 
 WORKSHOP = ["Hog_office_Marlena", "Bear_education_Lila", "Bear_lodging_Evan", "Bear_assembly_Jose"]
 HOMEWORK = ["Hog_office_Gustavo", "Moose_education_Leland", "Robin_lodging_Janie", "Rat_assembly_Rolland"]
@@ -34,6 +37,12 @@ def tables():
     e = pd.read_excel(C / "energy/ENB2012_data.xlsx")
     e.columns = ["compactness", "surface_area", "wall_area", "roof_area", "height", "orientation", "glazing_area",
                  "glazing_distribution", "heating_load", "cooling_load"]
+    # US units: m² -> ft², m -> ft, kWh/m² -> kBtu/ft²
+    for col in ("surface_area", "wall_area", "roof_area"):
+        e[col] = (e[col] * FT2_PER_M2).round(0).astype(int)
+    e["height"] = (e["height"] * FT_PER_M).round(1)
+    for col in ("heating_load", "cooling_load"):
+        e[col] = (e[col] * KBTU_FT2_PER_KWH_M2).round(2)
     e.to_csv(D / "energy_efficiency.csv", index=False)
     print("tables:", c.shape, e.shape)
 
@@ -50,12 +59,12 @@ def meters():
             m = meta.loc[b]
             s = el[b].interpolate(limit=6).bfill().ffill().round(2)
             t = wx[wx.site_id == m.site_id].set_index("timestamp").airTemperature.reindex(s.index).interpolate(limit=12).bfill().ffill().round(1)
-            df = pd.DataFrame({"timestamp": s.index, "kWh": s.values, "air_temp_C": t.values})
+            df = pd.DataFrame({"timestamp": s.index, "kWh": s.values, "air_temp_F": (t.values * 9 / 5 + 32).round(1)})
             df.to_csv(D / "meters" / f"{b}.csv", index=False)
             info[b] = {"set": group, "use": USE.get(m.primaryspaceusage, m.primaryspaceusage), "sub_use": str(m.sub_primaryspaceusage),
-                       "sqm": round(float(m.sqm)), "site": m.site_id, "timezone": m.timezone, "year_built": None if pd.isna(m.yearbuilt) else int(m.yearbuilt),
+                       "sqft": round(float(m.sqm) * FT2_PER_M2, -1), "site": m.site_id, "timezone": m.timezone, "year_built": None if pd.isna(m.yearbuilt) else int(m.yearbuilt),
                        "mean_kWh": round(float(s.mean()), 1), "missing_hours": int(el[b].isna().sum())}
-            print(f"{group:8} {b:26} {info[b]['use']:15} {info[b]['sqm']:>7,} m2  mean {info[b]['mean_kWh']:>6} kWh  missing {info[b]['missing_hours']}")
+            print(f"{group:8} {b:26} {info[b]['use']:15} {info[b]['sqft']:>9,.0f} ft2  mean {info[b]['mean_kWh']:>6} kWh  missing {info[b]['missing_hours']}")
     json.dump(info, open(D / "meters.json", "w"), indent=1)
 
 

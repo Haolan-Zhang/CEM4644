@@ -302,11 +302,11 @@ def series_files(lab, meter_id: str):
         return lab.chat_cache[key]
     t0 = pd.Timestamp(C.TEST_START)
     hist = m.df[(m.df.index >= t0 - pd.Timedelta(days=28)) & (m.df.index < t0)].round(2); hist.index.name = "timestamp"
-    nxt = m.df[["air_temp_C"]].reindex(pd.date_range(t0, periods=C.HORIZON, freq="h")).interpolate().bfill().ffill().round(1)
+    nxt = m.df[["air_temp_F"]].reindex(pd.date_range(t0, periods=C.HORIZON, freq="h")).interpolate().bfill().ffill().round(1)
     nxt.index.name = "timestamp"
     day = m.kwh.resample("D").sum()
     daily = pd.DataFrame({"weekday": day.index.day_name(), "kWh": day.round(0).values,
-                          "mean_air_temp_C": m.temp.resample("D").mean().round(1).values}, index=day.index)
+                          "mean_air_temp_F": m.temp.resample("D").mean().round(1).values}, index=day.index)
     daily.index.name = "date"; daily.index = daily.index.strftime("%Y-%m-%d")
     d = dict(meter=m, hist=hist, next=nxt, daily=daily,
              hist_path=_save(f"{m.id}_last_4_weeks.csv", hist, index=True),
@@ -320,7 +320,7 @@ def _series_intro(d, attach: bool) -> str:
     m, h, n = d["meter"], d["hist"], d["next"]
     return (f"I am a construction student. {'I attached two files' if attach else 'The two files are pasted below'} for a building on a "
             f"North American university campus that is used as {_article(m.use)}. {d['hist_path'].name} has its electricity use (kWh) "
-            f"and the outdoor air temperature (°C), hour by hour, for the four weeks from {_when(h.index[0])} to {_when(h.index[-1])} "
+            f"and the outdoor air temperature (°F), hour by hour, for the four weeks from {_when(h.index[0])} to {_when(h.index[-1])} "
             f"{h.index[-1].year}. {d['next_path'].name} has the outdoor temperature for the next week, {_when(n.index[0])} to "
             f"{_when(n.index[-1])} {n.index[-1].year} (as a weather forecast would give it).")
 
@@ -421,7 +421,7 @@ def oddday_prompt(lab, meter_id: str, give: str = "attach the files") -> str:
     attach = _attach(give)
     y = d["daily"].index[0][:4]
     p = (f"I am a construction student. {'I attached' if attach else 'Below is'} {d['daily_path'].name}: a building on a North American "
-         f"university campus that is used as {_article(m.use)}, with its total electricity use (kWh) and the mean outdoor temperature (°C) "
+         f"university campus that is used as {_article(m.use)}, with its total electricity use (kWh) and the mean outdoor temperature (°F) "
          f"for every day of {y}.\n\nWhich days do not fit the building's usual pattern? List every such day, say whether use was higher "
          f"or lower than usual, and give the most likely reason. Reply in this form, one line per day:\n\n"
          f"date, higher or lower, reason\n{y}-01-02, lower, ...")
