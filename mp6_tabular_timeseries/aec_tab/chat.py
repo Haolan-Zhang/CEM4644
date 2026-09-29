@@ -264,8 +264,6 @@ def table_score(lab, text: str, name: str):
         print(f"Same prompt, two new chats ({chats[0]['name']} and {chats[-1]['name']}): the same number for {same} of {len(common)} {spec.rows}"
               + (f"; the other {len(moved)} moved by {spec.fmt(moved.mean())} {spec.unit} on average, most on {moved.idxmax()} ({spec.fmt(moved.max())} {spec.unit})."
                  if len(moved) else "."))
-    elif name == "chat":
-        print("Now start a second new chat, give it the same prompt, and score that reply too: does the chat give the same numbers twice?")
     worst = (mine - truth).abs().sort_values(ascending=False).index[:5]
     view = d["test"].set_index(d["idcol"]).loc[list(worst)].copy()
     view.columns = [spec.label(c) for c in view.columns]

@@ -141,9 +141,7 @@ def classification_view(lab, kind: str, task: str, threshold: float):
         r = models.passfail_result(model, kind, Xte, yte, spec, threshold)
         print(f"{kind}, does the {spec.row_word} reach {threshold:,g} {spec.unit}? {r.accuracy * 100:.0f} % of the {len(Xte)} unseen {spec.rows} called right.")
         confusion(r.matrix)
-        print(f"  False passes (predicted pass, actually fails): {r.false_pass}   |   false fails (predicted fail, actually passes): {r.false_fail}")
         if r.proba is not None:
-            print(f"  {spec.rows.capitalize()} the model is unsure about (probability of passing between 30 % and 70 %): {r.uncertain}")
             fig, ax = plt.subplots(figsize=(7, 2.8))
             ax.scatter(yte.values, r.proba, s=12, alpha=0.6, c=np.where(r.y_true, GREEN, RED))
             ax.axvline(threshold, color="k", lw=1, ls="--"); ax.axhline(0.5, color=GREY, lw=1)
@@ -195,9 +193,6 @@ def whatif(lab, start_from: str = "a typical row"):
             ax.plot(xs, ys, color=BLUE); ax.scatter([row[f0]], [pred], color=RED, zorder=3)
             ax.set_xlabel(spec.label(f0)); ax.set_ylabel(f"predicted {spec.label(spec.target)}"); ax.set_title(f"predicted {spec.target_label}: {spec.fmt(pred)} {spec.unit}", fontsize=11)
             show(fig)
-            inside = all(df[f].min() <= row[f] <= df[f].max() for f in spec.whatif)
-            print(f"Predicted {spec.target_label}: {spec.fmt(pred)} {spec.unit}."
-                  + ("" if inside else " At least one slider is outside anything the model was trained on: treat this number as a guess."))
     for s in sliders.values():
         s.observe(render, names="value")
     display(w.VBox([*sliders.values(), out])); render()
