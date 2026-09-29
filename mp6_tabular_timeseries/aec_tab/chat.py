@@ -115,22 +115,28 @@ def _box(files: List[Path], prompt: str, what: str, on_score: Callable[[str], No
     display(w.VBox([w.HTML(how), *rows, prompt_box, reply_box, btn, out]))
 
 
+CHAT_NAME = "HokieAI"
+
+
 def _add_run(lab, key, name: str, values) -> Tuple[str, bool]:
-    """Keep every scored reply, so a second chat can be compared with the first; the same reply twice is not a new run."""
+    """Keep every scored reply, so a second chat can be compared with the first; the same reply twice is not a new run.
+    name: "chat" (the chat on its own: HokieAI, HokieAI (chat 2), ...) or the name of a tool run."""
     runs = lab.chat_runs.setdefault(key, [])
     for r in runs:
         if r["values"] == values:
             return r["name"], False
-    if name == "chat":
-        full = f"chat {sum(r['name'].startswith('chat ') and 'tool' not in r['name'] for r in runs) + 1}"
-    else:
-        k = sum(r["name"].startswith(name) for r in runs) + 1
-        full = name if k == 1 else f"{name} ({k})"
-    runs.append({"name": full, "values": values})
+    plain = name == "chat"
+    base = CHAT_NAME if plain else name
+    k = sum(r["plain"] for r in runs) + 1 if plain else sum(r["name"].startswith(base) for r in runs) + 1
+    full = base if k == 1 else (f"{base} (chat {k})" if plain else f"{base} ({k})")
+    runs.append({"name": full, "values": values, "plain": plain})
     return full, True
 
 
 # ============================================================================ the table
+TREES = "trees (Step 2b)"
+
+
 def table_files(lab):
     """The training rows (with the answer) and 30 held-out rows (without), the same for everyone."""
     spec = lab.table_spec
@@ -155,8 +161,8 @@ def table_files(lab):
     trees = lab.models.get(("reg", "trees")) or models.fit_regressor("trees", Xtr, ytr)
     lab.models[("reg", "trees")] = trees
     line = lab.models.get(("reg", "linear")) or models.fit_regressor("linear", Xtr, ytr)
-    ref = {"trees (the notebook, Step 2b)": pd.Series(trees.predict(Xte.loc[pick]), index=ids),
-           "straight line (the notebook, Step 2b)": pd.Series(line.predict(Xte.loc[pick]), index=ids)}
+    ref = {TREES: pd.Series(trees.predict(Xte.loc[pick]), index=ids),
+           "straight line (Step 2b)": pd.Series(line.predict(Xte.loc[pick]), index=ids)}
     d = dict(train=train, test=test, truth=truth, ref=ref, idcol=idcol,
              tr_path=_save(f"{spec.key}_train.csv", train), te_path=_save(f"{spec.key}_test.csv", test))
     lab.chat_cache["table"] = d
@@ -170,7 +176,7 @@ def _table_intro(spec, d, attach: bool) -> str:
 
 
 def _table_form(spec, d) -> str:
-    return (f"Reply in this form, one line per {spec.row_word}, all {len(d['test'])} lines:\n\n"
+    return (f"Reply in this form, one line per {spec.row_word}, all {len(d['test'])} lines, plain numbers without commas:\n\n"
             f"{d['idcol']}, {spec.target}\nT01, ...\nT02, ...\n...")
 
 
@@ -194,10 +200,11 @@ def table_tool_prompt(lab, model: str) -> str:
 
 
 def parse_rows(text: str) -> Dict[str, float]:
-    """'T01, 38.5' pairs anywhere in the reply (one per line or all on one line; tables, fences and extra words are fine)."""
+    """'T01, 5437' pairs anywhere in the reply (one per line or all on one line; tables, fences, extra words and
+    thousands separators such as 5,437 are fine)."""
     out = {}
-    for tid, v in re.findall(r"\b(T\d{1,2})\b\s*\**\s*[,;:|=\t ]\s*\**\s*(-?\d+(?:\.\d+)?)", text):
-        out.setdefault(f"T{int(tid[1:]):02d}", float(v))
+    for tid, v in re.findall(r"\b(T\d{1,2})\b\s*\**\s*[,;:|=\t ]\s*\**\s*(-?(?:\d{1,3}(?:,\d{3})+(?!\d)|\d+)(?:\.\d+)?)", text):
+        out.setdefault(f"T{int(tid[1:]):02d}", float(v.replace(",", "")))
     return out
 
 
@@ -221,53 +228,52 @@ def table_score(lab, text: str, name: str):
         """Each forecast on the rows it has (a chat reply may skip some; the notebook's models have all of them)."""
         rows_ = [i for i in full.index if i in pred.index]
         p = pred.reindex(rows_); t_ = full.reindex(rows_); e = (p - t_).abs()
-        g = int(sum(spec.grade_of(a) == spec.grade_of(b) for a, b in zip(p, t_)))
+        close = int((e <= t_.abs() * spec.close_pct / 100).sum())
         n_ = len(rows_)
-        return {"predicted by": label, f"average miss ({spec.unit})": f"{e.mean():.1f}", f"worst miss ({spec.unit})": f"{e.max():.1f}",
-                f"within {spec.close_enough:g} {spec.unit}": f"{int((e <= spec.close_enough).sum())} of {n_}",
-                "right grade": f"{g} of {n_}"}, float(e.mean()), g
+        return {"predicted by": label, f"average error ({spec.unit})": spec.fmt(e.mean()), f"worst error ({spec.unit})": spec.fmt(e.max()),
+                f"within {spec.close_pct:g} %": f"{close} of {n_}"}, float(e.mean()), close
     runs = lab.chat_runs[("table", spec.key)]
     rows = []
     for r in runs:
-        rr, mae, g = row(("▶ " if r["name"] == run else "") + r["name"], pd.Series(r["values"]))
+        rr, mae, close = row(("▶ " if r["name"] == run else "") + r["name"], pd.Series(r["values"]))
         rows.append(rr)
-        lab.results[("chat_table", r["name"])] = {"mae": mae, "grades": g, "n": len(r["values"])}
+        lab.results[("chat_table", r["name"])] = {"mae": mae, "close": close, "n": len(r["values"])}
     for label, pred in d["ref"].items():
         rows.append(row(label, pred)[0])
-    print(f"Scored on {spec.rows} whose measured {spec.target_label} neither the models nor the chat was given:")
+    print(f"Scored on {spec.rows} whose measured {spec.target_label} neither the models nor {CHAT_NAME} was given:")
     ui.table(pd.DataFrame(rows))
     if len(have) < len(full):
         same = {label: float((pred.reindex(have) - truth).abs().mean()) for label, pred in d["ref"].items()}
-        print(f"On the same {len(have)} {spec.rows} as {run}: " + ", ".join(f"{k.split(' (')[0]} {v:.1f} {spec.unit}" for k, v in same.items()) + ".")
+        print(f"On the same {len(have)} {spec.rows} as {run}: " + ", ".join(f"{k.split(' (')[0]} {spec.fmt(v)} {spec.unit}" for k, v in same.items()) + ".")
 
     mine = pd.Series(next(r for r in runs if r["name"] == run)["values"]).reindex(have)
-    trees = d["ref"]["trees (the notebook, Step 2b)"].reindex(have)
+    trees = d["ref"][TREES].reindex(have)
     fig, ax = plt.subplots(figsize=(5, 4.6))
-    ax.scatter(truth, trees, s=26, color=ui.GREEN, alpha=0.8, label="trees (the notebook)")
+    ax.scatter(truth, trees, s=26, color=ui.GREEN, alpha=0.8, label=TREES)
     ax.scatter(truth, mine, s=26, color=ORANGE, marker="D", alpha=0.9, label=run)
     lim = [min(truth.min(), mine.min()) * 0.95, max(truth.max(), mine.max()) * 1.05]
     ax.plot(lim, lim, "k--", lw=1); ax.set_xlabel(f"measured {spec.label(spec.target)}"); ax.set_ylabel("predicted"); ax.legend(fontsize=8)
     ax.set_title("on the dashed line = exactly right", fontsize=9); ui.show(fig)
 
-    chats = [r for r in runs if r["name"].startswith("chat ") and "tool" not in r["name"]]
+    chats = [r for r in runs if r["plain"]]
     if len(chats) >= 2:
         a, b = pd.Series(chats[0]["values"]), pd.Series(chats[-1]["values"])
         common = [i for i in a.index if i in b.index]
         diff = (a[common] - b[common]).abs()
         same = int((diff < 0.05).sum()); moved = diff[diff >= 0.05]
         print(f"Same prompt, two new chats ({chats[0]['name']} and {chats[-1]['name']}): the same number for {same} of {len(common)} {spec.rows}"
-              + (f"; the other {len(moved)} moved by {moved.mean():.1f} {spec.unit} on average, most on {moved.idxmax()} ({moved.max():.1f} {spec.unit})."
+              + (f"; the other {len(moved)} moved by {spec.fmt(moved.mean())} {spec.unit} on average, most on {moved.idxmax()} ({spec.fmt(moved.max())} {spec.unit})."
                  if len(moved) else "."))
     elif name == "chat":
         print("Now start a second new chat, give it the same prompt, and score that reply too: does the chat give the same numbers twice?")
     worst = (mine - truth).abs().sort_values(ascending=False).index[:5]
     view = d["test"].set_index(d["idcol"]).loc[list(worst)].copy()
     view.columns = [spec.label(c) for c in view.columns]
-    view.insert(0, f"{run} ({spec.unit})", mine[worst].round(1).values)
-    view.insert(0, f"trees ({spec.unit})", trees[worst].round(1).values)
-    view.insert(0, f"measured ({spec.unit})", truth[worst].round(1).values)
+    view.insert(0, f"{run} ({spec.unit})", mine[worst].round(spec.decimals).values)
+    view.insert(0, f"trees ({spec.unit})", trees[worst].round(spec.decimals).values)
+    view.insert(0, f"measured ({spec.unit})", truth[worst].round(spec.decimals).values)
     view.insert(0, d["idcol"], list(worst))
-    print(f"\nThe {len(worst)} {spec.rows} {run} missed most:"); ui.table(view.reset_index(drop=True))
+    print(f"\nThe {len(worst)} {spec.rows} {run} got most wrong:"); ui.table(view.reset_index(drop=True))
 
 
 def _steps(give: str, steps_text, paste_steps_text):
@@ -283,7 +289,7 @@ def chat_table(lab, give: str = "attach the files", steps_text=None, paste_steps
 def chat_table_tool(lab, model: str, steps_text=None):
     d = table_files(lab)
     _box([d["tr_path"], d["te_path"]], table_tool_prompt(lab, model), "chat + analysis tool",
-         lambda text: table_score(lab, text, f"chat + analysis tool, {model}"), attach=True, steps=steps_text)
+         lambda text: table_score(lab, text, f"{CHAT_NAME} + analysis tool, {model}"), attach=True, steps=steps_text)
 
 
 # ============================================================================ the time series
@@ -383,7 +389,7 @@ def forecast_score(lab, meter_id: str, text: str, name: str):
         f = series.forecast(m, meth, lab.forecaster)
         mae = float(np.mean(np.abs(f.median[ok] - actual.values[ok])))
         ax.plot(actual.index, f.median, color=colors[f.method], lw=1, alpha=0.7, label=meth)
-        rows.append((meth + " (the notebook)", f"{mae:.1f}", f"{mae / actual.mean() * 100:.0f} %", f"{len(actual)}"))
+        rows.append((meth + " (Step 2a)", f"{mae:.1f}", f"{mae / actual.mean() * 100:.0f} %", f"{len(actual)}"))
     chat_rows = []
     for r in lab.chat_runs[("forecast", m.id)]:
         s = pd.Series({pd.Timestamp(k): v for k, v in r["values"].items()}).reindex(actual.index)
@@ -394,7 +400,7 @@ def forecast_score(lab, meter_id: str, text: str, name: str):
     ax.plot(pred.index, pred.values, color=ORANGE, lw=2, label=run)
     ax.set_title(f"{m.label}: the week of {actual.index[0].date()}", fontsize=11); ax.set_ylabel("kWh"); ax.legend(fontsize=8, ncol=5)
     ui.show(fig)
-    ui.table(pd.DataFrame(chat_rows + rows, columns=["forecast", "average miss (kWh per hour)", "as a share of the mean load", "hours given"]))
+    ui.table(pd.DataFrame(chat_rows + rows, columns=["forecast", "average error (kWh per hour)", "as a share of the mean load", "hours given"]))
     print("The chat saw four weeks of history; the notebook's methods saw the whole year up to the same Monday. "
           + ("All are scored on the same hours." if n == len(actual) else f"The notebook's methods are scored on the {int(ok.sum())} hours this reply gave."))
 
@@ -408,7 +414,7 @@ def chat_forecast(lab, meter_id: str, give: str = "attach the files", steps_text
 def chat_forecast_tool(lab, meter_id: str, model: str, steps_text=None):
     d = series_files(lab, meter_id)
     _box([d["hist_path"], d["next_path"]], forecast_tool_prompt(lab, meter_id, model), "chat + analysis tool",
-         lambda text: forecast_score(lab, meter_id, text, f"chat + analysis tool, {model}"), attach=True, steps=steps_text)
+         lambda text: forecast_score(lab, meter_id, text, f"{CHAT_NAME} + analysis tool, {model}"), attach=True, steps=steps_text)
 
 
 # ---------------------------------------------------------------------------- odd days

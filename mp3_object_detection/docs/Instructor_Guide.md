@@ -34,11 +34,11 @@ is exactly the point to bring out in question 2.
 
 ## 3. Answer key and marking notes (100 points)
 
-1. **Counting game (6).** Any score; good answers mention small/distant workers, occlusion, helmets that are hard to see, and that labellers make judgement calls too.
-2. **Labelling yourself (8).** Typical: 1–2 minutes per photo, 5–15 boxes per minute, about half to two thirds of the boxes agreeing with the dataset at the 50 % overlap rule. Good answers name the hard cases (partly hidden workers, NO vest vs. vest under a jacket, tiny heads) and conclude that the full training set is days of work for one person, so labelling is the real cost of a custom detector and label consistency matters.
+1. **Counting game (6).** Any score; good answers mention small/distant workers, occlusion, helmets that are hard to see, and that labelers make judgment calls too.
+2. **Labeling yourself (8).** Typical: 1–2 minutes per photo, 5–15 boxes per minute, about half to two thirds of the boxes agreeing with the dataset at the 50 % overlap rule. Good answers name the hard cases (partly hidden workers, NO vest vs. vest under a jacket, tiny heads) and conclude that the full training set is days of work for one person, so labeling is the real cost of a custom detector and label consistency matters.
 3. **Reliable vs. missed classes (12).** Workshop: *person* and *helmet* are found most reliably; *NO helmet* has the lowest recall (rare class, small boxes). Homework: *dump truck* and *wheel loader* are strong, *excavator* weaker in some photos (rarer in the test set, many shapes). Full marks need the recall numbers and a plausible reason.
 4. **Threshold (12).** Low threshold: fewer misses, more false alarms; high threshold: the opposite. Instant alarm: rather high threshold (false alarms erode trust) unless the cost of a miss is severe; weekly statistic: a middle threshold with a person checking flagged photos. Any threshold is fine if justified with both numbers.
-5. **Fooling photos (12).** Expect: tiny objects after *move away*, dark or blurred photos, rotation, the astronaut counted as a person with a helmet, out-of-scope images producing confident boxes. Marks for the mechanism (scale, texture, colour, nothing similar in training).
+5. **Fooling photos (12).** Expect: tiny objects after *move away*, dark or blurred photos, rotation, the astronaut counted as a person with a helmet, out-of-scope images producing confident boxes. Marks for the mechanism (scale, texture, color, nothing similar in training).
 6. **Pretrained vs. fine-tuned, domain shift (12).** COCO YOLO finds *person* / *truck* but has no helmet or vest classes; fine-tuning adds them from a few hundred photos. On other-domain photos each model can only answer with its own classes and invents them. Lesson: an "AI camera" must be trained (or checked) on the classes and photos of *your* site.
 7. **Dashboard (10).** AI compliance is close to the labeled compliance but not identical; count the missed and false flags. Instant alarm: higher threshold; monthly statistic: middle threshold, errors average out. Homework: total machine counts, photos exactly right, over/under-counting.
 8. **Training runs (14).** More photos and passes raise mAP50 with diminishing returns; a random start stays near zero with this little data. A detector must learn *where* as well as *what*, needs many boxes per class, and is judged by a stricter metric than accuracy. Typical test scores (PPE set, GPU; the backbone is kept frozen in the students' runs):
@@ -51,7 +51,7 @@ is exactly the point to bring out in question 2.
    | course model (897 photos / 30 passes, full network) | 82 |
    | all / 12, random start | about 0 |
 9. **Own photos, homework only (8).** Screenshots of five photos with verdicts and sensible explanations.
-10. **Deployment reflection (8, or 16 in the workshop).** Camera placement (height, coverage, lighting), what happens on an alarm, failure modes (weather, night, occlusion, drift), privacy and consent of workers, data collection and labelling plan for the site's own classes.
+10. **Deployment reflection (8, or 16 in the workshop).** Camera placement (height, coverage, lighting), what happens on an alarm, failure modes (weather, night, occlusion, drift), privacy and consent of workers, data collection and labeling plan for the site's own classes.
 
 ## 4. Known failure modes
 
@@ -66,6 +66,6 @@ is exactly the point to bring out in question 2.
 ## 5. Rebuilding or changing the material
 
 See `README.md` in this folder for the build scripts. To swap a dataset, add a `DetSpec` in
-`aec_det/config.py` (classes, colours, counting question, dashboard type), package it with
+`aec_det/config.py` (classes, colors, counting question, dashboard type), package it with
 `build/prepare_datasets.py` from a YOLO-format folder, train with `build/train_course_models.py`,
 build its tricky gallery, and point a variant in `build/make_notebooks.py` at it.

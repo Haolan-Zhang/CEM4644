@@ -38,7 +38,7 @@ def build_model(base_model_dir, num_classes: int, pretrained: bool = True):
     base_model_dir = str(base_model_dir)
     labels = {"id2label": {i: str(i) for i in range(num_classes)}, "label2id": {str(i): i for i in range(num_classes)}}
     old = transformers.logging.get_verbosity()
-    transformers.logging.set_verbosity_error()  # hide the expected "classifier re-initialised" report
+    transformers.logging.set_verbosity_error()  # hide the expected "classifier re-initialized" report
     try:
         if pretrained:
             return AutoModelForImageClassification.from_pretrained(
@@ -63,7 +63,7 @@ def quick_train(train_set: ImageSet, test_set: ImageSet, base_model_dir, *, n_tr
                 label_smoothing: float = 0.0, head_lr_mult: float = 10.0):
     """Fine-tune a copy of the base model. Returns (Classifier, history).
 
-    Small runs get a smaller batch (more optimizer steps) and the freshly initialised classifier
+    Small runs get a smaller batch (more optimizer steps) and the freshly initialized classifier
     head learns faster than the pretrained body, so even 20 photos / 1 pass moves the needle."""
     _seed(seed)
     device = get_device()
@@ -87,7 +87,7 @@ def quick_train(train_set: ImageSet, test_set: ImageSet, base_model_dir, *, n_tr
     clf = Classifier(model, train_set.pretty_classes, name=name, device=device)
     history = []
     log(f"Training '{name}' on {len(sub)} photos, starting from a "
-        f"{'pretrained' if pretrained else 'randomly initialised'} network, "
+        f"{'pretrained' if pretrained else 'randomly initialized'} network, "
         f"for {epochs} pass(es) over the data, on {'GPU' if device.type == 'cuda' else 'CPU'}.")
     t0 = time.time()
     for ep in range(1, epochs + 1):

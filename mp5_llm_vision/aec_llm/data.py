@@ -60,7 +60,7 @@ class Site:
 @dataclass
 class Plan:
     """A floor plan with its answer key. Two key layouts are read: MP4's sheets as converted by build/prepare_data.py
-    (units "ft", every room with "area" and "indoor") and the older metre-based copies of the Finnish scans
+    (units "ft", every room with "area" and "indoor") and the older meter-based copies of the Finnish scans
     ("scale_m_per_px", "area_m2"); both end up with the same fields."""
     id: str
     path: Path
@@ -70,7 +70,7 @@ class Plan:
 
     def __post_init__(self):
         k = self.key
-        if "units" not in k:                                   # the older metre-based layout
+        if "units" not in k:                                   # the older meter-based layout
             k["units"] = "m"
             k["scale_units_per_px"] = float(k["scale_m_per_px"])
             k["floor_area"] = float(k["floor_area_m2"])

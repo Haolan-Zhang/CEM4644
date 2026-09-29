@@ -16,7 +16,7 @@ from .engine import SegResult
 
 GREEN, RED, BLUE, PURPLE = "#2a9d8f", "#e76f51", "#457b9d", "#7b2cbf"      # found / missed / not one / your example
 LEGEND = "green = a real one the model found, red outline = a real one it missed, blue = a region that is not one"
-AREA_FILL = "#f4a261"     # every measured area in one colour: a number, not a verdict
+AREA_FILL = "#f4a261"     # every measured area in one color: a number, not a verdict
 AREA_COLORS = ["#e63946", "#4cc9f0", "#ffd166", "#06d6a0", "#7b2cbf", "#f4a261", "#457b9d", "#2a9d8f",
                "#e9c46a", "#8d6e63", "#ff70a6", "#9aa5b1"]
 
@@ -39,7 +39,7 @@ def centre_in(p, t) -> bool:
 
 
 def box_hit(truth, pred, iou: float = 0.2) -> bool:
-    """A predicted box counts for a key box when they overlap enough, or when its centre is inside it and it is at
+    """A predicted box counts for a key box when they overlap enough, or when its center is inside it and it is at
     least a quarter of its size (small symbols: a box a few pixels off has a low IoU but is clearly the same thing;
     a small part drawn inside a large symbol - the circle inside a light fixture - is not the symbol)."""
     if box_iou(truth, pred) >= iou:
@@ -241,7 +241,7 @@ def intro_phrase(lab, photo_id: str, phrase: str, threshold: float):
 
 
 def intro_prompts_compute(lab, img, prompts):
-    """prompts: [(label, [x1, y1, x2, y2])] in full-image pixels; 'point' uses the centre of the drawn box as the click."""
+    """prompts: [(label, [x1, y1, x2, y2])] in full-image pixels; 'point' uses the center of the drawn box as the click."""
     layers, lines, marks = [], [], []
     for i, (label, b) in enumerate(prompts):
         color = INTRO_COLORS[i % len(INTRO_COLORS)]
@@ -284,7 +284,7 @@ def intro_draw(lab, photo_id: str):
     buf = io.BytesIO(); disp.save(buf, "PNG")
     widget = BBoxWidget(classes=["box", "point"])
     widget.image_bytes = buf.getvalue()
-    msg = w.HTML("Draw a <b>box</b> around an object, or a tiny box on it labelled <b>point</b> (its centre is the click). "
+    msg = w.HTML("Draw a <b>box</b> around an object, or a tiny box on it labeled <b>point</b> (its center is the click). "
                  "Several are fine. Then <b>Submit</b>.")
     out = w.Output()
 
@@ -559,7 +559,7 @@ def takeoff_compute(lab, sheet_id: str, boxes, threshold: Optional[float] = None
     count_categories: which of the sheet's counting categories to run (None = all of them).
 
     Nothing here is a tally of the student's own boxes. A COUNT always comes from the model: the student
-    draws ONE box labelled 'example: <category>' and SAM 3 (`segment_like`) finds everything else like it,
+    draws ONE box labeled 'example: <category>' and SAM 3 (`segment_like`) finds everything else like it,
     which is what the answer key is then compared with. An AREA always comes from the model as well.
     Returns (overlay image, report dict). The report is what `print_takeoff` turns into words.
     """
@@ -787,13 +787,13 @@ def count_lines(rep, tips: bool = True, bold=lambda s: s):
                   f"{bold('Missed:')} {nm}",
                   f"{bold('Extra:')} {ne} region{'' if ne == 1 else 's'} that {'was not a ' + cat if ne == 1 else 'were not ' + real}"]
         if c.get("extra_examples"):
-            lines.append(f"   You drew {c['extra_examples'] + 1} boxes labelled 'example: {cat}'. "
+            lines.append(f"   You drew {c['extra_examples'] + 1} boxes labeled 'example: {cat}'. "
                          "Only the first one was used - one example is all the model needs.")
         if tips and c.get("tip"):
             lines.append(f"   {c['tip']}")
     for cat in rep.get("counts_todo") or []:
         label = (rep.get("todo_labels") or {}).get(cat, f"example: {cat}")
-        lines.append(f"{cat}: not counted. Draw ONE clean box labelled '{label}' and submit again; "
+        lines.append(f"{cat}: not counted. Draw ONE clean box labeled '{label}' and submit again; "
                      "the count comes from the model, not from your boxes.")
     if rep["counts"]:
         lines.append(LEGEND + "; purple = your example box")
@@ -891,7 +891,7 @@ def print_areas(sheet, rep):
 
 def takeoff(lab, sheet_id: str):
     """One cell for the whole take-off of one drawing: the scale, the areas, and every count the sheet asks
-    for, each one made by SAM 3 from a single box labelled 'example: <category>'."""
+    for, each one made by SAM 3 from a single box labeled 'example: <category>'."""
     import ipywidgets as w
     from IPython.display import display
     from jupyter_bbox_widget import BBoxWidget
@@ -914,7 +914,7 @@ def takeoff(lab, sheet_id: str):
     todo = "<br>".join(f"<b>{i + 1}.</b> {t}" for i, t in enumerate(sheet.tasks))   # shown only when guided
     msg = w.HTML("" if not guided else f"<b>{sheet.id} - {sheet.title}</b><br>{todo}<br>"
                  "Pick the label above the picture before each box. Zoom with the mouse wheel. Then <b>Submit</b>."
-                 + ("<br>A count is never a tally of your boxes: draw <b>one</b> box labelled "
+                 + ("<br>A count is never a tally of your boxes: draw <b>one</b> box labeled "
                     "<b>example: ...</b> and SAM 3 finds all the others like it." if cats else ""))
     out = w.Output()
 

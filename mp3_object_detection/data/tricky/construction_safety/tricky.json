@@ -42,7 +42,7 @@
   {
     "id": 6,
     "file": "06_crowded.jpg",
-    "caption": "a crowded photo with 42 labelled objects",
+    "caption": "a crowded photo with 42 labeled objects",
     "group": "crowded",
     "expected": "helmet \u00d715, person \u00d719, NO helmet \u00d71, vest \u00d77",
     "source": "te0172.jpg"
@@ -50,7 +50,7 @@
   {
     "id": 7,
     "file": "07_crowded.jpg",
-    "caption": "a crowded photo with 36 labelled objects",
+    "caption": "a crowded photo with 36 labeled objects",
     "group": "crowded",
     "expected": "helmet \u00d713, vest \u00d712, person \u00d711",
     "source": "te0071.jpg"
@@ -170,7 +170,7 @@
   {
     "id": 22,
     "file": "22_out_of_scope.jpg",
-    "caption": "a blank grey image",
+    "caption": "a blank gray image",
     "group": "out_of_scope",
     "expected": "",
     "source": "synthetic"

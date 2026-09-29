@@ -20,9 +20,26 @@ def show(fig, dpi: int = 100):
     display(Image(buf.getvalue()))
 
 
+def _decimals(col: pd.Series) -> int:
+    """As few decimals as the column needs (0 to 2), the same for every row."""
+    v = col.dropna().to_numpy(dtype=float)
+    for d in (0, 1):
+        if np.allclose(v * 10 ** d, np.round(v * 10 ** d), atol=1e-6):
+            return d
+    return 2
+
+
 def table(df: pd.DataFrame, max_rows: int = 30):
-    display(HTML(df.head(max_rows).to_html(index=isinstance(df.index, pd.DatetimeIndex) or df.index.name is not None,
-                                          float_format=lambda v: f"{v:,.2f}", border=0)))
+    view = df.head(max_rows)
+    fmt = {c: (lambda v, d=_decimals(view[c]): f"{v:,.{d}f}") for c in view.columns
+           if pd.api.types.is_numeric_dtype(view[c]) and not pd.api.types.is_bool_dtype(view[c])}
+    display(HTML(view.to_html(index=isinstance(df.index, pd.DatetimeIndex) or df.index.name is not None,
+                              formatters=fmt, border=0)))
+
+
+def confusion(mat: pd.DataFrame):
+    """The confusion matrix with its row and column names (Actual / Predicted)."""
+    display(HTML(mat.to_html(border=0).replace("<th>", "<th style='text-align:center'>")))
 
 
 # ----------------------------------------------------------------------------- Part 1: the table
@@ -32,9 +49,9 @@ def show_table(lab, rows: int = 10):
     view = df.sample(rows, random_state=1).sort_index(); view.columns = [spec.label(c) for c in view.columns]
     table(view.reset_index(drop=True))
     fig, ax = plt.subplots(1, 2, figsize=(11, 3.4))
-    ax[0].hist(df[spec.target], bins=30, color=BLUE); ax[0].set_xlabel(spec.label(spec.target)); ax[0].set_ylabel(f"{spec.rows}"); ax[0].set_title("the answer column")
+    ax[0].hist(df[spec.target], bins=30, color=BLUE); ax[0].set_xlabel(spec.label(spec.target)); ax[0].set_ylabel(f"{spec.rows}"); ax[0].set_title("Distribution of the output")
     top = spec.whatif[0]
-    ax[1].scatter(df[top], df[spec.target], s=8, alpha=0.4, color=BLUE); ax[1].set_xlabel(spec.label(top)); ax[1].set_ylabel(spec.label(spec.target)); ax[1].set_title("one input against the answer")
+    ax[1].scatter(df[top], df[spec.target], s=8, alpha=0.4, color=BLUE); ax[1].set_xlabel(spec.label(top)); ax[1].set_ylabel(spec.label(spec.target)); ax[1].set_title(f"One input ({spec.label(top).split(' (')[0]}) vs. the output")
     show(fig)
 
 
@@ -61,7 +78,7 @@ def guess_game(lab):
         lab.guesses = {"rows": rows.index.tolist(), "guess": g, "truth_grade": tg, "truth": truth.values.tolist(), "right": right}
         with out:
             out.clear_output(wait=True)
-            res = pd.DataFrame({"your grade": g, "really": tg, f"measured ({spec.unit})": np.round(truth.values, 1), "": ["✓" if a == b else "✗" for a, b in zip(g, tg)]}, index=view.index)
+            res = pd.DataFrame({"your grade": g, "really": tg, f"measured ({spec.unit})": [spec.fmt(v) for v in truth.values], "": ["✓" if a == b else "✗" for a, b in zip(g, tg)]}, index=view.index)
             table(res)
             print(f"You put {right} of {len(g)} {spec.rows} in the right grade. Step 2a shows what the model does with the same {spec.rows}.")
     btn.on_click(go)
@@ -70,7 +87,7 @@ def guess_game(lab):
 
 
 # ----------------------------------------------------------------------------- Part 2: regression and classification
-REGRESSION_TEXT = ("**{model}:**\nTrained on **{n_train}** {rows}, tested on **{n_test}** it never saw.\n**Average miss (MAE):** {mae} {unit}\n"
+REGRESSION_TEXT = ("**{model}:**\nTrained on **{n_train}** {rows}, tested on **{n_test}** it never saw.\n**Average error (MAE):** {mae} {unit}\n"
                    "**R²:** {r2} (1.0 would be perfect; 0 is no better than guessing the average)")
 
 
@@ -95,15 +112,15 @@ def regression_view(lab, kind: str, result_text: Optional[str] = None):
     ax.plot(lim, lim, "k--", lw=1); ax.set_xlabel(f"measured {spec.label(spec.target)}"); ax.set_ylabel("predicted"); ax.set_title(f"{len(Xte)} {spec.rows} the model never saw", fontsize=10)
     show(fig)
     md_text(result_text or REGRESSION_TEXT, model=kind[:1].upper() + kind[1:], n_train=len(Xtr), n_test=len(Xte), rows=spec.rows,
-            mae=f"{r.mae:.2f}", unit=spec.unit, r2=f"{r.r2:.3f}")
+            mae=spec.fmt(r.mae) if spec.decimals == 0 else f"{r.mae:.2f}", unit=spec.unit, r2=f"{r.r2:.3f}")
     if lab.guesses:
         p = model.predict(df.loc[lab.guesses["rows"], spec.features])
         m = float(np.mean(np.abs(p - np.array(lab.guesses["truth"]))))
         right = sum(spec.grade_of(v) == g for v, g in zip(p, lab.guesses["truth_grade"]))
-        print(f"  On the {len(p)} {spec.rows} you graded in Step 1b: the model's numbers are off by {m:.1f} {spec.unit} on average, "
+        print(f"  On the {len(p)} {spec.rows} you graded in Step 1b: the model's numbers are off by {spec.fmt(m)} {spec.unit} on average, "
               f"and turned into grades they put {right} of {len(p)} right (you: {lab.guesses['right']}).")
     w_ = r.worst.copy(); w_.columns = [spec.label(c) if c in spec.features else c for c in w_.columns]
-    print(f"\nThe {len(r.worst)} worst misses:"); table(w_.reset_index(drop=True))
+    print(f"\nThe {len(r.worst)} largest errors:"); table(w_.reset_index(drop=True))
 
 
 def classification_view(lab, kind: str, task: str, threshold: float):
@@ -114,8 +131,7 @@ def classification_view(lab, kind: str, task: str, threshold: float):
         model = models.fit_classifier(kind, Xtr, labels_tr)
         r = models.grades_result(model, kind, Xte, yte, spec)
         print(f"{kind}, {len(spec.grades)} grades of {spec.label(spec.target)}: {r.accuracy * 100:.0f} % of the {len(Xte)} unseen {spec.rows} put in the right grade.")
-        table(r.matrix)
-        print("Rows are the truth, columns what the model said; the diagonal is right, everything else is a mistake.")
+        confusion(r.matrix)
         if lab.guesses:
             p = model.predict(df.loc[lab.guesses["rows"], spec.features])
             right = sum(a == b for a, b in zip(p, lab.guesses["truth_grade"]))
@@ -123,15 +139,15 @@ def classification_view(lab, kind: str, task: str, threshold: float):
     else:
         model = models.fit_classifier(kind, Xtr, ytr.values >= threshold)
         r = models.passfail_result(model, kind, Xte, yte, spec, threshold)
-        print(f"{kind}, does the {spec.row_word} reach {threshold:g} {spec.unit}? {r.accuracy * 100:.0f} % of the {len(Xte)} unseen {spec.rows} called right.")
-        table(r.matrix)
-        print(f"  False passes (called pass, really fails): {r.false_pass}   |   false fails (called fail, really passes): {r.false_fail}")
+        print(f"{kind}, does the {spec.row_word} reach {threshold:,g} {spec.unit}? {r.accuracy * 100:.0f} % of the {len(Xte)} unseen {spec.rows} called right.")
+        confusion(r.matrix)
+        print(f"  False passes (predicted pass, actually fails): {r.false_pass}   |   false fails (predicted fail, actually passes): {r.false_fail}")
         if r.proba is not None:
             print(f"  {spec.rows.capitalize()} the model is unsure about (probability of passing between 30 % and 70 %): {r.uncertain}")
             fig, ax = plt.subplots(figsize=(7, 2.8))
             ax.scatter(yte.values, r.proba, s=12, alpha=0.6, c=np.where(r.y_true, GREEN, RED))
             ax.axvline(threshold, color="k", lw=1, ls="--"); ax.axhline(0.5, color=GREY, lw=1)
-            ax.set_xlabel(f"measured {spec.label(spec.target)}"); ax.set_ylabel("model's probability of a pass"); ax.set_title("green = really passes, red = really fails", fontsize=9)
+            ax.set_xlabel(f"measured {spec.label(spec.target)}"); ax.set_ylabel("model's probability of a pass"); ax.set_title("green = actually passes, red = actually fails", fontsize=9)
             show(fig)
     lab.results[("cls", r.kind, r.task)] = {"accuracy": r.accuracy, "false_pass": r.false_pass, "false_fail": r.false_fail}
 
@@ -177,10 +193,10 @@ def whatif(lab, start_from: str = "a typical row"):
             out.clear_output(wait=True)
             fig, ax = plt.subplots(figsize=(7, 3))
             ax.plot(xs, ys, color=BLUE); ax.scatter([row[f0]], [pred], color=RED, zorder=3)
-            ax.set_xlabel(spec.label(f0)); ax.set_ylabel(f"predicted {spec.label(spec.target)}"); ax.set_title(f"predicted {spec.target_label}: {pred:.1f} {spec.unit}", fontsize=11)
+            ax.set_xlabel(spec.label(f0)); ax.set_ylabel(f"predicted {spec.label(spec.target)}"); ax.set_title(f"predicted {spec.target_label}: {spec.fmt(pred)} {spec.unit}", fontsize=11)
             show(fig)
             inside = all(df[f].min() <= row[f] <= df[f].max() for f in spec.whatif)
-            print(f"Predicted {spec.target_label}: {pred:.1f} {spec.unit}."
+            print(f"Predicted {spec.target_label}: {spec.fmt(pred)} {spec.unit}."
                   + ("" if inside else " At least one slider is outside anything the model was trained on: treat this number as a guess."))
     for s in sliders.values():
         s.observe(render, names="value")
@@ -255,7 +271,7 @@ def forecast_view(lab, meter_id: str, method: str):
         lab.results[("forecast", m.id, f.method)] = f.mae
     ax.set_title(f"{m.label}: the week of {actual.index[0].date()}, forecast from the data before it", fontsize=11); ax.set_ylabel("kWh"); ax.legend(fontsize=8, ncol=4)
     show(fig)
-    table(pd.DataFrame(rows, columns=["method", "average miss (kWh per hour)", "as a share of the mean load", "time", "uncertainty band"]).set_index("method"))
+    table(pd.DataFrame(rows, columns=["method", "average error (kWh per hour)", "as a share of the mean load", "time", "uncertainty band"]).set_index("method"))
 
 
 # ----------------------------------------------------------------------------- Part 6: odd days
@@ -281,7 +297,7 @@ def report_summary(lab):
     for key, v in sorted(lab.results.items(), key=lambda kv: str(kv[0])):
         kind, *rest = key if isinstance(key, tuple) else (key,)
         if kind == "reg":
-            print(f"  regression, {rest[0]}: MAE {v['mae']:.2f} {spec.unit}, R² {v['r2']:.3f}")
+            print(f"  regression, {rest[0]}: MAE {spec.fmt(v['mae'])} {spec.unit}, R² {v['r2']:.3f}")
         elif kind == "cls":
             extra = f", false passes {v['false_pass']}, false fails {v['false_fail']}" if "pass" in rest[1] else ""
             print(f"  classification, {rest[0]}, {rest[1]}: {v['accuracy'] * 100:.0f} % right{extra}")
@@ -292,7 +308,7 @@ def report_summary(lab):
         elif kind == "buildings_game":
             print(f"  which building is which: {v} of 4")
         elif kind == "chat_table":
-            print(f"  {rest[0]}: MAE {v['mae']:.2f} {spec.unit}, right grade {v['grades']} of {v['n']}")
+            print(f"  {rest[0]}: MAE {spec.fmt(v['mae'])} {spec.unit}, within {spec.close_pct:g} % on {v['close']} of {v['n']}")
         elif kind == "chat_forecast":
             print(f"  forecast {rest[0]} by {rest[1]}: MAE {v:.1f} kWh/h")
         elif kind == "chat_odd":

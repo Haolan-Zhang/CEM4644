@@ -34,7 +34,7 @@ in MP4: SAM 3 is used as it comes.
 2. **Floor plans, structural plans, MEP plans** (Parts 2, 3, 4), two cells each. *Step Na, your boxes*: the take-off
    cell. Room areas on the floor plans (plus two fixture counts on the clinic sheet); footing areas and a footing
    count on the structural sheets; light-fixture counts on the ceiling plan. **Every count is made by the model from
-   one box labelled `example: <thing>`** — students never tally their own boxes against the key. *Step Nb, a phrase*:
+   one box labeled `example: <thing>`** — students never tally their own boxes against the key. *Step Nb, a phrase*:
    the same things asked for by name (`lab.ask`), no box at all; the regions are scored against the answer key
    (hits / misses / extras, and the area of every room or footing found). Measured: *room* finds most rooms, *square* the footings, *rectangle* the pile caps, *circle* the grid bubbles; *footing*,
    *light fixture* and every other trade word find nothing, and nothing at all works by phrase on the ceiling plan.
@@ -93,9 +93,9 @@ the plain area category (`room`, `footing`, `pit`) for something to measure, and
 to count. There is no label for "one of the things I am counting": a count a student tallies by hand against an
 answer key is not a model result, so the lab does not ask for one.
 
-## The drawings, their sources and licences
+## The drawings, their sources and licenses
 
-| id | set | drawing | source | licence |
+| id | set | drawing | source | license |
 |---|---|---|---|---|
 | `usda_5544` | workshop | USDA design 710-5544, five-room farmhouse (Misc. Pub. 360 p. 17, 1940) | [archive.org/details/plansoffarmbuild360unit](https://archive.org/details/plansoffarmbuild360unit) | Public domain, work of the U.S. Government (17 U.S.C. 105) |
 | `usda_5540` | workshop | USDA design 710-5540, four-room and attic farmhouse (p. 13, 1940); re-cropped from the source PDF so the side porch is complete | same | same |
@@ -108,13 +108,13 @@ answer key is not a model result, so the lab does not ask for one.
 | `uscg_motorpool` | homework | US Coast Guard Motor Pool Facility, Support Center New York, shop building foundation plan S-1 (1984); cropped to keep the footing schedule | [Wikimedia Commons / DPLA](https://commons.wikimedia.org/wiki/File:Building_928_Structural_Foundation_Plan,_Details_and_Notes_Shop_Building,_June_20,_1984_-_DPLA_-_2938a6cfb0663504470f4b44fe7ae27e.tiff) | Public domain, US Government work |
 | `uscg_pile` | homework | US Coast Guard Building 785 bowling facility, pile footing plan (1983) | [Wikimedia Commons / DPLA](https://commons.wikimedia.org/wiki/File:Building_785_Sixteen_Lane_Bowling_Facility_Foundation_Plan,_January_19,_1983_-_DPLA_-_ec587aa2a393d5917cb73be19a2da195.tiff) | Public domain, US Government work |
 
-The USDA sheets were rendered from the scanned publication, cropped to the plan and cleaned of page artefacts; the
+The USDA sheets were rendered from the scanned publication, cropped to the plan and cleaned of page artifacts; the
 VA sheets were rendered from the VA's own template PDF. Every sheet keeps its own pixel size; nothing is rescaled to
 a round number, so the scale has to be measured. Each `credits.json` repeats the credit of every sheet in the set.
 
 **Model.** SAM 3 (Meta, Nov 2025). The official checkpoint `facebook/sam3` is behind a manual approval form, so the
 notebook loads the public mirror `jetjodh/sam3` (identical weights and config, no account needed); the env var
-`AEC_SEG_MODEL_ID` points it at a local copy. The SAM License allows redistribution with a copy of the licence,
+`AEC_SEG_MODEL_ID` points it at a local copy. The SAM License allows redistribution with a copy of the license,
 which is in `docs/SAM_LICENSE.txt`. Precomputed masks were produced with the same model at score threshold 0.1 and
 the notebook applies the student's threshold when reading them.
 

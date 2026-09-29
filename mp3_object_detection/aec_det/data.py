@@ -26,7 +26,7 @@ def unzip_dataset(zip_path: Path, dest_root: Path) -> Path:
 @dataclass
 class Item:
     path: Path
-    boxes: np.ndarray            # [n, 4] normalised cx, cy, w, h  (YOLO)
+    boxes: np.ndarray            # [n, 4] normalized cx, cy, w, h  (YOLO)
     cls: np.ndarray              # [n] int
     size: Optional[tuple] = None  # (w, h) lazily read
 

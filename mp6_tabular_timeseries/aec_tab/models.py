@@ -45,15 +45,21 @@ class RegResult:
     y_pred: np.ndarray
     mae: float
     r2: float
-    worst: pd.DataFrame                                  # the rows with the largest misses
+    worst: pd.DataFrame                                  # the rows with the largest errors
 
 
 def score_regression(model, kind: str, Xte, yte, spec: TableSpec, n_worst: int = 5) -> RegResult:
     p = model.predict(Xte)
     err = pd.Series(p - yte.values, index=Xte.index)
-    worst = Xte.copy(); worst["measured"] = yte.values; worst["predicted"] = np.round(p, 1); worst["miss"] = np.round(err.values, 1)
+    worst = Xte.copy(); worst["measured"] = yte.values; worst["predicted"] = np.round(p, spec.decimals); worst["error"] = np.round(err.values, spec.decimals)
     worst = worst.reindex(err.abs().sort_values(ascending=False).index[:n_worst])
     return RegResult(kind_of(kind), yte.values, p, float(mean_absolute_error(yte, p)), float(r2_score(yte, p)), worst)
+
+
+def confusion_frame(m, names: List[str]) -> pd.DataFrame:
+    """A confusion matrix with its two axes named: rows the actual class, columns the predicted one."""
+    return pd.DataFrame(m, index=pd.MultiIndex.from_product([["Actual"], names]),
+                        columns=pd.MultiIndex.from_product([["Predicted"], names]))
 
 
 @dataclass
@@ -75,7 +81,7 @@ def grades_result(model, kind, Xte, yte, spec: TableSpec) -> ClsResult:
     labels = [g[0] for g in spec.grades]
     true = np.array([spec.grade_of(v) for v in yte]); pred = model.predict(Xte)
     m = confusion_matrix(true, pred, labels=labels)
-    mat = pd.DataFrame(m, index=[f"really {l}" for l in labels], columns=[f"called {l.split(' (')[0]}" for l in labels])
+    mat = confusion_frame(m, [l.split(" (")[0] for l in labels])
     return ClsResult(kind_of(kind), "grades", labels, true, pred, None, float((true == pred).mean()), mat)
 
 
@@ -83,10 +89,10 @@ def passfail_result(model, kind, Xte, yte, spec: TableSpec, threshold: float) ->
     true = (yte.values >= threshold); pred = model.predict(Xte).astype(bool)
     proba = model.predict_proba(Xte)[:, list(model.classes_).index(True)] if hasattr(model, "predict_proba") else None
     m = confusion_matrix(true, pred, labels=[True, False])
-    mat = pd.DataFrame(m, index=["really passes", "really fails"], columns=["called pass", "called fail"])
+    mat = confusion_frame(m, ["pass", "fail"])
     fp = int(((~true) & pred).sum()); fn = int((true & (~pred)).sum())
     unc = int(((proba > 0.3) & (proba < 0.7)).sum()) if proba is not None else 0
-    return ClsResult(kind_of(kind), f"pass/fail at {threshold:g} {spec.unit}", ["pass", "fail"], true, pred, proba,
+    return ClsResult(kind_of(kind), f"pass/fail at {threshold:,g} {spec.unit}", ["pass", "fail"], true, pred, proba,
                      float((true == pred).mean()), mat, fp, fn, unc)
 
 

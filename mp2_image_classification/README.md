@@ -60,7 +60,7 @@ tricky gallery, and point a variant in `build/make_notebooks.py` at it.
 
 ## Data and model sources
 
-| Set | Source | Licence |
+| Set | Source | License |
 |---|---|---|
 | Façade defects (BD3) | https://github.com/Praveenkottari/BD3-Dataset via https://huggingface.co/datasets/chandrabhuma/building_defect_vqa | CC-BY-4.0 |
 | Concrete cracks | https://huggingface.co/datasets/mohammadnajeeb/concrete_crack_images (Özgenel 2019) | CC-BY-4.0 |

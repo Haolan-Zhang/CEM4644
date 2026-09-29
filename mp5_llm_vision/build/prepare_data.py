@@ -108,7 +108,7 @@ def sites(spec, out: Path, n_pick: int = 6):
 
 def plans(spec, out: Path):
     """MP4's sheets (data/sheets/<set>/*.key.json, in feet) become MP5 plan keys, and the SAM 3 'room' result MP4
-    precomputed for them (data/masks/<set>) is stored as the specialist. The older metre-based copies of the Finnish
+    precomputed for them (data/masks/<set>) is stored as the specialist. The older meter-based copies of the Finnish
     scans (a plan set MP4 no longer ships) are left exactly as they are."""
     sys.path.insert(0, str(MP4))
     from aec_seg.config import SETS

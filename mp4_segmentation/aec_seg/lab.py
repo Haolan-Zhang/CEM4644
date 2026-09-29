@@ -187,7 +187,7 @@ class SegLab:
             print(f"  {sh.id}: {sh.title} - {sh.facts()}")
         if not self.takeoffs:
             print("\nYou have not submitted a take-off yet. Go back to the take-off step, draw the boxes and click Submit; "
-                  "every submitted drawing is summarised here.")
+                  "every submitted drawing is summarized here.")
         else:
             print(f"\nYour take-offs ({len(self.takeoffs)} drawing(s)) - these are the numbers for your report:")
             for sid, rep in self.takeoffs.items():

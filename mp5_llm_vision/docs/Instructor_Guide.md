@@ -11,7 +11,7 @@ work without a key; a student's own prompt or image runs live and needs their fr
 |---|---|---|
 | Classification | 14 façade-defect photos, 7 classes (MP2 test split) | 20 computer-generated façade-style images, 10 classes (MP2) |
 | Detection | 6 site-safety photos, 52 boxes (MP3 test split) | 6 machinery photos, 9 boxes (MP3) |
-| Plans | `usda_5544`, `usda_5540`, `usda_5539`: MP4's three 1940 USDA farmhouse plans (public domain), answer keys in square feet | 8138, 10715, 11615, 5018 (the earlier MP4 set of CubiCasa scans, metres; 5018 has both storeys on one sheet) |
+| Plans | `usda_5544`, `usda_5540`, `usda_5539`: MP4's three 1940 USDA farmhouse plans (public domain), answer keys in square feet | 8138, 10715, 11615, 5018 (the earlier MP4 set of CubiCasa scans, meters; 5018 has both stories on one sheet) |
 | Own experiments | 2 | 3 |
 | Time | about 90 min | about 2 h |
 
@@ -94,8 +94,8 @@ closets and the halls are missed by every route: the generalist stops at the roo
 | JSON lab | A: 3/3 valid, all fenced; B: 3/3 valid, no fences; same label throughout | | |
 | Detection (machinery, 9 boxes) | recall **100 %**, precision 100 %, with and without the schema | MP3 YOLO: recall 100 %, precision 90 % | large, distinct objects: the easy case for a generalist |
 | Counting excavators | right on three photos; on site 3 it says 1 of 2 where the key has 0 (its own boxes: 0); on site 6 it says 0 of 1 where the key has 2 machines | | again the direct count is the less reliable of the two |
-| Rooms, LLM polygons + schema (scans) | 8138: 6/6 rooms, median 10 %; 10715: 6/7, 20 %; 11615: 4/6, 7 %; 5018 (two storeys): 13/17, 15 % | MP4 SAM 3 'room': 6/6 at 3 %, 4/7 at 24 %, 5/6 at 56 %, 13/17 at 8 % | on the scans the model returns extra "rooms" (9 for 6 on 8138, where it also gives no usable polygon and the areas come from the boxes) and the totals overshoot the floor area |
-| Rooms, LLM boxes + SAM 3 (plain notebooks only) | 8138: 5/6, 10 %; 10715: 6/7, 12 %; 11615: 3/6, 26 %; 5018: 13/17, 45 % | | on 10715 SAM 3 tightens the loose boxes (20 → 12 %); on the small flat 11615 and the two-storey sheet it loses area |
+| Rooms, LLM polygons + schema (scans) | 8138: 6/6 rooms, median 10 %; 10715: 6/7, 20 %; 11615: 4/6, 7 %; 5018 (two stories): 13/17, 15 % | MP4 SAM 3 'room': 6/6 at 3 %, 4/7 at 24 %, 5/6 at 56 %, 13/17 at 8 % | on the scans the model returns extra "rooms" (9 for 6 on 8138, where it also gives no usable polygon and the areas come from the boxes) and the totals overshoot the floor area |
+| Rooms, LLM boxes + SAM 3 (plain notebooks only) | 8138: 5/6, 10 %; 10715: 6/7, 12 %; 11615: 3/6, 26 %; 5018: 13/17, 45 % | | on 10715 SAM 3 tightens the loose boxes (20 → 12 %); on the small flat 11615 and the two-story sheet it loses area |
 | Rooms without the schema | 8138 and 10715: the reply is not valid JSON (long coordinate lists); 11615: 5/6 at 15 %; 5018: 15 entries but only 1 room matched, 60 % off | | |
 | Step 4b, all 4 plans at once (chat notebooks) | 30 matched rooms, median 11 %, 9 above 25 % | | 12 s and about 7,400 tokens; with the schema off, two of the four replies are unusable, which is the switch worth showing in class |
 
@@ -122,9 +122,9 @@ percent of the ones in section 3.
 1. **JSON two ways (10).** A: some runs fenced, occasionally invalid or with a label outside the list; the label can
    change between runs. B: always valid, labels from the enum; the label can still be wrong or change. A program needs
    B because it must parse the reply every time; correctness is a separate question.
-2. **Classification (14).** Accuracy per prompt vs the MP2 model (section 3). Confusions between neighbouring classes
+2. **Classification (14).** Accuracy per prompt vs the MP2 model (section 3). Confusions between neighboring classes
    (minor/major crack, stain/algae, peeling/spalling); descriptions and rules move a few photos. Homework: the style
-   images are synthetic and the MP2 model was trained on the same kind, so the comparison favours the specialist.
+   images are synthetic and the MP2 model was trained on the same kind, so the comparison favors the specialist.
 3. **Own prompt (10).** Any documented change and its accuracy; the risk is the same as tuning on the test split in
    MP2: a prompt tuned on the 14 photos is not proven on the next 14.
 4. **Detection (14).** Recall/precision vs YOLO (section 3); hardest labels are the head/torso states (NO helmet, NO
@@ -136,7 +136,7 @@ percent of the ones in section 3.
 7. **Own experiments (12; 16 in the homework).** The image, the prompt, the raw reply, right or wrong, and the failure
    mode named (wrong answer, invented objects, unreadable reply).
 8. **Reflection (16; 12 in the homework).** Per task a defensible choice; the generalist needs no data and no training
-   but a network, a key, money per request and a check; the specialist needs labelled data and a GPU but is fast,
+   but a network, a key, money per request and a check; the specialist needs labeled data and a GPU but is fast,
    offline and consistent; together (Step 4b) each does what it is good at. Structured output guarantees the
    *shape* of the reply, not its truth.
 
@@ -153,7 +153,7 @@ percent of the ones in section 3.
 - **SAM 3 not loaded** (no GPU, or Step 0 asked for a restart after installing transformers): Step 4b falls back to
   the box areas and says so.
 - **The prompt lab prints no link**: it is opened from a link rather than embedded (the embedded frame is unreliable in Colab). Run the cell again; it needs a live key.
-- **Licences**: the photos and plans keep the licences of the earlier labs (see the README); the model's replies are
+- **Licenses**: the photos and plans keep the licenses of the earlier labs (see the README); the model's replies are
   the students' to use.
 
 ## 7. Rebuilding or changing the material

@@ -142,7 +142,7 @@ def guess_game(image_set, rounds: int = 5, seed: Optional[int] = None):
                 bb.button_style = "success"
             elif bb is b and not ok:
                 bb.button_style = "danger"
-        msg.value = (f"<b style='color:{GREEN}'>Correct!</b>" if ok else f"<b style='color:{RED}'>Not quite.</b> It is labelled <b>{truth}</b>.") + \
+        msg.value = (f"<b style='color:{GREEN}'>Correct!</b>" if ok else f"<b style='color:{RED}'>Not quite.</b> It is labeled <b>{truth}</b>.") + \
                     f" &nbsp; Score: {state['score']} / {state['i'] + 1}"
 
     def on_next(_):

@@ -68,7 +68,7 @@ def build(variant):
 # 🏗️ CEM4644 · MP3 — Object detection for construction
 ## {v['label']}: *{spec.title}*
 
-**No coding needed.** Each grey box below is one *step*: click the ▶ (play) button at its left, wait until it finishes, look at the result, then answer the report question that follows. Run the steps **from top to bottom**.
+**No coding needed.** Each gray box below is one *step*: click the ▶ (play) button at its left, wait until it finishes, look at the result, then answer the report question that follows. Run the steps **from top to bottom**.
 
 **What you will do (about {v['minutes']} minutes)**
 1. Look at labeled photos, count objects yourself, and label a few photos by hand.
@@ -80,7 +80,7 @@ def build(variant):
 
 **Before you start:** menu *Runtime → Change runtime type → T4 GPU → Save*. Detection works on CPU too, but the training step in Part 6 is much faster with a GPU.
 
-**Dataset:** {spec.title}. Sources and licences are listed at the bottom.
+**Dataset:** {spec.title}. Sources and licenses are listed at the bottom.
 """))
     cells.append(form(
         "▶ Step 0 · Run me first (about 2 minutes)",
@@ -138,7 +138,7 @@ Boxes drawn with a **dashed** line are labels made by people; boxes with a **sol
         notes=[f"A photo appears without boxes. Question: **{spec.count_question}** Click a number, then *Next photo*."],
         params=['rounds = 6 #@param {type:"slider", min:3, max:12, step:1}'],
     ))
-    questions.append((1, f"What was your score in the counting game? Which photos were hard for **you** ({', '.join(['small or distant objects', 'objects partly hidden', 'unclear cases'])}), and would you have drawn the boxes the same way as the labellers?"))
+    questions.append((1, f"What was your score in the counting game? Which photos were hard for **you** ({', '.join(['small or distant objects', 'objects partly hidden', 'unclear cases'])}), and would you have drawn the boxes the same way as the labelers?"))
     cells.append(q(*questions[-1]))
     cells.append(form(
         "▶ Step 1c · Label a few photos yourself",
@@ -149,7 +149,7 @@ Boxes drawn with a **dashed** line are labels made by people; boxes with a **sol
                "If the drawing tool does not appear, run Step 0 again and then this cell."],
         params=['how_many = 3 #@param [2, 3, 5] {type:"raw"}'],
     ))
-    questions.append((2, "Labelling: how long did you need per photo, and how many of your boxes agreed with the dataset labels? "
+    questions.append((2, "Labeling: how long did you need per photo, and how many of your boxes agreed with the dataset labels? "
                          "Which objects or classes were hard to decide? At your speed, how many hours would the whole training set take, "
                          "and what does that mean for anyone who wants a detector for their own site?"))
     cells.append(q(*questions[-1]))
@@ -163,7 +163,7 @@ The **course model** is a detector that was fine-tuned on {n_train(spec)} labele
 To score a detector we compare its boxes with the labeled boxes on unseen test photos. A detection is **correct** when it has the right class and overlaps the true box by at least half. From that we count, per class:
 - **recall** = share of the true objects that were found (100 % = nothing missed);
 - **precision** = share of the detections that were right (100 % = no false alarms);
-- **mAP50** = one overall quality score (0–100) that summarises precision and recall over all thresholds.
+- **mAP50** = one overall quality score (0–100) that summarizes precision and recall over all thresholds.
 """))
     cells.append(form("▶ Step 2a · Detect, one photo at a time", "lab.pick_and_detect()",
                       notes=["Click *🎲 Another photo* and move the *confidence ≥* slider. Watch boxes appear and disappear. Tick the checkbox to overlay the true boxes (dashed)."]))
@@ -296,7 +296,7 @@ def build_short():
 # 🏗️ CEM4644 · MP3 — Object detection for construction
 ## {v['label']}: *{spec.title}*
 
-**No coding needed.** Each grey box below is one *step*: click the ▶ (play) button at its left, wait until it finishes, look at the result, then answer the report question that follows. Run the steps **from top to bottom**.
+**No coding needed.** Each gray box below is one *step*: click the ▶ (play) button at its left, wait until it finishes, look at the result, then answer the report question that follows. Run the steps **from top to bottom**.
 
 The workshop taught you how a detector works on the PPE photos. This homework puts the same tools on a second problem, **construction machinery**, and asks what changes. Every machine is boxed as *excavator*, *dump truck* or *wheel loader*.
 
@@ -310,7 +310,7 @@ The workshop taught you how a detector works on the PPE photos. This homework pu
 
 **Before you start:** menu *Runtime → Change runtime type → T4 GPU → Save*. Detection works on CPU too, but the training step in Part 5 is much faster with a GPU.
 
-**Dataset:** {spec.title}. Sources and licences are listed at the bottom.
+**Dataset:** {spec.title}. Sources and licenses are listed at the bottom.
 """))
     cells.append(form(
         "▶ Step 0 · Run me first (about 2 minutes)",

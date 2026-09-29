@@ -8,7 +8,7 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-From Step 2a: how many mixes the model puts in the right grade against your own score in Step 1b, and at your pass / fail threshold how many false passes and false fails there are. From Step 2b: the average miss of the straight line and of the trees, in MPa, and what the worst misses have in common. What is the difference between predicting 'pass' and predicting 33 MPa, and which of the two mistakes costs more on a real project?
+From Step 2a: how many mixes the model puts in the right grade against your own score in Step 1b, and at your pass / fail threshold how many false passes and false fails there are. From Step 2b: the average error of the straight line and of the trees, in psi, and what the largest errors have in common. What is the difference between predicting 'pass' and predicting 4,800 psi, and which of the two mistakes costs more on a real project?
 
 *Your answer:*
 
@@ -24,7 +24,7 @@ From Step 3: the three columns that matter most. Does the model agree with what 
 
 ## Question 3
 
-From Step 4a: the chat's average miss and right grades next to the trees', and how many numbers changed between your two new chats. Ask the chat how it made those predictions: what does it say it did? From Step 4b: the model you asked for, its average miss, and why it lands where it does against the notebook's trees and straight line (Step 2b). Compare the three columns the chat said mattered most with Step 3a. When would you trust a chat's numbers on a real project, and what would you check first?
+From Step 4a: HokieAI's average error and how many mixes it predicts within 10 %, next to the trees', and how many numbers changed between your two new chats. Ask the chat how it made those predictions: what does it say it did? From Step 4b: the model you asked for, its average error, and why it lands where it does against the notebook's trees and straight line (Step 2b). Compare the three columns the chat said mattered most with Step 3a. When would you trust a chat's numbers on a real project, and what would you check first?
 
 *Your answer:*
 

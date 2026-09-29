@@ -8,7 +8,7 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-What was your score in the counting game? Which photos were hard for **you** (small or distant objects, objects partly hidden, unclear cases), and would you have drawn the boxes the same way as the labellers?
+What was your score in the counting game? Which photos were hard for **you** (small or distant objects, objects partly hidden, unclear cases), and would you have drawn the boxes the same way as the labelers?
 
 *Your answer:*
 
@@ -16,7 +16,7 @@ What was your score in the counting game? Which photos were hard for **you** (sm
 
 ## Question 2
 
-Labelling: how long did you need per photo, and how many of your boxes agreed with the dataset labels? Which objects or classes were hard to decide? At your speed, how many hours would the whole training set take, and what does that mean for anyone who wants a detector for their own site?
+Labeling: how long did you need per photo, and how many of your boxes agreed with the dataset labels? Which objects or classes were hard to decide? At your speed, how many hours would the whole training set take, and what does that mean for anyone who wants a detector for their own site?
 
 *Your answer:*
 

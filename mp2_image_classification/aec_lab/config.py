@@ -106,7 +106,7 @@ register(DatasetSpec(
     },
     description=(
         "Computer-generated reference images of building façades in 10 architectural styles, with controlled viewing "
-        "angle, crop and lighting. None of them shows a real building. Source: Jonathandav/facade-styles, MIT licence."
+        "angle, crop and lighting. None of them shows a real building. Source: Jonathandav/facade-styles, MIT license."
     ),
     binary=None,
     binary_model=None,

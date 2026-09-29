@@ -10,7 +10,7 @@ hidden. No GPU needed.
 
 | Notebook | Open | Data |
 |---|---|---|
-| `MP6A_Workshop_Tabular.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp6_tabular_timeseries/MP6A_Workshop_Tabular.ipynb) | 1,030 concrete mixes and their strength |
+| `MP6A_Workshop_Tabular.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp6_tabular_timeseries/MP6A_Workshop_Tabular.ipynb) | 1,030 concrete mixes and their strength (lb/yd³, psi) |
 | `MP6A_Homework_Tabular.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp6_tabular_timeseries/MP6A_Homework_Tabular.ipynb) | 768 simulated building shapes and their heating load |
 | `MP6B_Workshop_TimeSeries.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp6_tabular_timeseries/MP6B_Workshop_TimeSeries.ipynb) | four campus buildings' electricity in 2017 |
 | `MP6B_Homework_TimeSeries.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp6_tabular_timeseries/MP6B_Homework_TimeSeries.ipynb) | four other buildings' electricity in 2017 |
@@ -33,7 +33,7 @@ hidden. No GPU needed.
 
 **MP6B · Time series**
 
-1. **A time series**: four buildings unlabelled, a week and a year each: which is the office, the school, the residence
+1. **A time series**: four buildings unlabeled, a week and a year each: which is the office, the school, the residence
    hall, the assembly hall? Then the anatomy of one building's year.
 2. **Next week**: same hour last week, trees on the past weeks + calendar + temperature, and Chronos-Bolt (a pretrained
    forecasting model used zero-shot, with an uncertainty band), each scored on the week of 16 October 2017.
@@ -71,11 +71,11 @@ python build/prepare_data.py       # needs the raw downloads in _candidates/ (se
 python build/make_notebooks.py     # the four notebooks + report templates (add "tabular" or "series" for one part)
 ```
 
-## Sources and licences
+## Sources and licenses
 
-| Item | Source | Licence |
+| Item | Source | License |
 |---|---|---|
-| Concrete compressive strength | I-Cheng Yeh (1998), [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/165/concrete+compressive+strength) | CC BY 4.0 |
+| Concrete compressive strength (converted to lb/yd³ and psi) | I-Cheng Yeh (1998), [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/165/concrete+compressive+strength) | CC BY 4.0 |
 | Energy efficiency | A. Tsanas and A. Xifara (2012), [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/242/energy+efficiency) | CC BY 4.0 |
 | Building electricity meters and site weather (2017) | [Building Data Genome Project 2](https://github.com/buds-lab/building-data-genome-project-2), Miller et al. (2020) | MIT |
 | Chronos-Bolt (small) | [Amazon Science](https://huggingface.co/amazon/chronos-bolt-small), loaded in Step 0 | Apache-2.0 |

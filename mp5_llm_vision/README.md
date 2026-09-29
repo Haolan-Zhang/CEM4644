@@ -10,7 +10,7 @@ Colab form and the code is hidden.
 | Notebook | Open | Examples |
 |---|---|---|
 | `MP5_Workshop_LLM_Vision.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Workshop_LLM_Vision.ipynb) | façade defects (14 photos, 7 classes), site safety (6 photos, 52 boxes), the 3 clean floor plans of MP4 |
-| `MP5_Homework_LLM_Vision.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Homework_LLM_Vision.ipynb) | architectural styles (20 images, 10 classes), machinery (6 photos), 4 scanned floor plans (one two-storey) |
+| `MP5_Homework_LLM_Vision.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Homework_LLM_Vision.ipynb) | architectural styles (20 images, 10 classes), machinery (6 photos), 4 scanned floor plans (one two-story) |
 | `MP5_Workshop_LLM_Vision_chat.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Workshop_LLM_Vision_chat.ipynb) | the workshop with the single-example steps through hokie.ai (chat window, paste-back cells) |
 | `MP5_Homework_LLM_Vision_chat.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp5_llm_vision/MP5_Homework_LLM_Vision_chat.ipynb) | the homework with the single-example steps through hokie.ai |
 
@@ -90,9 +90,9 @@ cell's first line or title) and rebuilds only the code; the report template foll
 `--fresh-text` to throw the notebook's text away and start again from this file's defaults. Step 0 prints only the
 ✅ line (and a warning when no Gemini key is found); the result cells print numbers and tables, not explanations.
 
-## Sources and licences
+## Sources and licenses
 
-| Item | Source | Licence |
+| Item | Source | License |
 |---|---|---|
 | Façade defect photos | BD3 Building Defect Dataset (via MP2) | CC-BY-4.0 |
 | Façade style images | Jonathandav/facade-styles (computer-generated, via MP2) | MIT |

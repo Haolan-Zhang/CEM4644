@@ -10,7 +10,7 @@ class DetSpec:
     zip_name: str
     classes: List[str]                    # YOLO class ids in order
     display: Dict[str, str]               # class -> friendly name
-    colors: Dict[str, str]                # class -> box colour
+    colors: Dict[str, str]                # class -> box color
     description: str
     course_model: str                     # repo-relative .pt of the course detector
     tricky_dir: str

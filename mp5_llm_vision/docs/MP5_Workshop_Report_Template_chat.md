@@ -64,7 +64,7 @@ Run at least 2 experiments of your own in Step 5 (a photo from a site or from th
 
 ## Question 8
 
-From Step 6: for each task, would you use the generalist, the specialist, or both together? Argue with the numbers you got and with what each needs: labelled data, training, a GPU, a network connection, money per request, and someone who checks. What does structured output guarantee about a reply, and what does it not guarantee?
+From Step 6: for each task, would you use the generalist, the specialist, or both together? Argue with the numbers you got and with what each needs: labeled data, training, a GPU, a network connection, money per request, and someone who checks. What does structured output guarantee about a reply, and what does it not guarantee?
 
 *Your answer:*
 

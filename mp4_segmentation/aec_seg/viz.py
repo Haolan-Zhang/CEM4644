@@ -76,8 +76,8 @@ def multi_overlay(image: Image.Image, layers: Sequence[Tuple[str, np.ndarray, st
 
 def judged_image(image: Image.Image, masks, judged: Sequence[bool], missed_boxes, alpha: float = 0.45,
                  good: str = "#2a9d8f", bad: str = "#457b9d", missed: str = "#e76f51", example=None) -> Image.Image:
-    """Every region's mask in ONE of three colours: green when it is a real one, blue when it is not, and a red
-    outline around every real one the model missed. No numbers, no palette: the colour is the verdict."""
+    """Every region's mask in ONE of three colors: green when it is a real one, blue when it is not, and a red
+    outline around every real one the model missed. No numbers, no palette: the color is the verdict."""
     im = np.asarray(image.convert("RGB")).astype(np.float32)
     for m, ok in zip(masks, judged):
         m = np.asarray(m).astype(bool)
@@ -103,7 +103,7 @@ def mask_image(mask: np.ndarray, color: str = "#ffffff") -> Image.Image:
 
 
 def instances_image(image: Image.Image, res: SegResult, min_score: float = 0.0, alpha: float = 0.55) -> Image.Image:
-    """Each instance in its own colour with its number and confidence."""
+    """Each instance in its own color with its number and confidence."""
     palette = ["#e63946", "#f4a261", "#ffd166", "#06d6a0", "#4cc9f0", "#7b2cbf", "#ff70a6", "#c9a227", "#2a9d8f", "#bde0fe"]
     im = np.asarray(image.convert("RGB")).astype(np.float32)
     labels = []

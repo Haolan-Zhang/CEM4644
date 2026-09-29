@@ -233,7 +233,7 @@
   {
     "id": 22,
     "file": "22_out_of_scope.jpg",
-    "caption": "a blank grey image",
+    "caption": "a blank gray image",
     "group": "out_of_scope",
     "expected": {
       "binary": null,

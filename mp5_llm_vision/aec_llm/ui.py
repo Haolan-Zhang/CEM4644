@@ -21,12 +21,20 @@ def _cost_line(r) -> str:
     return f"{r.seconds:.1f} s, tokens in {r.tokens_in} / out {r.tokens_out} / thinking {r.tokens_thought} ({src}, {r.model})"
 
 
+# British spellings inside the prompts: the model keeps receiving them (its saved replies are keyed by the exact text),
+# students see the American ones
+US_SPELLING = {"metre": "meter", "discoloured": "discolored", "grey": "gray"}
+
+
 def student_prompt(text: str) -> str:
     """The prompt as it is shown to students: the words about JSON are left out of the printout (they confuse more
     than they explain); the model still receives the full text."""
-    return (text.replace("Reply with JSON only, no other text, in this form: ", "Reply in this form: ")
+    text = (text.replace("Reply with JSON only, no other text, in this form: ", "Reply in this form: ")
                 .replace("Output a JSON list of segmentation masks where each entry contains", "Output in the form of a list of segmentation masks where each entry contains")
                 .replace("Output a JSON list where each entry has", "Output in the form of a list where each entry has"))
+    for uk, us in US_SPELLING.items():
+        text = text.replace(uk, us)
+    return text
 
 
 # ----------------------------------------------------------------------------- Part 1

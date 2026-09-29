@@ -27,13 +27,18 @@ class TableSpec:
     guess_n: int = 5
     description: str = ""
     chat_about: str = ""                                # the table in words, for the chat prompt ("824 " + this)
-    close_enough: float = 5.0                           # a miss this small counts as close, in the chat steps
+    close_pct: float = 10                               # an error within this share of the measured value counts as close (chat steps)
+    decimals: int = 1                                   # how the target's numbers are shown
     guess_ratio: Optional[Tuple[str, str, str]] = None  # (label, numerator, denominator) worked out for the guessing game
 
     @property
     def rows(self) -> str:
         """The plural of one row's word."""
         return {"mix": "mixes"}.get(self.row_word, self.row_word + "s")
+
+    def fmt(self, v: float) -> str:
+        """A value of the target (or an error on it), as the notebook shows it."""
+        return f"{v:,.{self.decimals}f}"
 
     def label(self, col: str) -> str:
         return self.labels.get(col, col.replace("_", " "))
@@ -62,19 +67,19 @@ class LabSpec:
 
 
 CONCRETE = TableSpec(
-    key="concrete", title="Concrete mixes and their strength", file="concrete.csv", target="strength_MPa", unit="MPa",
+    key="concrete", title="Concrete mixes and their strength", file="concrete.csv", target="strength_psi", unit="psi",
     target_label="compressive strength",
-    features=["cement", "slag", "fly_ash", "water", "superplasticizer", "coarse_agg", "fine_agg", "age_days"],
-    labels={"cement": "cement (kg/m³)", "slag": "blast-furnace slag (kg/m³)", "fly_ash": "fly ash (kg/m³)", "water": "water (kg/m³)",
-            "superplasticizer": "superplasticizer (kg/m³)", "coarse_agg": "coarse aggregate (kg/m³)", "fine_agg": "fine aggregate (kg/m³)",
-            "age_days": "age at test (days)", "strength_MPa": "compressive strength (MPa)"},
-    grades=[("low (< 25 MPa)", 0, 25), ("normal (25-45 MPa)", 25, 45), ("high (> 45 MPa)", 45, 1e9)],
-    spec_default=30, spec_range=(15, 60, 5), whatif=["cement", "water", "age_days", "superplasticizer"], row_word="mix",
-    description="1,030 concrete mixes tested in a laboratory: what went into each cubic metre, how old the sample was, and the strength it reached.",
-    chat_about=("concrete mixes that were tested in a laboratory: the amount of each ingredient in kg per cubic metre of concrete "
-                "(cement, blast-furnace slag, fly ash, water, superplasticizer, coarse aggregate, fine aggregate), the age of the "
-                "sample when it was tested (age_days), and the compressive strength it reached (strength_MPa)"),
-    close_enough=5.0, guess_ratio=("water / cement", "water", "cement"),
+    features=["cement", "water", "coarse_agg", "fine_agg", "slag", "fly_ash", "superplasticizer", "age_days"],
+    labels={"cement": "cement (lb/yd³)", "water": "water (lb/yd³)", "coarse_agg": "coarse aggregate (lb/yd³)", "fine_agg": "fine aggregate (lb/yd³)",
+            "slag": "slag (lb/yd³)", "fly_ash": "fly ash (lb/yd³)", "superplasticizer": "superplasticizer (lb/yd³)",
+            "age_days": "age at test (days)", "strength_psi": "compressive strength (psi)"},
+    grades=[("low (< 3,500 psi)", 0, 3500), ("normal (3,500-6,500 psi)", 3500, 6500), ("high (> 6,500 psi)", 6500, 1e9)],
+    spec_default=4000, spec_range=(2000, 9000, 500), whatif=["cement", "water", "age_days", "superplasticizer"], row_word="mix",
+    description="1,030 concrete mixes tested in a laboratory: what went into each cubic yard, how old the sample was, and the strength it reached.",
+    chat_about=("concrete mixes that were tested in a laboratory: the amount of each ingredient in pounds per cubic yard of concrete "
+                "(cement, water, coarse aggregate, fine aggregate, blast-furnace slag, fly ash, superplasticizer), the age of the "
+                "sample when it was tested (age_days), and the compressive strength it reached in psi (strength_psi)"),
+    close_pct=10, decimals=0, guess_ratio=("water / cement", "water", "cement"),
 )
 
 ENERGY = TableSpec(
@@ -91,7 +96,7 @@ ENERGY = TableSpec(
                 "compactness, surface area, wall area and roof area (m²), overall height (m), orientation (2 = north, 3 = east, "
                 "4 = south, 5 = west), glazing area (as a share of the floor area), glazing distribution (0-5), and the heating "
                 "load the simulator computed (heating_load, kWh per m² of floor)"),
-    close_enough=2.0,
+    close_pct=10,
 )
 
 SPECS: Dict[str, LabSpec] = {

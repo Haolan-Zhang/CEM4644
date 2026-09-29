@@ -28,7 +28,7 @@ VARIANTS = {
         own_photos=1,
         multiclass_intro=(
             "So far the question was *is there a defect?* Now we ask *which kind of defect?* The same photos "
-            "are labelled with seven classes, and a second course model was trained on them."),
+            "are labeled with seven classes, and a second course model was trained on them."),
     ),
     "homework": dict(
         file="MP2_Homework_Image_Classification.ipynb",
@@ -55,7 +55,7 @@ def n_train_full(spec, task):
 
 
 def form(title, body, notes=(), params=()):
-    """A code cell shown as a Colab form: title + grey instructions + widgets, code hidden."""
+    """A code cell shown as a Colab form: title + gray instructions + widgets, code hidden."""
     src = f'#@title {title} {{ display-mode: "form" }}\n'
     src += "".join(f"#@markdown {n}\n" for n in notes)
     src += "".join(p + "\n" for p in params)
@@ -96,10 +96,10 @@ def build(variant: str, gradio: bool = False):
 # 🏗️ CEM4644 · MP2 — Image classification for construction
 ## {v['label']}: *{B}* and *{M}*
 
-**No coding needed.** This notebook is a series of buttons. Each grey box below is one *step*: click the ▶ (play) button at its left, wait until it finishes, look at the result, then answer the report question that follows. Run the steps **from top to bottom**.
+**No coding needed.** This notebook is a series of buttons. Each gray box below is one *step*: click the ▶ (play) button at its left, wait until it finishes, look at the result, then answer the report question that follows. Run the steps **from top to bottom**.
 
 **What you will do (about {v['minutes']} minutes)**
-1. Look at labelled photos and try to label some yourself.
+1. Look at labeled photos and try to label some yourself.
 2. Run a trained classifier, read its confidence, and measure how often it is right.
 3. Try to break it: tricky photos, edited photos, photos from another world, your own photos.
 4. Do the same with more than two classes.
@@ -107,7 +107,7 @@ def build(variant: str, gradio: bool = False):
 
 **Before you start (required):** in the menu choose *Runtime → Change runtime type → T4 GPU → Save*, then come back here. The notebook expects a GPU; without one the training steps are very slow.
 
-**Datasets:** {sb.title} · {sm.title}. Sources and licences are listed at the bottom.
+**Datasets:** {sb.title} · {sm.title}. Sources and licenses are listed at the bottom.
 """))
 
     cells.append(form(
@@ -138,7 +138,7 @@ lab.setup(binary="{v['binary']}", multiclass="{v['multiclass']}", task_names={js
     cells.append(md(f"""
 ## Part 1 · Meet the data
 
-A classifier learns from **labelled examples**: photos for which a person has already written down the answer. The answer is called the **label**, and each possible answer is a **class** (for example *{bin_classes[1]}* / *{bin_classes[0]}*).
+A classifier learns from **labeled examples**: photos for which a person has already written down the answer. The answer is called the **label**, and each possible answer is a **class** (for example *{bin_classes[1]}* / *{bin_classes[0]}*).
 
 The photos are kept in two separate piles:
 - **training photos** — the model learns from these;
@@ -166,7 +166,7 @@ The photos are kept in two separate piles:
     cells.append(md(f"""
 ## Part 2 · Run a trained classifier ({B})
 
-The **course model** was trained beforehand on {nb_train} labelled photos. Given a new photo it returns a **confidence** for every class (the confidences add up to 100 %) and answers with the class that has the highest confidence.
+The **course model** was trained beforehand on {nb_train} labeled photos. Given a new photo it returns a **confidence** for every class (the confidences add up to 100 %) and answers with the class that has the highest confidence.
 """))
     cells.append(form(
         "▶ Step 2a · Classify one photo at a time",
@@ -242,7 +242,7 @@ A model only knows the kind of photos it was trained on. Let's look for its limi
     cells.append(md(f"""
 ## Part 4 · More than two classes ({M})
 
-{v['multiclass_intro']} The course model for this task was trained on {nm_train} labelled images and chooses between **{len(multi_classes)} classes**: {', '.join(multi_classes)}.
+{v['multiclass_intro']} The course model for this task was trained on {nm_train} labeled images and chooses between **{len(multi_classes)} classes**: {', '.join(multi_classes)}.
 """))
     cells.append(form("▶ Step 4a · Classify one image at a time", f'lab.pick_and_predict("{M}")',
                       notes=["With many classes the confidence is spread out. Look at the runner-up: is it a *reasonable* second guess?"]))
@@ -259,7 +259,7 @@ A model only knows the kind of photos it was trained on. Let's look for its limi
     cells.append(md("""
 ## Part 5 · Train your own model
 
-**Training** means showing the model labelled photos, letting it guess, and nudging it a little each time it is wrong. One pass over all the training photos is called an **epoch**.
+**Training** means showing the model labeled photos, letting it guess, and nudging it a little each time it is wrong. One pass over all the training photos is called an **epoch**.
 
 The course models did not start from zero: they started from a network **pretrained** on 1.2 million everyday photos (ImageNet) and were then **fine-tuned** on our photos. You can start from that pretrained network, or from a **random** network that has never seen a photo in its life.
 

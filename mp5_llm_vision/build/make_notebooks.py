@@ -41,7 +41,7 @@ VARIANTS = {
         q_detect=("From Step 3b: Gemini's recall and precision against the MP3 YOLO model's on the machinery photos. Which machine is hardest and why? "
                   "From Step 3c: does the model's count of excavators agree with its own boxes and with the answer key?"),
         q_segment_chat=("From Step 4a on plan 8138 and on plan 11615 (scanned drawings with furniture and dimension strings): copy the per-room tables from your pasted replies. "
-                        "What does the scan's clutter do to the chat model's polygons? Then from Step 4b: the table for all four plans from the API, including the two-storey sheet 5018. "
+                        "What does the scan's clutter do to the chat model's polygons? Then from Step 4b: the table for all four plans from the API, including the two-story sheet 5018. "
                         "Where is the API's batch result better or worse than your chat replies, and how does either compare with MP4's SAM 3 by phrase?"),
         q_segment=("From Step 4c on plan 8138 and on plan 11615 (scanned drawings with furniture and dimension strings, unlike the clean drawings of the workshop): "
                    "copy the per-room tables. Which way holds up better on a scan, and what does the scan's clutter do to the polygons? Compare with the MP4 numbers for the same plans."),
@@ -115,7 +115,7 @@ def build(variant, chat=False):
 # 🤖 CEM4644 · MP5 — One model for everything?
 ## {v['label']}: *{spec.title}*
 
-**No coding needed.** Each grey box is one step: click ▶, wait, read the result, answer the report question. Run from top to bottom.
+**No coding needed.** Each gray box is one step: click ▶, wait, read the result, answer the report question. Run from top to bottom.
 
 One **generalist** model (Gemini) does the MP2, MP3 and MP4 tasks from words alone, and every answer is scored against the same answer keys as before. About {v['minutes']} minutes.
 
@@ -231,7 +231,7 @@ The MP3 photos. Boxes come back as `[ymin, xmin, ymax, xmax]` on a 0–1000 grid
     cells.append(q(*questions[-1]))
 
     # ------------------------------------------------------------------ Part 4
-    unit = "square feet" if spec.plans.units == "ft" else "square metres"
+    unit = "square feet" if spec.plans.units == "ft" else "square meters"
     cells.append(md(f"""
 ## Part 4 · Rooms on a floor plan
 
@@ -271,7 +271,7 @@ A small app for your own image and your own prompt. Needs your key.
     # ------------------------------------------------------------------ wrap-up
     cells.append(md("## Wrap-up · Generalist or specialist?"))
     cells.append(form("▶ Step 6 · All tasks side by side", "lab.summary(chat=True)" if chat else "lab.summary()"))
-    questions.append((8, "From Step 6: for each task, would you use the generalist, the specialist, or both together" + (" (as in Step 4b)" if not chat else "") + "? Argue with the numbers you got and with what each needs: labelled data, training, a GPU, a network connection, money per request, and someone who checks. "
+    questions.append((8, "From Step 6: for each task, would you use the generalist, the specialist, or both together" + (" (as in Step 4b)" if not chat else "") + "? Argue with the numbers you got and with what each needs: labeled data, training, a GPU, a network connection, money per request, and someone who checks. "
                          "What does structured output guarantee about a reply, and what does it not guarantee?"))
     cells.append(q(*questions[-1]))
     cells.append(form("▶ Numbers for your report", "lab.report_summary()"))

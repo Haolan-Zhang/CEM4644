@@ -42,7 +42,7 @@ def show_image(img: Image.Image, max_width: int = 900):
 
 
 def draw_boxes(image: Image.Image, boxes: Sequence[Tuple[str, Sequence[float], str, int]], font_size: Optional[int] = None) -> Image.Image:
-    """boxes: (text, [x1, y1, x2, y2], colour, width). Text is drawn on a filled tag above the box."""
+    """boxes: (text, [x1, y1, x2, y2], color, width). Text is drawn on a filled tag above the box."""
     im = image.convert("RGB").copy()
     d = ImageDraw.Draw(im)
     fs = font_size or max(11, im.width // 60)
@@ -60,7 +60,7 @@ def draw_boxes(image: Image.Image, boxes: Sequence[Tuple[str, Sequence[float], s
 
 
 def draw_polygons(image: Image.Image, polys: Sequence[Tuple[str, Sequence[Sequence[float]], str]], alpha: float = 0.45) -> Image.Image:
-    """polys: (text, [[x, y], ...] in pixels, colour): filled translucent polygons with an outline and a label."""
+    """polys: (text, [[x, y], ...] in pixels, color): filled translucent polygons with an outline and a label."""
     base = image.convert("RGBA")
     layer = Image.new("RGBA", base.size, (0, 0, 0, 0))
     d = ImageDraw.Draw(layer)

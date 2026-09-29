@@ -141,6 +141,6 @@ class LabelExercise:
                 total = self.est_train_photos * self.est_boxes_per_photo
                 hours = total / per_min / 60
                 lines.append(f"The course model was trained on about {self.est_train_photos:,} photos with roughly {total:,.0f} boxes: "
-                             f"at your speed that is about <b>{hours:.0f} hours</b> of labelling for one person, before any checking.")
+                             f"at your speed that is about <b>{hours:.0f} hours</b> of labeling for one person, before any checking.")
         self.msg.value = " ".join(lines)
         print("Write these numbers in your report.")

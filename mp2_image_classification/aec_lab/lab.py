@@ -51,7 +51,7 @@ class Lab:
     def setup(self, binary: str = "facade_defects", multiclass: str = "facade_defects", install: bool = True,
               task_names: Optional[Dict[str, str]] = None, gradio: Optional[str] = None):
         """gradio: optional exact version to install (the *_gradio notebooks pin it); None keeps the old
-        behaviour (install whatever pip picks, only if gradio is missing)."""
+        behavior (install whatever pip picks, only if gradio is missing)."""
         t0 = time.time()
         if task_names:
             self.task_names.update(task_names)

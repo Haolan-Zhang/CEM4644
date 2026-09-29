@@ -151,7 +151,7 @@
    "id": "5018",
    "file": "5018.png",
    "key": "5018.key.json",
-   "title": "two-storey house: ground floor (left) and upper floor (right)",
+   "title": "two-story house: ground floor (left) and upper floor (right)",
    "specialist": {
     "name": "SAM 3 asked for 'room' (confidence 0.3)",
     "rooms": [
@@ -261,5 +261,5 @@
    }
   }
  ],
- "credit": "- 14341: long single-storey house, 20 rooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 5018: two-storey house: ground floor (left) and upper floor (right). CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 1217: two-storey villa, Swedish labels. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 8138: apartment with bold walls and furniture. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 9136: two-storey house, both floors stacked on the sheet. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 11615: small flat A3 with printed room areas. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 10715: apartment (bold walls). CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548"
+ "credit": "- 14341: long single-storey house, 20 rooms. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 5018: two-story house: ground floor (left) and upper floor (right). CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 1217: two-story villa, Swedish labels. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 8138: apartment with bold walls and furniture. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 9136: two-story house, both floors stacked on the sheet. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 11615: small flat A3 with printed room areas. CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548\n- 10715: apartment (bold walls). CubiCasa5K (Kalervo, Ylioinas, Häikiö, Karhu, Kannala 2019), CubiCasa Oy, CC BY-NC-SA 4.0. https://zenodo.org/records/2613548"
 }

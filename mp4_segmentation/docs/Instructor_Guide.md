@@ -12,7 +12,7 @@ box-drawing tool, tables of square feet next to the drawing's own numbers, and a
 | Teaches SAM 3 | yes: photo steps, ask-by-name, wording, inspector | no: straight into the take-off |
 | Take-off | one cell per drawing (Step 3a/3b/3c) | one cell per discipline (Steps 2a, 3a, 4a), a dropdown of that discipline's sheets, and after each a phrase cell (Steps 2b, 3b, 4b: `lab.ask`, the same things asked for by name and scored against the key) |
 | What is taken off | the scale (two readings) and the area of every room | areas (rooms, footings, pits) **and** counts |
-| Counts | not in the take-off cells (rooms only); Step 3d counts the doors from one `example: door` box, scored against the key | one box labelled `example: <thing>` per counting category; SAM 3 finds the rest and the key checks it |
+| Counts | not in the take-off cells (rooms only); Step 3d counts the doors from one `example: door` box, scored against the key | one box labeled `example: <thing>` per counting category; SAM 3 finds the rest and the key checks it |
 | Own drawings | 1 | 3, from at least two disciplines |
 | Report questions | 7 | 5 |
 | Time | about 90 min | about 2.5 h |
@@ -29,7 +29,7 @@ request.
 **A count is always a model result.** There is no task anywhere in the lab where the student boxes every instance of
 something and the boxes are then tallied against the answer key: a row of hand-drawn boxes ticked off against a key
 measures the student's eyesight, not SAM 3, and the student learns nothing from it. Where a sheet has something to
-count, the student draws **one** box labelled `example: <thing>` and `segment_like` finds the rest; the answer key's
+count, the student draws **one** box labeled `example: <thing>` and `segment_like` finds the rest; the answer key's
 list of instances exists to check *that* count (found / missed / extra). This is why the three workshop floor plans
 no longer ask for windows and doors: on a floor plan the only take-off left is the rooms.
 
@@ -218,7 +218,7 @@ produces, with a few percent of variation because the boxes are drawn by hand.
 6. **Own words (10).** A shape word works because the model was trained on photographs of *things*; on a drawing
    a door is an arc, a wall is a thick black stripe and a window is a gap with thin lines in it. Those are shapes,
    and shapes are what the model can be asked for.
-7. **Own drawing and reflection (20).** Their own sheet, the phrase, the result, a judgement. Useful in practice: a
+7. **Own drawing and reflection (20).** Their own sheet, the phrase, the result, a judgment. Useful in practice: a
    first pass over many sheets, counting repeated symbols, checking a room schedule, sanity-checking someone else's
    take-off. Misleading: open-plan spaces, anything without a known dimension, small symbols, any drawing where the
    convention matters more than the picture. Needed before it goes into an estimate: a printed dimension or a
@@ -246,7 +246,7 @@ produces, with a few percent of variation because the boxes are drawn by hand.
    (*rectangle* 7/41 with 24 extras, *small circle* 0/14), so the example box of Step 4a (39/41) is the only route —
    which is the answer to the "does the best phrase get near the count" part of the question.
 4. **Own drawings (14).** Three sheets from at least two disciplines; what failed and why (hand-drawn sheets,
-   photographs at an angle, colour fills, symbols too small, no known dimension).
+   photographs at an angle, color fills, symbols too small, no known dimension).
 5. **Reflection (20).** What decides reliability: how large the thing is on the sheet (about 60 px is the floor),
    how regularly it repeats, and whether it is drawn as a simple closed outline. Counting repeated symbols is the
    most reliable task in the whole lab; measuring small symbols is the least. Boxes or phrases: boxes for anything
@@ -265,7 +265,7 @@ produces, with a few percent of variation because the boxes are drawn by hand.
 - **The wrong scale bar.** `va_floor` and `va_ceiling` carry a 0–16 ft graphic bar that is exactly 2× too long
   (about 43 px/ft against the printed dimension's 21.6). It is no longer a task; a student who boxes it anyway as the
   scale gets every area four times too small, which is worth a word in class.
-- **A rotated example box.** `segment_like` generalises to the symbol *family*, but a rotated example costs about
+- **A rotated example box.** `segment_like` generalizes to the symbol *family*, but a rotated example costs about
   40 % of the count on the ceiling plan and starts returning the stipple-hatched toilet ceilings as extras. Tell
   the students to pick a clean example lying the same way as most of the others.
 - **Open-plan spaces.** A porch with a screen rail, a hall that is a set of doorways, a dining corner with no wall on one
@@ -277,7 +277,7 @@ produces, with a few percent of variation because the boxes are drawn by hand.
   *sprinkler*). Send the students to the shape words (Step 4a and 4c) and, on a sheet with something to count, to
   the `example:` box.
 - **No `example:` box drawn.** A take-off on a sheet with a counting category prints, for each one that has no
-  example box, *"not counted. Draw ONE clean box labelled 'example: …' and submit again"*. Two or more boxes with
+  example box, *"not counted. Draw ONE clean box labeled 'example: …' and submit again"*. Two or more boxes with
   the same `example:` label are not an error either: the first is used and the cell says so.
 - **Boxing the dimension line instead of the dimension.** The scale box must go from arrowhead tip to arrowhead tip.
   Boxing the whole line including the extension lines makes the scale a few percent too large, and every area

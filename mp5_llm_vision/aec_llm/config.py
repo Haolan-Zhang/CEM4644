@@ -142,7 +142,7 @@ register(LabSpec(
             "Contemporary Curtain Wall": "a glass skin over the whole façade, recent office or apartment tower",
             "Industrial Warehouse": "brick or steel shed with large repeated windows or loading doors, functional",
         },
-        source="Jonathandav/facade-styles (MIT licence; computer-generated images, no real building), the test images of MP2",
+        source="Jonathandav/facade-styles (MIT license; computer-generated images, no real building), the test images of MP2",
         specialist="image classification model from previous class",
         rules=("Rules: judge by the façade itself (ornament, window rhythm, materials), not by the weather or the age of the photo; "
                "a glass skin over the whole façade is 'Contemporary curtain wall' even next to old buildings; raw concrete without ornament is "
@@ -165,7 +165,7 @@ register(LabSpec(
         mp3_map={"EXCAVATORS": "excavator", "dump truck": "dump truck", "wheel loader": "wheel loader"},
     ),
     plans=PlanRef(title="Floor plans (scanned drawings)", mp4_set="homes_b", ids=["8138", "10715", "11615", "5018"],
-                  description="four of the MP4 homework plans: scanned real drawings with furniture and dimension strings (one of them a two-storey sheet), with the same answer keys"),
+                  description="four of the MP4 homework plans: scanned real drawings with furniture and dimension strings (one of them a two-story sheet), with the same answer keys"),
 ))
 
 

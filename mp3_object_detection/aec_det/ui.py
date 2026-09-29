@@ -66,7 +66,7 @@ def image_grid(images: Sequence[Image.Image], titles: Optional[Sequence[str]] = 
 
 
 def legend_text(spec) -> str:
-    return "box colours: " + ", ".join(f"{spec.pretty(c)} = {spec.colors.get(c, '?')}" for c in spec.classes)
+    return "box colors: " + ", ".join(f"{spec.pretty(c)} = {spec.colors.get(c, '?')}" for c in spec.classes)
 
 
 def det_summary(det, class_names: Sequence[str], conf: float) -> str:

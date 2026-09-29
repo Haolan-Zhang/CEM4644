@@ -8,7 +8,7 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-From Step 1: which buildings did you get right, and from what (the shape of the day, the weekend, the summer)? Pick one building in Step 1c and describe its week in three sentences a facilities manager would recognise.
+From Step 1: which buildings did you get right, and from what (the shape of the day, the weekend, the summer)? Pick one building in Step 1c and describe its week in three sentences a facilities manager would recognize.
 
 *Your answer:*
 
@@ -16,7 +16,7 @@ From Step 1: which buildings did you get right, and from what (the shape of the 
 
 ## Question 2
 
-From Step 2a on all four buildings: the average miss of each method. One of these buildings forecasts far worse than the others, whichever method you use: which one, why (look at Step 1c), and what extra information would a forecaster need?
+From Step 2a on all four buildings: the average error of each method. One of these buildings forecasts far worse than the others, whichever method you use: which one, why (look at Step 1c), and what extra information would a forecaster need?
 
 *Your answer:*
 
@@ -32,7 +32,7 @@ From Step 3a on two buildings: the flagged days at threshold 3.5. Which have an 
 
 ## Question 4
 
-Steps 4a to 4c on the building that forecast worst in Step 2a and on one other: the chat's average miss on its own and with its analysis tool against Step 2a's methods, and the odd days it found. Does the chat do better than the notebook on the hard building? Does its explanation of that building's pattern help you, and how would you check whether it is true?
+Steps 4a to 4c on the building that forecast worst in Step 2a and on one other: the chat's average error on its own and with its analysis tool against Step 2a's methods, and the odd days it found. Does the chat do better than the notebook on the hard building? Does its explanation of that building's pattern help you, and how would you check whether it is true?
 
 *Your answer:*
 

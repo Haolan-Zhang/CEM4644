@@ -15,7 +15,7 @@ from torchvision import transforms as T
 
 
 def square(clf, image: Image.Image) -> Image.Image:
-    """The photo exactly as the model sees it (resized + centre-cropped), still in normal colours."""
+    """The photo exactly as the model sees it (resized + center-cropped), still in normal colors."""
     return T.Compose([T.Resize(clf.size), T.CenterCrop(clf.size)])(image.convert("RGB"))
 
 
@@ -81,7 +81,7 @@ def attack(clf, image: Image.Image, eps_255: float = 4, steps: int = 10, target:
     adv = _to_pil(x_adv)
     noise = (x_adv - x0)                                          # in [-eps, eps]
     amp = 127.5 / max(float(eps_255), 1e-6)
-    noise_img = _to_pil((noise * (0.5 / max(eps, 1e-6)) + 0.5).clamp(0, 1))   # grey = no change, full range = ±eps
+    noise_img = _to_pil((noise * (0.5 / max(eps, 1e-6)) + 0.5).clamp(0, 1))   # gray = no change, full range = ±eps
     jpeg = _jpeg(adv, jpeg_quality)
 
     # all verdicts come from the classifier exactly as the rest of the notebook uses it

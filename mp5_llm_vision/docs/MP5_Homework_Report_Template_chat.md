@@ -48,7 +48,7 @@ From Step 3d on two photos: the chat's count, the number of boxes it gave you in
 
 ## Question 6
 
-From Step 4b on plan 8138 and on plan 11615 (scanned drawings with furniture and dimension strings): copy the per-room tables from your pasted replies. What does the scan's clutter do to the chat model's polygons? Then from Step 4c: the table for all four plans from the API, including the two-storey sheet 5018. Where is the API's batch result better or worse than your chat replies, and how does either compare with MP4's SAM 3 by phrase?
+From Step 4b on plan 8138 and on plan 11615 (scanned drawings with furniture and dimension strings): copy the per-room tables from your pasted replies. What does the scan's clutter do to the chat model's polygons? Then from Step 4c: the table for all four plans from the API, including the two-story sheet 5018. Where is the API's batch result better or worse than your chat replies, and how does either compare with MP4's SAM 3 by phrase?
 
 *Your answer:*
 
@@ -64,7 +64,7 @@ Run at least 3 experiments of your own in Step 5 (a photo from a site or from th
 
 ## Question 8
 
-From Step 6: for each task, would you use the generalist, the specialist, or both together? Argue with the numbers you got and with what each needs: labelled data, training, a GPU, a network connection, money per request, and someone who checks. What does structured output guarantee about a reply, and what does it not guarantee?
+From Step 6: for each task, would you use the generalist, the specialist, or both together? Argue with the numbers you got and with what each needs: labeled data, training, a GPU, a network connection, money per request, and someone who checks. What does structured output guarantee about a reply, and what does it not guarantee?
 
 *Your answer:*
 

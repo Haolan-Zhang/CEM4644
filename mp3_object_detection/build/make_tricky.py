@@ -25,7 +25,7 @@ def out_of_scope_images():
     d.rectangle([50, 50, 590, 590], outline="black", width=6); d.line([320, 50, 320, 590], fill="black", width=4); d.line([50, 350, 590, 350], fill="black", width=4)
     d.text((100, 170), "ROOM 101", fill="black"); d.text((380, 450), "ROOM 102", fill="black")
     ims.append(("plan", "a floor-plan drawing", plan))
-    ims.append(("grey", "a blank grey image", Image.new("RGB", (640, 640), (128, 128, 128))))
+    ims.append(("grey", "a blank gray image", Image.new("RGB", (640, 640), (128, 128, 128))))
     return ims
 
 

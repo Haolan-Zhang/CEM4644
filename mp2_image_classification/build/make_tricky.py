@@ -30,7 +30,7 @@ def out_of_scope_images():
             ims.append((key, cap, Image.fromarray(fn()).convert("RGB")))
         except Exception as e:  # needs network for pooch download
             print("  skipping", key, e)
-    ims.append(("grey", "a blank grey image", Image.new("RGB", (256, 256), (128, 128, 128))))
+    ims.append(("grey", "a blank gray image", Image.new("RGB", (256, 256), (128, 128, 128))))
     rng = np.random.default_rng(0)
     ims.append(("noise", "pure random noise", Image.fromarray(rng.integers(0, 255, (256, 256, 3), dtype=np.uint8))))
     plan = Image.new("RGB", (256, 256), "white")

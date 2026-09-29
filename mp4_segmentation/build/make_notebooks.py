@@ -92,7 +92,7 @@ def header(set_key, minutes, what):
 
 ## {'Workshop (in class)' if set_key == 'workshop' else 'Homework (individual)'}: *{spec.title}*
 
-**No coding needed.** Each grey box below is one *step*: click the (play) button at its left, wait until it finishes,
+**No coding needed.** Each gray box below is one *step*: click the (play) button at its left, wait until it finishes,
 look at the result, then answer the report question that follows. Run the steps **from top to bottom**.
 
 **What you will do (about {minutes} minutes)**
@@ -125,7 +125,7 @@ def credits_cell(sheets, intro, extra=""):
     if intro:
         lines.append("- Site photos in Part 1: " + "; ".join(f"{p.title} ({p.author}, {p.license}, {p.source})" for p in intro.photos) + ".")
     lines.append("- Model: SAM 3 by Meta AI (SAM License), loaded from a public mirror of the official checkpoint; "
-                 "a copy of the licence is in `docs/SAM_LICENSE.txt`.")
+                 "a copy of the license is in `docs/SAM_LICENSE.txt`.")
     lines.append("- Lab code: https://github.com/Haolan-Zhang/CEM4644 (folder `mp4_segmentation`).")
     if extra:
         lines.append(extra)
@@ -197,7 +197,7 @@ Two steps on an ordinary site photo first, so that you see what the model does b
                               'own_phrase = "" #@param {type:"string"}', CONF]))
     cells.append(form("Step 1b - Box it, or tap it", "lab.intro_draw(photo)",
                       notes=["Draw a box around an object and label it *box*; or draw a tiny box on an object and label it *point* "
-                             "(its centre is the click). Draw several, click *Submit*: SAM 3 cuts out one object per box or click, "
+                             "(its center is the click). Draw several, click *Submit*: SAM 3 cuts out one object per box or click, "
                              "no words needed. Needs the live model."],
                       params=[param_choice("photo", photo_labels[0], photo_labels)]))
     cells.append(md(f"""
@@ -350,7 +350,7 @@ GROUP_TEXT = {
             "On an MEP sheet almost nothing is measured and almost everything is **counted**. The scale comes from the "
             "ceiling grid (ten 2 ft cells). The trade words - *light "
             "fixture*, *diffuser*, *sprinkler* - return nothing at all from the model, so counting is done the other way "
-            "round: box **one** example of the symbol, labelled *example: 2x4 light fixture*, and the model finds every "
+            "round: box **one** example of the symbol, labeled *example: 2x4 light fixture*, and the model finds every "
             "other symbol like it. Pick an example that is clean and lying the same way as most of the others; a rotated "
             "example loses about 40 % of the count."),
 }
@@ -379,7 +379,7 @@ You already met SAM 3 in the workshop, so this notebook goes straight to the wor
   sheet tells you. A sheet where things are only counted needs no scale.
 - **you** draw the boxes. The model turns a box into an outline; it does not know what a footing or a diffuser is.
 - **counts come from the model, never from a tally of your own boxes**: where a sheet asks for a count you box ONE
-  example of the symbol, labelled *example: ...*, and SAM 3 finds all the others like it.
+  example of the symbol, labeled *example: ...*, and SAM 3 finds all the others like it.
 - everything you measure and everything you count is checked against what is really on the drawing, so you always see how far off you are.
 """))
     cells.append(form("Step 1a - Browse the seven drawings", "lab.show_sheets(drawing)",
@@ -398,7 +398,7 @@ Each of the next three parts has two cells. The first is the **take-off**: pick 
 the picture before each box you draw (the labels are the things that sheet asks for), then *Submit*. Three kinds of
 label: **scale: ...** for a length whose size the sheet gives you, the plain word (**room**, **footing**,
 **elevator shaft**) for
-something you want the area of, and **example: ...** for something you want counted. One box labelled *example: pile
+something you want the area of, and **example: ...** for something you want counted. One box labeled *example: pile
 footing* is all a count needs: SAM 3 goes and finds every other symbol on the sheet that looks like it, and that is how
 a count of 41 light fixtures or 29 pile footings is made. Where the thing counted is also measured (the footings), there is
 no separate example label: your **first** *footing* box is the example. The slider under the picture sets how sure the model has to be

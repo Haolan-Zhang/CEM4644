@@ -155,7 +155,7 @@ def build_tabular(variant, v, spec, cells):
 # 📊 CEM4644 · MP6A — Tables
 ## {v['label']}: *{t.title}*
 
-**No coding needed.** Each grey box is one step: click ▶, wait, read the result, answer the report question. Run from top to bottom.
+**No coding needed.** Each gray box is one step: click ▶, wait, read the result, answer the report question. Run from top to bottom.
 
 Photos and drawings were the last four labs. Most construction data is neither: it is a **table** (one row per mix, per building, per bid) or a **time series** (one value per hour, per day; that is MP6B). This part does the table: predict a number, predict a class, see what the model learned, then give the same job to a chat model. Every answer is checked against what really happened. About {v['minutes']} minutes. No GPU needed.
 """))
@@ -191,10 +191,10 @@ The same table can answer **which class?** (a category: *classification*, the qu
                       params=[choice("model", list(KINDS)[1], list(KINDS))],
                       texts={"result_text": REGRESSION_TEXT.replace("{rows}", t.rows)}))
     cells.append(q(1, (f"From Step 2a: how many {t.rows} the model puts in the right grade against your own score in Step 1b, and at your pass / fail threshold how many false passes and false fails there are. "
-                       f"From Step 2b: the average miss of the straight line and of the trees, in {t.unit}, and what the worst misses have in common. "
-                       f"What is the difference between predicting 'pass' and predicting 33 {t.unit}, and which of the two mistakes costs more on a real project?")
+                       f"From Step 2b: the average error of the straight line and of the trees, in {t.unit}, and what the largest errors have in common. "
+                       f"What is the difference between predicting 'pass' and predicting {t.fmt(t.spec_default * 1.2)} {t.unit}, and which of the two mistakes costs more on a real project?")
                    if variant == "workshop" else
-                   (f"From Step 2a and 2b: the average miss and the share of {t.rows} in the right band. These numbers are far better than the concrete table's in the workshop. "
+                   (f"From Step 2a and 2b: the average error and the share of {t.rows} in the right band. These numbers are far better than the concrete table's in the workshop. "
                     "What is different about this table (read the description in Part 1), and why does that make it easier for a model? Would you trust a model trained on it for a real building?")))
 
     cells.append(md("""
@@ -204,7 +204,9 @@ A model that scores well may still have learned the wrong thing. Two checks: whi
 """))
     cells.append(form("▶ Step 3a · Which columns matter", "lab.importance()"))
     cells.append(form("▶ Step 3b · What if…", "lab.whatif(start_from)",
-                      notes=["Move a slider; the prediction updates. Everything not on a slider stays as it is in the chosen row."],
+                      notes=[f"The trees of Step 2b predict the {t.target_label} of one {t.row_word}. *start_from* picks it: *a typical row* (the middle value of every column) or a real row of the table.",
+                             f"Each slider changes one input while everything else stays fixed, and the prediction updates. The curve shows the prediction as {t.label(t.whatif[0]).split(' (')[0]} goes from low to high; the red dot is the current {t.row_word}.",
+                             "Use it to check whether the model behaves as you would expect, and to see where it stops making sense."],
                       params=[choice("start_from", "a typical row", ["a typical row", "row 12", "row 100", "row 500"])]))
     cells.append(q(2, ("From Step 3: the three columns that matter most. Does the model agree with what you know about concrete (more water, longer curing, more cement)? "
                        "Push one slider to the edge of its range: where does the prediction stop making sense, and why can a model not know that?")
@@ -215,7 +217,7 @@ A model that scores well may still have learned the wrong thing. Two checks: whi
     cells.append(md(f"""
 ## Part 4 · The same job, by a chat model
 
-{chat_md(f"gets the same training {t.rows} the models above learned from, and {TEST_N} of the held-out {t.rows} without their {t.target_label}.")} The {TEST_N} {t.rows} are the same for everyone, so you can compare with your neighbours.
+{chat_md(f"gets the same training {t.rows} the models above learned from, and {TEST_N} of the held-out {t.rows} without their {t.target_label}.")} The {TEST_N} {t.rows} are the same for everyone, so you can compare with your neighbors.
 """))
     cells.append(form("▶ Step 4a · Ask the chat", "lab.chat_table(give, steps_text, paste_steps_text)",
                       texts={"steps_text": steps_default(2, True), "paste_steps_text": steps_default(2, False)},
@@ -227,12 +229,12 @@ A model that scores well may still have learned the wrong thing. Two checks: whi
                       notes=["Pick the model the chat should train, run the cell, and follow the steps. If the reply shows no code or analysis panel, "
                              "ask it again to *use your data-analysis tool*. Then try a second model: every reply you score stays in the table."],
                       params=[choice("model", list(TOOL_MODELS)[0], list(TOOL_MODELS))]))
-    cells.append(q(3, (f"From Step 4a: the chat's average miss and right grades next to the trees', and how many numbers changed between your two new chats. "
-                       "Ask the chat how it made those predictions: what does it say it did? From Step 4b: the model you asked for, its average miss, and why it lands where it does "
+    cells.append(q(3, (f"From Step 4a: HokieAI's average error and how many {t.rows} it predicts within {t.close_pct:g} %, next to the trees', and how many numbers changed between your two new chats. "
+                       "Ask the chat how it made those predictions: what does it say it did? From Step 4b: the model you asked for, its average error, and why it lands where it does "
                        "against the notebook's trees and straight line (Step 2b). Compare the three columns the chat said mattered most with Step 3a. "
                        "When would you trust a chat's numbers on a real project, and what would you check first?")
                    if variant == "workshop" else
-                   (f"From Step 4a and 4b: the chat's average miss on its own and with its analysis tool (two models), against the notebook's trees. "
+                   (f"From Step 4a and 4b: the chat's average error on its own and with its analysis tool (two models), against the notebook's trees. "
                     "This table comes from a simulator and the trees nearly get it perfect (question 1): did the chat on its own come close? "
                     "What does that tell you about the difference between reasoning about a table and fitting a model to it?")))
 
@@ -258,7 +260,7 @@ def build_series(variant, v, spec, cells):
 # 📈 CEM4644 · MP6B — Time series
 ## {v['label']}: *{spec.series.title}*
 
-**No coding needed.** Each grey box is one step: click ▶, wait, read the result, answer the report question. Run from top to bottom.
+**No coding needed.** Each gray box is one step: click ▶, wait, read the result, answer the report question. Run from top to bottom.
 
 MP6A was a table: one row per thing. This part is a **time series**: one value per hour, from the electricity meters of {len(meters)} real buildings on North American campuses, with the site's air temperature. A time series has a **rhythm** (days, weeks, seasons) that a table does not, and a model that knows the rhythm can say what comes next. You will tell the buildings apart, forecast a week three ways, find the days that do not fit, then give the same jobs to a chat model. About {v['minutes']} minutes. No GPU needed.
 """))
@@ -276,7 +278,7 @@ MP6A was a table: one row per thing. This part is a **time series**: one value p
     cells.append(form("▶ Step 1c · The anatomy of one building's year", "lab.anatomy(building, anatomy_text)",
                       params=[choice("building", labels[0], labels)], texts={"anatomy_text": ANATOMY_TEXT}))
     cells.append(q(1, "From Step 1: which buildings did you get right, and from what (the shape of the day, the weekend, the summer)? "
-                      "Pick one building in Step 1c and describe its week in three sentences a facilities manager would recognise."))
+                      "Pick one building in Step 1c and describe its week in three sentences a facilities manager would recognize."))
 
     cells.append(md("""
 ## Part 2 · Next week
@@ -285,10 +287,10 @@ Three ways to forecast a week: copy last week; decision trees that learned from 
 """))
     cells.append(form("▶ Step 2a · Forecast one week", "lab.forecast(building, method)",
                       params=[choice("building", labels[0], labels), choice("method", "all three", ["all three"] + list(METHODS))]))
-    cells.append(q(2, ("From Step 2a on all four buildings: the average miss of each method (copy the tables). Which method wins where, and is 'same hour last week' ever hard to beat? "
+    cells.append(q(2, ("From Step 2a on all four buildings: the average error of each method (copy the tables). Which method wins where, and is 'same hour last week' ever hard to beat? "
                        "What does the shaded band of the pretrained model mean, and how would you use it when planning a site's power supply?")
                    if variant == "workshop" else
-                   ("From Step 2a on all four buildings: the average miss of each method. One of these buildings forecasts far worse than the others, whichever method you use: "
+                   ("From Step 2a on all four buildings: the average error of each method. One of these buildings forecasts far worse than the others, whichever method you use: "
                     "which one, why (look at Step 1c), and what extra information would a forecaster need?")))
 
     cells.append(md("""
@@ -320,11 +322,11 @@ Every building has a usual day for each weekday. A day that leaves the pattern i
                       texts={"steps_text": steps_default(1, True), "paste_steps_text": steps_default(1, False)},
                       notes=["The notebook compares the chat's days with the days its own rule flags in Step 3a (threshold 3.5) and with the public holidays."],
                       params=[choice("building", labels[0], labels), choice("give", list(GIVE)[0], list(GIVE))]))
-    cells.append(q(4, ("From Step 4a and 4b on one building: the chat's average miss on its own and with its analysis tool, next to the three methods of Step 2a (copy the table). "
+    cells.append(q(4, ("From Step 4a and 4b on one building: the chat's average error on its own and with its analysis tool, next to the three methods of Step 2a (copy the table). "
                        "Did it give all 168 hours, and did two new chats agree? From Step 4c: how many of the notebook's flagged days the chat found, which days it added, "
                        "and whether its reasons are believable (check one against the calendar). Which job suits the chat better, forecasting numbers or explaining odd days, and why?")
                    if variant == "workshop" else
-                   ("Steps 4a to 4c on the building that forecast worst in Step 2a and on one other: the chat's average miss on its own and with its analysis tool against Step 2a's methods, "
+                   ("Steps 4a to 4c on the building that forecast worst in Step 2a and on one other: the chat's average error on its own and with its analysis tool against Step 2a's methods, "
                     "and the odd days it found. Does the chat do better than the notebook on the hard building? Does its explanation of that building's pattern help you, "
                     "and how would you check whether it is true?")))
 

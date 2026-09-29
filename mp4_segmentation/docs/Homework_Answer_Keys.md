@@ -356,13 +356,13 @@ Scale: 15.29 px/ft. the printed 14'-0" bay between grid lines X2 and X3 on the b
 
 | counted from one example | how many on the sheet | confidence the key suggests | tip |
 |---|---|---|---|
-| footing | 19 | 0.40 | Either a light grey footing or one of the two heavy black F4.0 ones works as the example - the model does not care about the line weight. The thin strip along t |
+| footing | 19 | 0.40 | Either a light gray footing or one of the two heavy black F4.0 ones works as the example - the model does not care about the line weight. The thin strip along t |
 
 Tasks in the key:
 
 1. Box the printed 14'-0" bay X2-X3 on the bottom dimension string, tick to tick (label: scale: printed 14'-0" bay X2-X3). That sets the scale for every area on this sheet.
 2. The hexagon next to each footing gives its size: E4'-6", E4'-8", E4'-10", E5'-0", and F4.0 (4'-0" square) for the two heavy black ones.
-3. Box ONE grey footing (label: footing), outside edge to outside edge. SAM 3 finds all the others like it and counts them (there are 19: 17 grey ones and the 2 heavy black F4.0), and the footing you boxed is measured in square feet with the drawing's scale. Box more footings to measure more of them.
+3. Box ONE gray footing (label: footing), outside edge to outside edge. SAM 3 finds all the others like it and counts them (there are 19: 17 gray ones and the 2 heavy black F4.0), and the footing you boxed is measured in square feet with the drawing's scale. Box more footings to measure more of them.
 4. Box the elevator shaft opening (label: elevator shaft).
 
 ### What SAM 3 measures (boxes taken from the key, each side moved by a few percent)
@@ -470,7 +470,7 @@ Tasks in the key:
 2. Read the FOOTING SCHEDULE at the top right: F60 is 6'-0" square, F66 6'-6", F70 7'-0", F80 8'-0", F96 9'-6" and F126 is 12'-6" x 9'-6".
 3. Box several of the scheduled footings (label: footing) and compare your measured area with the schedule size.
 4. The two X-crossed pits (label: equipment pit) are in the key as well, but they are only about 40 px across on this sheet. Measure one and watch what the warning says.
-5. Your first footing box is also the example SAM 3 uses to count all the footings (there are 20). The grid bubbles are counted the same way from ONE box labelled 'example: grid bubble' (there are 32).
+5. Your first footing box is also the example SAM 3 uses to count all the footings (there are 20). The grid bubbles are counted the same way from ONE box labeled 'example: grid bubble' (there are 32).
 
 ### What SAM 3 measures (boxes taken from the key, each side moved by a few percent)
 

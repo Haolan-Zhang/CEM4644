@@ -7,7 +7,7 @@ Both end with a section in which the students give the same job to a chat model 
 
 | | Workshop | Homework |
 |---|---|---|
-| **MP6A** table | 1,030 real concrete mixes → compressive strength (MPa) | 768 simulated building shapes → heating load (kWh/m²) |
+| **MP6A** table | 1,030 real concrete mixes (lb/yd³) → compressive strength (psi) | 768 simulated building shapes → heating load (kWh/m²) |
 | MP6A steps | 1a look, 1b guess five grades (with a water / cement rule of thumb), 2a classification, 2b regression, 3a importance, 3b what-if, **4a chat, 4b chat + analysis tool** | the same without 1b, plus 5: the tap test and their own table |
 | **MP6B** series | `Hog_office_Marlena` (office), `Bear_education_Lila` (school), `Bear_lodging_Evan` (residence hall), `Bear_assembly_Jose` (assembly hall) | `Hog_office_Gustavo`, `Moose_education_Leland`, `Robin_lodging_Janie`, `Rat_assembly_Rolland` (a swimming pool) |
 | MP6B steps | 1a-1b which building is which, 1c anatomy, 2a forecast three ways, 3a odd days, **4a chat forecast, 4b chat + analysis tool, 4c chat odd days** | the same, plus 5: activity recognition and their own series |
@@ -31,13 +31,16 @@ a small neural network).
 ## 2. Measured numbers (the answer keys)
 
 **Step 1b rule of thumb** (water / cement below 0.5 high, 0.5-1.0 normal, above 1.0 low; 7 days or younger one grade
-lower): 4 of the 5 game mixes right, about 57 % of the 206 held-out mixes, against the trees' 83 %.
+lower): 4 of the 5 game mixes right, about 64 % of the 206 held-out mixes, against the trees' 84 %.
 
-**Concrete, 206 held-out mixes (split seed 4644):** straight line MAE 7.8 MPa (R² 0.69); trees **MAE 2.8 MPa (R² 0.94)**.
+The concrete table is in US units: the UCI data (kg/m³, MPa) converted to lb/yd³ and psi by `build/prepare_data.py`.
+
+**Concrete, 206 held-out mixes (split seed 4644):** straight line MAE 1,137 psi (R² 0.69); trees **MAE 419 psi (R² 0.94)**.
 Importance: age, cement, then slag and water, then superplasticizer; the aggregates and fly ash near zero. What-if on the
-median mix at 28 days: water 140 → 230 kg/m³ takes the prediction from about 48 to 35 MPa; age 3 → 28 → 365 days gives
-about 18 → 38 → 49 MPa. Grades (< 25 / 25-45 / > 45): trees **83 %** (logistic 75 %), mistakes only between neighbouring
-grades. Pass / fail at 30 MPa: **94 %**, 7 false passes, 5 false fails, 6 uncertain mixes; at 40 MPa 90 %, 10 and 10.
+median mix at 28 days: water 236 → 388 lb/yd³ takes the prediction from about 6,600 to 5,000 psi; age 3 → 28 → 365 days
+gives about 2,600 → 5,300 → 6,800 psi. Grades (< 3,500 / 3,500-6,500 / > 6,500 psi): trees **84 %** (logistic 75 %),
+mistakes only between neighboring grades. Pass / fail at 4,000 psi: **95 %**, 8 false passes, 2 false fails, 5 uncertain
+mixes; at 6,000 psi 92 %, 6 and 11.
 
 **Energy efficiency, 154 held-out buildings:** trees MAE 0.35 (R² 0.998), 98 % in the right band, 100 % at the 20 kWh/m²
 threshold. That is the homework's question 1: the loads come from a simulator, so there is no measurement noise and the
@@ -70,15 +73,20 @@ Here the pretrained model wins on all four buildings, most clearly on the large 
 **Odd days** (office, threshold 3.5): 25 days flagged, 9 on public holidays (New Year, MLK, Memorial, 3-4 July, Labor Day,
 Thanksgiving, Christmas), plus a Saturday spike on 22 April, a dip on 8 August and a three-day dip in mid September.
 
-**The chat on the concrete table** (hokie.ai, September 2026, the 30 test mixes; trees on the same 30: MAE 2.7 MPa,
-27 of 30 grades; straight line 8.5 MPa):
+**The chat on the concrete table** (hokie.ai, September 2026, before the switch to US units: the table was then in
+kg/m³ and MPa, and the 30 test mixes were balanced on the old grades, so today's 30 differ; psi in brackets, converted.
+Trees on those 30: MAE 2.7 MPa (≈ 390 psi), 27 of 30 grades; straight line 8.5 MPa (≈ 1,230 psi)):
 
-| | average miss | worst miss | right grade |
+| | average error | worst error | right grade |
 |---|---|---|---|
-| chat on its own, first new chat | 2.9 MPa | 13.0 | 28 of 30 |
-| chat on its own, second new chat | 3.3 MPa | 15.3 | 26 of 30 |
+| chat on its own, first new chat | 2.9 MPa (≈ 420 psi) | 13.0 MPa | 28 of 30 |
+| chat on its own, second new chat | 3.3 MPa (≈ 480 psi) | 15.3 MPa | 26 of 30 |
 | chat asked for grades directly | | | 27 of 30 |
-| chat + analysis tool (it said HistGradientBoostingRegressor) | 2.7 MPa | 11.6 | 27 of 30 |
+| chat + analysis tool (it said HistGradientBoostingRegressor) | 2.7 MPa (≈ 390 psi) | 11.6 MPa | 27 of 30 |
+
+With today's 30 mixes the notebook's references are trees 486 psi (16 of 30 within 10 %) and straight line 1,385 psi
+(7 of 30). The chat table now shows average error, worst error and how many predictions fall within 10 % of the
+measured strength; the chat's runs are named HokieAI, HokieAI (chat 2), HokieAI + analysis tool, ...
 
 On its own the chat copies the strength of the most similar training mix (its two-decimal answers are exact training
 values; the UCI table records some mixes twice with rounded numbers, which also flatters the trees). It is close to
@@ -89,15 +97,15 @@ mix is close. With the analysis tool it fits the same kind of model as the noteb
 
 MP6A:
 
-1. Regression vs classification: trees beat the line by a factor of nearly three; the worst misses are high-strength
-   mixes at unusual ages. Predicting 33 MPa says how far above 30 the mix is; "pass" does not. A false pass is the
-   dangerous mistake; the model's probability shows which mixes to send for a test cube.
-2. The model agrees with the textbook on water, age and cement; a slider beyond the data (water 230+, age 365) flattens
+1. Regression vs classification: trees beat the line by a factor of nearly three; the largest errors are high-strength
+   mixes at unusual ages. Predicting 4,800 psi says how far above 4,000 the mix is; "pass" does not. A false pass is the
+   dangerous mistake; the model's probability shows which mixes to send for a test cylinder.
+2. The model agrees with the textbook on water, age and cement; a slider beyond the data (water 385+ lb/yd³, age 365) flattens
    or wanders, because the trees cannot extrapolate.
 3. The chat on its own is about as good as the trees on concrete and inconsistent between chats; asked how, it should
    describe finding similar mixes. With the analysis tool it runs the notebook's method (same family, same misses),
    which is the answer to "why does it agree". Not yet measured: the other tool models (a straight line should land
-   near the notebook's 8.5 MPa), the chat's column ranking against Step 3a, and the homework table, where the trees
+   near the notebook's straight line), the chat's column ranking against Step 3a, and the homework table, where the trees
    are near perfect and the test is whether the chat on its own gets anywhere close.
 4. (Homework) Own data: any table with a numeric answer column and 30+ rows works; the tap test is described in Part 5.
 

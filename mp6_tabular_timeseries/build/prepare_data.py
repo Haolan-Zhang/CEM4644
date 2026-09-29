@@ -14,6 +14,8 @@ import pandas as pd
 REPO = Path(__file__).resolve().parents[1]
 C = REPO / "_candidates"
 D = REPO / "data"
+LB_YD3_PER_KG_M3 = 1.685555
+PSI_PER_MPA = 145.0377
 
 WORKSHOP = ["Hog_office_Marlena", "Bear_education_Lila", "Bear_lodging_Evan", "Bear_assembly_Jose"]
 HOMEWORK = ["Hog_office_Gustavo", "Moose_education_Leland", "Robin_lodging_Janie", "Rat_assembly_Rolland"]
@@ -24,7 +26,11 @@ USE = {"Office": "office", "Education": "school", "Lodging/residential": "reside
 def tables():
     c = pd.read_excel(C / "concrete/Concrete_Data.xls")
     c.columns = ["cement", "slag", "fly_ash", "water", "superplasticizer", "coarse_agg", "fine_agg", "age_days", "strength_MPa"]
-    c = c.round(2); c.to_csv(D / "concrete.csv", index=False)
+    # US units: kg/m³ -> lb/yd³, MPa -> psi; the main ingredients first
+    mats = ["cement", "water", "coarse_agg", "fine_agg", "slag", "fly_ash", "superplasticizer"]
+    c[mats] = (c[mats] * LB_YD3_PER_KG_M3).round(1)
+    c["strength_psi"] = (c.pop("strength_MPa") * PSI_PER_MPA).round(0).astype(int)
+    c = c[mats + ["age_days", "strength_psi"]]; c.to_csv(D / "concrete.csv", index=False)
     e = pd.read_excel(C / "energy/ENB2012_data.xlsx")
     e.columns = ["compactness", "surface_area", "wall_area", "roof_area", "height", "orientation", "glazing_area",
                  "glazing_distribution", "heating_load", "cooling_load"]
