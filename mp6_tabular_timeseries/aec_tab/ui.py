@@ -134,7 +134,7 @@ def classification_view(lab, kind: str, task: str, threshold: float):
         if lab.guesses:
             p = model.predict(df.loc[lab.guesses["rows"], spec.features])
             right = sum(a == b for a, b in zip(p, lab.guesses["truth_grade"]))
-            print(f"  On the {len(p)} {spec.rows} you graded in Step 1b: the model puts {right} of {len(p)} in the right grade, you put {lab.guesses['right']}.")
+            print(f"  On the {len(p)} {spec.rows} you guessed: the model puts {right} of {len(p)} in the right grade, you put {lab.guesses['right']}.")
     else:
         model = models.fit_classifier(kind, Xtr, ytr.values >= threshold)
         r = models.passfail_result(model, kind, Xte, yte, spec, threshold)
