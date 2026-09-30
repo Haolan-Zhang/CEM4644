@@ -283,16 +283,18 @@ def oddday_view(lab, meter_id: str, threshold: float):
 # ----------------------------------------------------------------------------- wrap-up
 def report_summary(lab):
     spec = lab.table_spec
+    model_name = {k: name for name, k in models.KINDS.items()}             # "trees" -> "decision tree", as in the dropdowns
+    method_name = {k: name for name, k in series.METHODS.items()}
     print(f"Table: {spec.title}." if lab.part != "series" else f"Time series: {lab.spec.series.title}.")
     for key, v in sorted(lab.results.items(), key=lambda kv: str(kv[0])):
         kind, *rest = key if isinstance(key, tuple) else (key,)
         if kind == "reg":
-            print(f"  regression, {rest[0]}: MAE {spec.fmt(v['mae'])} {spec.unit}, R² {v['r2']:.3f}")
+            print(f"  regression, {model_name[rest[0]]}: MAE {spec.fmt(v['mae'])} {spec.unit}, R² {v['r2']:.3f}")
         elif kind == "cls":
             extra = f", false passes {v['false_pass']}, false fails {v['false_fail']}" if "pass" in rest[1] else ""
-            print(f"  classification, {rest[0]}, {rest[1]}: {v['accuracy'] * 100:.0f} % right{extra}")
+            print(f"  classification, {model_name[rest[0]]}, {rest[1]}: {v['accuracy'] * 100:.0f} % right{extra}")
         elif kind == "forecast":
-            print(f"  forecast {rest[0]} by {rest[1]}: MAE {v:.1f} kWh/h")
+            print(f"  forecast {rest[0]} by {method_name.get(rest[1], rest[1])}: MAE {v:.1f} kWh/h")
         elif kind == "odd_days":
             print(f"  odd days on {rest[0]} at threshold {rest[1]:g}: {v}")
         elif kind == "buildings_game":
