@@ -98,7 +98,7 @@ def _box(files: List[Path], prompt: str, what: str, on_score: Callable[[str], No
                             description="prompt", style={"description_width": "60px"})
     reply_box = w.Textarea(placeholder="paste the chat's whole reply here (extra words are fine)",
                            layout=w.Layout(width="100%", height="160px"), description="reply", style={"description_width": "60px"})
-    btn = w.Button(description=f"Score the reply ({what})", button_style="primary", layout=w.Layout(width="auto"))
+    btn = w.Button(description=what if what.startswith("Score") else f"Score the reply ({what})", button_style="primary", layout=w.Layout(width="auto"))
     out = w.Output()
 
     def _go(_):
@@ -302,7 +302,7 @@ def _steps(give: str, steps_text, paste_steps_text):
 def chat_table(lab, give: str = "attach the files", steps_text=None, paste_steps_text=None, paste_prompt_text=None,
                compare_text=None, plot_text=None):
     d = table_files(lab)
-    _box([d["tr_path"], d["te_path"]], table_prompt(lab, give, paste_prompt_text), "the chat on its own",
+    _box([d["tr_path"], d["te_path"]], table_prompt(lab, give, paste_prompt_text), f"Score {CHAT_NAME} predictions",
          lambda text: table_score(lab, text, "chat", compare_text, plot_text), attach=_attach(give),
          steps=_steps(give, steps_text, paste_steps_text))
 
