@@ -20,7 +20,7 @@ from aec_tab import config as C  # noqa: E402
 from aec_tab.data import load_meters  # noqa: E402
 from aec_tab.models import KINDS  # noqa: E402
 from aec_tab.series import METHODS  # noqa: E402
-from aec_tab.chat import CHAT_URL, GIVE, TEST_N, TOOL_MODELS, steps_default  # noqa: E402
+from aec_tab.chat import CHAT_URL, COMPARE_TEXT, GIVE, PLOT_TEXT, TEST_N, TOOL_MODELS, paste_prompt_default, steps_default  # noqa: E402
 from aec_tab.ui import ANATOMY_TEXT, REGRESSION_TEXT  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
@@ -235,13 +235,14 @@ A model that scores well may still have learned the wrong thing. Two checks: whi
 
 {chat_md(f"gets the same training {t.rows} the models above learned from, and {TEST_N} of the held-out {t.rows} without their {t.target_label}.")} The {TEST_N} {t.rows} are the same for everyone, so you can compare with your neighbors.
 """))
-    cells.append(form("▶ Step 4a · Ask the chat", "lab.chat_table(give, steps_text, paste_steps_text)",
-                      texts={"steps_text": steps_default(2, True), "paste_steps_text": steps_default(2, False)},
+    cells.append(form("▶ Step 4a · Ask the chat", "lab.chat_table(give, steps_text, paste_steps_text, paste_prompt_text, compare_text, plot_text)",
+                      texts={"steps_text": steps_default(2, True), "paste_steps_text": steps_default(2, False),
+                             "paste_prompt_text": paste_prompt_default(t), "compare_text": COMPARE_TEXT, "plot_text": PLOT_TEXT},
                       notes=["Run the same prompt in **two** new chats and score both replies: the table then compares them. "
                              "If attaching files does not work, choose *paste the data into the prompt* and run the cell again."],
                       params=[choice("give", list(GIVE)[0], list(GIVE))]))
-    cells.append(form("▶ Step 4b · Ask the chat to use its analysis tool", "lab.chat_table_tool(model, steps_text)",
-                      texts={"steps_text": steps_default(2, True)},
+    cells.append(form("▶ Step 4b · Ask the chat to use its analysis tool", "lab.chat_table_tool(model, steps_text, compare_text, plot_text)",
+                      texts={"steps_text": steps_default(2, True), "compare_text": COMPARE_TEXT, "plot_text": PLOT_TEXT},
                       notes=["Pick the model the chat should train, run the cell, and follow the steps. If the reply shows no code or analysis panel, "
                              "ask it again to *use your data-analysis tool*. Then try a second model: every reply you score stays in the table."],
                       params=[choice("model", list(TOOL_MODELS)[0], list(TOOL_MODELS))]))

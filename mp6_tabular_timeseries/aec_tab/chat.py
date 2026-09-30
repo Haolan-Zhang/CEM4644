@@ -134,7 +134,15 @@ def _add_run(lab, key, name: str, values) -> Tuple[str, bool]:
 
 
 # ============================================================================ the table
-TREES = "decision tree (Step 2b)"
+TREES, LINE = "Decision tree", "Straight line"
+COMPARE_TEXT = "Comparison of the prediction errors of the two models (Part 1) and HokieAI on the same testing data"
+PLOT_TEXT = "Predicted vs. actual plot for the two models (Part 1) and HokieAI on the same testing data"
+
+
+def paste_prompt_default(spec) -> str:
+    """The prompt with the data pasted in (the notebook cell carries its own copy, which the teacher can edit);
+    {train_data} and {test_data} are replaced by the two tables."""
+    return (spec.paste_prompt.strip() + "\n\nTraining data:\n{train_data}\n\nTesting data:\n{test_data}") if spec.paste_prompt else ""
 
 
 def table_files(lab):
@@ -162,7 +170,7 @@ def table_files(lab):
     lab.models[("reg", "trees")] = trees
     line = lab.models.get(("reg", "linear")) or models.fit_regressor("linear", Xtr, ytr)
     ref = {TREES: pd.Series(trees.predict(Xte.loc[pick]), index=ids),
-           "straight line (Step 2b)": pd.Series(line.predict(Xte.loc[pick]), index=ids)}
+           LINE: pd.Series(line.predict(Xte.loc[pick]), index=ids)}
     d = dict(train=train, test=test, truth=truth, ref=ref, idcol=idcol,
              tr_path=_save(f"{spec.key}_train.csv", train), te_path=_save(f"{spec.key}_test.csv", test))
     lab.chat_cache["table"] = d
@@ -180,9 +188,16 @@ def _table_form(spec, d) -> str:
             f"{d['idcol']}, {spec.target}\nT01, ...\nT02, ...\n...")
 
 
-def table_prompt(lab, give: str = "attach the files") -> str:
+def table_prompt(lab, give: str = "attach the files", paste_prompt_text=None) -> str:
     spec, d = lab.table_spec, table_files(lab)
     attach = _attach(give)
+    template = paste_prompt_text or paste_prompt_default(spec)
+    if not attach and template:
+        data = dict(train_data=d["train"].to_csv(index=False).strip(), test_data=d["test"].to_csv(index=False).strip())
+        try:
+            return template.format(**data)
+        except (KeyError, IndexError, ValueError):
+            return template + f"\n\nTraining data:\n{data['train_data']}\n\nTesting data:\n{data['test_data']}"
     p = (_table_intro(spec, d, attach) + f"\n\nUsing what the {len(d['train'])} {spec.rows} in {d['tr_path'].name} show, predict the "
          f"{spec.target_label} in {spec.unit} of each of the {len(d['test'])} {spec.rows} in {d['te_path'].name}. " + _table_form(spec, d))
     if not attach:
@@ -208,7 +223,7 @@ def parse_rows(text: str) -> Dict[str, float]:
     return out
 
 
-def table_score(lab, text: str, name: str):
+def table_score(lab, text: str, name: str, compare_text=None, plot_text=None):
     spec, d = lab.table_spec, table_files(lab)
     got = parse_rows(text)
     ids = list(d["truth"].index)
@@ -240,20 +255,26 @@ def table_score(lab, text: str, name: str):
         lab.results[("chat_table", r["name"])] = {"mae": mae, "close": close, "n": len(r["values"])}
     for label, pred in d["ref"].items():
         rows.append(row(label, pred)[0])
-    print(f"Scored on {spec.rows} whose measured {spec.target_label} neither the models nor {CHAT_NAME} was given:")
+    print(compare_text or COMPARE_TEXT)
     ui.table(pd.DataFrame(rows))
     if len(have) < len(full):
         same = {label: float((pred.reindex(have) - truth).abs().mean()) for label, pred in d["ref"].items()}
         print(f"On the same {len(have)} {spec.rows} as {run}: " + ", ".join(f"{k.split(' (')[0]} {spec.fmt(v)} {spec.unit}" for k, v in same.items()) + ".")
 
     mine = pd.Series(next(r for r in runs if r["name"] == run)["values"]).reindex(have)
-    trees = d["ref"][TREES].reindex(have)
-    fig, ax = plt.subplots(figsize=(5, 4.6))
+    trees = d["ref"][TREES].reindex(have); line = d["ref"][LINE].reindex(have)
+    import textwrap
+    fig, ax = plt.subplots(figsize=(5.6, 5))
+    ax.scatter(truth, line, s=26, color=ui.BLUE, marker="s", alpha=0.7, label=LINE)
     ax.scatter(truth, trees, s=26, color=ui.GREEN, alpha=0.8, label=TREES)
     ax.scatter(truth, mine, s=26, color=ORANGE, marker="D", alpha=0.9, label=run)
-    lim = [min(truth.min(), mine.min()) * 0.95, max(truth.max(), mine.max()) * 1.05]
-    ax.plot(lim, lim, "k--", lw=1); ax.set_xlabel(f"measured {spec.label(spec.target)}"); ax.set_ylabel("predicted"); ax.legend(fontsize=8)
-    ax.set_title("on the dashed line = exactly right", fontsize=9); ui.show(fig)
+    allv = pd.concat([truth, line, trees, mine])
+    lim = [allv.min() * 0.95, allv.max() * 1.05]
+    ax.plot(lim, lim, "k--", lw=1); ax.set_xlabel(f"actual {spec.label(spec.target)}"); ax.set_ylabel(f"predicted {spec.label(spec.target)}"); ax.legend(fontsize=8)
+    from matplotlib.ticker import StrMethodFormatter
+    for axis in (ax.xaxis, ax.yaxis):
+        axis.set_major_formatter(StrMethodFormatter("{x:,.%df}" % (0 if spec.decimals == 0 else 1)))
+    ax.set_title(textwrap.fill(plot_text or PLOT_TEXT, 60), fontsize=9); ui.show(fig)
 
     chats = [r for r in runs if r["plain"]]
     if len(chats) >= 2:
@@ -268,8 +289,8 @@ def table_score(lab, text: str, name: str):
     view = d["test"].set_index(d["idcol"]).loc[list(worst)].copy()
     view.columns = [spec.label(c) for c in view.columns]
     view.insert(0, f"{run} ({spec.unit})", mine[worst].round(spec.decimals).values)
-    view.insert(0, f"decision tree ({spec.unit})", trees[worst].round(spec.decimals).values)
-    view.insert(0, f"measured ({spec.unit})", truth[worst].round(spec.decimals).values)
+    view.insert(0, f"{TREES} ({spec.unit})", trees[worst].round(spec.decimals).values)
+    view.insert(0, f"actual ({spec.unit})", truth[worst].round(spec.decimals).values)
     view.insert(0, d["idcol"], list(worst))
     print(f"\nThe {len(worst)} {spec.rows} {run} got most wrong:"); ui.table(view.reset_index(drop=True))
 
@@ -278,16 +299,18 @@ def _steps(give: str, steps_text, paste_steps_text):
     return steps_text if _attach(give) else paste_steps_text
 
 
-def chat_table(lab, give: str = "attach the files", steps_text=None, paste_steps_text=None):
+def chat_table(lab, give: str = "attach the files", steps_text=None, paste_steps_text=None, paste_prompt_text=None,
+               compare_text=None, plot_text=None):
     d = table_files(lab)
-    _box([d["tr_path"], d["te_path"]], table_prompt(lab, give), "the chat on its own",
-         lambda text: table_score(lab, text, "chat"), attach=_attach(give), steps=_steps(give, steps_text, paste_steps_text))
+    _box([d["tr_path"], d["te_path"]], table_prompt(lab, give, paste_prompt_text), "the chat on its own",
+         lambda text: table_score(lab, text, "chat", compare_text, plot_text), attach=_attach(give),
+         steps=_steps(give, steps_text, paste_steps_text))
 
 
-def chat_table_tool(lab, model: str, steps_text=None):
+def chat_table_tool(lab, model: str, steps_text=None, compare_text=None, plot_text=None):
     d = table_files(lab)
     _box([d["tr_path"], d["te_path"]], table_tool_prompt(lab, model), "chat + analysis tool",
-         lambda text: table_score(lab, text, f"{CHAT_NAME} + analysis tool, {model}"), attach=True, steps=steps_text)
+         lambda text: table_score(lab, text, f"{CHAT_NAME} + analysis tool, {model}", compare_text, plot_text), attach=True, steps=steps_text)
 
 
 # ============================================================================ the time series

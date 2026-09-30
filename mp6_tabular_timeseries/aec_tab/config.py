@@ -30,6 +30,7 @@ class TableSpec:
     close_pct: float = 10                               # an error within this share of the measured value counts as close (chat steps)
     decimals: int = 1                                   # how the target's numbers are shown
     guess_ratio: Optional[Tuple[str, str, str]] = None  # (label, numerator, denominator) worked out for the guessing game
+    paste_prompt: str = ""                              # Step 4a's prompt when the data is pasted in (the data follows it)
 
     @property
     def rows(self) -> str:
@@ -80,6 +81,14 @@ CONCRETE = TableSpec(
                 "(cement, water, coarse aggregate, fine aggregate, blast-furnace slag, fly ash, superplasticizer), the age of the "
                 "sample when it was tested (age_days), and the compressive strength it reached in psi (strength_psi)"),
     close_pct=10, decimals=0, guess_ratio=("water / cement", "water", "cement"),
+    paste_prompt="""Below are two datasets. The training data contain 824 concrete mixes: the amount of each ingredient in pounds per cubic yard of concrete (cement, water, coarse aggregate, fine aggregate, slag, fly ash, and superplasticizer), the age when tested (age_days), and the measured compressive strength in psi (strength_psi). The test data contain 30 other mixes (T01–T30) with the same input columns but without strength_psi.
+Using the training data, predict the compressive strength (psi) of each of the 30 mixes in the test data.
+Reply in the following format, one line per mix for all 30 mixes. Use plain numbers without commas:
+mix_id, strength_psi
+T01, ...
+T02, ...
+...
+T30, ...""",
 )
 
 ENERGY = TableSpec(
@@ -97,6 +106,14 @@ ENERGY = TableSpec(
                 "4 = south, 5 = west), glazing area (as a share of the floor area), glazing distribution (0-5), and the heating "
                 "load the simulator computed (heating_load, kBtu per ft² of floor)"),
     close_pct=10, decimals=2,
+    paste_prompt="""Below are two datasets. The training data contain 614 simulated residential buildings of the same volume but different shapes: relative compactness, surface area, wall area and roof area (ft²), overall height (ft), orientation (2 = north, 3 = east, 4 = south, 5 = west), glazing area (as a share of the floor area), glazing distribution (0-5), and the heating load a building-energy simulator computed in kBtu per ft² of floor (heating_load). The test data contain 30 other buildings (T01–T30) with the same input columns but without heating_load.
+Using the training data, predict the heating load (kBtu/ft²) of each of the 30 buildings in the test data.
+Reply in the following format, one line per building for all 30 buildings. Use plain numbers without commas:
+building_id, heating_load
+T01, ...
+T02, ...
+...
+T30, ...""",
 )
 
 SPECS: Dict[str, LabSpec] = {
