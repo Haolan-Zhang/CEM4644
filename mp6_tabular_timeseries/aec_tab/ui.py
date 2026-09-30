@@ -187,7 +187,7 @@ def whatif(lab, sample: str = "a typical row"):
         pred = models.predict_one(model, row, spec.features)
         with out:
             out.clear_output(wait=True)
-            print(f"Predicted {spec.target_label}: {spec.fmt(pred)} {spec.unit}")
+            display(HTML(f"Predicted {spec.target_label}: <b>{spec.fmt(pred)} {spec.unit}</b>"))
     for s in sliders.values():
         s.observe(render, names="value")
     display(w.VBox([*sliders.values(), out])); render()
