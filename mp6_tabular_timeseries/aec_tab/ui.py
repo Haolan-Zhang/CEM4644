@@ -116,7 +116,7 @@ def regression_view(lab, kind: str, result_text: Optional[str] = None):
         p = model.predict(df.loc[lab.guesses["rows"], spec.features])
         m = float(np.mean(np.abs(p - np.array(lab.guesses["truth"]))))
         right = sum(spec.grade_of(v) == g for v, g in zip(p, lab.guesses["truth_grade"]))
-        print(f"  On the {len(p)} {spec.rows} you graded in Step 1b: the model's numbers are off by {spec.fmt(m)} {spec.unit} on average, "
+        print(f"  On the {len(p)} {spec.rows} you guessed: the model's numbers are off by {spec.fmt(m)} {spec.unit} on average, "
               f"and turned into grades they put {right} of {len(p)} right (you: {lab.guesses['right']}).")
     w_ = r.worst.copy(); w_.columns = [spec.label(c) if c in spec.features else c for c in w_.columns]
     print(f"\nThe {len(r.worst)} largest errors:"); table(w_.reset_index(drop=True))
