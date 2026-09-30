@@ -78,12 +78,11 @@ def guess_game(lab):
         lab.guesses = {"rows": rows.index.tolist(), "guess": g, "truth_grade": tg, "truth": truth.values.tolist(), "right": right}
         with out:
             out.clear_output(wait=True)
-            res = pd.DataFrame({"your grade": g, "really": tg, f"measured ({spec.unit})": [spec.fmt(v) for v in truth.values], "": ["✓" if a == b else "✗" for a, b in zip(g, tg)]}, index=view.index)
+            res = pd.DataFrame({"your guess": g, "really": tg, f"measured ({spec.unit})": [spec.fmt(v) for v in truth.values], "": ["✓" if a == b else "✗" for a, b in zip(g, tg)]}, index=view.index)
             table(res)
-            print(f"You put {right} of {len(g)} {spec.rows} in the right grade. Step 2a shows what the model does with the same {spec.rows}.")
+            print(f"You put {right} of {len(g)} {spec.rows} in the correct {spec.target_label.split()[-1]} level.")
     btn.on_click(go)
-    display(w.VBox([w.HTML(f"Which grade of {spec.target_label} does each {spec.row_word} reach? Pick one per {spec.row_word}, then click the button. "
-                           f"The grades: {', '.join(grades)}."), *picks, btn, out]))
+    display(w.VBox([*picks, btn, out]))
 
 
 # ----------------------------------------------------------------------------- Part 2: regression and classification
@@ -130,7 +129,7 @@ def classification_view(lab, kind: str, task: str, threshold: float):
         labels_tr = np.array([spec.grade_of(v) for v in ytr])
         model = models.fit_classifier(kind, Xtr, labels_tr)
         r = models.grades_result(model, kind, Xte, yte, spec)
-        print(f"{kind}, {len(spec.grades)} grades of {spec.label(spec.target)}: {r.accuracy * 100:.0f} % of the {len(Xte)} unseen {spec.rows} put in the right grade.")
+        print(f"{kind}: {r.accuracy * 100:.0f} % of the {len(Xte)} unseen {spec.rows} put in the right grade.")
         confusion(r.matrix)
         if lab.guesses:
             p = model.predict(df.loc[lab.guesses["rows"], spec.features])
@@ -139,7 +138,7 @@ def classification_view(lab, kind: str, task: str, threshold: float):
     else:
         model = models.fit_classifier(kind, Xtr, ytr.values >= threshold)
         r = models.passfail_result(model, kind, Xte, yte, spec, threshold)
-        print(f"{kind}, does the {spec.row_word} reach {threshold:,g} {spec.unit}? {r.accuracy * 100:.0f} % of the {len(Xte)} unseen {spec.rows} called right.")
+        print(f"{kind}: {r.accuracy * 100:.0f} % of the {len(Xte)} unseen {spec.rows} were classified correctly.")
         confusion(r.matrix)
         if r.proba is not None:
             fig, ax = plt.subplots(figsize=(7, 2.8))
