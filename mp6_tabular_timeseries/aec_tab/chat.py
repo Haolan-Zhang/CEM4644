@@ -309,7 +309,7 @@ def chat_table(lab, give: str = "attach the files", steps_text=None, paste_steps
 
 def chat_table_tool(lab, model: str, steps_text=None, compare_text=None, plot_text=None):
     d = table_files(lab)
-    _box([d["tr_path"], d["te_path"]], table_tool_prompt(lab, model), f"Score {CHAT_NAME} predictions (analysis tool)",
+    _box([d["tr_path"], d["te_path"]], table_tool_prompt(lab, model), f"Score {CHAT_NAME} predictions",
          lambda text: table_score(lab, text, f"{CHAT_NAME} + analysis tool, {model}", compare_text, plot_text), attach=True, steps=steps_text)
 
 
@@ -434,7 +434,7 @@ def chat_forecast(lab, meter_id: str, give: str = "attach the files", steps_text
 
 def chat_forecast_tool(lab, meter_id: str, model: str, steps_text=None):
     d = series_files(lab, meter_id)
-    _box([d["hist_path"], d["next_path"]], forecast_tool_prompt(lab, meter_id, model), f"Score {CHAT_NAME} predictions (analysis tool)",
+    _box([d["hist_path"], d["next_path"]], forecast_tool_prompt(lab, meter_id, model), f"Score {CHAT_NAME} predictions",
          lambda text: forecast_score(lab, meter_id, text, f"{CHAT_NAME} + analysis tool, {model}"), attach=True, steps=steps_text)
 
 
@@ -503,5 +503,5 @@ def oddday_score(lab, meter_id: str, text: str, threshold: float = 3.5):
 
 def chat_odd_days(lab, meter_id: str, give: str = "attach the files", steps_text=None, paste_steps_text=None):
     d = series_files(lab, meter_id)
-    _box([d["daily_path"]], oddday_prompt(lab, meter_id, give), f"Score {CHAT_NAME} odd days",
+    _box([d["daily_path"]], oddday_prompt(lab, meter_id, give), f"Score {CHAT_NAME} predictions",
          lambda text: oddday_score(lab, meter_id, text), attach=_attach(give), steps=_steps(give, steps_text, paste_steps_text))
