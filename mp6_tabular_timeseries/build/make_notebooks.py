@@ -191,7 +191,7 @@ The same table can answer **which class?** (a category: *classification*, the qu
                       params=[choice("model", list(KINDS)[1], list(KINDS))],
                       texts={"result_text": REGRESSION_TEXT.replace("{rows}", t.rows)}))
     cells.append(q(1, (f"From Step 2a: how many {t.rows} the model puts in the right grade against your own score in Step 1b, and at your pass / fail threshold how many false passes and false fails there are. "
-                       f"From Step 2b: the average error of the straight line and of the trees, in {t.unit}, and what the largest errors have in common. "
+                       f"From Step 2b: the average error of the straight line and of the decision tree, in {t.unit}, and what the largest errors have in common. "
                        f"What is the difference between predicting 'pass' and predicting {t.fmt(t.spec_default * 1.2)} {t.unit}, and which of the two mistakes costs more on a real project?")
                    if variant == "workshop" else
                    (f"From Step 2a and 2b: the average error and the share of {t.rows} in the right band. These numbers are far better than the concrete table's in the workshop. "
@@ -204,10 +204,9 @@ A model that scores well may still have learned the wrong thing. Two checks: whi
 """))
     cells.append(form("▶ Step 3a · Which columns matter", "lab.importance()"))
     cells.append(form("▶ Step 3b · What if…", "lab.whatif(sample)",
-                      notes=[f"- The trees of Step 2b predict the {t.target_label} of one {t.row_word}.",
+                      notes=[f"- The decision tree of Step 2b predicts the {t.target_label} of one {t.row_word}.",
                              f"- *sample*: the {t.row_word} the sliders start from: *a typical {t.row_word}* (the middle value of every column) or one real {t.row_word} from the table.",
-                             "- Each slider changes one input; everything else stays fixed.",
-                             f"- The curve: the prediction as {t.label(t.whatif[0]).split(' (')[0]} goes from low to high. The red dot: the current {t.row_word}.",
+                             "- Each slider changes one input; everything else stays fixed, and the prediction updates.",
                              "- Check that the model behaves as you expect, and where it stops making sense."],
                       params=[choice("sample", f"a typical {t.row_word}", [f"a typical {t.row_word}"] + [f"{t.row_word} {i}" for i in (12, 100, 500)])]))
     cells.append(q(2, ("From Step 3: the three columns that matter most. Does the model agree with what you know about concrete (more water, longer curing, more cement)? "
@@ -231,13 +230,13 @@ A model that scores well may still have learned the wrong thing. Two checks: whi
                       notes=["Pick the model the chat should train, run the cell, and follow the steps. If the reply shows no code or analysis panel, "
                              "ask it again to *use your data-analysis tool*. Then try a second model: every reply you score stays in the table."],
                       params=[choice("model", list(TOOL_MODELS)[0], list(TOOL_MODELS))]))
-    cells.append(q(3, (f"From Step 4a: HokieAI's average error and how many {t.rows} it predicts within {t.close_pct:g} %, next to the trees', and how many numbers changed between your two new chats. "
+    cells.append(q(3, (f"From Step 4a: HokieAI's average error and how many {t.rows} it predicts within {t.close_pct:g} %, next to the decision tree's, and how many numbers changed between your two new chats. "
                        "Ask the chat how it made those predictions: what does it say it did? From Step 4b: the model you asked for, its average error, and why it lands where it does "
-                       "against the notebook's trees and straight line (Step 2b). Compare the three columns the chat said mattered most with Step 3a. "
+                       "against the notebook's decision tree and straight line (Step 2b). Compare the three columns the chat said mattered most with Step 3a. "
                        "When would you trust a chat's numbers on a real project, and what would you check first?")
                    if variant == "workshop" else
-                   (f"From Step 4a and 4b: the chat's average error on its own and with its analysis tool (two models), against the notebook's trees. "
-                    "This table comes from a simulator and the trees nearly get it perfect (question 1): did the chat on its own come close? "
+                   (f"From Step 4a and 4b: the chat's average error on its own and with its analysis tool (two models), against the notebook's decision tree. "
+                    "This table comes from a simulator and the decision tree nearly gets it perfect (question 1): did the chat on its own come close? "
                     "What does that tell you about the difference between reasoning about a table and fitting a model to it?")))
 
     if variant == "homework":                  # the workshop ends with the chat; the students' own table is homework

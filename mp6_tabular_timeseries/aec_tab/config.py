@@ -74,7 +74,7 @@ CONCRETE = TableSpec(
             "slag": "slag (lb/yd³)", "fly_ash": "fly ash (lb/yd³)", "superplasticizer": "superplasticizer (lb/yd³)",
             "age_days": "age at test (days)", "strength_psi": "compressive strength (psi)"},
     grades=[("low (< 3,500 psi)", 0, 3500), ("normal (3,500-6,500 psi)", 3500, 6500), ("high (> 6,500 psi)", 6500, 1e9)],
-    spec_default=4000, spec_range=(2000, 9000, 500), whatif=["cement", "water", "age_days", "superplasticizer"], row_word="mix",
+    spec_default=4000, spec_range=(2000, 9000, 500), whatif=["cement", "water", "age_days"], row_word="mix",
     description="1,030 concrete mixes tested in a laboratory: what went into each cubic yard, how old the sample was, and the strength it reached.",
     chat_about=("concrete mixes that were tested in a laboratory: the amount of each ingredient in pounds per cubic yard of concrete "
                 "(cement, water, coarse aggregate, fine aggregate, blast-furnace slag, fly ash, superplasticizer), the age of the "

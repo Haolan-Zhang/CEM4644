@@ -24,7 +24,7 @@ From Step 3: which two columns decide the heating load, and in which direction? 
 
 ## Question 3
 
-From Step 4a and 4b: the chat's average error on its own and with its analysis tool (two models), against the notebook's trees. This table comes from a simulator and the trees nearly get it perfect (question 1): did the chat on its own come close? What does that tell you about the difference between reasoning about a table and fitting a model to it?
+From Step 4a and 4b: the chat's average error on its own and with its analysis tool (two models), against the notebook's decision tree. This table comes from a simulator and the decision tree nearly gets it perfect (question 1): did the chat on its own come close? What does that tell you about the difference between reasoning about a table and fitting a model to it?
 
 *Your answer:*
 

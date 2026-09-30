@@ -134,7 +134,7 @@ def _add_run(lab, key, name: str, values) -> Tuple[str, bool]:
 
 
 # ============================================================================ the table
-TREES = "trees (Step 2b)"
+TREES = "decision tree (Step 2b)"
 
 
 def table_files(lab):
@@ -268,7 +268,7 @@ def table_score(lab, text: str, name: str):
     view = d["test"].set_index(d["idcol"]).loc[list(worst)].copy()
     view.columns = [spec.label(c) for c in view.columns]
     view.insert(0, f"{run} ({spec.unit})", mine[worst].round(spec.decimals).values)
-    view.insert(0, f"trees ({spec.unit})", trees[worst].round(spec.decimals).values)
+    view.insert(0, f"decision tree ({spec.unit})", trees[worst].round(spec.decimals).values)
     view.insert(0, f"measured ({spec.unit})", truth[worst].round(spec.decimals).values)
     view.insert(0, d["idcol"], list(worst))
     print(f"\nThe {len(worst)} {spec.rows} {run} got most wrong:"); ui.table(view.reset_index(drop=True))

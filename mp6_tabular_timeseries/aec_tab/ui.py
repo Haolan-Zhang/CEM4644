@@ -185,15 +185,9 @@ def whatif(lab, sample: str = "a typical row"):
         for f, s in sliders.items():
             row[f] = s.value
         pred = models.predict_one(model, row, spec.features)
-        f0 = spec.whatif[0]
-        xs = np.linspace(sliders[f0].min, sliders[f0].max, 40)
-        ys = models.whatif_curve(model, row, f0, xs, spec.features)
         with out:
             out.clear_output(wait=True)
-            fig, ax = plt.subplots(figsize=(7, 3))
-            ax.plot(xs, ys, color=BLUE); ax.scatter([row[f0]], [pred], color=RED, zorder=3)
-            ax.set_xlabel(spec.label(f0)); ax.set_ylabel(f"predicted {spec.label(spec.target)}"); ax.set_title(f"predicted {spec.target_label}: {spec.fmt(pred)} {spec.unit}", fontsize=11)
-            show(fig)
+            print(f"Predicted {spec.target_label}: {spec.fmt(pred)} {spec.unit}")
     for s in sliders.values():
         s.observe(render, names="value")
     display(w.VBox([*sliders.values(), out])); render()

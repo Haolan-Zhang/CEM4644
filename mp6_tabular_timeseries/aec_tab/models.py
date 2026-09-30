@@ -14,7 +14,7 @@ from sklearn.preprocessing import StandardScaler
 
 from .config import SEED, TEST_SIZE, TableSpec
 
-KINDS = {"a straight line (linear regression)": "linear", "decision trees (gradient boosting)": "trees"}
+KINDS = {"straight line": "linear", "decision tree": "trees"}
 
 
 def split(df: pd.DataFrame, spec: TableSpec):
