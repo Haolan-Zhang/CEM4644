@@ -27,6 +27,7 @@ GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
 KEEP_TEXT = True
 EXISTING = {}
 EXISTING_TEXTS = {}          # cell title -> {name: text} for the result wordings written in a cell (name_text = """...""")
+EXISTING_PARAM_NOTES = {}    # cell title -> {param name: [#@markdown lines written just above that form field]}
 
 VARIANTS = {
     ("tabular", "workshop"): dict(file="MP6A_Workshop_Tabular.ipynb", label="Workshop (in class)", minutes=75, guess=True),
@@ -68,7 +69,7 @@ PART_NAME = {"tabular": ("MP6A", "Tables", "📊"), "series": ("MP6B", "Time ser
 
 
 def load_existing(path: Path):
-    EXISTING.clear(); EXISTING_TEXTS.clear()
+    EXISTING.clear(); EXISTING_TEXTS.clear(); EXISTING_PARAM_NOTES.clear()
     if not (KEEP_TEXT and path.exists()):
         return
     for c in nbformat.read(str(path), as_version=4).cells:
@@ -76,15 +77,28 @@ def load_existing(path: Path):
         if c.cell_type == "markdown":
             EXISTING[first] = c.source
         elif first.startswith("#@title"):
-            EXISTING[first] = [l[len("#@markdown "):] for l in c.source.split("\n") if l.startswith("#@markdown ")]
+            notes, above, pending, seen_param = [], {}, [], False
+            for l in c.source.split("\n"):
+                if l.startswith("#@markdown "):
+                    (pending if seen_param else notes).append(l[len("#@markdown "):])     # above a later field / the cell's notes
+                elif "#@param" in l:
+                    if pending:
+                        above[l.split("=")[0].strip()] = pending
+                    pending, seen_param = [], True
+            EXISTING[first] = notes
+            EXISTING_PARAM_NOTES[first] = above
             EXISTING_TEXTS[first] = dict(re.findall(r'^(\w+_text) = """(.*?)"""', c.source, re.S | re.M))
 
 
-def form(title, body, notes=(), params=(), texts=None):
-    """texts: {name: wording} written into the cell as name = \"\"\"...\"\"\" (visible under Show code, kept on a rebuild)."""
+def form(title, body, notes=(), params=(), texts=None, param_notes=None):
+    """texts: {name: wording} written into the cell as name = \"\"\"...\"\"\" (visible under Show code, kept on a rebuild).
+    param_notes: {param name: note} shown just above that form field (kept on a rebuild like the other notes)."""
     head = f'#@title {title} {{ display-mode: "form" }}'
+    above = {k: [v] for k, v in (param_notes or {}).items()}
     if head in EXISTING:
         notes = EXISTING[head]
+        above = EXISTING_PARAM_NOTES.get(head, {})
+    params = ["".join(f"#@markdown {n}\n" for n in above.get(p.split("=")[0].strip(), [])) + p for p in params]
     words = ""
     if texts:
         kept = EXISTING_TEXTS.get(head, {})
@@ -186,7 +200,8 @@ The same table can answer **which class?** (a category: *classification*, the qu
     cells.append(form("▶ Step 2a · Classification: predict the class", "lab.classification(model, task, threshold)",
                       notes=[f"*grades* puts each {t.row_word} in one of {len(t.grades)} bands of {t.target_label}, the game of Step 1b; *pass / fail* asks whether it reaches the *threshold* you set."],
                       params=[choice("model", list(KINDS)[1], list(KINDS)), choice("task", "grades", ["grades", "pass / fail against a specification"]),
-                              f'threshold = {t.spec_default:g} #@param {{type:"slider", min:{t.spec_range[0]:g}, max:{t.spec_range[1]:g}, step:{t.spec_range[2]:g}}}']))
+                              f'threshold = {t.spec_default:g} #@param {{type:"slider", min:{t.spec_range[0]:g}, max:{t.spec_range[1]:g}, step:{t.spec_range[2]:g}}}'],
+                      param_notes={"threshold": "*threshold* (only for *pass / fail against a specification*):"}))
     cells.append(form("▶ Step 2b · Regression: predict the number", "lab.regression(model, result_text)",
                       params=[choice("model", list(KINDS)[1], list(KINDS))],
                       texts={"result_text": REGRESSION_TEXT.replace("{rows}", t.rows)}))
