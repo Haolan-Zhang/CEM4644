@@ -38,16 +38,21 @@ VARIANTS = {
 TAP_TEST = """
 ### 🔨 The tap test: data you collect yourself
 
-Knock on a wall and you can hear whether a stud is behind it; inspectors do the same on concrete and tile to find hollow, delaminated spots (a *sounding test*). Here you record taps with your phone, turn each tap into one row of a table, and train a model to tell the materials apart.
+Knock on a wall and you can hear whether a stud is behind it; inspectors do the same on concrete and tile to find hollow, delaminated spots (a *sounding test*). Here you record taps with your phone, the app in Step 5 turns each tap into one row of a table, and a model learns to tell the materials apart.
+
+**Before the app**
 
 1. **Plan.** Pick 4–5 materials or surfaces (for example drywall between studs, drywall over a stud, concrete or masonry, a wooden door, a metal stand, glass or tile) and 3–4 separate spots of each. To be sure a spot is over a stud, use the magnetometer in the free *phyphox* app: it jumps at the drywall screws.
 2. **Record.** At each spot, tap 10 times, about half a second apart, always with the same object (a coin or a pen cap). Hold the phone about 8 inches away in a quiet room and record with its voice recorder (*Voice Memos* on an iPhone): one recording per spot. Do not use phyphox's *Audio Spectrum* for this: it does not keep the sound.
 3. **Name each recording by its material and spot number:** `wooden table 1`, `wooden table 2`, `metal stand 1`, … The app reads the material from the name, so every spot of one material must use the same words, with only the number changing.
-4. **Make the table** (Step 5, part 1). Upload all your recordings. The app finds each tap (red lines: check that it found yours) and measures its pitch, brightness, ring time, loudness and its low / middle / high share of sound: one row per tap. Download the table: it is your dataset.
-5. **Look first** (part 2). Write down what you expect (does hollow sound lower? ring longer?), then check it against each material's average tap and a scatter plot of two measurements.
-6. **Train and test twice** (part 3): once on *random taps*, once with *whole recordings held out*. Why do the two scores differ, and which would you believe? Try the small decision tree and read the rules it learned.
-7. **Blind test** (part 4). Record a spot you did not use, upload it, and see whether the model names the material.
-8. **Ask the chat.** Give hokie.ai your downloaded table, ask it to do the same with its analysis tool, and compare.
+
+**What the app measures on each tap**
+
+- *pitch*: the strongest tone, in Hz (a higher number is a higher note)
+- *brightness*: the average tone, in Hz (bright and sharp versus dull)
+- *ring time*: how long the tap takes to fade to a tenth of its loudness, in milliseconds
+- *loudness*: how far the tap rises above the room's background noise, in dB
+- *low / middle / high share*: how much of the sound is below 300 Hz, between 300 and 800 Hz, and above 800 Hz
 """
 ACTIVITY = """
 ### 🚶 Activity recognition: data you collect yourself
@@ -262,8 +267,17 @@ A small app, opened from a link, turns your own tap recordings into a table and 
 """))
         cells.append(md(TAP_TEST))
         cells.append(form("▶ Step 5 · The tap test", "lab.tap_app()",
-                          notes=["Open the printed link in a new tab. It works on a phone too, so you can upload the recordings straight from the phone you made them on.",
-                                 "If the app finds fewer taps than you made in a recording, tap harder or closer to the phone and record that spot again."]))
+                          notes=["**Using the app, step by step**",
+                                 "1. **Open the app.** Run this cell and open the printed link in a new tab. It works on a phone too, so you can upload straight from the phone you recorded on.",
+                                 "2. **Make the table.** Drop all your recordings into *your recordings* (or click it and pick them), then click **Make the table**. The line that appears says how many taps, recordings and materials it found.",
+                                 "3. **Check the taps.** In *each recording, with the taps found*, every red line should sit on one of your taps. If a recording has fewer red lines than taps you made, tap harder or closer to the phone and record that spot again.",
+                                 "4. **Download the table** under *download the table (CSV)*: one row per tap. Keep it for your report and for the chat.",
+                                 "5. **Look before training.** Write down what you expect (does hollow sound lower? ring longer?). Compare the curves in *the average tap of each material*, then pick two measurements for *across* and *up*: do the materials form separate clouds of dots?",
+                                 "6. **Train and test on random taps.** Pick a *model*, choose *random taps* under *test on*, click **Train and test**, and note the score.",
+                                 "7. **Train and test with whole recordings held out.** Keep the same model, choose *whole recordings held out*, and click again: now each spot is tested by a model that never heard it. Compare the two scores.",
+                                 "8. **Read the rules.** Choose the *small decision tree* model and read the rules it learned: which measurement does it ask about first?",
+                                 "9. **Blind test.** Record one spot you did not use, upload it under *one new recording*, click **What is it?**, and check its answer.",
+                                 "10. **Ask the chat.** Give hokie.ai the table you downloaded, ask it to do the same with its analysis tool, and compare its answer with the app's."]))
         cells.append(q(4, "From the tap test (Step 5): the materials you recorded (how many spots and taps of each), the score on random taps and with whole recordings held out, "
                           "and which materials get confused. Which measurements separate your materials best (the scatter plot and the small decision tree's rules)? "
                           "Did the blind test name the material right? Would the model still work in another room, with another phone or with another person tapping?"))

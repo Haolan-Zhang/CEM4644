@@ -148,12 +148,12 @@ def build():
     import gradio as gr
     names = list(taps.MEASURES.values())
     with gr.Blocks(title="The tap test") as demo:
-        gr.Markdown("## The tap test\nName every recording by its material, with a number for the spot: `wooden table 1.m4a`, `wooden table 2.m4a`, `metal stand 1.m4a`.")
+        gr.Markdown("## The tap test\n### 1 · Make the table")
         state = gr.State(None)
         with gr.Row():
             up = gr.File(label="your recordings", file_count="multiple", type="filepath")
             with gr.Column():
-                go = gr.Button("1 · Make the table", variant="primary")
+                go = gr.Button("Make the table", variant="primary")
                 summary = gr.Markdown()
                 dl = gr.File(label="download the table (CSV)", interactive=False)
         tbl = gr.Dataframe(label="one row per tap", interactive=False, wrap=True)
