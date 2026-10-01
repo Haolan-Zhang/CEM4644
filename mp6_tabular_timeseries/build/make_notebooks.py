@@ -42,8 +42,8 @@ Knock on a wall and you can hear whether a stud is behind it; inspectors do the 
 
 **Before the app**
 
-1. **Plan.** Pick 4–5 materials or surfaces (for example drywall between studs, drywall over a stud, concrete or masonry, a wooden door, a metal stand, glass or tile) and 3–4 separate spots of each. To be sure a spot is over a stud, use the magnetometer in the free *phyphox* app: it jumps at the drywall screws.
-2. **Record.** At each spot, tap 10 times, about half a second apart, always with the same object (a coin or a pen cap). Hold the phone about 8 inches away in a quiet room and record with its voice recorder (*Voice Memos* on an iPhone): one recording per spot. Do not use phyphox's *Audio Spectrum* for this: it does not keep the sound.
+1. **Plan.** Pick 4–5 materials or surfaces (for example drywall between studs, drywall over a stud, concrete or masonry, a wooden door, a metal stand, glass or tile) and 3–4 separate spots of each.
+2. **Record.** At each spot, tap 10 times, about half a second apart, always with the same object (a coin or a pen cap). Hold the phone about 8 inches away in a quiet room and record with the phone's voice recorder (*Voice Memos* on an iPhone, *Recorder* or *Voice Recorder* on Android): one recording per spot.
 3. **Name each recording by its material and spot number:** `wooden table 1`, `wooden table 2`, `metal stand 1`, … The app reads the material from the name, so every spot of one material must use the same words, with only the number changing.
 
 **What the app measures on each tap**

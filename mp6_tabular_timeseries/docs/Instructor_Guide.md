@@ -117,8 +117,7 @@ MP6A:
    iPhone's Voice Memos): typical pitch about 190, 800 and 380-500 Hz; every model 100 % on random taps; the decision
    tree splits on the share of sound below 300 Hz (under 17 % metal, over 58 % wall). With one spot per material the
    honest test cannot run, which is the point of asking for 3-4 spots. The iPhone recordings lose everything above
-   about 2 kHz, so the measurements use the sound below that. phyphox's Audio Spectrum export keeps only the last 43 ms
-   and a peak-pitch history, not the sound: it does not work for this.
+   about 2 kHz, so the measurements use the sound below that.
 
 MP6B:
 
