@@ -8,10 +8,10 @@ Both end with a section in which the students give the same job to a chat model 
 | | Workshop | Homework |
 |---|---|---|
 | **MP6A** table | 1,030 real concrete mixes (lb/yd³) → compressive strength (psi) | 768 simulated building shapes (ft²) → heating load (kBtu/ft²) |
-| MP6A steps | 1a look, 1b guess five grades (with a water / cement rule of thumb), 2a classification, 2b regression, 3a importance, 3b what-if, **4a chat, 4b chat + analysis tool** | the same without 1b, plus 5: the tap test and their own table |
+| MP6A steps | 1a look, 1b guess five grades (with a water / cement rule of thumb), 2a classification, 2b regression, 3a importance, 3b what-if, **4a chat, 4b chat + analysis tool** | the same without 1b, plus 5a the tap-test app and 5b any table of their own |
 | **MP6B** series | `Hog_office_Marlena` (office), `Bear_education_Lila` (school), `Bear_lodging_Evan` (residence hall), `Bear_assembly_Jose` (assembly hall) | `Hog_office_Gustavo`, `Moose_education_Leland`, `Robin_lodging_Janie`, `Rat_assembly_Rolland` (a swimming pool) |
 | MP6B steps | 1a-1b which building is which, 1c anatomy, 2a forecast three ways, 3a odd days, **4a chat forecast, 4b chat + analysis tool, 4c chat odd days** | the same, plus 5: activity recognition and their own series |
-| Report questions | MP6A 3, MP6B 4 | MP6A 4, MP6B 5 (own data is the main deliverable) |
+| Report questions | MP6A 3, MP6B 4 | MP6A 5, MP6B 5 (own data is the main deliverable) |
 | Time | about 75 min each | about 75 min each |
 
 Step 0 clones only this folder and prints one line. MP6A installs `gradio` and loads the table; MP6B also installs
@@ -108,7 +108,18 @@ MP6A:
    which is the answer to "why does it agree". Not yet measured: the other tool models (a straight line should land
    near the notebook's straight line), the chat's column ranking against Step 3a, and the homework table, where the trees
    are near perfect and the test is whether the chat on its own gets anywhere close.
-4. (Homework) Own data: any table with a numeric answer column and 30+ rows works; the tap test is described in Part 5.
+4. (Homework) The tap test (Step 5a): students name each recording by material and spot number (`wooden table 2.m4a`);
+   the app reads the material from the name with the number dropped. It finds the taps (onsets well above the room's
+   loudness; the first 0.15 s, the recorder's start click, is skipped), measures seven numbers per tap, and trains one
+   of four models (a small decision tree whose rules are shown, nearest neighbors, logistic regression, gradient-boosted
+   trees) on random taps or with whole recordings held out (a material with one recording is left out of that test).
+   Measured on three example recordings (an interior wall, a metal stand, a wooden table; one spot each, 10 taps, an
+   iPhone's Voice Memos): typical pitch about 190, 800 and 380-500 Hz; every model 100 % on random taps; the decision
+   tree splits on the share of sound below 300 Hz (under 17 % metal, over 58 % wall). With one spot per material the
+   honest test cannot run, which is the point of asking for 3-4 spots. The iPhone recordings lose everything above
+   about 2 kHz, so the measurements use the sound below that. phyphox's Audio Spectrum export keeps only the last 43 ms
+   and a peak-pitch history, not the sound: it does not work for this.
+5. (Homework) Any table: a numeric answer column and 30+ rows.
 
 MP6B:
 

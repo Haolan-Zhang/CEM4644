@@ -114,7 +114,11 @@ def build(kind=None):
 
 
 def launch(share=None, kind=None):
-    demo = build(kind)
+    return serve(build(kind), share)
+
+
+def serve(demo, share=None):
+    """Start a Gradio app in the background and print only its public link."""
     sink = io.StringIO()
     with contextlib.redirect_stdout(sink), contextlib.redirect_stderr(sink):
         demo.launch(share=True if share is None else share, inline=False, debug=False, quiet=True, show_error=True, prevent_thread_lock=True)

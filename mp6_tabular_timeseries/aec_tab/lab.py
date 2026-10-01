@@ -149,6 +149,13 @@ class TabLab:
         from . import app
         self.apps["upload"] = app.launch(kind={"tabular": "table", "series": "time series"}.get(self.part))
 
+    def tap_app(self):
+        self._need()
+        if os.environ.get("AEC_LAB_NO_APP"):
+            print("(tap-test app skipped: AEC_LAB_NO_APP is set)"); return
+        from . import tap_app
+        self.apps["taps"] = tap_app.launch()
+
     def report_summary(self):
         self._need(); from . import ui; ui.report_summary(self)
 

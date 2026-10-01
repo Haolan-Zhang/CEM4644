@@ -28,8 +28,11 @@ hidden. No GPU needed.
 4. **The same job, by a chat model**: the training rows and 30 held-out rows go to hokie.ai, first with a plain
    prompt (twice, in two new chats, to see whether the numbers stay the same), then with the chat told to train a
    model of the student's choice with its data-analysis tool; each reply is scored next to the trees and the line.
-5. **Their own table** (homework): the tap test (phone recordings of taps on different surfaces, one row per tap) or
-   any CSV, in a small app opened from a link: trees and a score on held-out rows.
+5. **Their own table** (homework). **The tap test:** they record taps on 4-5 materials with the phone's voice
+   recorder, name each file by material and spot (`wooden table 2.m4a`), and upload them to an app opened from a link
+   (works on a phone), which finds each tap, measures it (one row per tap), shows each material's average tap and a
+   scatter plot, trains a model of their choice on random taps or with whole recordings held out, and names the
+   material of a new recording. Then **any CSV** of their own in a second app: trees and a score on held-out rows.
 
 **MP6B · Time series**
 
@@ -51,7 +54,8 @@ MP6A_Workshop_Tabular.ipynb, MP6A_Homework_Tabular.ipynb         student noteboo
 MP6B_Workshop_TimeSeries.ipynb, MP6B_Homework_TimeSeries.ipynb   student notebooks, time series (generated)
 aec_tab/          the hidden code: config (what each notebook works on), data, models (regression / classification),
                   series (forecasts, odd days), ui (what each step shows), chat (the hokie.ai steps: files, prompts,
-                  reading and scoring the pasted replies), app (the upload app), lab (the one object)
+                  reading and scoring the pasted replies), app (the upload app), taps + tap_app (the tap test:
+                  finding and measuring taps in a recording, and its app), lab (the one object)
 data/             concrete.csv, energy_efficiency.csv, meters/<building>.csv (2017, hourly kWh + air temperature in °F),
                   meters.json, credits.json  (2.3 MB in total)
 build/            instructor-side scripts: prepare_data.py (from the raw downloads), make_notebooks.py

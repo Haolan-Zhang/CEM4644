@@ -32,7 +32,15 @@ From Step 4a and 4b: the chat's average error on its own and with its analysis t
 
 ## Question 4
 
-The main deliverable: find or make a table of your own (a bid tabulation, a materials price list, anything with a numeric column to predict and 30+ rows). Run it through Step 5 and report what the data is, what the app found, and what you would need to trust the numbers. Then give the same file to the chat and ask it to use its analysis tool to do the same: does it agree with the app?
+From the tap test (Step 5a): the materials you recorded (how many spots and taps of each), the score on random taps and with whole recordings held out, and which materials get confused. Which measurements separate your materials best (the scatter plot and the small decision tree's rules)? Did the blind test name the material right? Would the model still work in another room, with another phone or with another person tapping?
+
+*Your answer:*
+
+
+
+## Question 5
+
+Find or make a table of your own (a bid tabulation, a materials price list, anything with a numeric column to predict and 30+ rows). Run it through Step 5b and report what the data is, what the app found, and what you would need to trust the numbers. Then give the same file to the chat and ask it to use its analysis tool to do the same: does it agree with the app?
 
 *Your answer:*
 
