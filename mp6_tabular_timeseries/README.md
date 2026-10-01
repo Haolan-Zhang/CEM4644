@@ -32,7 +32,7 @@ hidden. No GPU needed.
    recorder, name each file by material and spot (`wooden table 2.m4a`), and upload them to an app opened from a link
    (works on a phone), which finds each tap, measures it (one row per tap), shows each material's average tap and a
    scatter plot, trains a model of their choice on random taps or with whole recordings held out, and names the
-   material of a new recording. Then **any CSV** of their own in a second app: trees and a score on held-out rows.
+   material of a new recording.
 
 **MP6B · Time series**
 

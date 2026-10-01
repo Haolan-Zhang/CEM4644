@@ -43,7 +43,7 @@ Knock on a wall and you can hear whether a stud is behind it; inspectors do the 
 1. **Plan.** Pick 4–5 materials or surfaces (for example drywall between studs, drywall over a stud, concrete or masonry, a wooden door, a metal stand, glass or tile) and 3–4 separate spots of each. To be sure a spot is over a stud, use the magnetometer in the free *phyphox* app: it jumps at the drywall screws.
 2. **Record.** At each spot, tap 10 times, about half a second apart, always with the same object (a coin or a pen cap). Hold the phone about 8 inches away in a quiet room and record with its voice recorder (*Voice Memos* on an iPhone): one recording per spot. Do not use phyphox's *Audio Spectrum* for this: it does not keep the sound.
 3. **Name each recording by its material and spot number:** `wooden table 1`, `wooden table 2`, `metal stand 1`, … The app reads the material from the name, so every spot of one material must use the same words, with only the number changing.
-4. **Make the table** (Step 5a, part 1). Upload all your recordings. The app finds each tap (red lines: check that it found yours) and measures its pitch, brightness, ring time, loudness and its low / middle / high share of sound: one row per tap. Download the table: it is your dataset.
+4. **Make the table** (Step 5, part 1). Upload all your recordings. The app finds each tap (red lines: check that it found yours) and measures its pitch, brightness, ring time, loudness and its low / middle / high share of sound: one row per tap. Download the table: it is your dataset.
 5. **Look first** (part 2). Write down what you expect (does hollow sound lower? ring longer?), then check it against each material's average tap and a scatter plot of two measurements.
 6. **Train and test twice** (part 3): once on *random taps*, once with *whole recordings held out*. Why do the two scores differ, and which would you believe? Try the small decision tree and read the rules it learned.
 7. **Blind test** (part 4). Record a spot you did not use, upload it, and see whether the model names the material.
@@ -258,19 +258,15 @@ A model that scores well may still have learned the wrong thing. Two checks: whi
         cells.append(md("""
 ## Part 5 · Your own table
 
-Two small apps, each opened from a link: the first turns your own tap recordings into a table and trains a model on it; the second takes any CSV you bring.
+A small app, opened from a link, turns your own tap recordings into a table and trains a model on it.
 """))
         cells.append(md(TAP_TEST))
-        cells.append(form("▶ Step 5a · The tap test", "lab.tap_app()",
+        cells.append(form("▶ Step 5 · The tap test", "lab.tap_app()",
                           notes=["Open the printed link in a new tab. It works on a phone too, so you can upload the recordings straight from the phone you made them on.",
                                  "If the app finds fewer taps than you made in a recording, tap harder or closer to the phone and record that spot again."]))
-        cells.append(q(4, "From the tap test (Step 5a): the materials you recorded (how many spots and taps of each), the score on random taps and with whole recordings held out, "
+        cells.append(q(4, "From the tap test (Step 5): the materials you recorded (how many spots and taps of each), the score on random taps and with whole recordings held out, "
                           "and which materials get confused. Which measurements separate your materials best (the scatter plot and the small decision tree's rules)? "
                           "Did the blind test name the material right? Would the model still work in another room, with another phone or with another person tapping?"))
-        cells.append(form("▶ Step 5b · Any table of your own", "lab.upload_app()", notes=["Open the printed link in a new tab."]))
-        cells.append(q(5, "Find or make a table of your own (a bid tabulation, a materials price list, anything with a numeric column to predict and 30+ rows). "
-                          "Run it through Step 5b and report what the data is, what the app found, and what you would need to trust the numbers. "
-                          "Then give the same file to the chat and ask it to use its analysis tool to do the same: does it agree with the app?"))
     return ["table"]
 
 
