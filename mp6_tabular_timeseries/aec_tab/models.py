@@ -85,8 +85,14 @@ def grades_result(model, kind, Xte, yte, spec: TableSpec) -> ClsResult:
     return ClsResult(kind_of(kind), "grades", labels, true, pred, None, float((true == pred).mean()), mat)
 
 
+def passes(spec: TableSpec, y, threshold: float):
+    """Whether each value meets the specification: at or above it (a strength), or at or below it (a load limit)."""
+    y = np.asarray(y)
+    return y <= threshold if spec.pass_below else y >= threshold
+
+
 def passfail_result(model, kind, Xte, yte, spec: TableSpec, threshold: float) -> ClsResult:
-    true = (yte.values >= threshold); pred = model.predict(Xte).astype(bool)
+    true = passes(spec, yte.values, threshold); pred = model.predict(Xte).astype(bool)
     proba = model.predict_proba(Xte)[:, list(model.classes_).index(True)] if hasattr(model, "predict_proba") else None
     m = confusion_matrix(true, pred, labels=[True, False])
     mat = confusion_frame(m, ["pass", "fail"])

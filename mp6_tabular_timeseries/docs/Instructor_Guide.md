@@ -8,14 +8,21 @@ Both end with a section in which the students give the same job to a chat model 
 | | Workshop | Homework |
 |---|---|---|
 | **MP6A** table | 1,030 real concrete mixes (lb/yd³) → compressive strength (psi) | 768 simulated building shapes (ft²) → heating load (kBtu/ft²) |
-| MP6A steps | 1a look, 1b guess five grades (with a water / cement rule of thumb), 2a classification, 2b regression, 3a importance, 3b what-if, **4a chat, 4b chat + analysis tool** | the same without 1b, plus 5: the tap-test app |
+| MP6A steps | 1a look, 1b guess five grades (with a water / cement rule of thumb), 2a classification, 2b regression, 3a importance, 3b what-if, **4a chat, 4b chat + analysis tool** | browse; 1a level classification, 1b pass / fail (pass = heating load at or below the limit), 1c regression; 2a importance, 2b what-if; **3a HokieAI, 3b HokieAI's data-analysis tool**; 4 the tap-test app |
 | **MP6B** series | `Hog_office_Marlena` (office), `Bear_education_Lila` (school), `Bear_lodging_Evan` (residence hall), `Bear_assembly_Jose` (assembly hall) | `Hog_office_Gustavo`, `Moose_education_Leland`, `Robin_lodging_Janie`, `Rat_assembly_Rolland` (a swimming pool) |
-| MP6B steps | 1a-1b which building is which, 1c anatomy, 2a forecast three ways, 3a odd days, **4a chat forecast, 4b chat + analysis tool, 4c chat odd days** | the same, plus 5: activity recognition and their own series |
-| Report questions | MP6A 3, MP6B 4 | MP6A 4, MP6B 5 (own data is the main deliverable) |
+| MP6B steps | 1a-1b identify the building type, 1c daily and weekly patterns, 2a forecast one week (seasonal naive, decision tree, Chronos-Bolt), 3a anomalous days (robust z-score), **4a HokieAI forecast, 4b HokieAI's data-analysis tool, 4c HokieAI anomalous days** | the same, plus 5: activity recognition (phyphox; classified with HokieAI's data-analysis tool) and their own series in the upload app |
+| Report questions | MP6A 3, MP6B 4 | MP6A 4, MP6B 5 |
 | Time | about 75 min each | about 75 min each |
 
 Step 0 clones only this folder and prints one line. MP6A installs `gradio` and loads the table; MP6B also installs
 `chronos-forecasting` and (if ticked) downloads Chronos-Bolt-small (about 190 MB). Nothing needs a GPU.
+
+**Style and wording.** The MP6A homework and both MP6B notebooks follow the In-Class activity's style (Title Case step
+titles, technical terms, one quoted report paragraph per step, "Data and model sources"). Every result line, caption,
+plot title, button and prompt is a wording written in its cell (`name_text = """..."""`; the two apps take a
+`labels_text` block of `key: wording` lines), so it can be edited in Colab; `aec_tab/texts.py` (and `LABELS` in
+`app.py` / `tap_app.py`) only hold the fallbacks. Column and slider names come from the dataset definitions in
+`config.py`, and error messages stay in the code.
 
 **The chat steps.** Each shows download buttons for the files, a link to hokie.ai, the prompt to copy, a box for the
 reply and a *Score* button (the MP5 pattern). The files are made from the lab's own data when the cell runs:

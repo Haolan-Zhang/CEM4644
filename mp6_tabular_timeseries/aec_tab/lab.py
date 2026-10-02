@@ -90,71 +90,72 @@ class TabLab:
         raise KeyError(which)
 
     # ------------------------------------------------------------------ steps
-    def show_table(self, rows=10):
-        self._need(); from . import ui; ui.show_table(self, int(rows))
+    # Every step takes the wordings its notebook cell carries (name_text="..."), which override the defaults in texts.py.
+    def show_table(self, rows=10, **texts):
+        self._need(); from . import ui; ui.show_table(self, int(rows), texts)
 
-    def guess(self):
-        self._need(); from . import ui; ui.guess_game(self)
+    def guess(self, **texts):
+        self._need(); from . import ui; ui.guess_game(self, texts)
 
-    def regression(self, model="decision tree", result_text=None):
-        self._need(); from . import ui; ui.regression_view(self, model, result_text)
+    def regression(self, model="decision tree", result_text=None, **texts):
+        self._need(); from . import ui; ui.regression_view(self, model, result_text, texts)
 
-    def classification(self, model="decision tree", task="grades", threshold=None):
+    def classification(self, model="decision tree", task="grades", threshold=None, **texts):
         self._need(); from . import ui
-        ui.classification_view(self, model, task, float(threshold if threshold is not None else self.table_spec.spec_default))
+        ui.classification_view(self, model, task, float(threshold if threshold is not None else self.table_spec.spec_default), texts)
 
-    def importance(self):
-        self._need(); from . import ui; ui.importance_view(self)
+    def importance(self, **texts):
+        self._need(); from . import ui; ui.importance_view(self, texts)
 
-    def whatif(self, sample="a typical row"):
-        self._need(); from . import ui; ui.whatif(self, sample)
+    def whatif(self, sample="a typical row", **texts):
+        self._need(); from . import ui; ui.whatif(self, sample, texts)
 
-    def buildings(self):
-        self._need(); from . import ui; ui.buildings_game(self)
+    def buildings(self, **texts):
+        self._need(); from . import ui; ui.buildings_game(self, texts)
 
-    def buildings_answer(self, a="?", b="?", c="?", d="?"):
-        self._need(); from . import ui; ui.buildings_check(self, a=a, b=b, c=c, d=d)
+    def buildings_answer(self, a="?", b="?", c="?", d="?", **texts):
+        self._need(); from . import ui; ui.buildings_check(self, texts, a=a, b=b, c=c, d=d)
 
-    def anatomy(self, building, anatomy_text=None):
-        self._need(); from . import ui; ui.anatomy(self, building, anatomy_text)
+    def anatomy(self, building, anatomy_text=None, **texts):
+        self._need(); from . import ui; ui.anatomy(self, building, anatomy_text, texts)
 
-    def forecast(self, building, method="all three"):
-        self._need(); from . import ui; ui.forecast_view(self, building, method)
+    def forecast(self, building, method="all three", **texts):
+        self._need(); from . import ui; ui.forecast_view(self, building, method, texts)
 
-    def odd_days(self, building, threshold=3.5):
-        self._need(); from . import ui; ui.oddday_view(self, building, float(threshold))
+    def odd_days(self, building, threshold=3.5, **texts):
+        self._need(); from . import ui; ui.oddday_view(self, building, float(threshold), texts)
 
-    # ------------------------------------------------------------------ the chat (hokie.ai) steps
+    # ------------------------------------------------------------------ the HokieAI steps
     def chat_table(self, give="attach the files", steps_text=None, paste_steps_text=None, paste_prompt_text=None,
-                   compare_text=None, plot_text=None):
+                   compare_text=None, plot_text=None, **texts):
         self._need(); from . import chat
-        chat.chat_table(self, give, steps_text, paste_steps_text, paste_prompt_text, compare_text, plot_text)
+        chat.chat_table(self, give, steps_text, paste_steps_text, paste_prompt_text, compare_text, plot_text, texts)
 
-    def chat_table_tool(self, model="gradient-boosted trees", steps_text=None, compare_text=None, plot_text=None):
-        self._need(); from . import chat; chat.chat_table_tool(self, model, steps_text, compare_text, plot_text)
+    def chat_table_tool(self, model="gradient-boosted trees", steps_text=None, compare_text=None, plot_text=None, tool_prompt_text=None, **texts):
+        self._need(); from . import chat; chat.chat_table_tool(self, model, steps_text, compare_text, plot_text, tool_prompt_text, texts)
 
-    def chat_forecast(self, building, give="attach the files", steps_text=None, paste_steps_text=None):
-        self._need(); from . import chat; chat.chat_forecast(self, building, give, steps_text, paste_steps_text)
+    def chat_forecast(self, building, give="paste the data into the prompt", steps_text=None, paste_steps_text=None, paste_prompt_text=None, **texts):
+        self._need(); from . import chat; chat.chat_forecast(self, building, give, steps_text, paste_steps_text, paste_prompt_text, texts)
 
-    def chat_forecast_tool(self, building, model="gradient-boosted trees", steps_text=None):
-        self._need(); from . import chat; chat.chat_forecast_tool(self, building, model, steps_text)
+    def chat_forecast_tool(self, building, model="gradient-boosted trees", steps_text=None, tool_prompt_text=None, **texts):
+        self._need(); from . import chat; chat.chat_forecast_tool(self, building, model, steps_text, tool_prompt_text, texts)
 
-    def chat_odd_days(self, building, give="attach the files", steps_text=None, paste_steps_text=None):
-        self._need(); from . import chat; chat.chat_odd_days(self, building, give, steps_text, paste_steps_text)
+    def chat_odd_days(self, building, give="paste the data into the prompt", steps_text=None, paste_steps_text=None, paste_prompt_text=None, **texts):
+        self._need(); from . import chat; chat.chat_odd_days(self, building, give, steps_text, paste_steps_text, paste_prompt_text, texts)
 
-    def upload_app(self):
+    def upload_app(self, labels_text=None):
         self._need()
         if os.environ.get("AEC_LAB_NO_APP"):
             print("(upload app skipped: AEC_LAB_NO_APP is set)"); return
         from . import app
-        self.apps["upload"] = app.launch(kind={"tabular": "table", "series": "time series"}.get(self.part))
+        self.apps["upload"] = app.launch(kind={"tabular": "table", "series": "time series"}.get(self.part), labels_text=labels_text)
 
-    def tap_app(self):
+    def tap_app(self, labels_text=None):
         self._need()
         if os.environ.get("AEC_LAB_NO_APP"):
             print("(tap-test app skipped: AEC_LAB_NO_APP is set)"); return
         from . import tap_app
-        self.apps["taps"] = tap_app.launch()
+        self.apps["taps"] = tap_app.launch(labels_text=labels_text)
 
     def report_summary(self):
         self._need(); from . import ui; ui.report_summary(self)

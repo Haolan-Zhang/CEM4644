@@ -20,7 +20,12 @@ from aec_tab import config as C  # noqa: E402
 from aec_tab.data import load_meters  # noqa: E402
 from aec_tab.models import KINDS  # noqa: E402
 from aec_tab.series import METHODS  # noqa: E402
-from aec_tab.chat import CHAT_URL, COMPARE_TEXT, GIVE, PLOT_TEXT, TEST_N, TOOL_MODELS, paste_prompt_default, steps_default  # noqa: E402
+from aec_tab.chat import (CHAT_URL, COMPARE_TEXT, FORECAST_PROMPT, FORECAST_TOOL_PROMPT, GIVE, ODD_DAYS_PROMPT, PLOT_TEXT, TEST_N,  # noqa: E402
+                          TOOL_MODELS, paste_prompt_default, steps_default, tool_prompt_default)
+from aec_tab.app import LABELS as APP_LABELS  # noqa: E402
+from aec_tab.data import load_table  # noqa: E402
+from aec_tab.tap_app import LABELS as TAP_LABELS  # noqa: E402
+from aec_tab.texts import TEXTS, block as texts_block  # noqa: E402
 from aec_tab.ui import ANATOMY_TEXT, REGRESSION_TEXT  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
@@ -36,38 +41,32 @@ VARIANTS = {
     ("series", "homework"): dict(file="MP6B_Homework_TimeSeries.ipynb", label="Homework (individual)", minutes=75),
 }
 TAP_TEST = """
-### 🔨 The tap test: data you collect yourself
+## Part 4 · Collect Your Own Data: Tap Test
+Knocking on a surface and listening is a common inspection technique (a *sounding test*): hollow or delaminated areas in concrete, tile, or drywall sound different from solid ones. In this part, you will record taps on different materials with your phone, convert each tap into a row of features, and train an AI model to classify the material.
 
-Knock on a wall and you can hear whether a stud is behind it; inspectors do the same on concrete and tile to find hollow, delaminated spots (a *sounding test*). Here you record taps with your phone, the app in Step 5 turns each tap into one row of a table, and a model learns to tell the materials apart.
+**Data collection**
+1. **Materials.** Choose 4–5 materials or surfaces (for example drywall between studs, drywall over a stud, concrete or masonry, a wooden door, a metal frame, glass, or tile) and 3–4 separate spots on each.
+2. **Recording.** At each spot, tap 10 times, about half a second apart, always with the same object (a coin or a pen cap). Hold the phone about 8 inches away in a quiet room and record with the phone's voice recorder (*Voice Memos* on iPhone; *Recorder* or *Voice Recorder* on Android). Make one recording per spot.
+3. **File names.** Name each recording by its material and spot number, for example `wooden table 1`, `wooden table 2`, `metal stand 1`. The app takes the material label from the file name, so all spots of one material must use the same words.
 
-**Before the app**
-
-1. **Plan.** Pick 4–5 materials or surfaces (for example drywall between studs, drywall over a stud, concrete or masonry, a wooden door, a metal stand, glass or tile) and 3–4 separate spots of each.
-2. **Record.** At each spot, tap 10 times, about half a second apart, always with the same object (a coin or a pen cap). Hold the phone about 8 inches away in a quiet room and record with the phone's voice recorder (*Voice Memos* on an iPhone, *Recorder* or *Voice Recorder* on Android): one recording per spot.
-3. **Name each recording by its material and spot number:** `wooden table 1`, `wooden table 2`, `metal stand 1`, … The app reads the material from the name, so every spot of one material must use the same words, with only the number changing.
-
-**What the app measures on each tap**
-
-- *pitch*: the strongest tone, in Hz (a higher number is a higher note)
-- *brightness*: the average tone, in Hz (bright and sharp versus dull)
-- *ring time*: how long the tap takes to fade to a tenth of its loudness, in milliseconds
-- *loudness*: how far the tap rises above the room's background noise, in dB
-- *low / middle / high share*: how much of the sound is below 300 Hz, between 300 and 800 Hz, and above 800 Hz
+**Features extracted from each tap**
+- *pitch (Hz)*: the frequency with the highest power
+- *brightness (Hz)*: the spectral centroid (power-weighted mean frequency)
+- *ring time (ms)*: the time for the tap to decay to 10 % of its peak amplitude
+- *loudness (dB)*: the peak level above the room's background noise
+- *low / middle / high share*: the fraction of power below 300 Hz, between 300 and 800 Hz, and above 800 Hz
 """
 ACTIVITY = """
-### 🚶 Activity recognition: data you collect yourself
+## Part 5 · Collect Your Own Data: Activity Recognition
+Wearable motion sensors are used in construction research to recognize worker activities (walking, climbing, carrying, idling) for productivity and safety studies. Your phone has the same sensor, an accelerometer. In this part, you will record your own activities as time series and use AI to analyze them.
 
-Researchers put motion sensors on construction workers to tell, minute by minute, whether they are walking, climbing, carrying or idle, for productivity and safety studies. Your phone has the same sensor. Here you record your own movements, cut each recording into short windows, and train a model to name the activity in each window.
+**Data collection**
+1. **Activities.** Choose 4–5 activities you can repeat (for example standing, walking, going up stairs, going down stairs, and carrying a heavy bag or box).
+2. **Recording.** In the free *phyphox* app, choose *Acceleration (without g)* and keep the phone in the same pocket every time. Record each activity for about 2 minutes in 3 separate sessions (different days, places, or shoes), and export each recording as a CSV file named by activity and session (for example `stairs_up_session2.csv`).
 
-1. **Plan.** Pick 4–5 activities you can repeat (for example standing, walking, going up stairs, going down stairs, carrying a heavy bag or box).
-2. **Record.** In the free *phyphox* app, choose *Acceleration (without g)* and put the phone in the same pocket every time. Do each activity for about 2 minutes, in 3 separate sessions (different days, places or shoes): one recording per activity and session, exported as CSV and named by what it is (`stairs_up_session2.csv`).
-3. **Make the table.** Upload the recordings to the notebook. It cuts each into 2-second windows and measures each window's average, spread, peak and rhythm (steps per second): one row per window, with the session and the activity. Download the table: it is your dataset.
-4. **Look first.** Write down what you expect (is climbing slower? is carrying smoother?), then check it against a few seconds of each activity and a scatter plot of two measurements.
-5. **Train and test twice:** once with the windows split at random, once with whole sessions held out. Why do the two scores differ, and which would you believe?
-6. **Blind test.** Record one mixed sequence (walk, stairs, stand) and write down when you switched; see whether the model finds when each activity starts.
-7. **Ask the chat.** Give hokie.ai your table, ask it to do the same with its analysis tool, and compare.
-
-Report which activities get confused, which measurements matter, and whether the model would still work for another person, with the phone in another pocket, or on a real site.
+**Analysis**
+1. **Forecasting (Step 5).** Upload one recording to the app in Step 5 to forecast its last part from the data before it.
+2. **Classification (HokieAI).** Give HokieAI your recordings and ask it to use its data-analysis tool to cut each recording into 2-second windows, compute features for each window (for example mean, standard deviation, peak, and dominant frequency), and train a classifier for the activity. Ask it to evaluate the classifier twice: with a random split of the windows, and with whole sessions held out.
 """
 PART_NAME = {"tabular": ("MP6A", "Tables", "📊"), "series": ("MP6B", "Time series", "📈")}
 
@@ -106,8 +105,11 @@ def form(title, body, notes=(), params=(), texts=None, param_notes=None):
     words = ""
     if texts:
         kept = EXISTING_TEXTS.get(head, {})
-        words = ("# The wording the notebook shows: edit the text between the triple quotes. Words in {braces} are filled in by the notebook;\n"
-                 "# **bold** and *italic* work, and each line is shown as its own line.\n"
+        comment = (("# The app's titles, labels, and result lines: edit the wording after each colon (keep the name before it).\n"
+                    "# Words in {braces} are filled in by the app; \\n starts a new line.\n") if list(texts) == ["labels_text"] else
+                   ("# The wording the notebook shows: edit the text between the triple quotes. Words in {braces} are filled in by the notebook;\n"
+                    "# **bold** and *italic* work, and each line is shown as its own line.\n"))
+        words = (comment
                  + "".join(f'{k} = """{kept.get(k, v)}"""\n' for k, v in texts.items()))
     src = head + "\n" + "".join(f"#@markdown {n}\n" for n in notes) + "".join(p + "\n" for p in params) + words + body.rstrip() + "\n"
     c = new_code_cell(src); c.metadata["cellView"] = "form"
@@ -381,11 +383,24 @@ def build(part, variant):
     spec = C.SPECS[variant]
     load_existing(REPO / v["file"])
     cells = []
-    uses = (build_tabular if part == "tabular" else build_series)(variant, v, spec, cells)
+    revised = part == "series" or variant == "homework"          # the notebooks written in the In-Class activity's style
+    builder = (build_tabular_v2 if part == "tabular" else build_series_v2) if revised else build_tabular
+    uses = builder(variant, v, spec, cells)
+    cr = json.loads((REPO / "data" / "credits.json").read_text())
+    if revised:
+        lines = ["### Data and model sources"]
+        if "table" in uses:
+            tk = spec.table.key
+            lines.append(f"- Table: {cr[tk]['title']}, {cr[tk]['author']}, {cr[tk]['license']}, {cr[tk]['source']}.")
+        if "meters" in uses:
+            lines.append(f"- Electricity meters and weather: {cr['meters']['title']}, {cr['meters']['author']}, {cr['meters']['license']}, {cr['meters']['source']}.")
+            lines.append(f"- Pretrained forecasting model: {cr['forecaster']['title']}, {cr['forecaster']['author']}, {cr['forecaster']['license']}, {cr['forecaster']['source']}.")
+        lines.append("- Generative AI: GPT models via HokieAI (Virginia Tech).")
+        cells.append(md("\n".join(lines) + "\n"))
+        return _write(part, variant, v, spec, cells)
 
     cells.append(md("## Wrap-up"))
     cells.append(form("▶ Numbers for your report", "lab.report_summary()"))
-    cr = json.loads((REPO / "data" / "credits.json").read_text())
     lines = ["### Credits"]
     if "table" in uses:
         tk = spec.table.key
@@ -396,12 +411,17 @@ def build(part, variant):
     lines.append("- Chat model: the GPT models behind hokie.ai (Virginia Tech).")
     lines.append("- Lab code: https://github.com/Haolan-Zhang/CEM4644 (folder `mp6_tabular_timeseries`).")
     cells.append(md("\n".join(lines) + "\n"))
+    return _write(part, variant, v, spec, cells)
 
+
+def _write(part, variant, v, spec, cells):
     questions = []
     for c in cells:
-        if c.cell_type == "markdown" and c.source.startswith("> ### 📝 Report question "):
-            head, _, body = c.source.partition("\n")
-            questions.append((int(head.rsplit(" ", 1)[1]), body[2:].strip() if body.startswith("> ") else body.strip()))
+        src = c.source
+        if c.cell_type == "markdown" and ("### 📝 Report question " in src.split("\n", 1)[0]):
+            head, _, body = src.partition("\n")
+            paras = [p.strip()[2:].strip() if p.strip().startswith("> ") else p.strip() for p in body.split("\n\n") if p.strip()]
+            questions.append((int(head.rsplit(" ", 1)[1]), "\n\n".join(paras)))
     nb = new_notebook(cells=cells)
     nb.metadata.update({"colab": {"provenance": [], "toc_visible": True},
                         "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"}, "language_info": {"name": "python"}})
@@ -417,6 +437,249 @@ def build(part, variant):
         lines += [f"## Question {num}", "", text, "", "*Your answer:*", "", "", ""]
     p = REPO / "docs" / f"{code}_{variant.capitalize()}_Report_Template.md"
     p.parent.mkdir(exist_ok=True); p.write_text("\n".join(lines)); print("wrote", p)
+
+# ============================================================================ the revised notebooks (MP6A homework, MP6B)
+def qv2(n, *parts):
+    """A report question in the In-Class activity's form: a heading, then one quoted paragraph per step."""
+    return md(f"### 📝 Report question {n}\n" + "\n\n".join(f"> {p}" for p in parts))
+
+
+def T(group, spec=None, **extra):
+    """A step's default wordings for its cell, with the dataset's words written in ({rows}, {unit})."""
+    out = {}
+    for k, v in TEXTS[group].items():
+        if spec is not None:
+            v = v.replace("{rows}", spec.rows).replace("{unit}", spec.unit)
+        out[k] = v
+    out.update(extra)
+    return out
+
+
+def call(head, texts):
+    """lab.step(args, name_text=name_text, ...) for the wordings a cell carries."""
+    head = head.rstrip(")")
+    kw = ", ".join(f"{k}={k}" for k in texts)
+    return f"{head}{', ' if head[-1] != '(' and kw else ''}{kw})"
+
+
+def wform(title, head, texts, notes=(), params=()):
+    return form(title, call(head, texts), notes=notes, params=params, texts=texts)
+
+
+HOKIEAI = "**multimodal/generative AI (GPT/HokieAI)**"
+WORDS = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six"}
+TOOL_NOTE = ("Choose the model HokieAI should train. With its data-analysis tool, HokieAI writes and runs Python code on the attached files "
+             "instead of predicting from the text alone. If its output shows no code or analysis, ask it to use its data-analysis tool.")
+
+
+def build_tabular_v2(variant, v, spec, cells):
+    t = spec.table
+    out_name = t.label(t.target).split(" (")[0]
+    levels = ", ".join(f"{g[0].split(' (')[0]} ({g[0].split('(')[1].rstrip(')')})" for g in t.grades)
+    cells.append(md(f"""
+# Homework: Predicting the Heating Load of Buildings
+In this homework, you will use AI models to predict the heating load of buildings from tabular data, compare them with generative AI (HokieAI), and then collect your own tabular dataset to train a model.
+"""))
+    cells.append(step0(variant, "tabular"))
+    cells.append(wform("▶ Browse the Data", "lab.show_table(rows)", T("show_table", t),
+                       notes=[f"The table contains {len(load_table(REPO, t)):,} simulated residential buildings of the same volume but different shapes. Each row represents one building; "
+                              "the columns describe its geometry (relative compactness; surface, wall, and roof areas; overall height), orientation, and glazing, and the last column "
+                              f"is the heating load computed by a building-energy simulation. The heating load is the output the AI model will learn to predict from the other columns. "
+                              "Here, you can browse examples from the table."],
+                       params=['rows = 10 #@param [5, 10, 20] {type:"raw"}']))
+
+    cells.append(md("## Part 1 · Predicting Heating Load"))
+    cells.append(wform("▶ Step 1a · Classification: Predict Heating Load Level", "lab.classification(model, task, threshold)",
+                       {k: v for k, v in T("classification_grades", t).items() if k != "guess_text"},
+                       notes=[f"The AI model uses the input variables to classify each building into one of {WORDS[len(t.grades)]} heating-load levels ({t.unit}): {levels}.",
+                              "You can explore two AI models in this and the following steps:",
+                              "Straight line model: learns a simple linear relationship between the inputs and the output.",
+                              "Decision tree model: learns a series of splits in the data (for example, based on relative compactness or glazing area) to make predictions. "
+                              "It can capture more complex relationships than a straight line model."],
+                       params=[choice("model", "decision tree", list(KINDS)), 'task = "grades"', f"threshold = {t.spec_default:g}"]))
+    cells.append(wform("▶ Step 1b · Classification: Predict Pass or Fail", "lab.classification(model, task, threshold)", T("classification_passfail", t),
+                       notes=[f"Instead of predicting {WORDS[len(t.grades)]} levels, the AI model predicts whether each building meets a heating-load limit: a building passes if its "
+                              "heating load is at or below the threshold. This is a binary classification task. You can adjust the threshold."],
+                       params=[choice("model", "decision tree", list(KINDS)), 'task = "pass / fail against a specification"',
+                               f'threshold = {t.spec_default:g} #@param {{type:"slider", min:{t.spec_range[0]:g}, max:{t.spec_range[1]:g}, step:{t.spec_range[2]:g}}}']))
+    cells.append(wform("▶ Step 1c · Regression: Predict Heating Load", "lab.regression(model)",
+                       {k: v for k, v in T("regression", t).items() if k != "guess_text"},
+                       notes=["Finally, instead of predicting a category, let the AI model predict the heating load itself (regression)."],
+                       params=[choice("model", "decision tree", list(KINDS))]))
+    cells.append(qv2(1,
+                     "From Step 1a: Explore both AI models. How accurately does each model classify the test buildings into the correct heating-load level? "
+                     "Include the confusion matrix for each model.",
+                     "From Step 1b: For the better-performing model, at your selected threshold, what is the accuracy? How many false passes (false positives) "
+                     "and false fails (false negatives) did it make? Which is more concerning for an energy requirement, and why?",
+                     "From Step 1c: Report the MAE and R² of both models and compare them with the concrete-strength results from the in-class activity. "
+                     "The heating loads come from a building-energy simulation rather than measurements: why does that make the prediction task easier?"))
+
+    cells.append(md("""
+## Part 2 · What the Model Learned
+The model learned relationships between the input columns and the heating load from the training data. In this part, we will explore which inputs matter most overall and how changing input values affects a prediction.
+"""))
+    cells.append(wform("▶ Step 2a · Which Inputs Matter", "lab.importance()", T("importance", t),
+                       notes=["Run the cell to see the importance of each input for the decision tree model. Importance is measured by permutation: how much the model's R² "
+                              "drops when the values of one input are shuffled. A higher importance means that the model relied more on that input."]))
+    whatif_words = ", ".join(t.label(f).split(" (")[0] for f in t.whatif[:-1]) + ", and " + t.label(t.whatif[-1]).split(" (")[0]
+    cells.append(wform("▶ Step 2b · What If Inputs Change?", "lab.whatif(building_sample)", T("whatif", t),
+                       notes=[f"Move the sliders to change {whatif_words}. The decision tree model updates its predicted heating load each time; all other inputs stay at "
+                              "the median values of the table. If the sliders are not showing, run the cell again."],
+                       params=['building_sample = "a typical building"']))
+    cells.append(qv2(2,
+                     "From Step 2a: Which two inputs are most important to the model? Were these the inputs you expected to matter most?",
+                     "From Step 2b: Change one input at a time. Which input causes the largest change in predicted heating load, and in which direction? "
+                     "Then set the sliders to a building you would design and report its predicted heating load."))
+
+    cells.append(md(f"""
+## Part 3 · The Same Prediction Task with Generative/Multimodal AI
+
+So far, you used AI models trained specifically to predict heating load (in **Step 1c**). Now you will give the same training data and test buildings to {HOKIEAI} and compare its predictions with those models.
+"""))
+    ct = {k: v for k, v in T("chat_table", t).items()}
+    cells.append(wform("▶ Step 3a · Predict with HokieAI", 'lab.chat_table(give)',
+                       dict(paste_steps_text=steps_default(2, False), paste_prompt_text=paste_prompt_default(t), **ct),
+                       notes=["Run the cell to reveal the instructions and prompt. To check whether HokieAI is consistent, paste the same prompt into a second new chat "
+                              "and score that output too: the notebook then compares the two."],
+                       params=['give = "paste the data into the prompt"']))
+    cells.append(wform("▶ Step 3b · Predict with HokieAI's Data-Analysis Tool", "lab.chat_table_tool(model)",
+                       dict(steps_text=steps_default(2, True), tool_prompt_text=tool_prompt_default(t),
+                            **{k: v for k, v in ct.items() if k != "repeat_text"}),
+                       notes=[TOOL_NOTE], params=[choice("model", list(TOOL_MODELS)[0], list(TOOL_MODELS))]))
+    cells.append(qv2(3,
+                     "From Step 3a: How does HokieAI perform compared with the two models in Part 1? Use the error table and the predicted vs. actual plot to summarize. "
+                     "If you ran the prompt twice, how consistent were the two outputs?",
+                     "From Step 3b: Report the MAE of HokieAI with its data-analysis tool and the model you chose. Why is it closer to (or farther from) the decision tree "
+                     "model than in Step 3a?",
+                     "Finally, ask HokieAI how it made its predictions in Step 3a and briefly summarize its explanation."))
+
+    cells.append(md(TAP_TEST))
+    cells.append(form("▶ Step 4 · Tap Test App", "lab.tap_app(labels_text=labels_text)",
+                      notes=["1. Run the cell and open the printed link in a new tab. The app also works on a phone, so you can upload directly from the phone you recorded with.",
+                             "2. **Build the dataset.** Upload all recordings and click **Build dataset**. Check the detected taps (red lines): each tap you made should have one line. "
+                             "If taps are missing, tap harder or closer to the phone and record that spot again.",
+                             "3. **Download the dataset** (CSV, one row per tap) for your report and for HokieAI.",
+                             "4. **Explore the features.** Compare the mean spectra of the materials, then choose two features for the scatter plot. Do the materials form separate clusters?",
+                             "5. **Train and evaluate** with both evaluation methods: a *random split* (80 % of the taps for training, 20 % for testing) and *leave-one-recording-out* "
+                             "(each recording is tested by a model trained on all other recordings, so the test spot is never seen in training). Compare the accuracies.",
+                             "6. **Read the rules.** With the *decision tree* model, read the rules it learned: which feature does it split on first?",
+                             "7. **Predict a new recording.** Record a spot that is not in the dataset, upload it, and click **Predict**. Check whether the predicted material is correct.",
+                             "8. **Ask HokieAI.** Give HokieAI your dataset (CSV), ask it to train a classifier with its data-analysis tool, and compare its accuracy with the app's."],
+                      texts={"labels_text": texts_block(TAP_LABELS)}))
+    cells.append(qv2(4,
+                     "Report the materials you recorded (number of spots and taps for each) and include the confusion matrix of your best model.",
+                     "Compare the accuracy from the random split with the accuracy from leave-one-recording-out. Why are they different, and which one better estimates "
+                     "the accuracy on a new spot?",
+                     "Which features separate your materials best (use the scatter plot and the decision tree's rules)? Was the material of your new recording predicted correctly?",
+                     "Would the model still work in another room, with another phone, or with another person tapping? Briefly explain."))
+    return ["table", "chat"]
+
+
+def build_series_v2(variant, v, spec, cells):
+    meters = load_meters(REPO, spec.series.meters)
+    labels = [m.label for m in meters.values()]
+    uses = sorted({m.use for m in meters.values()})
+    ws = variant == "workshop"
+    cells.append(md("# In-Class Activity: Forecasting Building Electricity Use\nIn this activity, we will use AI to explore, forecast, and detect anomalies in the hourly electricity use of four campus buildings."
+                    if ws else
+                    "# Homework: Forecasting Building Electricity Use\nIn this homework, you will repeat the in-class analysis on four other buildings and then collect your own time-series data."))
+    cells.append(step0(variant, "series"))
+
+    cells.append(md(f"""
+## Part 1 · Exploring the Time Series
+The data are the hourly electricity use (kWh) of {WORDS[len(meters)]} buildings on North American university campuses in 2017, with the outdoor air temperature at each site. Unlike a table, a time series is ordered in time and has patterns that repeat (daily, weekly, and seasonal cycles).
+"""))
+    cells.append(wform("▶ Step 1a · Identify the Building Type", "lab.buildings()", T("buildings"),
+                       notes=[f"The plots show one week in March and the whole year for {WORDS[len(meters)]} unlabeled buildings: {', '.join(_article_list(uses))}. "
+                              "Use the daily and weekly patterns to decide which building is which."]))
+    cells.append(wform("▶ Step 1b · Check Your Answers", "lab.buildings_answer(a, b, c, d)", T("buildings_answer"),
+                       params=[choice(k, uses[0], uses) for k in "abcd"]))
+    cells.append(wform("▶ Step 1c · Daily and Weekly Patterns", "lab.anatomy(building)", T("anatomy"),
+                       notes=["Choose a building to see its hourly use over the year, one week in March, and its typical day for each weekday "
+                              "(the median of all such days in 2017)."],
+                       params=[choice("building", labels[0], labels)]))
+    cells.append(qv2(1,
+                     "From Steps 1a and 1b: How many buildings did you identify correctly? Which patterns (daily cycle, weekends, seasons) did you use?",
+                     "From Step 1c: Choose one building and describe its typical weekday, weekend, and seasonal pattern in three sentences."))
+
+    cells.append(md("""
+## Part 2 · Forecasting Next Week
+A forecast predicts future values of a time series from its past. Here, three methods forecast the electricity use for every hour of the week of October 16, 2017 (168 hours), and each forecast is compared with the actual use.
+"""))
+    m1, m2, m3 = list(METHODS)
+    cells.append(wform("▶ Step 2a · Forecast One Week", "lab.forecast(building, method)", T("forecast"),
+                       notes=[f"*{m1}*: repeats the use from the same hour one week earlier. It is the baseline any model should beat.",
+                              f"*{m2}*: gradient-boosted decision trees trained on all data before the test week, with the use one and two weeks earlier, the hour of day, "
+                              "the day of week, and the outdoor temperature as inputs.",
+                              f"*{m3}*: a pretrained time-series foundation model, used zero-shot: it was trained on many other time series and receives only this "
+                              "building's recent history. The shaded area is its 80 % prediction interval."],
+                       params=[choice("building", labels[0], labels), choice("method", "all three", ["all three"] + list(METHODS))]))
+    cells.append(qv2(2,
+                     "From Step 2a: Report the MAE of each method for all four buildings (copy the tables). Which method performs best for each building? "
+                     "Is the seasonal naive baseline ever hard to beat?",
+                     "What does the 80 % prediction interval of Chronos-Bolt mean, and how could a facility manager use it?")
+                 if ws else
+                 qv2(2,
+                     "From Step 2a: Report the MAE of each method for all four buildings (copy the tables). One building is forecast much less accurately than the "
+                     "others by every method: which one, and why (use Step 1c)? What additional information would improve its forecast?"))
+
+    cells.append(md("""
+## Part 3 · Detecting Anomalous Days
+An anomaly is a day whose electricity use departs from the building's typical pattern. For each day, the notebook computes the average deviation from the typical use for that weekday and hour, and converts it into a robust z-score: how many robust standard deviations the day is from normal. Days beyond the threshold are flagged.
+"""))
+    cells.append(wform("▶ Step 3a · Flag Anomalous Days", "lab.odd_days(building, threshold)", T("odd_days"),
+                       notes=["Lower the threshold to flag more days; raise it to keep only the most unusual ones. The table lists the flagged days with the US public holidays."],
+                       params=[choice("building", labels[0], labels), 'threshold = 3.5 #@param {type:"slider", min:2, max:6, step:0.5}']))
+    cells.append(qv2(3,
+                     "From Step 3a (two buildings, threshold 3.5): Which flagged days have an obvious cause (see the holiday column), and which do not? "
+                     "For one unexplained day, what would you check first?",
+                     "What threshold would you choose for an automatic alert, and why?"))
+
+    cells.append(md(f"""
+## Part 4 · The Same Tasks with Generative/Multimodal AI
+Now you will give the same data to {HOKIEAI}: first to forecast the test week, then to identify anomalous days. The notebook compares its outputs with the methods of Steps 2a and 3a.
+"""))
+    cf = T("chat_forecast")
+    cells.append(wform("▶ Step 4a · Forecast with HokieAI", "lab.chat_forecast(building)",
+                       dict(paste_steps_text=steps_default(2, False), paste_prompt_text=FORECAST_PROMPT, **cf),
+                       notes=["Choose a building and run the cell to reveal the instructions and prompt. HokieAI must return all 168 hourly values; "
+                              "if its output stops early, ask it to continue and paste all parts."],
+                       params=[choice("building", labels[0], labels)]))
+    cells.append(wform("▶ Step 4b · Forecast with HokieAI's Data-Analysis Tool", "lab.chat_forecast_tool(building, model)",
+                       dict(steps_text=steps_default(2, True), tool_prompt_text=FORECAST_TOOL_PROMPT, **cf),
+                       notes=[TOOL_NOTE], params=[choice("building", labels[0], labels), choice("model", list(TOOL_MODELS)[0], list(TOOL_MODELS))]))
+    cells.append(wform("▶ Step 4c · Identify Anomalous Days with HokieAI", "lab.chat_odd_days(building)",
+                       dict(paste_steps_text=steps_default(1, False), paste_prompt_text=ODD_DAYS_PROMPT, **T("chat_odd_days")),
+                       notes=["The notebook compares the days HokieAI lists with the days flagged in Step 3a (threshold 3.5) and with the US public holidays."],
+                       params=[choice("building", labels[0], labels)]))
+    cells.append(qv2(4,
+                     "From Steps 4a and 4b (one building): Report HokieAI's MAE without and with its data-analysis tool, next to the three methods of Step 2a.",
+                     "From Step 4c: How many of the flagged days did HokieAI find, and which days did it add? Check one of its reasons against the data or the "
+                     "calendar: is it plausible?",
+                     "Which task suits HokieAI better, forecasting numbers or explaining anomalies, and why?")
+                 if ws else
+                 qv2(4,
+                     "Repeat Steps 4a–4c for the building with the largest forecast error in Step 2a and for one other building. Does HokieAI forecast the difficult "
+                     "building better than the methods of Step 2a?",
+                     "Is HokieAI's explanation of that building's pattern helpful, and how would you verify it?"))
+
+    if not ws:
+        cells.append(md(ACTIVITY))
+        cells.append(form("▶ Step 5 · Your Own Time Series", "lab.upload_app(labels_text=labels_text)",
+                          notes=["Run the cell and open the printed link in a new tab. Upload a CSV with a time column and a value column, choose *time series*, "
+                                 "and click **Run**: the app forecasts the last period from the data before it, with a seasonal naive baseline and gradient-boosted trees."],
+                          texts={"labels_text": texts_block(APP_LABELS)}))
+        cells.append(qv2(5,
+                         "Describe the data you collected: activities, number of sessions, sampling rate, and recording length.",
+                         "From Step 5: Report the forecast MAE for one recording. Does the seasonal naive baseline or the gradient-boosted trees model forecast it better?",
+                         "From HokieAI: Report the features it computed and the accuracy of its classifier with a random split and with whole sessions held out. "
+                         "Why are the two accuracies different, and which one better estimates the accuracy for a new session?"))
+    return ["meters", "forecaster", "chat"]
+
+
+def _article_list(uses):
+    return [("an " if u[0] in "aeiou" else "a ") + u for u in uses[:-1]] + ["and " + ("an " if uses[-1][0] in "aeiou" else "a ") + uses[-1]]
+
 
 if __name__ == "__main__":
     KEEP_TEXT = "--fresh-text" not in sys.argv

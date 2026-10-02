@@ -14,8 +14,8 @@ from sklearn.ensemble import HistGradientBoostingRegressor
 from .config import FORECASTER_ID, HOLIDAYS_2017, HORIZON, TEST_START
 from .data import Meter
 
-METHODS = {"same hour last week": "naive", "decision trees (last weeks + calendar + temperature)": "trees",
-           "Chronos-Bolt (a pretrained forecasting model, zero-shot)": "chronos"}
+METHODS = {"seasonal naive (same hour last week)": "naive", "decision tree (lagged use, calendar, temperature)": "trees",
+           "Chronos-Bolt (pretrained, zero-shot)": "chronos"}
 
 
 @contextlib.contextmanager
@@ -48,6 +48,13 @@ class Forecaster:
     """Chronos-Bolt: a model pretrained on many time series, used as it comes (no training on our meters)."""
 
     def __init__(self, model_id: str = FORECASTER_ID):
+        import os
+        os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")      # Step 0 prints only its ✅ line
+        try:
+            from transformers.utils import logging as hf_logging
+            hf_logging.disable_progress_bar()
+        except Exception:  # noqa: BLE001
+            pass
         import torch
         from chronos import BaseChronosPipeline
         self.device = "cuda" if torch.cuda.is_available() else "cpu"

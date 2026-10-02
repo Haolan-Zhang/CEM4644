@@ -33,12 +33,12 @@ MEASURES = {
     "high_share": "high share (above 800 Hz)",
 }
 MODELS = {
-    "small decision tree (3 questions deep)": lambda: DecisionTreeClassifier(max_depth=3, random_state=0),
-    "nearest neighbors (5 most similar taps vote)": lambda: make_pipeline(StandardScaler(), KNeighborsClassifier(5)),
+    "decision tree (max depth 3)": lambda: DecisionTreeClassifier(max_depth=3, random_state=0),
+    "k-nearest neighbors (k = 5)": lambda: make_pipeline(StandardScaler(), KNeighborsClassifier(5)),
     "logistic regression": lambda: make_pipeline(StandardScaler(), LogisticRegression(max_iter=5000)),
-    "decision trees (gradient boosting)": lambda: HistGradientBoostingClassifier(min_samples_leaf=3, random_state=0),
+    "gradient-boosted trees": lambda: HistGradientBoostingClassifier(min_samples_leaf=3, random_state=0),
 }
-SPLITS = {"random taps (80 % train, 20 % test)": "random", "whole recordings held out (one spot at a time)": "spot"}
+SPLITS = {"random split (80 % of taps train, 20 % test)": "random", "leave-one-recording-out": "spot"}
 
 
 # ----------------------------------------------------------------------------- reading
@@ -176,7 +176,7 @@ def single_recording_materials(df: pd.DataFrame) -> List[str]:
 def confusion(res: pd.DataFrame) -> pd.DataFrame:
     labels = sorted(set(res.material) | set(res.predicted))
     m = pd.crosstab(res.material, res.predicted).reindex(index=labels, columns=labels, fill_value=0)
-    m.index = [f"really {l}" for l in m.index]; m.columns = [f"called {l}" for l in m.columns]
+    m.index = [f"actual: {l}" for l in m.index]; m.columns = [f"predicted: {l}" for l in m.columns]
     return m
 
 

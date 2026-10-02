@@ -30,6 +30,7 @@ class TableSpec:
     close_pct: float = 10                               # an error within this share of the measured value counts as close (chat steps)
     decimals: int = 1                                   # how the target's numbers are shown
     guess_ratio: Optional[Tuple[str, str, str]] = None  # (label, numerator, denominator) worked out for the guessing game
+    pass_below: bool = False                            # pass / fail: True when passing means at or below the threshold (a load limit)
     paste_prompt: str = ""                              # Step 4a's prompt when the data is pasted in (the data follows it)
 
     @property
@@ -105,7 +106,7 @@ ENERGY = TableSpec(
                 "compactness, surface area, wall area and roof area (ft²), overall height (ft), orientation (2 = north, 3 = east, "
                 "4 = south, 5 = west), glazing area (as a share of the floor area), glazing distribution (0-5), and the heating "
                 "load the simulator computed (heating_load, kBtu per ft² of floor)"),
-    close_pct=10, decimals=2,
+    close_pct=10, decimals=2, pass_below=True,
     paste_prompt="""Below are two datasets. The training data contain 614 simulated residential buildings of the same volume but different shapes: relative compactness, surface area, wall area and roof area (ft²), overall height (ft), orientation (2 = north, 3 = east, 4 = south, 5 = west), glazing area (as a share of the floor area), glazing distribution (0-5), and the heating load a building-energy simulator computed in kBtu per ft² of floor (heating_load). The test data contain 30 other buildings (T01–T30) with the same input columns but without heating_load.
 Using the training data, predict the heating load (kBtu/ft²) of each of the 30 buildings in the test data.
 Reply in the following format, one line per building for all 30 buildings. Use plain numbers without commas:

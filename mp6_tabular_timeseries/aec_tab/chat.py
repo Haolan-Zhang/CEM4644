@@ -11,6 +11,7 @@ import pandas as pd
 
 from . import config as C
 from . import models, series, ui
+from .texts import TEXTS, fill, say, text
 
 CHAT_URL = "https://hokie.ai.vt.edu/"
 TEST_N = 30
@@ -51,10 +52,10 @@ def steps_default(n_files: int = 2, attach: bool = True) -> str:
     """The instructions above the prompt box (the notebook cell carries its own copy, which the teacher can edit)."""
     s = "s" if n_files > 1 else ""
     first = (f"1. Download {{files}} with the button{s} below.\n2. Open {{url}} (sign in with your VT account), start a new chat, "
-             f"attach the file{s}, paste the prompt, send.\n" if attach else
-             "1. The data is already inside the prompt below.\n2. Open {url} (sign in with your VT account), start a new chat, "
-             "paste the prompt, send.\n")
-    return first + "3. Copy the whole reply and paste it into the second box.\n4. Click *Score*."
+             f"attach the file{s}, and paste the prompt.\n" if attach else
+             "1. The data is already inside the provided prompt below.\n2. Open {url} (sign in with your VT account), start a new chat, "
+             "and paste the prompt.\n")
+    return first + "3. Copy the predictions from HokieAI and paste them into the box below.\n4. Click *Score* to evaluate the predictions."
 
 
 def _md_html(text: str) -> str:
@@ -67,7 +68,8 @@ def _md_html(text: str) -> str:
     return "<br>".join(t.split("\n"))
 
 
-def _box(files: List[Path], prompt: str, what: str, on_score: Callable[[str], None], attach: bool = True, steps: str = None):
+def _box(files: List[Path], prompt: str, what: str, on_score: Callable[[str], None], attach: bool = True, steps: str = None,
+         reply: str = None):
     """Download buttons, the prompt to copy, a box for the reply, a Score button (the MP5 chat steps' pattern)."""
     import ipywidgets as w
     from IPython.display import display
@@ -96,7 +98,7 @@ def _box(files: List[Path], prompt: str, what: str, on_score: Callable[[str], No
             rows.append(w.HBox([b, o]))
     prompt_box = w.Textarea(value=prompt, layout=w.Layout(width="100%", height="170px" if attach else "220px"),
                             description="prompt", style={"description_width": "60px"})
-    reply_box = w.Textarea(placeholder="paste the chat's whole reply here (extra words are fine)",
+    reply_box = w.Textarea(placeholder=reply or TEXTS["chat_table"]["reply_text"],
                            layout=w.Layout(width="100%", height="160px"), description="reply", style={"description_width": "60px"})
     btn = w.Button(description=what, button_style="primary", layout=w.Layout(width="auto"))
     out = w.Output()
@@ -106,11 +108,11 @@ def _box(files: List[Path], prompt: str, what: str, on_score: Callable[[str], No
             out.clear_output(wait=True)
             text = reply_box.value.strip()
             if not text:
-                print("Paste the reply first."); return
+                print("Paste HokieAI's output first."); return
             try:
                 on_score(text)
             except Exception as e:  # noqa: BLE001
-                print(f"Could not use that reply: {e}")
+                print(f"Could not read that output: {e}")
     btn.on_click(_go)
     display(w.VBox([w.HTML(how), *rows, prompt_box, reply_box, btn, out]))
 
@@ -206,12 +208,22 @@ def table_prompt(lab, give: str = "attach the files", paste_prompt_text=None) ->
     return p
 
 
-def table_tool_prompt(lab, model: str) -> str:
+def tool_prompt_default(spec) -> str:
+    """The analysis-tool prompt; {model}, {train_file}, {test_file}, {n_train} and {n_test} are filled in when the cell runs."""
+    idcol = f"{spec.row_word}_id"
+    return (f"The attached file {{train_file}} contains {{n_train}} {spec.chat_about}. The attached file {{test_file}} contains {{n_test}} other "
+            f"{spec.rows} (T01–T{{n_test}}) with the same input columns but without {spec.target}.\n"
+            f"Use your data-analysis tool (run Python code on the files) to train {{model}} on {{train_file}} to predict {spec.target} from the "
+            f"other columns. Then predict {spec.target} for each {spec.row_word} in {{test_file}}.\n"
+            f"Reply in the following format, one line per {spec.row_word} for all {{n_test}} {spec.rows}. Use plain numbers without commas:\n"
+            f"{idcol}, {spec.target}\nT01, ...\nT02, ...\n...\n\n"
+            "After the list, state in two sentences which model and settings you used and which three input columns mattered most.")
+
+
+def table_tool_prompt(lab, model: str, tool_prompt_text: str = None) -> str:
     spec, d = lab.table_spec, table_files(lab)
-    return (_table_intro(spec, d, True) + f"\n\nUse your data-analysis tool (run Python code on the files): train "
-            f"{TOOL_MODELS.get(model, model)} on {d['tr_path'].name} to predict {spec.target} from the other columns, then use it to "
-            f"predict the {spec.target_label} of each of the {len(d['test'])} {spec.rows} in {d['te_path'].name}. " + _table_form(spec, d)
-            + "\n\nAfter the list, say in two sentences which model and settings you used and which three columns mattered most.")
+    return fill(tool_prompt_text or tool_prompt_default(spec), model=TOOL_MODELS.get(model, model), train_file=d["tr_path"].name,
+                test_file=d["te_path"].name, n_train=len(d["train"]), n_test=len(d["test"]))
 
 
 def parse_rows(text: str) -> Dict[str, float]:
@@ -223,18 +235,19 @@ def parse_rows(text: str) -> Dict[str, float]:
     return out
 
 
-def table_score(lab, text: str, name: str, compare_text=None, plot_text=None):
+def table_score(lab, reply: str, name: str, texts: dict = None):
     spec, d = lab.table_spec, table_files(lab)
-    got = parse_rows(text)
+    G = "chat_table"
+    got = parse_rows(reply)
     ids = list(d["truth"].index)
     have = [i for i in ids if i in got]
     if not have:
-        print("No 'T01, number' lines found in the reply: check that you pasted the whole reply."); return
+        print("No 'T01, number' lines found: check that you pasted HokieAI's full output."); return
     run, new = _add_run(lab, ("table", spec.key), name, {i: got[i] for i in have})
     if not new:
-        print(f"This is the same reply as '{run}': start a new chat for a fresh run.")
+        print(f"This output is identical to '{run}': start a new chat for a new run.")
     if len(have) < len(ids):
-        print(f"The reply has {len(have)} of the {len(ids)} {spec.rows} ({', '.join(i for i in ids if i not in got)} missing); "
+        print(f"The output has {len(have)} of the {len(ids)} {spec.rows} ({', '.join(i for i in ids if i not in got)} missing); "
               f"only those {len(have)} are scored.")
     full = d["truth"]
     truth = full.reindex(have)
@@ -245,7 +258,7 @@ def table_score(lab, text: str, name: str, compare_text=None, plot_text=None):
         p = pred.reindex(rows_); t_ = full.reindex(rows_); e = (p - t_).abs()
         close = int((e <= t_.abs() * spec.close_pct / 100).sum())
         n_ = len(rows_)
-        return {"predicted by": label, f"average error ({spec.unit})": spec.fmt(e.mean()), f"worst error ({spec.unit})": spec.fmt(e.max()),
+        return {"predicted by": label, f"MAE ({spec.unit})": spec.fmt(e.mean()), f"max error ({spec.unit})": spec.fmt(e.max()),
                 f"within {spec.close_pct:g} %": f"{close} of {n_}"}, float(e.mean()), close
     runs = lab.chat_runs[("table", spec.key)]
     rows = []
@@ -255,7 +268,7 @@ def table_score(lab, text: str, name: str, compare_text=None, plot_text=None):
         lab.results[("chat_table", r["name"])] = {"mae": mae, "close": close, "n": len(r["values"])}
     for label, pred in d["ref"].items():
         rows.append(row(label, pred)[0])
-    print(compare_text or COMPARE_TEXT)
+    say(texts, G, "compare_text")
     ui.table(pd.DataFrame(rows))
     if len(have) < len(full):
         same = {label: float((pred.reindex(have) - truth).abs().mean()) for label, pred in d["ref"].items()}
@@ -274,7 +287,7 @@ def table_score(lab, text: str, name: str, compare_text=None, plot_text=None):
     from matplotlib.ticker import StrMethodFormatter
     for axis in (ax.xaxis, ax.yaxis):
         axis.set_major_formatter(StrMethodFormatter("{x:,.%df}" % (0 if spec.decimals == 0 else 1)))
-    ax.set_title(textwrap.fill(plot_text or PLOT_TEXT, 60), fontsize=9); ui.show(fig)
+    ax.set_title(textwrap.fill(fill(text(texts, G, "plot_text")), 60), fontsize=9); ui.show(fig)
 
     chats = [r for r in runs if r["plain"]]
     if len(chats) >= 2:
@@ -282,9 +295,9 @@ def table_score(lab, text: str, name: str, compare_text=None, plot_text=None):
         common = [i for i in a.index if i in b.index]
         diff = (a[common] - b[common]).abs()
         same = int((diff < 0.05).sum()); moved = diff[diff >= 0.05]
-        print(f"Same prompt, two new chats ({chats[0]['name']} and {chats[-1]['name']}): the same number for {same} of {len(common)} {spec.rows}"
-              + (f"; the other {len(moved)} moved by {spec.fmt(moved.mean())} {spec.unit} on average, most on {moved.idxmax()} ({spec.fmt(moved.max())} {spec.unit})."
-                 if len(moved) else "."))
+        say(texts, G, "repeat_text", first=chats[0]["name"], second=chats[-1]["name"], same=same, n=len(common), rows=spec.rows, moved=len(moved),
+            mean_diff=spec.fmt(moved.mean()) if len(moved) else "0", unit=spec.unit,
+            largest_id=moved.idxmax() if len(moved) else "–", largest=spec.fmt(moved.max()) if len(moved) else "0")
     worst = (mine - truth).abs().sort_values(ascending=False).index[:5]
     view = d["test"].set_index(d["idcol"]).loc[list(worst)].copy()
     view.columns = [spec.label(c) for c in view.columns]
@@ -292,25 +305,32 @@ def table_score(lab, text: str, name: str, compare_text=None, plot_text=None):
     view.insert(0, f"{TREES} ({spec.unit})", trees[worst].round(spec.decimals).values)
     view.insert(0, f"actual ({spec.unit})", truth[worst].round(spec.decimals).values)
     view.insert(0, d["idcol"], list(worst))
-    print(f"\nThe {len(worst)} {spec.rows} {run} got most wrong:"); ui.table(view.reset_index(drop=True))
+    say(texts, G, "worst_text", n=len(worst), rows=spec.rows, run=run); ui.table(view.reset_index(drop=True))
 
 
 def _steps(give: str, steps_text, paste_steps_text):
     return steps_text if _attach(give) else paste_steps_text
 
 
+def _texts(texts, **named):
+    return dict(texts or {}, **{k: v for k, v in named.items() if v})
+
+
 def chat_table(lab, give: str = "attach the files", steps_text=None, paste_steps_text=None, paste_prompt_text=None,
-               compare_text=None, plot_text=None):
+               compare_text=None, plot_text=None, texts=None):
+    t = _texts(texts, compare_text=compare_text, plot_text=plot_text)
     d = table_files(lab)
-    _box([d["tr_path"], d["te_path"]], table_prompt(lab, give, paste_prompt_text), f"Score {CHAT_NAME} predictions",
-         lambda text: table_score(lab, text, "chat", compare_text, plot_text), attach=_attach(give),
-         steps=_steps(give, steps_text, paste_steps_text))
+    _box([d["tr_path"], d["te_path"]], table_prompt(lab, give, paste_prompt_text), text(t, "chat_table", "button_text"),
+         lambda reply: table_score(lab, reply, "chat", t), attach=_attach(give),
+         steps=_steps(give, steps_text, paste_steps_text), reply=text(t, "chat_table", "reply_text"))
 
 
-def chat_table_tool(lab, model: str, steps_text=None, compare_text=None, plot_text=None):
+def chat_table_tool(lab, model: str, steps_text=None, compare_text=None, plot_text=None, tool_prompt_text=None, texts=None):
+    t = _texts(texts, compare_text=compare_text, plot_text=plot_text)
     d = table_files(lab)
-    _box([d["tr_path"], d["te_path"]], table_tool_prompt(lab, model), f"Score {CHAT_NAME} predictions",
-         lambda text: table_score(lab, text, f"{CHAT_NAME} + analysis tool, {model}", compare_text, plot_text), attach=True, steps=steps_text)
+    _box([d["tr_path"], d["te_path"]], table_tool_prompt(lab, model, tool_prompt_text), text(t, "chat_table", "button_text"),
+         lambda reply: table_score(lab, reply, f"{CHAT_NAME} + analysis tool, {model}", t), attach=True, steps=steps_text,
+         reply=text(t, "chat_table", "reply_text"))
 
 
 # ============================================================================ the time series
@@ -339,37 +359,50 @@ def series_files(lab, meter_id: str):
     return d
 
 
-def _series_intro(d, attach: bool) -> str:
+FORECAST_PROMPT = (
+    "Below are two datasets for a building on a North American university campus used as {use}. The first contains the building's "
+    "hourly electricity use (kWh) and outdoor air temperature (°F) for the four weeks from {start} to {end}. The second contains the "
+    "outdoor air temperature for the following week, {next_start} to {next_end} (as a weather forecast would provide it).\n"
+    "Forecast the building's electricity use for every hour of that week: {hours} values, from {first_hour} to {last_hour}.\n"
+    "Reply in the following format, one line per hour for all {hours} hours. Use plain numbers without commas:\n"
+    "timestamp, kWh\n{first_hour}, ...\n{second_hour}, ...\n...\n\n"
+    "Hourly electricity use and temperature:\n{history_data}\n\nNext week's temperature:\n{temperature_data}")
+FORECAST_TOOL_PROMPT = (
+    "The attached file {history_file} contains the hourly electricity use (kWh) and outdoor air temperature (°F) of a building on a "
+    "North American university campus used as {use}, for the four weeks from {start} to {end}. The attached file {temperature_file} "
+    "contains the outdoor air temperature for the following week, {next_start} to {next_end}.\n"
+    "Use your data-analysis tool (run Python code on the files) to train {model} on {history_file} to predict hourly electricity use. "
+    "Choose the input features yourself (for example hour of day, day of week, temperature, and the use at the same hour one week "
+    "earlier). Then forecast every hour of the following week with {temperature_file}: {hours} values, from {first_hour} to {last_hour}.\n"
+    "Reply in the following format, one line per hour for all {hours} hours. Use plain numbers without commas:\n"
+    "timestamp, kWh\n{first_hour}, ...\n{second_hour}, ...\n...\n\n"
+    "After the list, state in two sentences which model and which input features you used.")
+ODD_DAYS_PROMPT = (
+    "Below is a dataset for a building on a North American university campus used as {use}: its total daily electricity use (kWh) "
+    "and mean outdoor air temperature (°F) for every day of {year}.\n"
+    "Identify the anomalous days: days whose electricity use does not fit the building's usual pattern. For each, state whether use "
+    "was higher or lower than usual and give the most likely reason.\n"
+    "Reply in the following format, one line per day:\n"
+    "date, higher or lower, reason\n{year}-01-02, lower, ...\n\n"
+    "Daily data:\n{daily_data}")
+
+
+def _series_values(d, model: str = "") -> dict:
     m, h, n = d["meter"], d["hist"], d["next"]
-    return (f"I am a construction student. {'I attached two files' if attach else 'The two files are pasted below'} for a building on a "
-            f"North American university campus that is used as {_article(m.use)}. {d['hist_path'].name} has its electricity use (kWh) "
-            f"and the outdoor air temperature (°F), hour by hour, for the four weeks from {_when(h.index[0])} to {_when(h.index[-1])} "
-            f"{h.index[-1].year}. {d['next_path'].name} has the outdoor temperature for the next week, {_when(n.index[0])} to "
-            f"{_when(n.index[-1])} {n.index[-1].year} (as a weather forecast would give it).")
+    day = lambda ts: f"{ts:%A}, {ts:%B} {ts.day}, {ts.year}"
+    return dict(use=_article(m.use), start=day(h.index[0]), end=day(h.index[-1]), next_start=day(n.index[0]), next_end=day(n.index[-1]),
+                hours=len(n), first_hour=f"{n.index[0]:%Y-%m-%d %H:%M}", second_hour=f"{n.index[1]:%Y-%m-%d %H:%M}",
+                last_hour=f"{n.index[-1]:%Y-%m-%d %H:%M}", history_file=d["hist_path"].name, temperature_file=d["next_path"].name,
+                history_data=d["hist"].to_csv().strip(), temperature_data=d["next"].to_csv().strip(),
+                daily_data=d["daily"].to_csv().strip(), year=d["daily"].index[0][:4], model=TOOL_MODELS.get(model, model))
 
 
-def _series_form(d) -> str:
-    n = d["next"].index
-    return (f"Forecast the building's electricity use for every hour of that next week: {len(n)} values, from "
-            f"{n[0]:%Y-%m-%d %H:%M} to {n[-1]:%Y-%m-%d %H:%M}. Reply in this form, all {len(n)} lines:\n\ntimestamp, kWh\n"
-            f"{n[0]:%Y-%m-%d %H:%M}, ...\n{n[1]:%Y-%m-%d %H:%M}, ...\n...")
+def forecast_prompt(lab, meter_id: str, give: str = "paste the data into the prompt", paste_prompt_text: str = None) -> str:
+    return fill(paste_prompt_text or FORECAST_PROMPT, **_series_values(series_files(lab, meter_id)))
 
 
-def forecast_prompt(lab, meter_id: str, give: str = "attach the files") -> str:
-    d = series_files(lab, meter_id)
-    attach = _attach(give)
-    p = _series_intro(d, attach) + "\n\n" + _series_form(d)
-    if not attach:
-        p += f"\n\n--- {d['hist_path'].name} ---\n{d['hist'].to_csv()}\n--- {d['next_path'].name} ---\n{d['next'].to_csv()}"
-    return p
-
-
-def forecast_tool_prompt(lab, meter_id: str, model: str) -> str:
-    d = series_files(lab, meter_id)
-    return (_series_intro(d, True) + f"\n\nUse your data-analysis tool (run Python code on the files): train {TOOL_MODELS.get(model, model)} "
-            f"on the four weeks in {d['hist_path'].name} to predict the electricity use. Choose the inputs yourself (for example the hour "
-            f"of the day, the day of the week, the temperature, the use at the same hour one week earlier). Then use it with "
-            f"{d['next_path'].name}. " + _series_form(d) + "\n\nAfter the list, say in two sentences which model and which inputs you used.")
+def forecast_tool_prompt(lab, meter_id: str, model: str, tool_prompt_text: str = None) -> str:
+    return fill(tool_prompt_text or FORECAST_TOOL_PROMPT, **_series_values(series_files(lab, meter_id), model))
 
 
 def parse_hours(text: str, index: pd.DatetimeIndex) -> pd.Series:
@@ -387,21 +420,23 @@ def parse_hours(text: str, index: pd.DatetimeIndex) -> pd.Series:
     return pd.Series(np.nan, index=index)
 
 
-def forecast_score(lab, meter_id: str, text: str, name: str):
+def forecast_score(lab, meter_id: str, reply: str, name: str, texts: dict = None):
+    G = "chat_forecast"
     d = series_files(lab, meter_id); m = d["meter"]
     _, actual = series.test_window(m)
-    pred = parse_hours(text, actual.index)
+    pred = parse_hours(reply, actual.index)
     n = int(pred.notna().sum())
     if n == 0:
-        print("No 'timestamp, kWh' lines found in the reply: check that you pasted the whole reply."); return
+        print("No 'timestamp, kWh' lines found: check that you pasted HokieAI's full output."); return
     run, new = _add_run(lab, ("forecast", m.id), name, {str(k): v for k, v in pred.dropna().items()})
     if not new:
-        print(f"This is the same reply as '{run}': start a new chat for a fresh run.")
+        print(f"This output is identical to '{run}': start a new chat for a new run.")
     if n < len(actual):
-        print(f"The reply has {n} of the {len(actual)} hours; only those are scored (the chat stopped early or skipped hours).")
+        print(f"The output has {n} of the {len(actual)} hours; only those are scored.")
     ok = (pred.notna() & actual.notna()).values
+    week = f"{actual.index[0]:%B %-d, %Y}"
     fig, ax = plt.subplots(figsize=(14, 4))
-    ax.plot(actual.index, actual.values, "k", lw=1.8, label="what really happened")
+    ax.plot(actual.index, actual.values, "k", lw=1.8, label=fill(text(texts, "forecast", "actual_text")))
     rows = []
     colors = {"naive": ui.GREY, "trees": ui.GREEN, "chronos": ui.RED}
     for meth in series.METHODS:
@@ -410,7 +445,7 @@ def forecast_score(lab, meter_id: str, text: str, name: str):
         f = series.forecast(m, meth, lab.forecaster)
         mae = float(np.mean(np.abs(f.median[ok] - actual.values[ok])))
         ax.plot(actual.index, f.median, color=colors[f.method], lw=1, alpha=0.7, label=meth)
-        rows.append((meth + " (Step 2a)", f"{mae:.1f}", f"{mae / actual.mean() * 100:.0f} %", f"{len(actual)}"))
+        rows.append((meth, f"{mae:.1f}", f"{mae / actual.mean() * 100:.0f} %", f"{len(actual)}"))
     chat_rows = []
     for r in lab.chat_runs[("forecast", m.id)]:
         s = pd.Series({pd.Timestamp(k): v for k, v in r["values"].items()}).reindex(actual.index)
@@ -419,46 +454,41 @@ def forecast_score(lab, meter_id: str, text: str, name: str):
         lab.results[("chat_forecast", m.id, r["name"])] = mae
         chat_rows.append((("▶ " if r["name"] == run else "") + r["name"], f"{mae:.1f}", f"{mae / actual.mean() * 100:.0f} %", f"{int(s.notna().sum())}"))
     ax.plot(pred.index, pred.values, color=ORANGE, lw=2, label=run)
-    ax.set_title(f"{m.label}: the week of {actual.index[0].date()}", fontsize=11); ax.set_ylabel("kWh"); ax.legend(fontsize=8, ncol=5)
+    ax.set_title(fill(text(texts, G, "plot_text"), building=m.label, week=week), fontsize=11); ax.set_ylabel("kWh"); ax.legend(fontsize=8, ncol=5)
     ui.show(fig)
-    ui.table(pd.DataFrame(chat_rows + rows, columns=["forecast", "average error (kWh per hour)", "as a share of the mean load", "hours given"]))
-    print("The chat saw four weeks of history; the notebook's methods saw the whole year up to the same Monday. "
-          + ("All are scored on the same hours." if n == len(actual) else f"The notebook's methods are scored on the {int(ok.sum())} hours this reply gave."))
+    say(texts, G, "compare_text")
+    ui.table(pd.DataFrame(chat_rows + rows, columns=["forecast", "MAE (kWh per hour)", "MAE / mean load", "hours scored"]))
+    say(texts, G, "note_text", week=week)
 
 
-def chat_forecast(lab, meter_id: str, give: str = "attach the files", steps_text=None, paste_steps_text=None):
+def chat_forecast(lab, meter_id: str, give: str = "paste the data into the prompt", steps_text=None, paste_steps_text=None,
+                  paste_prompt_text=None, texts=None):
     d = series_files(lab, meter_id)
-    _box([d["hist_path"], d["next_path"]], forecast_prompt(lab, meter_id, give), f"Score {CHAT_NAME} predictions",
-         lambda text: forecast_score(lab, meter_id, text, "chat"), attach=_attach(give), steps=_steps(give, steps_text, paste_steps_text))
+    t = texts or {}
+    _box([d["hist_path"], d["next_path"]], forecast_prompt(lab, meter_id, give, paste_prompt_text), text(t, "chat_forecast", "button_text"),
+         lambda reply: forecast_score(lab, meter_id, reply, "chat", t), attach=False,
+         steps=paste_steps_text or (steps_text if not _attach(give) else None) or steps_default(2, False), reply=text(t, "chat_forecast", "reply_text"))
 
 
-def chat_forecast_tool(lab, meter_id: str, model: str, steps_text=None):
+def chat_forecast_tool(lab, meter_id: str, model: str, steps_text=None, tool_prompt_text=None, texts=None):
     d = series_files(lab, meter_id)
-    _box([d["hist_path"], d["next_path"]], forecast_tool_prompt(lab, meter_id, model), f"Score {CHAT_NAME} predictions",
-         lambda text: forecast_score(lab, meter_id, text, f"{CHAT_NAME} + analysis tool, {model}"), attach=True, steps=steps_text)
+    t = texts or {}
+    _box([d["hist_path"], d["next_path"]], forecast_tool_prompt(lab, meter_id, model, tool_prompt_text), text(t, "chat_forecast", "button_text"),
+         lambda reply: forecast_score(lab, meter_id, reply, f"{CHAT_NAME} + analysis tool, {model}", t), attach=True, steps=steps_text,
+         reply=text(t, "chat_forecast", "reply_text"))
 
 
 # ---------------------------------------------------------------------------- odd days
-def oddday_prompt(lab, meter_id: str, give: str = "attach the files") -> str:
-    d = series_files(lab, meter_id); m = d["meter"]
-    attach = _attach(give)
-    y = d["daily"].index[0][:4]
-    p = (f"I am a construction student. {'I attached' if attach else 'Below is'} {d['daily_path'].name}: a building on a North American "
-         f"university campus that is used as {_article(m.use)}, with its total electricity use (kWh) and the mean outdoor temperature (°F) "
-         f"for every day of {y}.\n\nWhich days do not fit the building's usual pattern? List every such day, say whether use was higher "
-         f"or lower than usual, and give the most likely reason. Reply in this form, one line per day:\n\n"
-         f"date, higher or lower, reason\n{y}-01-02, lower, ...")
-    if not attach:
-        p += f"\n\n--- {d['daily_path'].name} ---\n{d['daily'].to_csv()}"
-    return p
+def oddday_prompt(lab, meter_id: str, give: str = "paste the data into the prompt", paste_prompt_text: str = None) -> str:
+    return fill(paste_prompt_text or ODD_DAYS_PROMPT, **_series_values(series_files(lab, meter_id)))
 
 
-def parse_days(text: str, year: int) -> Dict[pd.Timestamp, Tuple[str, str]]:
+def parse_days(text_: str, year: int) -> Dict[pd.Timestamp, Tuple[str, str]]:
     """Each date in the reply, with 'higher' / 'lower' and the words after it (up to the next date)."""
-    hits = list(re.finditer(rf"\b{year}-\d{{2}}-\d{{2}}\b", text))
+    hits = list(re.finditer(rf"\b{year}-\d{{2}}-\d{{2}}\b", text_))
     out = {}
     for k, h in enumerate(hits):
-        seg = text[h.end(): hits[k + 1].start() if k + 1 < len(hits) else len(text)]
+        seg = text_[h.end(): hits[k + 1].start() if k + 1 < len(hits) else len(text_)]
         way = re.search(r"\b(higher|lower|high|low|above|below|spike|dip|drop)\b", seg, re.I)
         w_ = "" if not way else ("higher" if way.group(1).lower() in ("higher", "high", "above", "spike") else "lower")
         reason = re.sub(r"^[\s,;:|*\-–]*(higher|lower)?[\s,;:|*\-–]*", "", seg.strip(), flags=re.I).strip().split("\n")[0]
@@ -469,13 +499,14 @@ def parse_days(text: str, year: int) -> Dict[pd.Timestamp, Tuple[str, str]]:
     return out
 
 
-def oddday_score(lab, meter_id: str, text: str, threshold: float = 3.5):
+def oddday_score(lab, meter_id: str, reply: str, threshold: float = 3.5, texts: dict = None):
+    G = "chat_odd_days"
     d = series_files(lab, meter_id); m = d["meter"]
     rule = series.odd_days(m, threshold)
-    got = parse_days(text, rule.index[0].year)
+    got = parse_days(reply, rule.index[0].year)
     got = {k: v for k, v in got.items() if k in rule.index}
     if not got:
-        print(f"No dates like {rule.index[0].year}-01-02 found in the reply: check that you pasted the whole reply."); return
+        print(f"No dates like {rule.index[0].year}-01-02 found: check that you pasted HokieAI's full output."); return
     flagged = set(rule.index[rule.flag]); said = set(got)
     both, missed, extra = said & flagged, flagged - said, said - flagged
     hol = {pd.Timestamp(k) for k in C.HOLIDAYS_2017}
@@ -483,25 +514,27 @@ def oddday_score(lab, meter_id: str, text: str, threshold: float = 3.5):
     fig, ax = plt.subplots(figsize=(14, 3.4))
     ax.bar(rule.index, rule.deviation_kWh_per_h, width=1, color=np.where(rule.flag, ui.RED, ui.BLUE))
     ys = rule.deviation_kWh_per_h.reindex(sorted(said))
-    ax.scatter(ys.index, ys.values, marker="v", s=50, color=ORANGE, zorder=3, label="a day the chat listed")
-    ax.set_ylabel("kWh per hour above (+) or below (-) the usual day"); ax.legend(fontsize=8)
-    ax.set_title(f"{m.label}: red = flagged by the notebook's rule (threshold {threshold:g}), orange = listed by the chat", fontsize=11)
+    ax.scatter(ys.index, ys.values, marker="v", s=50, color=ORANGE, zorder=3, label=CHAT_NAME)
+    ax.set_ylabel(fill(text(texts, "odd_days", "axis_text"))); ax.legend(fontsize=8)
+    ax.set_title(fill(text(texts, G, "plot_text"), building=m.label, threshold=f"{threshold:g}"), fontsize=11)
     ui.show(fig)
-    print(f"The chat listed {len(said)} days. The notebook's rule (Step 3a, threshold {threshold:g}) flags {len(flagged)}: "
-          f"the chat found {len(both)} of them, missed {len(missed)} and added {len(extra)} the rule does not flag.")
-    print(f"Public holidays in the year: {len(hol)}; the chat listed {len(said & hol)} of them, the rule flags {len(flagged & hol)}.")
+    say(texts, G, "summary_text", listed=len(said), threshold=f"{threshold:g}", flagged=len(flagged), found=len(both), missed=len(missed), extra=len(extra))
+    say(texts, G, "holidays_text", holidays=len(hol), chat_holidays=len(said & hol), rule_holidays=len(flagged & hol))
     rows = []
     for day in sorted(said | flagged):
         w_, why = got.get(day, ("", ""))
         r = rule.loc[day]
-        verdict = "found" if day in both else ("missed by the chat" if day in missed else "only the chat")
-        rows.append({"date": day.strftime("%Y-%m-%d"), "weekday": r.weekday, "match": verdict,
-                     "the rule": (f"{'higher' if r.deviation_kWh_per_h > 0 else 'lower'} (z {r.z:+.1f})" if r.flag else f"not flagged (z {r.z:+.1f})"),
-                     "the chat": (w_ or "?") if day in said else "—", "the chat's reason": why, "holiday": r.holiday})
+        verdict = "both" if day in both else ("rule only" if day in missed else f"{CHAT_NAME} only")
+        rows.append({"date": day.strftime("%Y-%m-%d"), "weekday": r.weekday, "flagged by": verdict,
+                     "z-score": f"{r.z:+.1f}", f"{CHAT_NAME}": (w_ or "?") if day in said else "—",
+                     f"{CHAT_NAME}'s reason": why, "holiday": r.holiday})
     ui.table(pd.DataFrame(rows), max_rows=80)
 
 
-def chat_odd_days(lab, meter_id: str, give: str = "attach the files", steps_text=None, paste_steps_text=None):
+def chat_odd_days(lab, meter_id: str, give: str = "paste the data into the prompt", steps_text=None, paste_steps_text=None,
+                  paste_prompt_text=None, texts=None):
     d = series_files(lab, meter_id)
-    _box([d["daily_path"]], oddday_prompt(lab, meter_id, give), f"Score {CHAT_NAME} predictions",
-         lambda text: oddday_score(lab, meter_id, text), attach=_attach(give), steps=_steps(give, steps_text, paste_steps_text))
+    t = texts or {}
+    _box([d["daily_path"]], oddday_prompt(lab, meter_id, give, paste_prompt_text), text(t, "chat_odd_days", "button_text"),
+         lambda reply: oddday_score(lab, meter_id, reply, texts=t), attach=False,
+         steps=paste_steps_text or (steps_text if not _attach(give) else None) or steps_default(1, False), reply=text(t, "chat_odd_days", "reply_text"))

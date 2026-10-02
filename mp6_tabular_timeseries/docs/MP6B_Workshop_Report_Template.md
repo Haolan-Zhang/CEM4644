@@ -8,7 +8,9 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-From Step 1: which buildings did you get right, and from what (the shape of the day, the weekend, the summer)? Pick one building in Step 1c and describe its week in three sentences a facilities manager would recognize.
+From Steps 1a and 1b: How many buildings did you identify correctly? Which patterns (daily cycle, weekends, seasons) did you use?
+
+From Step 1c: Choose one building and describe its typical weekday, weekend, and seasonal pattern in three sentences.
 
 *Your answer:*
 
@@ -16,7 +18,9 @@ From Step 1: which buildings did you get right, and from what (the shape of the 
 
 ## Question 2
 
-From Step 2a on all four buildings: the average error of each method (copy the tables). Which method wins where, and is 'same hour last week' ever hard to beat? What does the shaded band of the pretrained model mean, and how would you use it when planning a site's power supply?
+From Step 2a: Report the MAE of each method for all four buildings (copy the tables). Which method performs best for each building? Is the seasonal naive baseline ever hard to beat?
+
+What does the 80 % prediction interval of Chronos-Bolt mean, and how could a facility manager use it?
 
 *Your answer:*
 
@@ -24,7 +28,9 @@ From Step 2a on all four buildings: the average error of each method (copy the t
 
 ## Question 3
 
-From Step 3a on two buildings: the flagged days at threshold 3.5. Which have an obvious cause (the calendar column), which do not? For one unexplained day, say what you would check first. What threshold would you set for an automatic alert, and why?
+From Step 3a (two buildings, threshold 3.5): Which flagged days have an obvious cause (see the holiday column), and which do not? For one unexplained day, what would you check first?
+
+What threshold would you choose for an automatic alert, and why?
 
 *Your answer:*
 
@@ -32,7 +38,11 @@ From Step 3a on two buildings: the flagged days at threshold 3.5. Which have an 
 
 ## Question 4
 
-From Step 4a and 4b on one building: the chat's average error on its own and with its analysis tool, next to the three methods of Step 2a (copy the table). Did it give all 168 hours, and did two new chats agree? From Step 4c: how many of the notebook's flagged days the chat found, which days it added, and whether its reasons are believable (check one against the calendar). Which job suits the chat better, forecasting numbers or explaining odd days, and why?
+From Steps 4a and 4b (one building): Report HokieAI's MAE without and with its data-analysis tool, next to the three methods of Step 2a.
+
+From Step 4c: How many of the flagged days did HokieAI find, and which days did it add? Check one of its reasons against the data or the calendar: is it plausible?
+
+Which task suits HokieAI better, forecasting numbers or explaining anomalies, and why?
 
 *Your answer:*
 

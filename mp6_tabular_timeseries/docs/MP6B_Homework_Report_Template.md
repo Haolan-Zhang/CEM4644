@@ -8,7 +8,9 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-From Step 1: which buildings did you get right, and from what (the shape of the day, the weekend, the summer)? Pick one building in Step 1c and describe its week in three sentences a facilities manager would recognize.
+From Steps 1a and 1b: How many buildings did you identify correctly? Which patterns (daily cycle, weekends, seasons) did you use?
+
+From Step 1c: Choose one building and describe its typical weekday, weekend, and seasonal pattern in three sentences.
 
 *Your answer:*
 
@@ -16,7 +18,7 @@ From Step 1: which buildings did you get right, and from what (the shape of the 
 
 ## Question 2
 
-From Step 2a on all four buildings: the average error of each method. One of these buildings forecasts far worse than the others, whichever method you use: which one, why (look at Step 1c), and what extra information would a forecaster need?
+From Step 2a: Report the MAE of each method for all four buildings (copy the tables). One building is forecast much less accurately than the others by every method: which one, and why (use Step 1c)? What additional information would improve its forecast?
 
 *Your answer:*
 
@@ -24,7 +26,9 @@ From Step 2a on all four buildings: the average error of each method. One of the
 
 ## Question 3
 
-From Step 3a on two buildings: the flagged days at threshold 3.5. Which have an obvious cause (the calendar column), which do not? For one unexplained day, say what you would check first. What threshold would you set for an automatic alert, and why?
+From Step 3a (two buildings, threshold 3.5): Which flagged days have an obvious cause (see the holiday column), and which do not? For one unexplained day, what would you check first?
+
+What threshold would you choose for an automatic alert, and why?
 
 *Your answer:*
 
@@ -32,7 +36,9 @@ From Step 3a on two buildings: the flagged days at threshold 3.5. Which have an 
 
 ## Question 4
 
-Steps 4a to 4c on the building that forecast worst in Step 2a and on one other: the chat's average error on its own and with its analysis tool against Step 2a's methods, and the odd days it found. Does the chat do better than the notebook on the hard building? Does its explanation of that building's pattern help you, and how would you check whether it is true?
+Repeat Steps 4a–4c for the building with the largest forecast error in Step 2a and for one other building. Does HokieAI forecast the difficult building better than the methods of Step 2a?
+
+Is HokieAI's explanation of that building's pattern helpful, and how would you verify it?
 
 *Your answer:*
 
@@ -40,7 +46,11 @@ Steps 4a to 4c on the building that forecast worst in Step 2a and on one other: 
 
 ## Question 5
 
-The main deliverable: find or make a time series of your own (a utility bill history, a site's weather, daily progress or deliveries). Run it through Step 5 and report what the data is, what the app found, and what you would need to trust the forecast. Then give the same file to the chat and ask it to use its analysis tool to forecast the same period: does it agree with the app?
+Describe the data you collected: activities, number of sessions, sampling rate, and recording length.
+
+From Step 5: Report the forecast MAE for one recording. Does the seasonal naive baseline or the gradient-boosted trees model forecast it better?
+
+From HokieAI: Report the features it computed and the accuracy of its classifier with a random split and with whole sessions held out. Why are the two accuracies different, and which one better estimates the accuracy for a new session?
 
 *Your answer:*
 
