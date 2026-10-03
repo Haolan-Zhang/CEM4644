@@ -83,3 +83,80 @@ def schedule(reply: str, key: List[dict]) -> dict:
         rows.append({"mark": k["mark"], "answer key": " | ".join(k[f] for f in FIELDS[1:]),
                      "HokieAI": " | ".join(g[1:]) if g else "—", "": "✓" if all(same) else "✗"})
     return {"right": exact, "n": len(key), "fields_right": fields, "fields": len(key) * len(FIELDS), "listed": len(got), "table": pd.DataFrame(rows)}
+
+
+# ---------------------------------------------------------------------------- submittal review
+RULES = {
+    "concrete": [("wcm", r"w\s*/\s*c|water[- /]*(to[- ])?cement|water-cementitious|water/cementitious"),
+                 ("content", r"cementitious (material(s)? )?content|minimum cementitious|cement(itious)? content|total cementitious"),
+                 ("slump", r"slump"), ("air", r"\bair\b|entrain"), ("aggregate", r"aggregate|nominal max"), ("strength", r"strength|f.?c\b|psi")],
+    "masonry": [("masonry_cement", r"masonry cement"), ("mortar_air", r"\bair\b|entrain"), ("grout_consistency", r"slump|flow|vsi|visual stability"),
+                ("grout_strength", r"strength|psi"), ("grout_type", r"\bfine\b|coarse|grout type|c476"), ("mortar_type", r"mortar type|type [nsmo]\b|c270|mortar")],
+}
+
+
+REQUIREMENT_NAMES = {"strength": "compressive strength (f'c)", "slump": "slump", "aggregate": "nominal maximum aggregate size",
+                     "wcm": "water-cementitious ratio (w/cm)", "air": "air content / air entrainment", "content": "minimum cementitious content",
+                     "mortar_type": "mortar type", "masonry_cement": "masonry cement", "mortar_air": "air entrainment in mortar",
+                     "grout_type": "grout type (fine / coarse)", "grout_consistency": "grout slump / slump flow / VSI", "grout_strength": "grout compressive strength"}
+
+
+def submittal(reply: str, problem: dict) -> dict:
+    """NONCOMPLIANT lines → the requirements flagged; every checked requirement counts as one decision."""
+    flagged, unknown = set(), []
+    for line in reply.splitlines():
+        m = re.match(r"\s*[-*`]*\s*NONCOMPLIANT\s*[*`]*\s*\|\s*(.+)", line, re.I)
+        if not m:
+            continue
+        body = m.group(1).strip().lower()
+        if body.startswith("none"):
+            continue
+        cat = next((c for c, rx in RULES[problem["family"]] if re.search(rx, body)), None)
+        (flagged.add(cat) if cat else unknown.append(body))
+    planted = {k["item"] for k in problem["key"]}
+    names = {k["item"]: k["name"] for k in problem["key"]}
+    rows, right = [], 0
+    for item in problem["checked"]:
+        dev, flag = item in planted, item in flagged
+        right += dev == flag
+        rows.append({"requirement": REQUIREMENT_NAMES.get(item, names.get(item, item)), "answer key": "noncompliant" if dev else "complies",
+                     "HokieAI": "noncompliant" if flag else "complies", "": "✓" if dev == flag else "✗"})
+    false = len(flagged - planted) + len(unknown)
+    return {"right": right, "n": len(problem["checked"]), "found": len(planted & flagged), "planted": len(planted), "false": false,
+            "table": pd.DataFrame(rows)}
+
+
+# ---------------------------------------------------------------------------- contract questions
+def _norm(s: str) -> str:
+    return re.sub(r"\s+", " ", str(s).replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"').replace("–", "-").replace("—", "-")).strip().lower()
+
+
+def contract(reply: str, questions: List[dict], clauses: str) -> dict:
+    lines = {}
+    for m in re.finditer(r"^\s*[*`]*\s*(Q\d\d)\s*[*`]*\s*[|.:)]\s*(.+)$", reply, re.M):
+        lines.setdefault(m.group(1), m.group(2))
+    ctext = _norm(clauses)
+    rows, right, made_up, quotes, verified = [], 0, 0, 0, 0
+    for q in questions:
+        parts = [p.strip() for p in lines.get(q["id"], "").split("|")]
+        ans = parts[0] if parts and parts[0] else ""
+        a = _norm(ans)
+        said_none = bool(re.search(r"not in (the )?text|not stated|not specified|not provided|not addressed|left blank|\bblank\b|does not (say|state|specify)|no (amount|number) (is )?(given|stated|specified)", a))
+        if q["answerable"]:
+            ok = bool(a) and not said_none and all(
+                (sum(bool(re.search(rx, a)) for rx in g["any"]) >= g["min"]) if isinstance(g, dict) else any(re.search(rx, a) for rx in g)
+                for g in q["patterns"])
+        else:
+            ok = said_none
+            made_up += bool(a) and not said_none
+        right += ok
+        quote = parts[-1] if len(parts) >= 2 else ""
+        qv = "—"
+        if quote and quote not in ("-", "—") and not re.match(r"^(far )?52\.\d", _norm(quote)):
+            quotes += 1
+            qt = _norm(quote).strip('"\'').rstrip(".").strip()
+            hit = len(qt) > 15 and (qt in ctext or all(seg.strip() in ctext for seg in re.split(r"\.\.\.|…", qt) if len(seg.strip()) > 15))
+            verified += hit; qv = "✓" if hit else "✗"
+        rows.append({"question": q["id"], "answer key": q["key"], "HokieAI": ans[:120] or "—", "": "✓" if ok else "✗", "quote found": qv})
+    return {"right": right, "n": len(questions), "made_up": made_up, "unanswerable": sum(not q["answerable"] for q in questions),
+            "quotes": quotes, "verified": verified, "table": pd.DataFrame(rows)}

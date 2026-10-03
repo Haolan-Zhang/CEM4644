@@ -65,6 +65,35 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "result_text": "**{version}, {sheet}:** {right} of {n} doors transcribed exactly ({fields_right} of {fields} fields right).",
         "table_text": "Answer key vs. HokieAI's output:",
     },
+    "submittals": {
+        "v1_prompt_text": "Review the submittal below against the specification excerpt. List every noncompliance.\n{final}\n\nSpecification:\n{spec}\nSubmittal:\n{submittal}",
+        "v2_prompt_text": ("You are a project engineer reviewing a submittal. First list every requirement in the specification excerpt that applies to the "
+                           "submittal's intended use. Then compare the submittal with each requirement, one by one, and decide whether it complies.\n{final}"
+                           "\n\nSpecification:\n{spec}\nSubmittal:\n{submittal}"),
+        "v3_prompt_text": ("You are a project engineer reviewing a submittal. First list every requirement in the specification excerpt that applies to the "
+                           "submittal's intended use. Then compare the submittal with each requirement, one by one, in a table with the columns: "
+                           "requirement | required value | submitted value | complies (YES or NO). Compute any value the submittal does not state "
+                           "directly (for example, w/cm = water / total cementitious materials).\n{final}\n\nSpecification:\n{spec}\nSubmittal:\n{submittal}"),
+        "final_text": ("End your reply with one line per noncompliance, in this format:\nNONCOMPLIANT | <requirement> | <submitted value> | <required value>\n"
+                       "If the submittal complies with every requirement, end with: NONCOMPLIANT | none"),
+        "steps_text": PASTE_STEPS,
+        **BOX,
+        "result_text": "**{version}, {submittal}:** {right} of {n} requirements judged correctly; noncompliances found {found} of {planted}, false flags {false}.",
+        "table_text": "Answer key vs. HokieAI's output (each requirement the submittal is checked against):",
+    },
+    "contract": {
+        "v1_prompt_text": "Answer the questions about the construction contract clauses below.\nReply with one line per question: Q01 | answer\n\nQuestions:\n{questions}\n\nContract clauses:\n{clauses}",
+        "v2_prompt_text": ("Answer the questions about the construction contract clauses below. For each question, quote the sentence of the contract that "
+                           "supports your answer.\nReply with one line per question: Q01 | answer | exact quote\n\nQuestions:\n{questions}\n\nContract clauses:\n{clauses}"),
+        "v3_prompt_text": ("You are a contract administrator. Answer each question using only the contract clauses below; do not use outside knowledge.\n"
+                           "Reply with one line per question: Q01 | short answer | FAR clause number | exact quote of the supporting sentence, copied word for word\n"
+                           "If the clauses do not answer the question, reply: Q01 | NOT IN TEXT | - | -\n\nQuestions:\n{questions}\n\nContract clauses:\n{clauses}"),
+        "steps_text": PASTE_STEPS,
+        **BOX,
+        "result_text": ("**{version}:** {right} of {n} questions answered correctly; {made_up} of the {unanswerable} questions the clauses do not answer were "
+                        "given an answer anyway; {verified} of {quotes} quotes found word for word in the clauses."),
+        "table_text": "Answer key vs. HokieAI's output:",
+    },
     "compare": {
         "title_text": "Share of correct outputs by prompt version",
         "table_text": "All scored outputs so far:",

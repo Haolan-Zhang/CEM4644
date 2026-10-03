@@ -1,0 +1,328 @@
+[
+ {
+  "id": "Q01",
+  "question": "Within how many days after the work commences must the Contractor submit its construction schedule, and how many copies?",
+  "key": "Within five days; three copies",
+  "clauses": [
+   "52.236-15"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "\\b(five|5)\\b"
+   ],
+   [
+    "\\b(three|3)\\b"
+   ]
+  ]
+ },
+ {
+  "id": "Q02",
+  "question": "What may the Contracting Officer do if the Contractor fails to submit the schedule within the time prescribed?",
+  "key": "Withhold approval of progress payments until the schedule is submitted",
+  "clauses": [
+   "52.236-15"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "withh[oe]ld"
+   ],
+   [
+    "progress payment"
+   ]
+  ]
+ },
+ {
+  "id": "Q03",
+  "question": "What is the maximum percentage the Contracting Officer may retain from a progress payment when satisfactory progress has not been made?",
+  "key": "10 percent",
+  "clauses": [
+   "52.232-5"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "\\b10\\b",
+    "\\bten\\b"
+   ]
+  ]
+ },
+ {
+  "id": "Q04",
+  "question": "Progress payments on undefinitized contract actions may not exceed what percentage of the work accomplished?",
+  "key": "80 percent",
+  "clauses": [
+   "52.232-5"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "\\b80\\b",
+    "eighty"
+   ]
+  ]
+ },
+ {
+  "id": "Q05",
+  "question": "How many calendar days after receiving the notice to proceed must the Contractor commence work?",
+  "key": "NOT IN TEXT (the number is left blank for the Contracting Officer to insert)",
+  "clauses": [
+   "52.211-10"
+  ],
+  "answerable": false,
+  "patterns": null
+ },
+ {
+  "id": "Q06",
+  "question": "How long does the Contractor's warranty of construction last, and from what date?",
+  "key": "1 year from the date of final acceptance (or from the date the Government takes possession, if earlier)",
+  "clauses": [
+   "52.246-21"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "\\b(1|one)[- ]year"
+   ],
+   [
+    "accept"
+   ]
+  ]
+ },
+ {
+  "id": "Q07",
+  "question": "If the Government takes possession of part of the work before final acceptance, when does the warranty on that part begin, and does the possession count as acceptance?",
+  "key": "The 1-year warranty runs from the date the Government takes possession; possession is not an acceptance of the work",
+  "clauses": [
+   "52.246-21",
+   "52.236-11"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "possession"
+   ],
+   [
+    "not (be )?(deemed |considered )?(an )?accept",
+    "no acceptance",
+    "does not (constitute|count as|amount to)",
+    "isn.t (an )?accept",
+    "\\bnot\\b.*\\baccept"
+   ]
+  ]
+ },
+ {
+  "id": "Q08",
+  "question": "Within how many days from the beginning of a delay must the Contractor notify the Contracting Officer in writing of its causes, for the delay to be excused under the Default clause?",
+  "key": "10 days",
+  "clauses": [
+   "52.249-10"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "\\b10\\b",
+    "\\bten\\b"
+   ]
+  ]
+ },
+ {
+  "id": "Q09",
+  "question": "What is the dollar amount of liquidated damages per calendar day of delay?",
+  "key": "NOT IN TEXT (the amount is left blank)",
+  "clauses": [
+   "52.211-12"
+  ],
+  "answerable": false,
+  "patterns": null
+ },
+ {
+  "id": "Q10",
+  "question": "Name three causes of delay that the Default clause gives as examples of unforeseeable causes beyond the Contractor's control.",
+  "key": "Any three of: acts of God or of the public enemy, acts of the Government, acts of another contractor, fires, floods, epidemics, quarantine restrictions, strikes, freight embargoes, unusually severe weather, certain subcontractor or supplier delays",
+  "clauses": [
+   "52.249-10"
+  ],
+  "answerable": true,
+  "patterns": [
+   {
+    "min": 3,
+    "any": [
+     "god",
+     "public enemy",
+     "acts? of the government",
+     "another contractor",
+     "\\bfires?\\b",
+     "\\bfloods?\\b",
+     "epidemic",
+     "quarantine",
+     "strikes?\\b",
+     "embargo",
+     "severe weather",
+     "subcontractor"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "Q11",
+  "question": "Under the Changes clause, within how many days after receiving a written change order must the Contractor assert its right to an adjustment?",
+  "key": "30 days",
+  "clauses": [
+   "52.243-4"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "\\b30\\b",
+    "thirty"
+   ]
+  ]
+ },
+ {
+  "id": "Q12",
+  "question": "Both the Changes clause (for changes under its paragraph (b)) and the Suspension of Work clause limit the costs that can be recovered from before the Contractor's written notice. How many days is the limit in each clause?",
+  "key": "20 days in both",
+  "clauses": [
+   "52.243-4",
+   "52.242-14"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "\\b20\\b",
+    "twenty"
+   ]
+  ]
+ },
+ {
+  "id": "Q13",
+  "question": "Is profit included in the adjustment for an unreasonable suspension, delay, or interruption of the work?",
+  "key": "No (excluding profit)",
+  "clauses": [
+   "52.242-14"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "\\bno\\b",
+    "exclud",
+    "not (be )?(included|recoverable|allowed)"
+   ]
+  ]
+ },
+ {
+  "id": "Q14",
+  "question": "What insurance coverage limits must the Contractor carry?",
+  "key": "NOT IN TEXT",
+  "clauses": [],
+  "answerable": false,
+  "patterns": null
+ },
+ {
+  "id": "Q15",
+  "question": "If the drawings and the specifications differ, which governs?",
+  "key": "The specifications",
+  "clauses": [
+   "52.236-21"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "specifications? (shall |will )?(govern|control|prevail|take precedence)",
+    "^the specifications?\\b",
+    "^specifications?\\b"
+   ]
+  ]
+ },
+ {
+  "id": "Q16",
+  "question": "Unless otherwise indicated, how many copies of each shop drawing must the Contractor submit, and how many does the Contracting Officer keep?",
+  "key": "Four submitted; three retained",
+  "clauses": [
+   "52.236-21"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "\\b(four|4)\\b"
+   ],
+   [
+    "\\b(three|3)\\b"
+   ]
+  ]
+ },
+ {
+  "id": "Q17",
+  "question": "Is the Contractor entitled to an extension of the performance schedule for a stop-work order issued because of a safety noncompliance?",
+  "key": "No",
+  "clauses": [
+   "52.236-13"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "\\bno\\b",
+    "not (be )?entitled"
+   ]
+  ]
+ },
+ {
+  "id": "Q18",
+  "question": "Which federal safety standards must the Contractor comply with under the Accident Prevention clause?",
+  "key": "29 CFR Part 1926 and 29 CFR Part 1910",
+  "clauses": [
+   "52.236-13"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "1926"
+   ],
+   [
+    "1910"
+   ]
+  ]
+ },
+ {
+  "id": "Q19",
+  "question": "How many days does the Contracting Officer have to approve or disapprove a shop drawing?",
+  "key": "NOT IN TEXT",
+  "clauses": [
+   "52.236-21"
+  ],
+  "answerable": false,
+  "patterns": null
+ },
+ {
+  "id": "Q20",
+  "question": "If, before acceptance, the Government removes completed work to examine it and the work meets the contract requirements, what is the Contractor entitled to?",
+  "key": "An equitable adjustment for the examination and reconstruction, and an extension of time if completion was delayed",
+  "clauses": [
+   "52.246-12"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "equitable adjustment"
+   ]
+  ]
+ },
+ {
+  "id": "Q21",
+  "question": "While the Government has possession or use of part of the work before completion, is the Contractor responsible for loss of or damage to that work caused by the Government's possession or use?",
+  "key": "No; the Contractor is relieved of that responsibility",
+  "clauses": [
+   "52.236-11"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "\\bno\\b",
+    "reliev",
+    "not (be )?responsible"
+   ]
+  ]
+ }
+]

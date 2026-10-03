@@ -1,0 +1,13 @@
+SECTION 04 20 00 · MASONRY (excerpt)
+Adapted from UFGS 04 20 00 with this project's selections. Practice project: not for construction.
+
+2.5   MORTAR AND GROUT MIXES
+2.5.1   Mortar Mix
+a.  Provide mortar that conforms to ASTM C270. Provide Type S mortar for exterior walls and for walls below grade.
+b.  Provide Type N or Type S mortar for non-load-bearing interior masonry.
+c.  Do not use masonry cement in the mortar. Do not use air-entrainment in the mortar.
+2.5.2   Grout and Ready Mix Grout Mix
+a.  Use grout that conforms to ASTM C476, coarse.
+b.  Use conventional grout with a slump between 8 and 11 inches.
+c.  Use self-consolidating grout with a slump flow of 24 to 30 inches and a visual stability index (VSI) not greater than 1.
+d.  Provide a minimum grout strength of 2000 psi in 28 days, as tested in accordance with ASTM C1019.

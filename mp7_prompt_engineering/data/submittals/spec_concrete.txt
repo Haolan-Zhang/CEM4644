@@ -1,0 +1,24 @@
+SECTION 03 30 00 · CAST-IN-PLACE CONCRETE (excerpt)
+Adapted from UFGS 03 30 00 with this project's selections. Practice project: not for construction.
+
+2.5   CONCRETE MIX DESIGN
+2.5.1   Properties and Requirements
+a.  Cementitious material content must be adequate for concrete to satisfy the specified requirements for strength, w/cm, durability, and finishability.
+b.  The minimum cementitious material content for concrete used in floors (slabs-on-ground and elevated slabs) must meet the following requirements:
+    Nominal maximum size of aggregate 1 in: 520 pounds per cubic yard
+    Nominal maximum size of aggregate 3/4 in: 540 pounds per cubic yard
+c.  Selected target slump must not exceed 9 in, unless a lower maximum slump is given in the table below.
+d.  Concrete must be air entrained for members assigned to Exposure Class F1 or F2, with the total air content in accordance with paragraph 2.5.2.
+e.  Concrete for slabs to receive a hard-troweled finish must not contain an air-entraining admixture or have a total air content greater than 3 percent.
+f.  Concrete properties and requirements for each portion of the structure are specified in the table below.
+
+    Portion of structure           | Minimum f'c at 28 days | Exposure class | Miscellaneous requirements
+    Footings                       | 3000 psi               | F0             | Max. slump 6 in; nominal maximum aggregate size 1 in
+    Foundation walls (exterior)    | 4000 psi               | F1             | Nominal maximum aggregate size 3/4 in
+    Interior slabs-on-ground       | 4000 psi               | F0             | Hard-troweled finish; nominal maximum aggregate size 3/4 in
+    Exterior slabs, walks, steps   | 4500 psi               | F2             | Nominal maximum aggregate size 3/4 in
+
+2.5.2   Durability (freezing and thawing)
+    Exposure class F0: no air-content or w/cm requirement beyond those above.
+    Exposure class F1: maximum w/cm 0.55; total air content 5.0 percent, tolerance plus or minus 1.5 percent.
+    Exposure class F2: maximum w/cm 0.45; total air content 6.0 percent, tolerance plus or minus 1.5 percent.

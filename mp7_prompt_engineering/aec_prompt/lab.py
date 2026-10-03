@@ -12,7 +12,15 @@ from .texts import FOUNDATION_CONVENTIONS, ROOF_CONVENTIONS, fill, fill_prompt, 
 INCIDENT_VERSIONS = {"v1 · task only": "v1", "v2 · role and definitions": "v2", "v3 · definitions and worked examples": "v3", "my own prompt": "own"}
 TAKEOFF_VERSIONS = {"v1 · task only": "v1", "v2 · step-by-step reasoning": "v2", "v3 · estimating conventions": "v3", "my own prompt": "own"}
 SCHEDULE_VERSIONS = {"v1 · whole sheet": "v1", "v2 · cropped schedule": "v2", "v3 · cropped schedule and column names": "v3", "my own prompt": "own"}
+SUBMITTAL_VERSIONS = {"v1 · task only": "v1", "v2 · requirements first, then compare": "v2", "v3 · comparison table": "v3", "my own prompt": "own"}
+CONTRACT_VERSIONS = {"v1 · questions only": "v1", "v2 · answers with quotes": "v2", "v3 · only from the text, with quotes": "v3", "my own prompt": "own"}
 FAMILY_NAME = {"foundation": "Foundation plan", "roof": "Gable roof", "schedule": "Door schedule sheet"}
+
+
+def submittal_label(p: dict) -> str:
+    n = p["id"].split("_")[-1]
+    kind = "Concrete mix design" if p["family"] == "concrete" else "Mortar and grout"
+    return f"{kind} {n} · {p['element'][0].lower() + p['element'][1:]}"
 
 
 def drawing_label(p: dict) -> str:
@@ -34,6 +42,11 @@ class PromptLab:
         self.problems = json.loads((d / "practice" / "problems.json").read_text())
         self.drawings = d / "practice" / "drawings"
         self.by_label = {drawing_label(p): p for p in self.problems}
+        self.submittals = json.loads((d / "submittals" / "problems.json").read_text())
+        self.specs = {k: (d / "submittals" / f"spec_{k}.txt").read_text() for k in ("concrete", "masonry")}
+        self.by_submittal = {submittal_label(p): p for p in self.submittals}
+        self.clauses = (d / "contract" / "clauses.txt").read_text()
+        self.questions = json.loads((d / "contract" / "questions.json").read_text())
         self.runs = []
         self.ready = True
         print(f"✅ Ready in {time.time() - t0:.0f} s.")
@@ -49,7 +62,7 @@ class PromptLab:
         return p
 
     def _record(self, task, drawing, version, right, n):
-        self.runs.append({"task": task, "drawing": drawing, "version": version, "correct": int(right), "of": int(n)})
+        self.runs.append({"task": task, "example": drawing, "version": version, "correct": int(right), "of": int(n)})
 
     @staticmethod
     def _version_label(choice: str, versions: dict, original: str, sent: str) -> str:
@@ -88,7 +101,42 @@ class PromptLab:
                 say(texts, G, "disagree_text"); ui.table(r["disagree"])
         ui.hokieai_box([], prompt, on_score, texts, G)
 
-    # ------------------------------------------------------------------ Part 2: takeoff from drawings
+    # ------------------------------------------------------------------ Part 2: submittal review
+    def review_submittal(self, submittal: str, version: str = "v1 · task only", **texts):
+        self._need(); G = "submittals"
+        p = self.by_submittal.get(submittal)
+        if p is None:
+            raise KeyError(f"No submittal called {submittal!r}")
+        v = SUBMITTAL_VERSIONS.get(version, "v3")
+        tmpl = text(texts, G, f"{'v3' if v == 'own' else v}_prompt_text")
+        prompt = fill_prompt(tmpl, final=text(texts, G, "final_text"), spec=self.specs[p["spec"]], submittal=p["text"])
+
+        def on_score(reply, sent):
+            label = self._version_label(version, SUBMITTAL_VERSIONS, prompt, sent)
+            r = score.submittal(reply, p)
+            self._record("submittals", submittal, label, r["right"], r["n"])
+            say(texts, G, "result_text", version=label, submittal=submittal, right=r["right"], n=r["n"], found=r["found"], planted=r["planted"], false=r["false"])
+            say(texts, G, "table_text"); ui.table(r["table"])
+        ui.hokieai_box([], prompt, on_score, texts, G)
+
+    # ------------------------------------------------------------------ Part 3: contract questions
+    def contract_questions(self, version: str = "v1 · questions only", **texts):
+        self._need(); G = "contract"
+        v = CONTRACT_VERSIONS.get(version, "v3")
+        tmpl = text(texts, G, f"{'v3' if v == 'own' else v}_prompt_text")
+        qs = "\n".join(f"{q['id']}. {q['question']}" for q in self.questions)
+        prompt = fill_prompt(tmpl, questions=qs, clauses=self.clauses)
+
+        def on_score(reply, sent):
+            label = self._version_label(version, CONTRACT_VERSIONS, prompt, sent)
+            r = score.contract(reply, self.questions, self.clauses)
+            self._record("contract", f"{r['n']} questions", label, r["right"], r["n"])
+            say(texts, G, "result_text", version=label, right=r["right"], n=r["n"], made_up=r["made_up"], unanswerable=r["unanswerable"],
+                verified=r["verified"], quotes=r["quotes"])
+            say(texts, G, "table_text"); ui.table(r["table"])
+        ui.hokieai_box([], prompt, on_score, texts, G)
+
+    # ------------------------------------------------------------------ Part 4: takeoff from drawings
     def takeoff(self, drawing: str, version: str = "v1 · task only", **texts):
         self._need()
         p = self._problem(drawing); G = "takeoff"
@@ -108,7 +156,7 @@ class PromptLab:
             say(texts, G, "table_text"); ui.table(r["table"])
         ui.hokieai_box([img], prompt, on_score, texts, G)
 
-    # ------------------------------------------------------------------ Part 3: door schedules
+    # ------------------------------------------------------------------ Part 5: door schedules
     def schedule(self, sheet: str, version: str = "v1 · whole sheet", **texts):
         self._need()
         p = self._problem(sheet); G = "schedule"
@@ -129,10 +177,10 @@ class PromptLab:
 
     # ------------------------------------------------------------------ comparisons
     def compare(self, task: str, **texts):
-        """task: "incidents", "takeoff" (foundation plans and roofs) or "schedule"."""
+        """task: "incidents", "submittals", "contract", "takeoff" (foundation plans and roofs) or "schedule"."""
         self._need()
         tasks = {"takeoff": ("foundation", "roof")}.get(task, (task,))
-        runs = pd.DataFrame(self.runs, columns=["task", "drawing", "version", "correct", "of"])
+        runs = pd.DataFrame(self.runs, columns=["task", "example", "version", "correct", "of"])
         ui.compare(runs[runs.task.isin(tasks)].drop(columns="task"), texts)
 
     @staticmethod
