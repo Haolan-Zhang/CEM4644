@@ -7,18 +7,21 @@ an answer key and compares the prompt versions. No programming and no GPU needed
 
 | Notebook | Open | Data |
 |---|---|---|
-| `MP7_Workshop_Prompt_Engineering.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp7_prompt_engineering/MP7_Workshop_Prompt_Engineering.ipynb) | 30 OSHA construction incident reports; 10 practice submittals against UFGS excerpts; 21 FAR construction clauses; 15 practice drawings made for the course |
+| `MP7_Workshop_Prompt_Engineering.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp7_prompt_engineering/MP7_Workshop_Prompt_Engineering.ipynb) | 30 OSHA construction incident reports; 12 practice submittals against UFGS excerpts; 29 FAR construction clauses; 15 practice drawings made for the course |
 
 ## What the students do
 
 1. **Classifying incident reports** (text): 30 construction reports from OSHA's Severe Injury Reports, classified into
    OSHA's Focus Four (fall, struck-by, caught-in/between, electrocution) or other, with three prompt versions (task only;
    role and definitions; definitions and worked examples) and their own; scored against OSHA's classification.
-2. **Reviewing submittals** (text): 10 practice submittals (5 concrete mix designs, 5 mortar and grout mixes) checked
-   against specification excerpts adapted from UFGS 03 30 00 and 04 20 00; prompt versions task only, requirements first
-   then compare (task decomposition), and a comparison table; scored per requirement against the planted noncompliances.
-3. **Answering questions from a contract** (text): 21 questions on 21 FAR construction clauses, four not answerable from
-   the text; prompt versions questions only, answers with quotes, and only-from-the-text with quotes and NOT IN TEXT;
+2. **Reviewing submittals** (text): 12 practice submittals (6 concrete mix designs, 6 mortar and grout mixes) checked
+   against specification excerpts adapted from UFGS 03 30 00 and 04 20 00. Each states its intended use rather than the
+   specification's portion of the structure; some values must be computed or sit exactly at a limit. Prompt versions task
+   only, requirements first then compare (task decomposition), and a comparison table; scored on six requirements per
+   submittal against the planted noncompliances.
+3. **Answering questions from a contract** (text): 27 questions on 29 FAR construction clauses, ten of them project
+   situations to check against a clause (notice deadlines, retainage, warranty periods), seven not answerable from the
+   text; prompt versions questions only, answers with quotes, and only-from-the-text with quotes and NOT IN TEXT;
    quotes checked word for word.
 4. **Quantity takeoff from drawings** (vision): five foundation plans (CMUs, grout) and five gable roofs (area,
    underlayment, shingles); prompt versions task only, step-by-step reasoning, and estimating conventions.

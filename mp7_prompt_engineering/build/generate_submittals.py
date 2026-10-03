@@ -4,8 +4,10 @@
 
 The two specification excerpts are adapted from the Unified Facilities Guide Specifications (public domain, US DoD):
 UFGS 03 30 00 Cast-in-Place Concrete (2.5 Concrete Mix Design) and UFGS 04 20 00 Masonry (2.5 Mortar and Grout Mixes),
-with one project's choices filled in for the guide specification's options. The submittals are generated: each is a
-mix-design submittal for a fictional project with 0-3 planted noncompliances, and the key lists them.
+with one project's choices filled in for the guide specification's options. The 12 submittals are designed by hand for a
+fictional project: each describes its intended use the way a project would (so the applicable requirements must be
+identified), carries 0-3 planted noncompliances (some only visible after a calculation) and some values exactly at a
+limit, and the key lists the noncompliances.
 """
 import argparse
 import json
@@ -56,139 +58,125 @@ c.  Use self-consolidating grout with a slump flow of 24 to 30 inches and a visu
 d.  Provide a minimum grout strength of 2000 psi in 28 days, as tested in accordance with ASTM C1019.
 """
 
-ELEMENTS = {   # portion -> requirements
+# What each portion of the structure must meet (from the excerpt above), for reference.
+ELEMENTS = {
     "Footings": dict(fc=3000, F="F0", slump=6, agg="1 in", floor=False, trowel=False),
     "Foundation walls (exterior)": dict(fc=4000, F="F1", slump=9, agg="3/4 in", floor=False, trowel=False),
     "Interior slabs-on-ground": dict(fc=4000, F="F0", slump=9, agg="3/4 in", floor=True, trowel=True),
     "Exterior slabs, walks, steps": dict(fc=4500, F="F2", slump=9, agg="3/4 in", floor=True, trowel=False),
 }
-F_REQ = {"F0": None, "F1": dict(wcm=0.55, air=5.0), "F2": dict(wcm=0.45, air=6.0)}
-MIN_CEM = {"1 in": 520, "3/4 in": 540}
+REQUIREMENT_NAMES = {"strength": "compressive strength (f'c at 28 days)", "slump": "slump", "aggregate": "nominal maximum aggregate size",
+                     "wcm": "water-cementitious ratio (w/cm)", "air": "air content / air entrainment", "content": "minimum cementitious content",
+                     "mortar_type": "mortar type", "masonry_cement": "masonry cement", "mortar_air": "air entrainment in mortar",
+                     "grout_type": "grout type (fine / coarse)", "grout_consistency": "grout slump / slump flow / VSI", "grout_strength": "grout compressive strength"}
+
+# Each submittal: the portion of the structure (hidden; the submittal and its label describe the use the way a project would), its values, and
+# the noncompliances planted in them. Traps that comply are noted in "notes" for the instructor.
+CONCRETE = [
+    dict(element="Foundation walls (exterior)", short="basement walls", use="Basement walls, backfilled on the outside face, exposed to freezing and to moisture",
+         fc=4000, age=28, cement=480, fly=120, water=342, show_wcm=False, agg="3/4 in", slump="5 in", aea=True, air=7.0,
+         devs=["wcm", "air"], notes="w/cm = 342 / 600 = 0.57 > 0.55 (computed); air 7.0 % > 6.5 % (F1 tolerance)"),
+    dict(element="Interior slabs-on-ground", short="warehouse floor slab", use="Warehouse floor slab-on-ground, power-troweled (hard-troweled) finish",
+         fc=4000, age=28, cement=470, fly=60, water=244, show_wcm=True, agg="3/4 in", slump="5 in", aea=True, air=2.5,
+         devs=["air", "content"], notes="air-entraining admixture in a hard-troweled slab although air is 2.5 %; cementitious 470 + 60 = 530 < 540"),
+    dict(element="Exterior slabs, walks, steps", short="entrance stoop and sidewalks", use="Entrance stoop, steps, and sidewalks, exposed to freezing and to deicing salts",
+         fc=4500, age=56, cement=560, fly=0, water=252, show_wcm=True, agg="3/4 in", slump="4 in", aea=True, air=4.5,
+         devs=["strength"], notes="4500 psi at 56 days instead of 28 days; w/cm 0.45 and air 4.5 % are exactly at the limits (comply)"),
+    dict(element="Footings", short="spread footings", use="Spread footings and column pads, below the frost line",
+         fc=3000, age=28, cement=500, fly=0, water=290, show_wcm=True, agg="1 in", slump="7 in", aea=False, air=1.5,
+         devs=["slump"], notes="slump 7 in: below the general 9 in but above the 6 in footing limit; w/cm 0.58 has no limit for F0 (complies)"),
+    dict(element="Foundation walls (exterior)", short="stair-tower foundation walls", use="Stair-tower foundation walls, backfilled on one side, exposed to freezing and to moisture",
+         fc=4000, age=28, cement=480, fly=120, water=330, show_wcm=False, agg="3/4 in", slump="4 in", aea=True, air=6.5,
+         devs=[], notes="fully compliant: w/cm = 330 / 600 = 0.55 and air 6.5 % are exactly at the limits"),
+    dict(element="Exterior slabs, walks, steps", short="loading-dock apron", use="Exterior loading-dock apron, exposed to freezing and to deicing salts",
+         fc=5000, age=28, cement=520, fly=40, water=263, show_wcm=False, agg="1 in", slump="4 in", aea=True, air=6.0,
+         devs=["aggregate", "wcm"], notes="1 in aggregate where 3/4 in is required; w/cm = 263 / 560 = 0.47 > 0.45 (computed)"),
+]
+MASONRY = [
+    dict(exterior=True, short="maintenance shop walls", use="Exterior CMU walls of the vehicle maintenance shop", mtype="M", materials="portland cement (ASTM C150 Type I) and hydrated lime (ASTM C207 Type S)",
+         mair="none", gtype="coarse", grout="conventional grout, slump 11 in (ASTM C143)", gstr=2000, devs=["mortar_type"],
+         notes="Type M where Type S is specified (stronger, still noncompliant); grout slump 11 in and strength 2000 psi exactly at the limits (comply)"),
+    dict(exterior=False, short="office partitions", use="Non-load-bearing CMU partitions between offices", mtype="N", materials="mortar cement (ASTM C1329 Type N)",
+         mair="none", gtype="coarse", grout="self-consolidating grout, slump flow 23 in, visual stability index (VSI) 1 (ASTM C1611)", gstr=2500,
+         devs=["grout_consistency"], notes="mortar cement is allowed (only masonry cement is prohibited); slump flow 23 in < 24 in"),
+    dict(exterior=True, short="elevator pit walls", use="Elevator pit walls below grade", mtype="S", materials="masonry cement (ASTM C91 Type S)",
+         mair="air-entraining admixture, 0.5 oz per bag of cement", gtype="fine", grout="conventional grout, slump 9 in (ASTM C143)", gstr=3000,
+         devs=["masonry_cement", "mortar_air", "grout_type"], notes="three noncompliances"),
+    dict(exterior=True, short="brick veneer backup walls", use="Exterior CMU backup walls behind the brick veneer", mtype="S", materials="portland cement (ASTM C150 Type I) and hydrated lime (ASTM C207 Type S)",
+         mair="none", gtype="coarse", grout="self-consolidating grout, slump flow 30 in, visual stability index (VSI) 1 (ASTM C1611)", gstr=2000,
+         devs=[], notes="fully compliant: slump flow 30 in, VSI 1 and 2000 psi are exactly at the limits"),
+    dict(exterior=False, short="storage room partitions", use="Non-load-bearing CMU partitions around the storage rooms", mtype="O", materials="portland cement (ASTM C150 Type I) and hydrated lime (ASTM C207 Type S)",
+         mair="none", gtype="coarse", grout="conventional grout, slump 10 in (ASTM C143)", gstr=1800, devs=["mortar_type", "grout_strength"],
+         notes="Type O where Type N or S is allowed; grout 1800 psi < 2000 psi"),
+    dict(exterior=True, short="loading-dock retaining wall", use="Below-grade CMU retaining wall at the loading dock", mtype="N", materials="portland cement (ASTM C150 Type I) and hydrated lime (ASTM C207 Type S)",
+         mair="none", gtype="coarse", grout="conventional grout, slump 7 in (ASTM C143)", gstr=2500, devs=["mortar_type", "grout_consistency"],
+         notes="Type N where Type S is specified for walls below grade; slump 7 in < 8 in"),
+]
 
 
-def concrete_submittal(rng, k, element, n_dev, show_wcm):
-    req = ELEMENTS[element]
-    fr = F_REQ[req["F"]]
-    applicable = ["strength", "slump", "aggregate"] + (["wcm", "air"] if fr else []) + (["air"] if req["trowel"] else []) + (["content"] if req["floor"] else [])
-    applicable = list(dict.fromkeys(applicable))
-    devs = list(rng.choice(applicable, size=min(n_dev, len(applicable)), replace=False)) if n_dev else []
-    # compliant baseline
-    fc = req["fc"] + int(rng.choice([0, 0, 500]))
-    agg = req["agg"]
-    cem_min = MIN_CEM[agg] if req["floor"] else 470
-    cement = int(rng.integers(cem_min + 20, cem_min + 110) // 5 * 5); fly = int(rng.choice([0, 0, 75, 100]))
-    cm = cement + fly
-    wcm_max = fr["wcm"] if fr else 0.55
-    wcm = round(float(rng.uniform(wcm_max - 0.08, wcm_max - 0.02)), 2)
-    slump = int(rng.integers(3, min(req["slump"], 6))) if req["slump"] > 4 else 3
-    aea = bool(fr)
-    air = (fr["air"] + float(rng.choice([-0.5, 0, 0.5]))) if fr else float(rng.choice([1.5, 2.0, 2.5]))
-    # planted noncompliances
-    if "strength" in devs:
-        fc = req["fc"] - int(rng.choice([500, 1000]))
-    if "slump" in devs:
-        slump = req["slump"] + int(rng.choice([1, 2]))
-    if "aggregate" in devs:
-        agg = "1 in" if req["agg"] == "3/4 in" else "1-1/2 in"
-    if "wcm" in devs:
-        wcm = round(fr["wcm"] + float(rng.choice([0.03, 0.05])), 2)
-    if "air" in devs:
-        if req["trowel"]:
-            aea, air = True, float(rng.choice([4.0, 5.0]))
-        else:
-            air = fr["air"] + float(rng.choice([-2.5, 2.5]))
-    if "content" in devs:
-        cement = MIN_CEM[req["agg"]] - int(rng.choice([30, 50])) - fly; cm = cement + fly
-    water = round(wcm * cm)
-    wcm_line = f"Water-cementitious materials ratio (w/cm): {wcm:.2f}" if show_wcm else "Water-cementitious materials ratio (w/cm): see batch weights"
+def concrete_submittal(k, c, rng):
+    # Every concrete submittal is checked on all six requirements: where the excerpt sets no limit for the portion of the
+    # structure (w/cm for F0, say), "complies" is the right decision and a flag is a false flag.
+    checked = ["strength", "slump", "aggregate", "wcm", "air", "content"]
+    cm = c["cement"] + c["fly"]
+    wcm_line = f"Water-cementitious materials ratio (w/cm): {c['water'] / cm:.2f}" if c["show_wcm"] else "Water-cementitious materials ratio (w/cm): see batch weights"
+    seven = round(c["fc"] * float(rng.uniform(0.66, 0.74)) / 10) * 10
     text = f"""CONCRETE MIX DESIGN SUBMITTAL · Submittal 03 30 00-{k:02d}
 Project: CEM4644 practice project (fictional) · Supplier: Practice Ready-Mix Co. (fictional), Plant 2
-Mix ID: {fc}-{int(slump)}{'-AE' if aea else ''}-{k:02d} · Intended use: {element}
+Mix ID: P2-{c['fc'] // 100}-{k:02d} · Intended use: {c['use']}
 
 Design data
-Specified compressive strength: {fc} psi at 28 days (required average strength f'cr = {fc + 1200} psi, from field records)
+Specified compressive strength: {c['fc']} psi at {c['age']} days
+Required average strength f'cr: {c['fc'] + 1200} psi, from field records (30 consecutive tests, standard deviation 520 psi)
+Trial batch: 7-day strength {seven} psi (average of 3 cylinders)
 Batch weights per cubic yard (saturated surface-dry aggregates):
-  Portland cement, ASTM C150 Type I/II: {cement} lb
-  {'Fly ash, ASTM C618 Class F: ' + str(fly) + ' lb' if fly else 'Fly ash: none'}
-  Total cementitious materials: {cm} lb
-  Water: {water} lb
-  Coarse aggregate, ASTM C33, nominal maximum size {agg}: {int(rng.integers(1700, 1900))} lb
+  Portland cement, ASTM C150 Type I/II: {c['cement']} lb
+  {'Fly ash, ASTM C618 Class F: ' + str(c['fly']) + ' lb' if c['fly'] else 'Fly ash: none'}
+  Water: {c['water']} lb
+  Coarse aggregate, ASTM C33, nominal maximum size {c['agg']}: {int(rng.integers(1700, 1900))} lb
   Fine aggregate, ASTM C33 natural sand: {int(rng.integers(1150, 1350))} lb
 {wcm_line}
-Admixtures: {'air-entraining admixture, ASTM C260, 0.6 oz per 100 lb cementitious; ' if aea else ''}water-reducing admixture, ASTM C494 Type A, 4 oz per 100 lb cementitious
-Target slump: {slump} in (ASTM C143)
-Target total air content: {air:.1f} percent (ASTM C231)
+Admixtures: {'air-entraining admixture, ASTM C260, 0.6 oz per 100 lb cementitious; ' if c['aea'] else ''}water-reducing admixture, ASTM C494 Type A, 4 oz per 100 lb cementitious
+Target slump: {c['slump']} (ASTM C143)
+Target total air content: {c['air']:.1f} percent (ASTM C231)
 Unit weight: {round(float(rng.uniform(141, 147)), 1)} lb per cubic foot
+Water-soluble chloride ion content: 0.05 percent by weight of cement
 """
-    names = {"strength": "compressive strength (f'c)", "slump": "slump", "aggregate": "nominal maximum aggregate size", "wcm": "water-cementitious ratio (w/cm)",
-             "air": "air content / air entrainment", "content": "minimum cementitious content"}
-    return {"id": f"concrete_{k}", "family": "concrete", "spec": "concrete", "element": element, "text": text,
-            "w_cm_stated": show_wcm, "key": [{"item": d, "name": names[d]} for d in devs], "checked": applicable}
+    return {"id": f"concrete_{k}", "family": "concrete", "spec": "concrete", "element": c["element"], "short": c["short"], "use": c["use"], "text": text,
+            "key": [{"item": d, "name": REQUIREMENT_NAMES[d]} for d in c["devs"]], "checked": checked, "notes": c["notes"]}
 
 
-def masonry_submittal(rng, k, wall, n_dev, grout_kind):
-    exterior = wall != "Interior non-load-bearing walls"
-    applicable = ["mortar_type", "masonry_cement", "mortar_air", "grout_type", "grout_consistency", "grout_strength"]
-    devs = list(rng.choice(applicable, size=n_dev, replace=False)) if n_dev else []
-    mtype = "S" if exterior else str(rng.choice(["N", "S"]))
-    materials = "portland cement (ASTM C150 Type I) and hydrated lime (ASTM C207 Type S)"
-    mair = "none"; gtype = "coarse"; gstr = int(rng.choice([2500, 3000, 3500]))
-    slump = int(rng.choice([9, 10])); flow = int(rng.choice([26, 27, 28])); vsi = 1 if rng.random() < 0.5 else 0
-    if "mortar_type" in devs:
-        mtype = "N" if exterior else "O"
-    if "masonry_cement" in devs:
-        materials = "masonry cement (ASTM C91 Type S)"
-    if "mortar_air" in devs:
-        mair = "air-entraining admixture, 0.5 oz per bag"
-    if "grout_type" in devs:
-        gtype = "fine"
-    if "grout_consistency" in devs:
-        if grout_kind == "conventional":
-            slump = int(rng.choice([6, 7, 12]))
-        else:
-            flow, vsi = (int(rng.choice([20, 32])), vsi) if rng.random() < 0.5 else (flow, 2)
-    if "grout_strength" in devs:
-        gstr = int(rng.choice([1500, 1800]))
-    grout_line = (f"Grout consistency: conventional grout, slump {slump} in (ASTM C143)" if grout_kind == "conventional" else
-                  f"Grout consistency: self-consolidating grout, slump flow {flow} in, visual stability index (VSI) {vsi} (ASTM C1611)")
+def masonry_submittal(k, m):
+    wall = ("Exterior walls and walls below grade" if m["exterior"] else "Non-load-bearing interior walls")
     text = f"""MORTAR AND GROUT MIX SUBMITTAL · Submittal 04 20 00-{k:02d}
 Project: CEM4644 practice project (fictional) · Supplier: Practice Masonry Supply (fictional)
-Intended use: {wall}
+Intended use: {m['use']}
 
 Mortar
-Specification: ASTM C270, Type {mtype}, proportion specification
-Cementitious materials: {materials}
+Specification: ASTM C270, Type {m['mtype']}, proportion specification
+Cementitious materials: {m['materials']}
 Aggregate: masonry sand, ASTM C144
-Admixtures: {mair}
+Admixtures: {m['mair']}
 Batching: field-batched by volume with measuring boxes
 
 Grout
-Specification: ASTM C476, {gtype} grout, ready-mixed
-{grout_line}
-Compressive strength: {gstr} psi at 28 days (ASTM C1019, three specimens, average)
+Specification: ASTM C476, {m['gtype']} grout, ready-mixed
+Grout consistency: {m['grout']}
+Compressive strength: {m['gstr']} psi at 28 days (ASTM C1019, three specimens, average)
 """
-    names = {"mortar_type": "mortar type", "masonry_cement": "masonry cement", "mortar_air": "air entrainment in mortar", "grout_type": "grout type (fine / coarse)",
-             "grout_consistency": "grout slump / slump flow / VSI", "grout_strength": "grout compressive strength"}
-    return {"id": f"masonry_{k}", "family": "masonry", "spec": "masonry", "element": wall, "text": text,
-            "key": [{"item": d, "name": names[d]} for d in devs], "checked": applicable}
+    return {"id": f"masonry_{k}", "family": "masonry", "spec": "masonry", "element": wall, "short": m["short"], "use": m["use"], "text": text,
+            "key": [{"item": d, "name": REQUIREMENT_NAMES[d]} for d in m["devs"]],
+            "checked": ["mortar_type", "masonry_cement", "mortar_air", "grout_type", "grout_consistency", "grout_strength"], "notes": m["notes"]}
 
 
 def main(seed):
     rng = np.random.default_rng(seed)
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "spec_concrete.txt").write_text(CONCRETE_SPEC); (OUT / "spec_masonry.txt").write_text(MASONRY_SPEC)
-    probs = []
-    plan_c = [("Foundation walls (exterior)", 2, True), ("Interior slabs-on-ground", 2, True), ("Exterior slabs, walks, steps", 3, False),
-              ("Footings", 1, True), ("Foundation walls (exterior)", 0, False)]
-    for k, (el, n, show) in enumerate(plan_c, 1):
-        probs.append(concrete_submittal(rng, k, el, n, show))
-    plan_m = [("Exterior walls", 2, "conventional"), ("Interior non-load-bearing walls", 1, "self-consolidating"), ("Walls below grade", 3, "conventional"),
-              ("Exterior walls", 0, "self-consolidating"), ("Interior non-load-bearing walls", 2, "conventional")]
-    for k, (w, n, g) in enumerate(plan_m, 1):
-        probs.append(masonry_submittal(rng, k, w, n, g))
+    probs = [concrete_submittal(k, c, rng) for k, c in enumerate(CONCRETE, 1)] + [masonry_submittal(k, m) for k, m in enumerate(MASONRY, 1)]
     (OUT / "problems.json").write_text(json.dumps(probs, indent=1))
     for p in probs:
-        print(p["id"], "|", p["element"], "|", [k["item"] for k in p["key"]])
+        print(f"{p['id']:11} | {p['use'][:60]:60} | {[k['item'] for k in p['key']]}")
 
 
 if __name__ == "__main__":

@@ -4,16 +4,17 @@
   "family": "concrete",
   "spec": "concrete",
   "element": "Foundation walls (exterior)",
-  "text": "CONCRETE MIX DESIGN SUBMITTAL \u00b7 Submittal 03 30 00-01\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Ready-Mix Co. (fictional), Plant 2\nMix ID: 3000-4-AE-01 \u00b7 Intended use: Foundation walls (exterior)\n\nDesign data\nSpecified compressive strength: 3000 psi at 28 days (required average strength f'cr = 4200 psi, from field records)\nBatch weights per cubic yard (saturated surface-dry aggregates):\n  Portland cement, ASTM C150 Type I/II: 500 lb\n  Fly ash, ASTM C618 Class F: 75 lb\n  Total cementitious materials: 575 lb\n  Water: 293 lb\n  Coarse aggregate, ASTM C33, nominal maximum size 3/4 in: 1828 lb\n  Fine aggregate, ASTM C33 natural sand: 1271 lb\nWater-cementitious materials ratio (w/cm): 0.51\nAdmixtures: air-entraining admixture, ASTM C260, 0.6 oz per 100 lb cementitious; water-reducing admixture, ASTM C494 Type A, 4 oz per 100 lb cementitious\nTarget slump: 4 in (ASTM C143)\nTarget total air content: 2.5 percent (ASTM C231)\nUnit weight: 143.3 lb per cubic foot\n",
-  "w_cm_stated": true,
+  "short": "basement walls",
+  "use": "Basement walls, backfilled on the outside face, exposed to freezing and to moisture",
+  "text": "CONCRETE MIX DESIGN SUBMITTAL \u00b7 Submittal 03 30 00-01\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Ready-Mix Co. (fictional), Plant 2\nMix ID: P2-40-01 \u00b7 Intended use: Basement walls, backfilled on the outside face, exposed to freezing and to moisture\n\nDesign data\nSpecified compressive strength: 4000 psi at 28 days\nRequired average strength f'cr: 5200 psi, from field records (30 consecutive tests, standard deviation 520 psi)\nTrial batch: 7-day strength 2950 psi (average of 3 cylinders)\nBatch weights per cubic yard (saturated surface-dry aggregates):\n  Portland cement, ASTM C150 Type I/II: 480 lb\n  Fly ash, ASTM C618 Class F: 120 lb\n  Water: 342 lb\n  Coarse aggregate, ASTM C33, nominal maximum size 3/4 in: 1744 lb\n  Fine aggregate, ASTM C33 natural sand: 1214 lb\nWater-cementitious materials ratio (w/cm): see batch weights\nAdmixtures: air-entraining admixture, ASTM C260, 0.6 oz per 100 lb cementitious; water-reducing admixture, ASTM C494 Type A, 4 oz per 100 lb cementitious\nTarget slump: 5 in (ASTM C143)\nTarget total air content: 7.0 percent (ASTM C231)\nUnit weight: 144.0 lb per cubic foot\nWater-soluble chloride ion content: 0.05 percent by weight of cement\n",
   "key": [
+   {
+    "item": "wcm",
+    "name": "water-cementitious ratio (w/cm)"
+   },
    {
     "item": "air",
     "name": "air content / air entrainment"
-   },
-   {
-    "item": "strength",
-    "name": "compressive strength (f'c)"
    }
   ],
   "checked": [
@@ -21,50 +22,72 @@
    "slump",
    "aggregate",
    "wcm",
-   "air"
-  ]
+   "air",
+   "content"
+  ],
+  "notes": "w/cm = 342 / 600 = 0.57 > 0.55 (computed); air 7.0 % > 6.5 % (F1 tolerance)"
  },
  {
   "id": "concrete_2",
   "family": "concrete",
   "spec": "concrete",
   "element": "Interior slabs-on-ground",
-  "text": "CONCRETE MIX DESIGN SUBMITTAL \u00b7 Submittal 03 30 00-02\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Ready-Mix Co. (fictional), Plant 2\nMix ID: 3000-5-02 \u00b7 Intended use: Interior slabs-on-ground\n\nDesign data\nSpecified compressive strength: 3000 psi at 28 days (required average strength f'cr = 4200 psi, from field records)\nBatch weights per cubic yard (saturated surface-dry aggregates):\n  Portland cement, ASTM C150 Type I/II: 635 lb\n  Fly ash, ASTM C618 Class F: 75 lb\n  Total cementitious materials: 710 lb\n  Water: 334 lb\n  Coarse aggregate, ASTM C33, nominal maximum size 1 in: 1816 lb\n  Fine aggregate, ASTM C33 natural sand: 1169 lb\nWater-cementitious materials ratio (w/cm): 0.47\nAdmixtures: water-reducing admixture, ASTM C494 Type A, 4 oz per 100 lb cementitious\nTarget slump: 5 in (ASTM C143)\nTarget total air content: 2.5 percent (ASTM C231)\nUnit weight: 146.4 lb per cubic foot\n",
-  "w_cm_stated": true,
+  "short": "warehouse floor slab",
+  "use": "Warehouse floor slab-on-ground, power-troweled (hard-troweled) finish",
+  "text": "CONCRETE MIX DESIGN SUBMITTAL \u00b7 Submittal 03 30 00-02\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Ready-Mix Co. (fictional), Plant 2\nMix ID: P2-40-02 \u00b7 Intended use: Warehouse floor slab-on-ground, power-troweled (hard-troweled) finish\n\nDesign data\nSpecified compressive strength: 4000 psi at 28 days\nRequired average strength f'cr: 5200 psi, from field records (30 consecutive tests, standard deviation 520 psi)\nTrial batch: 7-day strength 2850 psi (average of 3 cylinders)\nBatch weights per cubic yard (saturated surface-dry aggregates):\n  Portland cement, ASTM C150 Type I/II: 470 lb\n  Fly ash, ASTM C618 Class F: 60 lb\n  Water: 244 lb\n  Coarse aggregate, ASTM C33, nominal maximum size 3/4 in: 1776 lb\n  Fine aggregate, ASTM C33 natural sand: 1270 lb\nWater-cementitious materials ratio (w/cm): 0.46\nAdmixtures: air-entraining admixture, ASTM C260, 0.6 oz per 100 lb cementitious; water-reducing admixture, ASTM C494 Type A, 4 oz per 100 lb cementitious\nTarget slump: 5 in (ASTM C143)\nTarget total air content: 2.5 percent (ASTM C231)\nUnit weight: 142.6 lb per cubic foot\nWater-soluble chloride ion content: 0.05 percent by weight of cement\n",
   "key": [
    {
-    "item": "aggregate",
-    "name": "nominal maximum aggregate size"
+    "item": "air",
+    "name": "air content / air entrainment"
    },
    {
-    "item": "strength",
-    "name": "compressive strength (f'c)"
+    "item": "content",
+    "name": "minimum cementitious content"
    }
   ],
   "checked": [
    "strength",
    "slump",
    "aggregate",
+   "wcm",
    "air",
    "content"
-  ]
+  ],
+  "notes": "air-entraining admixture in a hard-troweled slab although air is 2.5 %; cementitious 470 + 60 = 530 < 540"
  },
  {
   "id": "concrete_3",
   "family": "concrete",
   "spec": "concrete",
   "element": "Exterior slabs, walks, steps",
-  "text": "CONCRETE MIX DESIGN SUBMITTAL \u00b7 Submittal 03 30 00-03\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Ready-Mix Co. (fictional), Plant 2\nMix ID: 4000-11-AE-03 \u00b7 Intended use: Exterior slabs, walks, steps\n\nDesign data\nSpecified compressive strength: 4000 psi at 28 days (required average strength f'cr = 5200 psi, from field records)\nBatch weights per cubic yard (saturated surface-dry aggregates):\n  Portland cement, ASTM C150 Type I/II: 510 lb\n  Fly ash: none\n  Total cementitious materials: 510 lb\n  Water: 199 lb\n  Coarse aggregate, ASTM C33, nominal maximum size 3/4 in: 1814 lb\n  Fine aggregate, ASTM C33 natural sand: 1202 lb\nWater-cementitious materials ratio (w/cm): see batch weights\nAdmixtures: air-entraining admixture, ASTM C260, 0.6 oz per 100 lb cementitious; water-reducing admixture, ASTM C494 Type A, 4 oz per 100 lb cementitious\nTarget slump: 11 in (ASTM C143)\nTarget total air content: 5.5 percent (ASTM C231)\nUnit weight: 144.1 lb per cubic foot\n",
-  "w_cm_stated": false,
+  "short": "entrance stoop and sidewalks",
+  "use": "Entrance stoop, steps, and sidewalks, exposed to freezing and to deicing salts",
+  "text": "CONCRETE MIX DESIGN SUBMITTAL \u00b7 Submittal 03 30 00-03\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Ready-Mix Co. (fictional), Plant 2\nMix ID: P2-45-03 \u00b7 Intended use: Entrance stoop, steps, and sidewalks, exposed to freezing and to deicing salts\n\nDesign data\nSpecified compressive strength: 4500 psi at 56 days\nRequired average strength f'cr: 5700 psi, from field records (30 consecutive tests, standard deviation 520 psi)\nTrial batch: 7-day strength 3190 psi (average of 3 cylinders)\nBatch weights per cubic yard (saturated surface-dry aggregates):\n  Portland cement, ASTM C150 Type I/II: 560 lb\n  Fly ash: none\n  Water: 252 lb\n  Coarse aggregate, ASTM C33, nominal maximum size 3/4 in: 1856 lb\n  Fine aggregate, ASTM C33 natural sand: 1226 lb\nWater-cementitious materials ratio (w/cm): 0.45\nAdmixtures: air-entraining admixture, ASTM C260, 0.6 oz per 100 lb cementitious; water-reducing admixture, ASTM C494 Type A, 4 oz per 100 lb cementitious\nTarget slump: 4 in (ASTM C143)\nTarget total air content: 4.5 percent (ASTM C231)\nUnit weight: 144.3 lb per cubic foot\nWater-soluble chloride ion content: 0.05 percent by weight of cement\n",
   "key": [
    {
     "item": "strength",
-    "name": "compressive strength (f'c)"
-   },
-   {
-    "item": "content",
-    "name": "minimum cementitious content"
-   },
+    "name": "compressive strength (f'c at 28 days)"
+   }
+  ],
+  "checked": [
+   "strength",
+   "slump",
+   "aggregate",
+   "wcm",
+   "air",
+   "content"
+  ],
+  "notes": "4500 psi at 56 days instead of 28 days; w/cm 0.45 and air 4.5 % are exactly at the limits (comply)"
+ },
+ {
+  "id": "concrete_4",
+  "family": "concrete",
+  "spec": "concrete",
+  "element": "Footings",
+  "short": "spread footings",
+  "use": "Spread footings and column pads, below the frost line",
+  "text": "CONCRETE MIX DESIGN SUBMITTAL \u00b7 Submittal 03 30 00-04\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Ready-Mix Co. (fictional), Plant 2\nMix ID: P2-30-04 \u00b7 Intended use: Spread footings and column pads, below the frost line\n\nDesign data\nSpecified compressive strength: 3000 psi at 28 days\nRequired average strength f'cr: 4200 psi, from field records (30 consecutive tests, standard deviation 520 psi)\nTrial batch: 7-day strength 2010 psi (average of 3 cylinders)\nBatch weights per cubic yard (saturated surface-dry aggregates):\n  Portland cement, ASTM C150 Type I/II: 500 lb\n  Fly ash: none\n  Water: 290 lb\n  Coarse aggregate, ASTM C33, nominal maximum size 1 in: 1868 lb\n  Fine aggregate, ASTM C33 natural sand: 1296 lb\nWater-cementitious materials ratio (w/cm): 0.58\nAdmixtures: water-reducing admixture, ASTM C494 Type A, 4 oz per 100 lb cementitious\nTarget slump: 7 in (ASTM C143)\nTarget total air content: 1.5 percent (ASTM C231)\nUnit weight: 141.4 lb per cubic foot\nWater-soluble chloride ion content: 0.05 percent by weight of cement\n",
+  "key": [
    {
     "item": "slump",
     "name": "slump"
@@ -77,54 +100,65 @@
    "wcm",
    "air",
    "content"
-  ]
- },
- {
-  "id": "concrete_4",
-  "family": "concrete",
-  "spec": "concrete",
-  "element": "Footings",
-  "text": "CONCRETE MIX DESIGN SUBMITTAL \u00b7 Submittal 03 30 00-04\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Ready-Mix Co. (fictional), Plant 2\nMix ID: 2500-3-04 \u00b7 Intended use: Footings\n\nDesign data\nSpecified compressive strength: 2500 psi at 28 days (required average strength f'cr = 3700 psi, from field records)\nBatch weights per cubic yard (saturated surface-dry aggregates):\n  Portland cement, ASTM C150 Type I/II: 575 lb\n  Fly ash: none\n  Total cementitious materials: 575 lb\n  Water: 293 lb\n  Coarse aggregate, ASTM C33, nominal maximum size 1 in: 1754 lb\n  Fine aggregate, ASTM C33 natural sand: 1307 lb\nWater-cementitious materials ratio (w/cm): 0.51\nAdmixtures: water-reducing admixture, ASTM C494 Type A, 4 oz per 100 lb cementitious\nTarget slump: 3 in (ASTM C143)\nTarget total air content: 2.0 percent (ASTM C231)\nUnit weight: 141.8 lb per cubic foot\n",
-  "w_cm_stated": true,
-  "key": [
-   {
-    "item": "strength",
-    "name": "compressive strength (f'c)"
-   }
   ],
-  "checked": [
-   "strength",
-   "slump",
-   "aggregate"
-  ]
+  "notes": "slump 7 in: below the general 9 in but above the 6 in footing limit; w/cm 0.58 has no limit for F0 (complies)"
  },
  {
   "id": "concrete_5",
   "family": "concrete",
   "spec": "concrete",
   "element": "Foundation walls (exterior)",
-  "text": "CONCRETE MIX DESIGN SUBMITTAL \u00b7 Submittal 03 30 00-05\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Ready-Mix Co. (fictional), Plant 2\nMix ID: 4000-4-AE-05 \u00b7 Intended use: Foundation walls (exterior)\n\nDesign data\nSpecified compressive strength: 4000 psi at 28 days (required average strength f'cr = 5200 psi, from field records)\nBatch weights per cubic yard (saturated surface-dry aggregates):\n  Portland cement, ASTM C150 Type I/II: 555 lb\n  Fly ash, ASTM C618 Class F: 100 lb\n  Total cementitious materials: 655 lb\n  Water: 321 lb\n  Coarse aggregate, ASTM C33, nominal maximum size 3/4 in: 1871 lb\n  Fine aggregate, ASTM C33 natural sand: 1287 lb\nWater-cementitious materials ratio (w/cm): see batch weights\nAdmixtures: air-entraining admixture, ASTM C260, 0.6 oz per 100 lb cementitious; water-reducing admixture, ASTM C494 Type A, 4 oz per 100 lb cementitious\nTarget slump: 4 in (ASTM C143)\nTarget total air content: 4.5 percent (ASTM C231)\nUnit weight: 142.7 lb per cubic foot\n",
-  "w_cm_stated": false,
+  "short": "stair-tower foundation walls",
+  "use": "Stair-tower foundation walls, backfilled on one side, exposed to freezing and to moisture",
+  "text": "CONCRETE MIX DESIGN SUBMITTAL \u00b7 Submittal 03 30 00-05\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Ready-Mix Co. (fictional), Plant 2\nMix ID: P2-40-05 \u00b7 Intended use: Stair-tower foundation walls, backfilled on one side, exposed to freezing and to moisture\n\nDesign data\nSpecified compressive strength: 4000 psi at 28 days\nRequired average strength f'cr: 5200 psi, from field records (30 consecutive tests, standard deviation 520 psi)\nTrial batch: 7-day strength 2950 psi (average of 3 cylinders)\nBatch weights per cubic yard (saturated surface-dry aggregates):\n  Portland cement, ASTM C150 Type I/II: 480 lb\n  Fly ash, ASTM C618 Class F: 120 lb\n  Water: 330 lb\n  Coarse aggregate, ASTM C33, nominal maximum size 3/4 in: 1830 lb\n  Fine aggregate, ASTM C33 natural sand: 1266 lb\nWater-cementitious materials ratio (w/cm): see batch weights\nAdmixtures: air-entraining admixture, ASTM C260, 0.6 oz per 100 lb cementitious; water-reducing admixture, ASTM C494 Type A, 4 oz per 100 lb cementitious\nTarget slump: 4 in (ASTM C143)\nTarget total air content: 6.5 percent (ASTM C231)\nUnit weight: 142.5 lb per cubic foot\nWater-soluble chloride ion content: 0.05 percent by weight of cement\n",
   "key": [],
   "checked": [
    "strength",
    "slump",
    "aggregate",
    "wcm",
-   "air"
-  ]
+   "air",
+   "content"
+  ],
+  "notes": "fully compliant: w/cm = 330 / 600 = 0.55 and air 6.5 % are exactly at the limits"
+ },
+ {
+  "id": "concrete_6",
+  "family": "concrete",
+  "spec": "concrete",
+  "element": "Exterior slabs, walks, steps",
+  "short": "loading-dock apron",
+  "use": "Exterior loading-dock apron, exposed to freezing and to deicing salts",
+  "text": "CONCRETE MIX DESIGN SUBMITTAL \u00b7 Submittal 03 30 00-06\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Ready-Mix Co. (fictional), Plant 2\nMix ID: P2-50-06 \u00b7 Intended use: Exterior loading-dock apron, exposed to freezing and to deicing salts\n\nDesign data\nSpecified compressive strength: 5000 psi at 28 days\nRequired average strength f'cr: 6200 psi, from field records (30 consecutive tests, standard deviation 520 psi)\nTrial batch: 7-day strength 3660 psi (average of 3 cylinders)\nBatch weights per cubic yard (saturated surface-dry aggregates):\n  Portland cement, ASTM C150 Type I/II: 520 lb\n  Fly ash, ASTM C618 Class F: 40 lb\n  Water: 263 lb\n  Coarse aggregate, ASTM C33, nominal maximum size 1 in: 1720 lb\n  Fine aggregate, ASTM C33 natural sand: 1181 lb\nWater-cementitious materials ratio (w/cm): see batch weights\nAdmixtures: air-entraining admixture, ASTM C260, 0.6 oz per 100 lb cementitious; water-reducing admixture, ASTM C494 Type A, 4 oz per 100 lb cementitious\nTarget slump: 4 in (ASTM C143)\nTarget total air content: 6.0 percent (ASTM C231)\nUnit weight: 143.0 lb per cubic foot\nWater-soluble chloride ion content: 0.05 percent by weight of cement\n",
+  "key": [
+   {
+    "item": "aggregate",
+    "name": "nominal maximum aggregate size"
+   },
+   {
+    "item": "wcm",
+    "name": "water-cementitious ratio (w/cm)"
+   }
+  ],
+  "checked": [
+   "strength",
+   "slump",
+   "aggregate",
+   "wcm",
+   "air",
+   "content"
+  ],
+  "notes": "1 in aggregate where 3/4 in is required; w/cm = 263 / 560 = 0.47 > 0.45 (computed)"
  },
  {
   "id": "masonry_1",
   "family": "masonry",
   "spec": "masonry",
-  "element": "Exterior walls",
-  "text": "MORTAR AND GROUT MIX SUBMITTAL \u00b7 Submittal 04 20 00-01\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Masonry Supply (fictional)\nIntended use: Exterior walls\n\nMortar\nSpecification: ASTM C270, Type N, proportion specification\nCementitious materials: portland cement (ASTM C150 Type I) and hydrated lime (ASTM C207 Type S)\nAggregate: masonry sand, ASTM C144\nAdmixtures: none\nBatching: field-batched by volume with measuring boxes\n\nGrout\nSpecification: ASTM C476, coarse grout, ready-mixed\nGrout consistency: conventional grout, slump 6 in (ASTM C143)\nCompressive strength: 3000 psi at 28 days (ASTM C1019, three specimens, average)\n",
+  "element": "Exterior walls and walls below grade",
+  "short": "maintenance shop walls",
+  "use": "Exterior CMU walls of the vehicle maintenance shop",
+  "text": "MORTAR AND GROUT MIX SUBMITTAL \u00b7 Submittal 04 20 00-01\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Masonry Supply (fictional)\nIntended use: Exterior CMU walls of the vehicle maintenance shop\n\nMortar\nSpecification: ASTM C270, Type M, proportion specification\nCementitious materials: portland cement (ASTM C150 Type I) and hydrated lime (ASTM C207 Type S)\nAggregate: masonry sand, ASTM C144\nAdmixtures: none\nBatching: field-batched by volume with measuring boxes\n\nGrout\nSpecification: ASTM C476, coarse grout, ready-mixed\nGrout consistency: conventional grout, slump 11 in (ASTM C143)\nCompressive strength: 2000 psi at 28 days (ASTM C1019, three specimens, average)\n",
   "key": [
-   {
-    "item": "grout_consistency",
-    "name": "grout slump / slump flow / VSI"
-   },
    {
     "item": "mortar_type",
     "name": "mortar type"
@@ -137,15 +171,50 @@
    "grout_type",
    "grout_consistency",
    "grout_strength"
-  ]
+  ],
+  "notes": "Type M where Type S is specified (stronger, still noncompliant); grout slump 11 in and strength 2000 psi exactly at the limits (comply)"
  },
  {
   "id": "masonry_2",
   "family": "masonry",
   "spec": "masonry",
-  "element": "Interior non-load-bearing walls",
-  "text": "MORTAR AND GROUT MIX SUBMITTAL \u00b7 Submittal 04 20 00-02\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Masonry Supply (fictional)\nIntended use: Interior non-load-bearing walls\n\nMortar\nSpecification: ASTM C270, Type S, proportion specification\nCementitious materials: portland cement (ASTM C150 Type I) and hydrated lime (ASTM C207 Type S)\nAggregate: masonry sand, ASTM C144\nAdmixtures: none\nBatching: field-batched by volume with measuring boxes\n\nGrout\nSpecification: ASTM C476, fine grout, ready-mixed\nGrout consistency: self-consolidating grout, slump flow 27 in, visual stability index (VSI) 1 (ASTM C1611)\nCompressive strength: 3500 psi at 28 days (ASTM C1019, three specimens, average)\n",
+  "element": "Non-load-bearing interior walls",
+  "short": "office partitions",
+  "use": "Non-load-bearing CMU partitions between offices",
+  "text": "MORTAR AND GROUT MIX SUBMITTAL \u00b7 Submittal 04 20 00-02\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Masonry Supply (fictional)\nIntended use: Non-load-bearing CMU partitions between offices\n\nMortar\nSpecification: ASTM C270, Type N, proportion specification\nCementitious materials: mortar cement (ASTM C1329 Type N)\nAggregate: masonry sand, ASTM C144\nAdmixtures: none\nBatching: field-batched by volume with measuring boxes\n\nGrout\nSpecification: ASTM C476, coarse grout, ready-mixed\nGrout consistency: self-consolidating grout, slump flow 23 in, visual stability index (VSI) 1 (ASTM C1611)\nCompressive strength: 2500 psi at 28 days (ASTM C1019, three specimens, average)\n",
   "key": [
+   {
+    "item": "grout_consistency",
+    "name": "grout slump / slump flow / VSI"
+   }
+  ],
+  "checked": [
+   "mortar_type",
+   "masonry_cement",
+   "mortar_air",
+   "grout_type",
+   "grout_consistency",
+   "grout_strength"
+  ],
+  "notes": "mortar cement is allowed (only masonry cement is prohibited); slump flow 23 in < 24 in"
+ },
+ {
+  "id": "masonry_3",
+  "family": "masonry",
+  "spec": "masonry",
+  "element": "Exterior walls and walls below grade",
+  "short": "elevator pit walls",
+  "use": "Elevator pit walls below grade",
+  "text": "MORTAR AND GROUT MIX SUBMITTAL \u00b7 Submittal 04 20 00-03\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Masonry Supply (fictional)\nIntended use: Elevator pit walls below grade\n\nMortar\nSpecification: ASTM C270, Type S, proportion specification\nCementitious materials: masonry cement (ASTM C91 Type S)\nAggregate: masonry sand, ASTM C144\nAdmixtures: air-entraining admixture, 0.5 oz per bag of cement\nBatching: field-batched by volume with measuring boxes\n\nGrout\nSpecification: ASTM C476, fine grout, ready-mixed\nGrout consistency: conventional grout, slump 9 in (ASTM C143)\nCompressive strength: 3000 psi at 28 days (ASTM C1019, three specimens, average)\n",
+  "key": [
+   {
+    "item": "masonry_cement",
+    "name": "masonry cement"
+   },
+   {
+    "item": "mortar_air",
+    "name": "air entrainment in mortar"
+   },
    {
     "item": "grout_type",
     "name": "grout type (fine / coarse)"
@@ -158,22 +227,68 @@
    "grout_type",
    "grout_consistency",
    "grout_strength"
-  ]
+  ],
+  "notes": "three noncompliances"
  },
  {
-  "id": "masonry_3",
+  "id": "masonry_4",
   "family": "masonry",
   "spec": "masonry",
-  "element": "Walls below grade",
-  "text": "MORTAR AND GROUT MIX SUBMITTAL \u00b7 Submittal 04 20 00-03\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Masonry Supply (fictional)\nIntended use: Walls below grade\n\nMortar\nSpecification: ASTM C270, Type S, proportion specification\nCementitious materials: portland cement (ASTM C150 Type I) and hydrated lime (ASTM C207 Type S)\nAggregate: masonry sand, ASTM C144\nAdmixtures: air-entraining admixture, 0.5 oz per bag\nBatching: field-batched by volume with measuring boxes\n\nGrout\nSpecification: ASTM C476, fine grout, ready-mixed\nGrout consistency: conventional grout, slump 12 in (ASTM C143)\nCompressive strength: 2500 psi at 28 days (ASTM C1019, three specimens, average)\n",
+  "element": "Exterior walls and walls below grade",
+  "short": "brick veneer backup walls",
+  "use": "Exterior CMU backup walls behind the brick veneer",
+  "text": "MORTAR AND GROUT MIX SUBMITTAL \u00b7 Submittal 04 20 00-04\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Masonry Supply (fictional)\nIntended use: Exterior CMU backup walls behind the brick veneer\n\nMortar\nSpecification: ASTM C270, Type S, proportion specification\nCementitious materials: portland cement (ASTM C150 Type I) and hydrated lime (ASTM C207 Type S)\nAggregate: masonry sand, ASTM C144\nAdmixtures: none\nBatching: field-batched by volume with measuring boxes\n\nGrout\nSpecification: ASTM C476, coarse grout, ready-mixed\nGrout consistency: self-consolidating grout, slump flow 30 in, visual stability index (VSI) 1 (ASTM C1611)\nCompressive strength: 2000 psi at 28 days (ASTM C1019, three specimens, average)\n",
+  "key": [],
+  "checked": [
+   "mortar_type",
+   "masonry_cement",
+   "mortar_air",
+   "grout_type",
+   "grout_consistency",
+   "grout_strength"
+  ],
+  "notes": "fully compliant: slump flow 30 in, VSI 1 and 2000 psi are exactly at the limits"
+ },
+ {
+  "id": "masonry_5",
+  "family": "masonry",
+  "spec": "masonry",
+  "element": "Non-load-bearing interior walls",
+  "short": "storage room partitions",
+  "use": "Non-load-bearing CMU partitions around the storage rooms",
+  "text": "MORTAR AND GROUT MIX SUBMITTAL \u00b7 Submittal 04 20 00-05\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Masonry Supply (fictional)\nIntended use: Non-load-bearing CMU partitions around the storage rooms\n\nMortar\nSpecification: ASTM C270, Type O, proportion specification\nCementitious materials: portland cement (ASTM C150 Type I) and hydrated lime (ASTM C207 Type S)\nAggregate: masonry sand, ASTM C144\nAdmixtures: none\nBatching: field-batched by volume with measuring boxes\n\nGrout\nSpecification: ASTM C476, coarse grout, ready-mixed\nGrout consistency: conventional grout, slump 10 in (ASTM C143)\nCompressive strength: 1800 psi at 28 days (ASTM C1019, three specimens, average)\n",
   "key": [
    {
-    "item": "grout_type",
-    "name": "grout type (fine / coarse)"
+    "item": "mortar_type",
+    "name": "mortar type"
    },
    {
-    "item": "mortar_air",
-    "name": "air entrainment in mortar"
+    "item": "grout_strength",
+    "name": "grout compressive strength"
+   }
+  ],
+  "checked": [
+   "mortar_type",
+   "masonry_cement",
+   "mortar_air",
+   "grout_type",
+   "grout_consistency",
+   "grout_strength"
+  ],
+  "notes": "Type O where Type N or S is allowed; grout 1800 psi < 2000 psi"
+ },
+ {
+  "id": "masonry_6",
+  "family": "masonry",
+  "spec": "masonry",
+  "element": "Exterior walls and walls below grade",
+  "short": "loading-dock retaining wall",
+  "use": "Below-grade CMU retaining wall at the loading dock",
+  "text": "MORTAR AND GROUT MIX SUBMITTAL \u00b7 Submittal 04 20 00-06\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Masonry Supply (fictional)\nIntended use: Below-grade CMU retaining wall at the loading dock\n\nMortar\nSpecification: ASTM C270, Type N, proportion specification\nCementitious materials: portland cement (ASTM C150 Type I) and hydrated lime (ASTM C207 Type S)\nAggregate: masonry sand, ASTM C144\nAdmixtures: none\nBatching: field-batched by volume with measuring boxes\n\nGrout\nSpecification: ASTM C476, coarse grout, ready-mixed\nGrout consistency: conventional grout, slump 7 in (ASTM C143)\nCompressive strength: 2500 psi at 28 days (ASTM C1019, three specimens, average)\n",
+  "key": [
+   {
+    "item": "mortar_type",
+    "name": "mortar type"
    },
    {
     "item": "grout_consistency",
@@ -187,47 +302,7 @@
    "grout_type",
    "grout_consistency",
    "grout_strength"
-  ]
- },
- {
-  "id": "masonry_4",
-  "family": "masonry",
-  "spec": "masonry",
-  "element": "Exterior walls",
-  "text": "MORTAR AND GROUT MIX SUBMITTAL \u00b7 Submittal 04 20 00-04\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Masonry Supply (fictional)\nIntended use: Exterior walls\n\nMortar\nSpecification: ASTM C270, Type S, proportion specification\nCementitious materials: portland cement (ASTM C150 Type I) and hydrated lime (ASTM C207 Type S)\nAggregate: masonry sand, ASTM C144\nAdmixtures: none\nBatching: field-batched by volume with measuring boxes\n\nGrout\nSpecification: ASTM C476, coarse grout, ready-mixed\nGrout consistency: self-consolidating grout, slump flow 26 in, visual stability index (VSI) 1 (ASTM C1611)\nCompressive strength: 2500 psi at 28 days (ASTM C1019, three specimens, average)\n",
-  "key": [],
-  "checked": [
-   "mortar_type",
-   "masonry_cement",
-   "mortar_air",
-   "grout_type",
-   "grout_consistency",
-   "grout_strength"
-  ]
- },
- {
-  "id": "masonry_5",
-  "family": "masonry",
-  "spec": "masonry",
-  "element": "Interior non-load-bearing walls",
-  "text": "MORTAR AND GROUT MIX SUBMITTAL \u00b7 Submittal 04 20 00-05\nProject: CEM4644 practice project (fictional) \u00b7 Supplier: Practice Masonry Supply (fictional)\nIntended use: Interior non-load-bearing walls\n\nMortar\nSpecification: ASTM C270, Type N, proportion specification\nCementitious materials: masonry cement (ASTM C91 Type S)\nAggregate: masonry sand, ASTM C144\nAdmixtures: air-entraining admixture, 0.5 oz per bag\nBatching: field-batched by volume with measuring boxes\n\nGrout\nSpecification: ASTM C476, coarse grout, ready-mixed\nGrout consistency: conventional grout, slump 10 in (ASTM C143)\nCompressive strength: 3000 psi at 28 days (ASTM C1019, three specimens, average)\n",
-  "key": [
-   {
-    "item": "masonry_cement",
-    "name": "masonry cement"
-   },
-   {
-    "item": "mortar_air",
-    "name": "air entrainment in mortar"
-   }
   ],
-  "checked": [
-   "mortar_type",
-   "masonry_cement",
-   "mortar_air",
-   "grout_type",
-   "grout_consistency",
-   "grout_strength"
-  ]
+  "notes": "Type N where Type S is specified for walls below grade; slump 7 in < 8 in"
  }
 ]

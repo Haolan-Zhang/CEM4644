@@ -141,7 +141,7 @@ In every HokieAI step, the notebook gives you a prompt; you send it to HokieAI (
     sub_labels = [submittal_label(p) for p in subs]
     cells.append(md("""
 ## Part 2 · Reviewing Submittals Against the Specification
-Before a material is used, its submittal (here, a concrete mix design or a mortar and grout mix) is checked against the specification. Ten practice submittals were made for this course, each to be checked against a specification excerpt adapted from the Unified Facilities Guide Specifications (UFGS 03 30 00 Cast-in-Place Concrete and 04 20 00 Masonry). Most contain planted noncompliances; two comply fully. The answer key is the list of planted noncompliances, and every requirement the submittal is checked against counts as one decision.
+Before a material is used, its submittal (here, a concrete mix design or a mortar and grout mix) is checked against the specification. Twelve practice submittals were made for this course, each to be checked against a specification excerpt adapted from the Unified Facilities Guide Specifications (UFGS 03 30 00 Cast-in-Place Concrete and 04 20 00 Masonry). A submittal states its intended use, not the portion of the structure named in the specification, so the applicable requirements must be identified first. Some values must be computed from the batch weights, some are exactly at a limit, and two submittals comply fully. The answer key is the list of planted noncompliances. Every requirement the submittal is checked against counts as one decision (six per submittal); a flag on a requirement that sets no limit for the intended use is a false flag.
 """))
     cells.append(form("▶ Step 2a · Review a Submittal with HokieAI", "lab.review_submittal(submittal, prompt_version)",
                       notes=["Choose a submittal and a prompt version, run the cell, and follow the instructions. Run all three versions on at least three submittals, including a concrete and a masonry one.",
@@ -162,13 +162,13 @@ Before a material is used, its submittal (here, a concrete mix design or a morta
     # ------------------------------------------------------------------ Part 3: contract questions
     cells.append(md("""
 ## Part 3 · Answering Questions from a Contract
-Twenty-one construction clauses of the Federal Acquisition Regulation (FAR), the standard terms of U.S. federal construction contracts, and 21 questions about them. Some questions need two clauses, and four cannot be answered from the text. The answer key gives the answer from the clauses; quotes are checked word for word against the clauses.
+Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), the standard terms of U.S. federal construction contracts, and 27 questions about them. Ten questions describe a project situation (a late notice, a withheld payment, a warranty claim), so the answer needs the requirement and its application to the facts. Seven cannot be answered from the text, although most have a common answer outside it. The answer key gives the answer from the clauses; quotes are checked word for word against the clauses.
 """))
     cells.append(form("▶ Step 3a · Ask HokieAI About the Contract", "lab.contract_questions(prompt_version)",
                       notes=["Choose a prompt version, run the cell, and follow the instructions. Score every version.",
                              "v1 · questions only: the questions and the clauses.",
                              "v2 · answers with quotes: asks for the sentence of the contract that supports each answer.",
-                             "v3 · only from the text, with quotes: restricts HokieAI to the clauses, asks for the clause number and an exact quote, and for NOT IN TEXT when the clauses do not answer.",
+                             "v3 · only from the text, with quotes: restricts HokieAI to the clauses, asks it to apply the requirement to the facts of each situation, for the clause number and an exact quote, and for NOT IN TEXT when the clauses do not answer.",
                              "my own prompt: starts from v3; edit the prompt in the prompt box before copying it."],
                       params=[choice("prompt_version", list(CONTRACT_VERSIONS)[0], CONTRACT_VERSIONS)], texts=T("contract")))
     cells.append(form("▶ Step 3b · Compare Prompt Versions", 'lab.compare("contract")',
@@ -226,7 +226,7 @@ Five 36 × 24 in drawing sheets, made for this course, each carry the door sched
 ### Data and model sources
 - Incident reports: Severe Injury Reports (2015–2025), Occupational Safety and Health Administration, U.S. Department of Labor, public domain, https://www.osha.gov/severe-injury-reports.
 - Specification excerpts: adapted from the Unified Facilities Guide Specifications 03 30 00 and 04 20 00, U.S. Department of Defense, public domain, https://www.wbdg.org/dod/ufgs; the submittals are practice submittals made for CEM4644.
-- Contract clauses: Federal Acquisition Regulation, Part 52 (21 construction clauses), public domain, https://www.acquisition.gov/far.
+- Contract clauses: Federal Acquisition Regulation, Part 52 (29 construction clauses), public domain, https://www.acquisition.gov/far.
 - Drawings: original practice drawings made for CEM4644 (not for construction).
 - Generative AI: GPT models via HokieAI (Virginia Tech).
 """))

@@ -20,7 +20,7 @@ FAMILY_NAME = {"foundation": "Foundation plan", "roof": "Gable roof", "schedule"
 def submittal_label(p: dict) -> str:
     n = p["id"].split("_")[-1]
     kind = "Concrete mix design" if p["family"] == "concrete" else "Mortar and grout"
-    return f"{kind} {n} · {p['element'][0].lower() + p['element'][1:]}"
+    return f"{kind} {n} · {p['short']}"
 
 
 def drawing_label(p: dict) -> str:

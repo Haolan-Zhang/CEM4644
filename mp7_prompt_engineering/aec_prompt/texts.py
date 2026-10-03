@@ -86,6 +86,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "v2_prompt_text": ("Answer the questions about the construction contract clauses below. For each question, quote the sentence of the contract that "
                            "supports your answer.\nReply with one line per question: Q01 | answer | exact quote\n\nQuestions:\n{questions}\n\nContract clauses:\n{clauses}"),
         "v3_prompt_text": ("You are a contract administrator. Answer each question using only the contract clauses below; do not use outside knowledge.\n"
+                           "If a question describes a situation, state the requirement and apply it to the facts (dates, amounts, quantities).\n"
                            "Reply with one line per question: Q01 | short answer | FAR clause number | exact quote of the supporting sentence, copied word for word\n"
                            "If the clauses do not answer the question, reply: Q01 | NOT IN TEXT | - | -\n\nQuestions:\n{questions}\n\nContract clauses:\n{clauses}"),
         "steps_text": PASTE_STEPS,

@@ -91,11 +91,20 @@ RULES = {
                  ("wcm", r"w\s*/\s*c|water[- /]*(to[- ])?cement|water-cementitious|water/cementitious"),
                  ("slump", r"slump"), ("air", r"\bair\b|entrain"), ("aggregate", r"aggregate|nominal max"), ("strength", r"strength|f.?c\b|psi")],
     "masonry": [("masonry_cement", r"masonry cement"), ("mortar_air", r"\bair\b|entrain"), ("grout_consistency", r"slump|flow|vsi|visual stability"),
-                ("grout_strength", r"strength|psi"), ("grout_type", r"\bfine\b|coarse|grout type|c476"), ("mortar_type", r"mortar type|type [nsmo]\b|c270|mortar")],
+                ("grout_strength", r"strength|psi"), ("grout_type", r"\bfine\b|coarse|grout type|c476"), ("mortar_type", r"mortar type|type [nsmo]\b|c270")],
 }
+FALLBACK = {"concrete": [], "masonry": [("mortar_type", r"mortar")]}
 
 
-REQUIREMENT_NAMES = {"strength": "compressive strength (f'c)", "slump": "slump", "aggregate": "nominal maximum aggregate size",
+def _category(body: str, family: str):
+    """The requirement column names the requirement; the whole line decides only when that column does not."""
+    for part, rules in ((body.split("|")[0], RULES[family]), (body, RULES[family]), (body, FALLBACK[family])):
+        cat = next((c for c, rx in rules if re.search(rx, part)), None)
+        if cat:
+            return cat
+
+
+REQUIREMENT_NAMES = {"strength": "compressive strength (f'c at 28 days)", "slump": "slump", "aggregate": "nominal maximum aggregate size",
                      "wcm": "water-cementitious ratio (w/cm)", "air": "air content / air entrainment", "content": "minimum cementitious content",
                      "mortar_type": "mortar type", "masonry_cement": "masonry cement", "mortar_air": "air entrainment in mortar",
                      "grout_type": "grout type (fine / coarse)", "grout_consistency": "grout slump / slump flow / VSI", "grout_strength": "grout compressive strength"}
@@ -105,13 +114,13 @@ def submittal(reply: str, problem: dict) -> dict:
     """NONCOMPLIANT lines → the requirements flagged; every checked requirement counts as one decision."""
     flagged, unknown = set(), []
     for line in reply.splitlines():
-        m = re.match(r"\s*[-*`]*\s*NONCOMPLIANT\s*[*`]*\s*\|\s*(.+)", line, re.I)
+        m = re.match(r"[\s>*`#-]*NONCOMPLIANT[\s*`]*\|\s*(.+)", line, re.I)
         if not m:
             continue
         body = m.group(1).strip().lower()
         if body.startswith("none"):
             continue
-        cat = next((c for c, rx in RULES[problem["family"]] if re.search(rx, body)), None)
+        cat = _category(body, problem["family"])
         (flagged.add(cat) if cat else unknown.append(body))
     planted = {k["item"] for k in problem["key"]}
     names = {k["item"]: k["name"] for k in problem["key"]}
@@ -131,8 +140,10 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", str(s).replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"').replace("–", "-").replace("—", "-")).strip().lower()
 
 
-NONE_RX = (r"not in (the )?(provided |supplied )?(text|clauses?)|not (stated|specified|provided|addressed|inserted|included|given|listed|contained|found)"
-           r"|left blank|\bblank\b|does not (say|state|specify|provide)|\bno\b[^.;|]{0,60}\b(is |are )?(stated|given|specified|provided|inserted|listed)\b")
+NONE_RX = (r"not in (the )?(provided |supplied )?(text|clauses?)|not (stated|specified|provided|addressed|inserted|included|given|listed|contained|found|mentioned)"
+           r"|left blank|\bblank\b|(does|do) not (say|state|specify|provide|address|include|contain|give)|\bsilent\b|cannot be determined"
+           r"|\bno(ne)?\b[^.;|]{0,60}\b(is |are )?(stated|given|specified|provided|inserted|listed)\b")
+NOT_IN_TEXT = r"^\W*not in (the )?(provided |supplied )?(text|clauses?)"
 
 
 def _quote_found(quote: str, ctext: str) -> bool:
@@ -153,8 +164,8 @@ def contract(reply: str, questions: List[dict], clauses: str) -> dict:
         ans = parts[0] if parts and parts[0] else ""
         a = _norm(ans)
         said_none = bool(re.search(NONE_RX, a))
-        if q["answerable"]:
-            ok = bool(a) and not said_none and all(
+        if q["answerable"]:            # the patterns decide; an answer that only says NOT IN TEXT is wrong
+            ok = bool(a) and not re.search(NOT_IN_TEXT, a) and all(
                 (sum(bool(re.search(rx, a)) for rx in g["any"]) >= g["min"]) if isinstance(g, dict) else any(re.search(rx, a) for rx in g)
                 for g in q["patterns"])
         else:

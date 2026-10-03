@@ -18,53 +18,21 @@
  },
  {
   "id": "Q02",
-  "question": "What may the Contracting Officer do if the Contractor fails to submit the schedule within the time prescribed?",
-  "key": "Withhold approval of progress payments until the schedule is submitted",
+  "question": "A progress payment request is for $240,000, and the Contracting Officer finds that satisfactory progress has not been made. What is the most the Contracting Officer may retain from this payment?",
+  "key": "$24,000 (10 percent)",
   "clauses": [
-   "52.236-15"
+   "52.232-5"
   ],
   "answerable": true,
   "patterns": [
    [
-    "withh[oe]ld"
-   ],
-   [
-    "progress payment"
+    "24,?000",
+    "\\$24\\s?k"
    ]
   ]
  },
  {
   "id": "Q03",
-  "question": "What is the maximum percentage the Contracting Officer may retain from a progress payment when satisfactory progress has not been made?",
-  "key": "10 percent",
-  "clauses": [
-   "52.232-5"
-  ],
-  "answerable": true,
-  "patterns": [
-   [
-    "\\b10\\b",
-    "\\bten\\b"
-   ]
-  ]
- },
- {
-  "id": "Q04",
-  "question": "Progress payments on undefinitized contract actions may not exceed what percentage of the work accomplished?",
-  "key": "80 percent",
-  "clauses": [
-   "52.232-5"
-  ],
-  "answerable": true,
-  "patterns": [
-   [
-    "\\b80\\b",
-    "eighty"
-   ]
-  ]
- },
- {
-  "id": "Q05",
   "question": "How many calendar days after receiving the notice to proceed must the Contractor commence work?",
   "key": "NOT IN TEXT (the number is left blank for the Contracting Officer to insert)",
   "clauses": [
@@ -74,61 +42,51 @@
   "patterns": null
  },
  {
-  "id": "Q06",
-  "question": "How long does the Contractor's warranty of construction last, and from what date?",
-  "key": "1 year from the date of final acceptance (or from the date the Government takes possession, if earlier)",
+  "id": "Q04",
+  "question": "The Government takes possession of the completed gymnasium on June 1, 2027; final acceptance of the whole project is on October 1, 2027. On July 15, 2028, a roof leak caused by defective flashing is found in the gymnasium. Is the gymnasium still under the Contractor's warranty of construction?",
+  "key": "No: for a part the Government took possession of before final acceptance, the 1-year warranty runs from possession, so it ended June 1, 2028",
   "clauses": [
    "52.246-21"
   ],
   "answerable": true,
   "patterns": [
    [
-    "\\b(1|one)[- ]year"
+    "\\bno\\b",
+    "expired",
+    "not (still )?(under|covered|within)",
+    "\\bended\\b",
+    "lapsed"
    ],
    [
-    "accept"
-   ]
-  ]
- },
- {
-  "id": "Q07",
-  "question": "If the Government takes possession of part of the work before final acceptance, when does the warranty on that part begin, and does the possession count as acceptance?",
-  "key": "The 1-year warranty runs from the date the Government takes possession; possession is not an acceptance of the work",
-  "clauses": [
-   "52.246-21",
-   "52.236-11"
-  ],
-  "answerable": true,
-  "patterns": [
-   [
+    "june 1,? 2028",
     "possession"
-   ],
-   [
-    "not (be )?(deemed |considered )?(an )?accept",
-    "no acceptance",
-    "does not (constitute|count as|amount to)",
-    "isn.t (an )?accept",
-    "\\bnot\\b.*\\baccept"
    ]
   ]
  },
  {
-  "id": "Q08",
-  "question": "Within how many days from the beginning of a delay must the Contractor notify the Contracting Officer in writing of its causes, for the delay to be excused under the Default clause?",
-  "key": "10 days",
+  "id": "Q05",
+  "question": "A strike at the ready-mix supplier stops concrete deliveries from March 3. The Contractor first notifies the Contracting Officer in writing of the cause of the delay on March 16. Did the Contractor meet the notice requirement of the Default clause for an excusable delay?",
+  "key": "No: the notice was due within 10 days from the beginning of the delay (by March 13), unless the Contracting Officer extended the period",
   "clauses": [
    "52.249-10"
   ],
   "answerable": true,
   "patterns": [
    [
-    "\\b10\\b",
-    "\\bten\\b"
+    "\\bno\\b",
+    "not (meet|met|timely)",
+    "\\blate\\b",
+    "missed",
+    "did not"
+   ],
+   [
+    "\\b(10|ten)\\b",
+    "march 13"
    ]
   ]
  },
  {
-  "id": "Q09",
+  "id": "Q06",
   "question": "What is the dollar amount of liquidated damages per calendar day of delay?",
   "key": "NOT IN TEXT (the amount is left blank)",
   "clauses": [
@@ -138,7 +96,27 @@
   "patterns": null
  },
  {
-  "id": "Q10",
+  "id": "Q07",
+  "question": "If the Government takes possession of part of the work before final acceptance, does the possession count as acceptance of that work?",
+  "key": "No; possession is not an acceptance of any work (and the 1-year warranty on that part runs from the date of possession)",
+  "clauses": [
+   "52.236-11",
+   "52.246-21"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "not (be )?(deemed |considered )?(an )?accept",
+    "no acceptance",
+    "does not (constitute|count as|amount to)",
+    "isn.t (an )?accept",
+    "\\bnot\\b.*\\baccept",
+    "\\bno\\b"
+   ]
+  ]
+ },
+ {
+  "id": "Q08",
   "question": "Name three causes of delay that the Default clause gives as examples of unforeseeable causes beyond the Contractor's control.",
   "key": "Any three of: acts of God or of the public enemy, acts of the Government, acts of another contractor, fires, floods, epidemics, quarantine restrictions, strikes, freight embargoes, unusually severe weather, certain subcontractor or supplier delays",
   "clauses": [
@@ -166,7 +144,23 @@
   ]
  },
  {
-  "id": "Q11",
+  "id": "Q09",
+  "question": "On April 1, the Contracting Officer orally directs the Contractor to change the anchor bolt pattern, and the Contractor's extra costs begin on April 2. On April 26, the Contractor gives written notice that it regards the direction as a change order. From what date are the extra costs recoverable?",
+  "key": "From April 6: no adjustment is made for costs incurred more than 20 days before the written notice (the costs of April 2-5 are not recoverable)",
+  "clauses": [
+   "52.243-4"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "april 6\\b",
+    "apr\\.? 6\\b",
+    "\\b4/6\\b"
+   ]
+  ]
+ },
+ {
+  "id": "Q10",
   "question": "Under the Changes clause, within how many days after receiving a written change order must the Contractor assert its right to an adjustment?",
   "key": "30 days",
   "clauses": [
@@ -181,39 +175,28 @@
   ]
  },
  {
-  "id": "Q12",
-  "question": "Both the Changes clause (for changes under its paragraph (b)) and the Suspension of Work clause limit the costs that can be recovered from before the Contractor's written notice. How many days is the limit in each clause?",
-  "key": "20 days in both",
-  "clauses": [
-   "52.243-4",
-   "52.242-14"
-  ],
-  "answerable": true,
-  "patterns": [
-   [
-    "\\b20\\b",
-    "twenty"
-   ]
-  ]
- },
- {
-  "id": "Q13",
-  "question": "Is profit included in the adjustment for an unreasonable suspension, delay, or interruption of the work?",
-  "key": "No (excluding profit)",
+  "id": "Q11",
+  "question": "The Contracting Officer unreasonably delays the approval of a shop drawing, which interrupts the work. The Contractor's added costs are $18,000, and it asks for $18,000 plus 10 percent profit ($1,800). What adjustment does the Suspension of Work clause allow?",
+  "key": "$18,000: the adjustment is for the increase in cost, excluding profit",
   "clauses": [
    "52.242-14"
   ],
   "answerable": true,
   "patterns": [
    [
-    "\\bno\\b",
+    "18,?000"
+   ],
+   [
     "exclud",
-    "not (be )?(included|recoverable|allowed)"
+    "no profit",
+    "without (the )?profit",
+    "profit (is |would be )?not",
+    "not (include|allow|recover)"
    ]
   ]
  },
  {
-  "id": "Q14",
+  "id": "Q12",
   "question": "What insurance coverage limits must the Contractor carry?",
   "key": "NOT IN TEXT",
   "clauses": [],
@@ -221,23 +204,24 @@
   "patterns": null
  },
  {
-  "id": "Q15",
-  "question": "If the drawings and the specifications differ, which governs?",
-  "key": "The specifications",
+  "id": "Q13",
+  "question": "The drawings show a floor drain in the mechanical room, but the specifications do not mention it. Must the Contractor provide the floor drain?",
+  "key": "Yes: anything shown on the drawings and not mentioned in the specifications is of like effect as if shown or mentioned in both",
   "clauses": [
    "52.236-21"
   ],
   "answerable": true,
   "patterns": [
    [
-    "specifications? (shall |will )?(govern|control|prevail|take precedence)",
-    "^the specifications?\\b",
-    "^specifications?\\b"
+    "\\byes\\b",
+    "must (provide|install|furnish)",
+    "\\brequired\\b",
+    "like effect"
    ]
   ]
  },
  {
-  "id": "Q16",
+  "id": "Q14",
   "question": "Unless otherwise indicated, how many copies of each shop drawing must the Contractor submit, and how many does the Contracting Officer keep?",
   "key": "Four submitted; three retained",
   "clauses": [
@@ -254,7 +238,7 @@
   ]
  },
  {
-  "id": "Q17",
+  "id": "Q15",
   "question": "Is the Contractor entitled to an extension of the performance schedule for a stop-work order issued because of a safety noncompliance?",
   "key": "No",
   "clauses": [
@@ -269,7 +253,7 @@
   ]
  },
  {
-  "id": "Q18",
+  "id": "Q16",
   "question": "Which federal safety standards must the Contractor comply with under the Accident Prevention clause?",
   "key": "29 CFR Part 1926 and 29 CFR Part 1910",
   "clauses": [
@@ -286,11 +270,47 @@
   ]
  },
  {
-  "id": "Q19",
-  "question": "How many days does the Contracting Officer have to approve or disapprove a shop drawing?",
-  "key": "NOT IN TEXT",
+  "id": "Q17",
+  "question": "While excavating for the footings, the Contractor hits rock that the boring logs in the contract do not show. It removes the rock and sends written notice to the Contracting Officer the following week. Is the Contractor's request for an equitable adjustment protected under the Differing Site Conditions clause?",
+  "key": "No (at risk): written notice was required promptly and before the conditions were disturbed; without it, no request is allowed unless the Contracting Officer extends the time",
   "clauses": [
-   "52.236-21"
+   "52.236-2"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "\\bno\\b",
+    "not (be )?(allowed|protected|entitled)",
+    "at risk",
+    "(may|could|can|will) (likely )?(be )?(disallow|den|reject|bar)",
+    "jeopard",
+    "\\bbarred\\b"
+   ],
+   [
+    "disturb"
+   ]
+  ]
+ },
+ {
+  "id": "Q18",
+  "question": "The estimated quantity of a unit-priced item, rock excavation, is 1,000 cubic yards; the actual quantity is 1,250 cubic yards. How many cubic yards of the variation can the equitable adjustment in the contract price be based on?",
+  "key": "100 cubic yards: the quantity above 115 percent of the estimate (1,150 cubic yards)",
+  "clauses": [
+   "52.211-18"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "(?<![\\d,.])100\\b"
+   ]
+  ]
+ },
+ {
+  "id": "Q19",
+  "question": "What minimum percentage of the total amount of work must the Contractor perform on the site with its own organization?",
+  "key": "NOT IN TEXT (the percentage is left blank for the Contracting Officer to insert)",
+  "clauses": [
+   "52.236-1"
   ],
   "answerable": false,
   "patterns": null
@@ -311,6 +331,81 @@
  },
  {
   "id": "Q21",
+  "question": "How many days after the designated billing office receives a proper payment request must the Government pay a progress payment before an interest penalty applies?",
+  "key": "NOT IN TEXT (the Prompt Payment clause is not among the clauses)",
+  "clauses": [],
+  "answerable": false,
+  "patterns": null
+ },
+ {
+  "id": "Q22",
+  "question": "While grading, the Contractor's crew destroys survey stakes that the Contracting Officer established, before their removal was authorized. Who pays to replace them, and how?",
+  "key": "The Contractor: the Contracting Officer may replace them and deduct the expense from amounts due to the Contractor",
+  "clauses": [
+   "52.236-17"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "contractor\\b"
+   ],
+   [
+    "deduct"
+   ]
+  ]
+ },
+ {
+  "id": "Q23",
+  "question": "What markup percentage for overhead and profit may the Contractor add to the cost of changed work?",
+  "key": "NOT IN TEXT",
+  "clauses": [],
+  "answerable": false,
+  "patterns": null
+ },
+ {
+  "id": "Q24",
+  "question": "A change order extends the completion date for the gymnasium only. Does the change order necessarily change the completion dates for the rest of the project?",
+  "key": "No: the change order may extend only the elements related to the changed work, and the completion dates for all other portions of the work will not be altered",
+  "clauses": [
+   "52.211-13"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "\\bno\\b",
+    "not (necessarily|be )?(altered|changed|extended)",
+    "unchanged",
+    "\\bremain"
+   ]
+  ]
+ },
+ {
+  "id": "Q25",
+  "question": "Who pays for the temporary connections, distribution lines, and meters for the utilities the Government makes available, and when must they be removed?",
+  "key": "The Contractor, at its expense; before final acceptance of the work",
+  "clauses": [
+   "52.236-14"
+  ],
+  "answerable": true,
+  "patterns": [
+   [
+    "contractor\\b"
+   ],
+   [
+    "before (the )?final acceptance"
+   ]
+  ]
+ },
+ {
+  "id": "Q26",
+  "question": "Within how many days after receiving the Contracting Officer's final decision on a claim must the Contractor appeal?",
+  "key": "NOT IN TEXT (the Disputes clause is not among the clauses)",
+  "clauses": [],
+  "answerable": false,
+  "patterns": null
+ },
+ {
+  "id": "Q27",
   "question": "While the Government has possession or use of part of the work before completion, is the Contractor responsible for loss of or damage to that work caused by the Government's possession or use?",
   "key": "No; the Contractor is relieved of that responsibility",
   "clauses": [
