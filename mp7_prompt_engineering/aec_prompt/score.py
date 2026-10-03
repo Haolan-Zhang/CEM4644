@@ -87,8 +87,8 @@ def schedule(reply: str, key: List[dict]) -> dict:
 
 # ---------------------------------------------------------------------------- submittal review
 RULES = {
-    "concrete": [("wcm", r"w\s*/\s*c|water[- /]*(to[- ])?cement|water-cementitious|water/cementitious"),
-                 ("content", r"cementitious (material(s)? )?content|minimum cementitious|cement(itious)? content|total cementitious"),
+    "concrete": [("content", r"cementitious (material(s)? )?content|minimum cementitious|\bcement content|total cementitious|content adequate|adequate[^|]*content"),
+                 ("wcm", r"w\s*/\s*c|water[- /]*(to[- ])?cement|water-cementitious|water/cementitious"),
                  ("slump", r"slump"), ("air", r"\bair\b|entrain"), ("aggregate", r"aggregate|nominal max"), ("strength", r"strength|f.?c\b|psi")],
     "masonry": [("masonry_cement", r"masonry cement"), ("mortar_air", r"\bair\b|entrain"), ("grout_consistency", r"slump|flow|vsi|visual stability"),
                 ("grout_strength", r"strength|psi"), ("grout_type", r"\bfine\b|coarse|grout type|c476"), ("mortar_type", r"mortar type|type [nsmo]\b|c270|mortar")],
@@ -131,6 +131,17 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", str(s).replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"').replace("–", "-").replace("—", "-")).strip().lower()
 
 
+NONE_RX = (r"not in (the )?(provided |supplied )?(text|clauses?)|not (stated|specified|provided|addressed|inserted|included|given|listed|contained|found)"
+           r"|left blank|\bblank\b|does not (say|state|specify|provide)|\bno\b[^.;|]{0,60}\b(is |are )?(stated|given|specified|provided|inserted|listed)\b")
+
+
+def _quote_found(quote: str, ctext: str) -> bool:
+    """Every quoted passage (several may be joined with ' / ') appears word for word; quotation marks and end punctuation ignored."""
+    strip = lambda t: re.sub(r"[\"'\\]", "", t)
+    parts = [x for x in re.split(r"\s+/\s+|\s*\.\.\.\s*|\s*…\s*", strip(_norm(quote))) if len(x.strip(" .;:,")) > 15]
+    return bool(parts) and all(x.strip(" .;:,") in strip(ctext) for x in parts)
+
+
 def contract(reply: str, questions: List[dict], clauses: str) -> dict:
     lines = {}
     for m in re.finditer(r"^\s*[*`]*\s*(Q\d\d)\s*[*`]*\s*[|.:)]\s*(.+)$", reply, re.M):
@@ -141,7 +152,7 @@ def contract(reply: str, questions: List[dict], clauses: str) -> dict:
         parts = [p.strip() for p in lines.get(q["id"], "").split("|")]
         ans = parts[0] if parts and parts[0] else ""
         a = _norm(ans)
-        said_none = bool(re.search(r"not in (the )?text|not stated|not specified|not provided|not addressed|left blank|\bblank\b|does not (say|state|specify)|no (amount|number) (is )?(given|stated|specified)", a))
+        said_none = bool(re.search(NONE_RX, a))
         if q["answerable"]:
             ok = bool(a) and not said_none and all(
                 (sum(bool(re.search(rx, a)) for rx in g["any"]) >= g["min"]) if isinstance(g, dict) else any(re.search(rx, a) for rx in g)
@@ -152,10 +163,10 @@ def contract(reply: str, questions: List[dict], clauses: str) -> dict:
         right += ok
         quote = parts[-1] if len(parts) >= 2 else ""
         qv = "—"
-        if quote and quote not in ("-", "—") and not re.match(r"^(far )?52\.\d", _norm(quote)):
+        no_quote = re.match(r"^(-|—|none|n/?a|not applicable|no (supporting|relevant|such) )", _norm(quote)) or re.match(r"^(far )?52\.\d", _norm(quote))
+        if quote and not no_quote:
             quotes += 1
-            qt = _norm(quote).strip('"\'').rstrip(".").strip()
-            hit = len(qt) > 15 and (qt in ctext or all(seg.strip() in ctext for seg in re.split(r"\.\.\.|…", qt) if len(seg.strip()) > 15))
+            hit = _quote_found(quote, ctext)
             verified += hit; qv = "✓" if hit else "✗"
         rows.append({"question": q["id"], "answer key": q["key"], "HokieAI": ans[:120] or "—", "": "✓" if ok else "✗", "quote found": qv})
     return {"right": right, "n": len(questions), "made_up": made_up, "unanswerable": sum(not q["answerable"] for q in questions),

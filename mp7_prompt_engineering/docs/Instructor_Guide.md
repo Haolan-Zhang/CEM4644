@@ -28,10 +28,17 @@ back, and scores it. Editing the prompt in the box labels the output "my own pro
 
 HokieAI's web chat may use a different model or settings, so the students' numbers can differ.
 
-Parts 2 and 3 were added on 2026-10-03; their trial stopped after 5 of 36 calls because the HokieAI API key's token
-quota ran out. Submittal review so far (concrete submittals 1 and 2): v1 5/5 and 3/5, v2 and v3 5/5 and 4/5. On
-submittal 2, v2 and v3 also flagged "cementitious content not adequate for the strength", counted as a false flag
-(a judgment worth discussing). The contract questions have not been run yet.
+Parts 2 and 3 (added 2026-10-03), run in the HokieAI web chat on 2026-10-03 (the API key's quota was used up):
+
+| Part | v1 | v2 | v3 |
+|---|---|---|---|
+| Submittal review (concrete 3, masonry 3, masonry 4: 18 requirements) | 18/18 | 18/18 | 18/18 |
+| Contract questions (21) | 21/21, no quotes | 21/21, 20/20 quotes found | 21/21, 17/17 quotes found |
+
+Earlier API runs on concrete submittals 1 and 2: v1 5/5 and 3/5, v2 and v3 5/5 and 4/5 (the extra flag "cementitious content
+not adequate for the strength" counts as a false flag). With the current HokieAI model these two parts barely separate
+the prompt versions: every version found every planted noncompliance and refused all four unanswerable questions. What
+does change is the evidence: v1 gives answers with nothing to check, v2 and v3 give quotes that can be verified.
 
 ## 3. Marking notes
 
