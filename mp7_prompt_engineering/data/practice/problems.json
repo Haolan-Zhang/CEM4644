@@ -1,0 +1,849 @@
+[
+ {
+  "id": "foundation_1",
+  "family": "foundation",
+  "image": "foundation_1.png",
+  "shape": "rectangle",
+  "hidden_dimension": false,
+  "wall_length_ft": 176.0,
+  "text": "The attached foundation plan shows a 6 in CMU foundation wall, 4 ft high, with no openings. Use 8 in x 16 in (nominal) CMUs.\nQ1. How many CMUs must be purchased, including 5 % waste?\nQ2. If every cell is grouted, how many cubic yards of grout are needed, including 5 % waste? A fully grouted 6 in CMU takes 0.17 ft\u00b3 of grout.\nQ3. If only the cells with vertical reinforcement at 32 in on center are grouted, how many cubic yards of grout are needed, including 5 % waste?",
+  "rules": "Estimating conventions: total wall length = sum of the outside dimensions (no deduction at corners); wall area = length x height; one CMU covers 8 in x 16 in = 0.889 ft\u00b2; round CMUs up after adding waste. Grout = CMUs before waste x grout per CMU, converted to CY (27 ft\u00b3 = 1 CY), then add grout waste. Cells are 8 in apart, so grouting at S in on center fills 8/S of the cells.",
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 832,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 5.236,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 32 in O.C.",
+    "value": 1.309,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ },
+ {
+  "id": "roof_1",
+  "family": "roof",
+  "image": "roof_1.png",
+  "text": "The attached diagram shows a gable roof with a 7:12 slope.\nQ1. What is the net roof area (ft\u00b2)?\nQ2. How many rolls of #15 single-coverage underlayment (144 ft x 3 ft per roll) are needed? The underlayment laps 4 in under each rake edge and overlaps 1 ft at the ridge.\nQ3. The roof is covered with 3-tab asphalt strip shingles, 3 ft x 1 ft, with 5.5 in exposure. Find (a) the starter-course area at the eaves (ft\u00b2), (b) the area for the 1 ft ridge coverage (ft\u00b2), (c) the cutting-waste area at the rakes (ft\u00b2, 0.25 ft\u00b2 per linear foot of rake), (d) the gross roof area (ft\u00b2), and (e) the number of shingles.",
+  "rules": "Estimating conventions: run = half the eave-to-eave distance; rise = run x slope; rake length = sqrt(run\u00b2 + rise\u00b2); net roof area = rake length x eave length x 2 roof planes. Underlayment area = net area + ridge lap (eave length x 1 ft) + rake laps (4/12 ft x rake length x 4 rake edges); rolls = area / (roll length x width), rounded up. Starter course = eave length x exposure x 2 eaves; ridge coverage = eave length x 1 ft; rake waste = 4 rake edges x rake length x 0.25 ft\u00b2/ft; gross area = net + starter + ridge + rake waste; shingles = gross area / (3 ft x exposure), rounded up.",
+  "dims": {
+   "eave_length": 40,
+   "eave_to_eave": 30,
+   "slope": 7
+  },
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "net roof area",
+    "value": 1389.244,
+    "unit": "ft2",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "underlayment rolls",
+    "value": 4,
+    "unit": "rolls",
+    "tolerance": 0
+   },
+   {
+    "q": "Q3a",
+    "quantity": "starter course area (both eaves)",
+    "value": 36.667,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3b",
+    "quantity": "ridge coverage area",
+    "value": 40,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3c",
+    "quantity": "rake cutting waste area",
+    "value": 17.366,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3d",
+    "quantity": "roof gross area",
+    "value": 1483.277,
+    "unit": "ft2",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q3e",
+    "quantity": "number of shingles",
+    "value": 1079,
+    "unit": "shingles",
+    "tolerance": 0.01
+   }
+  ]
+ },
+ {
+  "id": "schedule_1",
+  "family": "schedule",
+  "image": "schedule_1.png",
+  "crop": "schedule_1_unit_1A_crop.png",
+  "unit": "1A",
+  "units_on_sheet": [
+   "1A",
+   "1B",
+   "1C",
+   "2A",
+   "2B"
+  ],
+  "text": "List every door of UNIT TYPE 1A in the door schedule.",
+  "key": [
+   {
+    "mark": "1",
+    "type": "DF",
+    "width": "3'-0\"",
+    "height": "7'-0\"",
+    "hw": "32",
+    "location": "ENTRY"
+   },
+   {
+    "mark": "2",
+    "type": "DB",
+    "width": "2'-8\"",
+    "height": "6'-8\"",
+    "hw": "38",
+    "location": "BEDROOM"
+   },
+   {
+    "mark": "3",
+    "type": "DB",
+    "width": "2'-6\"",
+    "height": "7'-0\"",
+    "hw": "38",
+    "location": "OFFICE"
+   },
+   {
+    "mark": "4",
+    "type": "DE",
+    "width": "2'-6\"",
+    "height": "6'-8\"",
+    "hw": "37",
+    "location": "PANTRY"
+   },
+   {
+    "mark": "5",
+    "type": "DC",
+    "width": "4'-0\"",
+    "height": "6'-8\"",
+    "hw": "35",
+    "location": "LINEN"
+   },
+   {
+    "mark": "6",
+    "type": "DA",
+    "width": "2'-8\"",
+    "height": "7'-0\"",
+    "hw": "36",
+    "location": "BEDROOM"
+   },
+   {
+    "mark": "7",
+    "type": "DC",
+    "width": "4'-0\"",
+    "height": "7'-0\"",
+    "hw": "35",
+    "location": "CLOSET"
+   },
+   {
+    "mark": "8",
+    "type": "DA",
+    "width": "2'-8\"",
+    "height": "7'-0\"",
+    "hw": "34",
+    "location": "MECH"
+   }
+  ]
+ },
+ {
+  "id": "foundation_2",
+  "family": "foundation",
+  "image": "foundation_2.png",
+  "shape": "notch",
+  "hidden_dimension": true,
+  "wall_length_ft": 196.0,
+  "text": "The attached foundation plan shows a 6 in CMU foundation wall, 10 ft high, with no openings. Use 8 in x 16 in (nominal) CMUs.\nQ1. How many CMUs must be purchased, including 5 % waste?\nQ2. If every cell is grouted, how many cubic yards of grout are needed, including 5 % waste? A fully grouted 6 in CMU takes 0.17 ft\u00b3 of grout.\nQ3. If only the cells with vertical reinforcement at 48 in on center are grouted, how many cubic yards of grout are needed, including 5 % waste?",
+  "rules": "Estimating conventions: total wall length = sum of the outside dimensions (no deduction at corners); wall area = length x height; one CMU covers 8 in x 16 in = 0.889 ft\u00b2; round CMUs up after adding waste. Grout = CMUs before waste x grout per CMU, converted to CY (27 ft\u00b3 = 1 CY), then add grout waste. Cells are 8 in apart, so grouting at S in on center fills 8/S of the cells.",
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 2316,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 14.578,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 48 in O.C.",
+    "value": 2.43,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ },
+ {
+  "id": "roof_2",
+  "family": "roof",
+  "image": "roof_2.png",
+  "text": "The attached diagram shows a gable roof with a 4:12 slope.\nQ1. What is the net roof area (ft\u00b2)?\nQ2. How many rolls of #15 single-coverage underlayment (144 ft x 3 ft per roll) are needed? The underlayment laps 4 in under each rake edge and overlaps 1 ft at the ridge.\nQ3. The roof is covered with 3-tab asphalt strip shingles, 3 ft x 1 ft, with 5.5 in exposure. Find (a) the starter-course area at the eaves (ft\u00b2), (b) the area for the 1 ft ridge coverage (ft\u00b2), (c) the cutting-waste area at the rakes (ft\u00b2, 0.25 ft\u00b2 per linear foot of rake), (d) the gross roof area (ft\u00b2), and (e) the number of shingles.",
+  "rules": "Estimating conventions: run = half the eave-to-eave distance; rise = run x slope; rake length = sqrt(run\u00b2 + rise\u00b2); net roof area = rake length x eave length x 2 roof planes. Underlayment area = net area + ridge lap (eave length x 1 ft) + rake laps (4/12 ft x rake length x 4 rake edges); rolls = area / (roll length x width), rounded up. Starter course = eave length x exposure x 2 eaves; ridge coverage = eave length x 1 ft; rake waste = 4 rake edges x rake length x 0.25 ft\u00b2/ft; gross area = net + starter + ridge + rake waste; shingles = gross area / (3 ft x exposure), rounded up.",
+  "dims": {
+   "eave_length": 52,
+   "eave_to_eave": 30,
+   "slope": 4
+  },
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "net roof area",
+    "value": 1644.384,
+    "unit": "ft2",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "underlayment rolls",
+    "value": 4,
+    "unit": "rolls",
+    "tolerance": 0
+   },
+   {
+    "q": "Q3a",
+    "quantity": "starter course area (both eaves)",
+    "value": 47.667,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3b",
+    "quantity": "ridge coverage area",
+    "value": 52,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3c",
+    "quantity": "rake cutting waste area",
+    "value": 15.811,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3d",
+    "quantity": "roof gross area",
+    "value": 1759.862,
+    "unit": "ft2",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q3e",
+    "quantity": "number of shingles",
+    "value": 1280,
+    "unit": "shingles",
+    "tolerance": 0.01
+   }
+  ]
+ },
+ {
+  "id": "schedule_2",
+  "family": "schedule",
+  "image": "schedule_2.png",
+  "crop": "schedule_2_unit_1.1_crop.png",
+  "unit": "1.1",
+  "units_on_sheet": [
+   "1.1",
+   "1.2",
+   "2.1",
+   "2.2"
+  ],
+  "text": "List every door of UNIT TYPE 1.1 in the door schedule.",
+  "key": [
+   {
+    "mark": "1",
+    "type": "DF",
+    "width": "3'-0\"",
+    "height": "7'-0\"",
+    "hw": "31",
+    "location": "ENTRY"
+   },
+   {
+    "mark": "2",
+    "type": "DA",
+    "width": "2'-6\"",
+    "height": "6'-8\"",
+    "hw": "37",
+    "location": "WALK-IN CLOSET"
+   },
+   {
+    "mark": "3",
+    "type": "DC",
+    "width": "4'-0\"",
+    "height": "6'-8\"",
+    "hw": "34",
+    "location": "CLOSET"
+   },
+   {
+    "mark": "4",
+    "type": "DC",
+    "width": "4'-0\"",
+    "height": "6'-8\"",
+    "hw": "35",
+    "location": "CLOSET"
+   },
+   {
+    "mark": "5",
+    "type": "DA",
+    "width": "2'-10\"",
+    "height": "6'-8\"",
+    "hw": "37",
+    "location": "BEDROOM"
+   },
+   {
+    "mark": "6",
+    "type": "DC",
+    "width": "4'-0\"",
+    "height": "7'-0\"",
+    "hw": "38",
+    "location": "LINEN"
+   },
+   {
+    "mark": "7",
+    "type": "DC",
+    "width": "4'-0\"",
+    "height": "7'-0\"",
+    "hw": "37",
+    "location": "LINEN"
+   }
+  ]
+ },
+ {
+  "id": "foundation_3",
+  "family": "foundation",
+  "image": "foundation_3.png",
+  "shape": "L",
+  "hidden_dimension": false,
+  "wall_length_ft": 132.0,
+  "text": "The attached foundation plan shows a 6 in CMU foundation wall, 8 ft high, with no openings. Use 8 in x 16 in (nominal) CMUs.\nQ1. How many CMUs must be purchased, including 5 % waste?\nQ2. If every cell is grouted, how many cubic yards of grout are needed, including 5 % waste? A fully grouted 6 in CMU takes 0.17 ft\u00b3 of grout.\nQ3. If only the cells with vertical reinforcement at 16 in on center are grouted, how many cubic yards of grout are needed, including 5 % waste?",
+  "rules": "Estimating conventions: total wall length = sum of the outside dimensions (no deduction at corners); wall area = length x height; one CMU covers 8 in x 16 in = 0.889 ft\u00b2; round CMUs up after adding waste. Grout = CMUs before waste x grout per CMU, converted to CY (27 ft\u00b3 = 1 CY), then add grout waste. Cells are 8 in apart, so grouting at S in on center fills 8/S of the cells.",
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 1248,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 7.854,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 16 in O.C.",
+    "value": 3.927,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ },
+ {
+  "id": "roof_3",
+  "family": "roof",
+  "image": "roof_3.png",
+  "text": "The attached diagram shows a gable roof with a 8:12 slope.\nQ1. What is the net roof area (ft\u00b2)?\nQ2. How many rolls of #15 single-coverage underlayment (144 ft x 3 ft per roll) are needed? The underlayment laps 4 in under each rake edge and overlaps 1 ft at the ridge.\nQ3. The roof is covered with 3-tab asphalt strip shingles, 3 ft x 1 ft, with 6 in exposure. Find (a) the starter-course area at the eaves (ft\u00b2), (b) the area for the 1 ft ridge coverage (ft\u00b2), (c) the cutting-waste area at the rakes (ft\u00b2, 0.25 ft\u00b2 per linear foot of rake), (d) the gross roof area (ft\u00b2), and (e) the number of shingles.",
+  "rules": "Estimating conventions: run = half the eave-to-eave distance; rise = run x slope; rake length = sqrt(run\u00b2 + rise\u00b2); net roof area = rake length x eave length x 2 roof planes. Underlayment area = net area + ridge lap (eave length x 1 ft) + rake laps (4/12 ft x rake length x 4 rake edges); rolls = area / (roll length x width), rounded up. Starter course = eave length x exposure x 2 eaves; ridge coverage = eave length x 1 ft; rake waste = 4 rake edges x rake length x 0.25 ft\u00b2/ft; gross area = net + starter + ridge + rake waste; shingles = gross area / (3 ft x exposure), rounded up.",
+  "dims": {
+   "eave_length": 60,
+   "eave_to_eave": 24,
+   "slope": 8
+  },
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "net roof area",
+    "value": 1730.665,
+    "unit": "ft2",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "underlayment rolls",
+    "value": 5,
+    "unit": "rolls",
+    "tolerance": 0
+   },
+   {
+    "q": "Q3a",
+    "quantity": "starter course area (both eaves)",
+    "value": 60.0,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3b",
+    "quantity": "ridge coverage area",
+    "value": 60,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3c",
+    "quantity": "rake cutting waste area",
+    "value": 14.422,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3d",
+    "quantity": "roof gross area",
+    "value": 1865.087,
+    "unit": "ft2",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q3e",
+    "quantity": "number of shingles",
+    "value": 1244,
+    "unit": "shingles",
+    "tolerance": 0.01
+   }
+  ]
+ },
+ {
+  "id": "schedule_3",
+  "family": "schedule",
+  "image": "schedule_3.png",
+  "crop": "schedule_3_unit_2A_crop.png",
+  "unit": "2A",
+  "units_on_sheet": [
+   "1A",
+   "1B",
+   "1C",
+   "2A",
+   "2B",
+   "2C"
+  ],
+  "text": "List every door of UNIT TYPE 2A in the door schedule.",
+  "key": [
+   {
+    "mark": "1",
+    "type": "DF",
+    "width": "3'-0\"",
+    "height": "7'-0\"",
+    "hw": "31",
+    "location": "ENTRY"
+   },
+   {
+    "mark": "2",
+    "type": "DA",
+    "width": "3'-0\"",
+    "height": "7'-0\"",
+    "hw": "35",
+    "location": "WALK-IN CLOSET"
+   },
+   {
+    "mark": "3",
+    "type": "DD",
+    "width": "5'-0\"",
+    "height": "6'-8\"",
+    "hw": "35",
+    "location": "LAUNDRY"
+   },
+   {
+    "mark": "4",
+    "type": "DB",
+    "width": "2'-6\"",
+    "height": "6'-8\"",
+    "hw": "38",
+    "location": "WALK-IN CLOSET"
+   },
+   {
+    "mark": "5",
+    "type": "DA",
+    "width": "2'-8\"",
+    "height": "7'-0\"",
+    "hw": "36",
+    "location": "MECH"
+   },
+   {
+    "mark": "6",
+    "type": "DC",
+    "width": "4'-0\"",
+    "height": "6'-8\"",
+    "hw": "35",
+    "location": "CLOSET"
+   },
+   {
+    "mark": "7",
+    "type": "DA",
+    "width": "3'-0\"",
+    "height": "7'-0\"",
+    "hw": "38",
+    "location": "BATH"
+   },
+   {
+    "mark": "8",
+    "type": "DA",
+    "width": "2'-8\"",
+    "height": "6'-8\"",
+    "hw": "34",
+    "location": "BEDROOM"
+   },
+   {
+    "mark": "9",
+    "type": "DD",
+    "width": "5'-0\"",
+    "height": "6'-8\"",
+    "hw": "34",
+    "location": "LAUNDRY"
+   }
+  ]
+ },
+ {
+  "id": "foundation_4",
+  "family": "foundation",
+  "image": "foundation_4.png",
+  "shape": "bump",
+  "hidden_dimension": true,
+  "wall_length_ft": 148.0,
+  "text": "The attached foundation plan shows a 8 in CMU foundation wall, 6 ft high, with no openings. Use 8 in x 16 in (nominal) CMUs.\nQ1. How many CMUs must be purchased, including 5 % waste?\nQ2. If every cell is grouted, how many cubic yards of grout are needed, including 10 % waste? A fully grouted 8 in CMU takes 0.26 ft\u00b3 of grout.\nQ3. If only the cells with vertical reinforcement at 16 in on center are grouted, how many cubic yards of grout are needed, including 10 % waste?",
+  "rules": "Estimating conventions: total wall length = sum of the outside dimensions (no deduction at corners); wall area = length x height; one CMU covers 8 in x 16 in = 0.889 ft\u00b2; round CMUs up after adding waste. Grout = CMUs before waste x grout per CMU, converted to CY (27 ft\u00b3 = 1 CY), then add grout waste. Cells are 8 in apart, so grouting at S in on center fills 8/S of the cells.",
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 1049,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 10.582,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 16 in O.C.",
+    "value": 5.291,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ },
+ {
+  "id": "roof_4",
+  "family": "roof",
+  "image": "roof_4.png",
+  "text": "The attached diagram shows a gable roof with a 4:12 slope.\nQ1. What is the net roof area (ft\u00b2)?\nQ2. How many rolls of #15 single-coverage underlayment (144 ft x 3 ft per roll) are needed? The underlayment laps 4 in under each rake edge and overlaps 1 ft at the ridge.\nQ3. The roof is covered with 3-tab asphalt strip shingles, 3 ft x 1 ft, with 5 in exposure. Find (a) the starter-course area at the eaves (ft\u00b2), (b) the area for the 1 ft ridge coverage (ft\u00b2), (c) the cutting-waste area at the rakes (ft\u00b2, 0.25 ft\u00b2 per linear foot of rake), (d) the gross roof area (ft\u00b2), and (e) the number of shingles.",
+  "rules": "Estimating conventions: run = half the eave-to-eave distance; rise = run x slope; rake length = sqrt(run\u00b2 + rise\u00b2); net roof area = rake length x eave length x 2 roof planes. Underlayment area = net area + ridge lap (eave length x 1 ft) + rake laps (4/12 ft x rake length x 4 rake edges); rolls = area / (roll length x width), rounded up. Starter course = eave length x exposure x 2 eaves; ridge coverage = eave length x 1 ft; rake waste = 4 rake edges x rake length x 0.25 ft\u00b2/ft; gross area = net + starter + ridge + rake waste; shingles = gross area / (3 ft x exposure), rounded up.",
+  "dims": {
+   "eave_length": 50,
+   "eave_to_eave": 20,
+   "slope": 4
+  },
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "net roof area",
+    "value": 1054.093,
+    "unit": "ft2",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "underlayment rolls",
+    "value": 3,
+    "unit": "rolls",
+    "tolerance": 0
+   },
+   {
+    "q": "Q3a",
+    "quantity": "starter course area (both eaves)",
+    "value": 41.667,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3b",
+    "quantity": "ridge coverage area",
+    "value": 50,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3c",
+    "quantity": "rake cutting waste area",
+    "value": 10.541,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3d",
+    "quantity": "roof gross area",
+    "value": 1156.3,
+    "unit": "ft2",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q3e",
+    "quantity": "number of shingles",
+    "value": 926,
+    "unit": "shingles",
+    "tolerance": 0.01
+   }
+  ]
+ },
+ {
+  "id": "schedule_4",
+  "family": "schedule",
+  "image": "schedule_4.png",
+  "crop": "schedule_4_unit_1.2_crop.png",
+  "unit": "1.2",
+  "units_on_sheet": [
+   "1.1",
+   "1.2",
+   "2.1",
+   "2.2",
+   "3.1",
+   "3.2"
+  ],
+  "text": "List every door of UNIT TYPE 1.2 in the door schedule.",
+  "key": [
+   {
+    "mark": "1",
+    "type": "DF",
+    "width": "3'-0\"",
+    "height": "7'-0\"",
+    "hw": "31",
+    "location": "ENTRY"
+   },
+   {
+    "mark": "2",
+    "type": "DA",
+    "width": "2'-10\"",
+    "height": "7'-0\"",
+    "hw": "38",
+    "location": "STORAGE"
+   },
+   {
+    "mark": "3",
+    "type": "DC",
+    "width": "4'-0\"",
+    "height": "6'-8\"",
+    "hw": "38",
+    "location": "LINEN"
+   },
+   {
+    "mark": "4",
+    "type": "DC",
+    "width": "4'-0\"",
+    "height": "7'-0\"",
+    "hw": "34",
+    "location": "CLOSET"
+   },
+   {
+    "mark": "5",
+    "type": "DA",
+    "width": "2'-6\"",
+    "height": "7'-0\"",
+    "hw": "38",
+    "location": "MECH"
+   }
+  ]
+ },
+ {
+  "id": "foundation_5",
+  "family": "foundation",
+  "image": "foundation_5.png",
+  "shape": "L",
+  "hidden_dimension": false,
+  "wall_length_ft": 188.0,
+  "text": "The attached foundation plan shows a 6 in CMU foundation wall, 8 ft high, with no openings. Use 8 in x 16 in (nominal) CMUs.\nQ1. How many CMUs must be purchased, including 6 % waste?\nQ2. If every cell is grouted, how many cubic yards of grout are needed, including 10 % waste? A fully grouted 6 in CMU takes 0.17 ft\u00b3 of grout.\nQ3. If only the cells with vertical reinforcement at 48 in on center are grouted, how many cubic yards of grout are needed, including 10 % waste?",
+  "rules": "Estimating conventions: total wall length = sum of the outside dimensions (no deduction at corners); wall area = length x height; one CMU covers 8 in x 16 in = 0.889 ft\u00b2; round CMUs up after adding waste. Grout = CMUs before waste x grout per CMU, converted to CY (27 ft\u00b3 = 1 CY), then add grout waste. Cells are 8 in apart, so grouting at S in on center fills 8/S of the cells.",
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 1794,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 11.719,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 48 in O.C.",
+    "value": 1.953,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ },
+ {
+  "id": "roof_5",
+  "family": "roof",
+  "image": "roof_5.png",
+  "text": "The attached diagram shows a gable roof with a 5:12 slope.\nQ1. What is the net roof area (ft\u00b2)?\nQ2. How many rolls of #30 single-coverage underlayment (72 ft x 3 ft per roll) are needed? The underlayment laps 4 in under each rake edge and overlaps 1 ft at the ridge.\nQ3. The roof is covered with 3-tab asphalt strip shingles, 3 ft x 1 ft, with 6 in exposure. Find (a) the starter-course area at the eaves (ft\u00b2), (b) the area for the 1 ft ridge coverage (ft\u00b2), (c) the cutting-waste area at the rakes (ft\u00b2, 0.25 ft\u00b2 per linear foot of rake), (d) the gross roof area (ft\u00b2), and (e) the number of shingles.",
+  "rules": "Estimating conventions: run = half the eave-to-eave distance; rise = run x slope; rake length = sqrt(run\u00b2 + rise\u00b2); net roof area = rake length x eave length x 2 roof planes. Underlayment area = net area + ridge lap (eave length x 1 ft) + rake laps (4/12 ft x rake length x 4 rake edges); rolls = area / (roll length x width), rounded up. Starter course = eave length x exposure x 2 eaves; ridge coverage = eave length x 1 ft; rake waste = 4 rake edges x rake length x 0.25 ft\u00b2/ft; gross area = net + starter + ridge + rake waste; shingles = gross area / (3 ft x exposure), rounded up.",
+  "dims": {
+   "eave_length": 50,
+   "eave_to_eave": 36,
+   "slope": 5
+  },
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "net roof area",
+    "value": 1950.0,
+    "unit": "ft2",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "underlayment rolls",
+    "value": 10,
+    "unit": "rolls",
+    "tolerance": 0
+   },
+   {
+    "q": "Q3a",
+    "quantity": "starter course area (both eaves)",
+    "value": 50.0,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3b",
+    "quantity": "ridge coverage area",
+    "value": 50,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3c",
+    "quantity": "rake cutting waste area",
+    "value": 19.5,
+    "unit": "ft2",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3d",
+    "quantity": "roof gross area",
+    "value": 2069.5,
+    "unit": "ft2",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q3e",
+    "quantity": "number of shingles",
+    "value": 1380,
+    "unit": "shingles",
+    "tolerance": 0.01
+   }
+  ]
+ },
+ {
+  "id": "schedule_5",
+  "family": "schedule",
+  "image": "schedule_5.png",
+  "crop": "schedule_5_unit_1A_crop.png",
+  "unit": "1A",
+  "units_on_sheet": [
+   "1A",
+   "1B",
+   "1C",
+   "2A",
+   "2B",
+   "2C"
+  ],
+  "text": "List every door of UNIT TYPE 1A in the door schedule.",
+  "key": [
+   {
+    "mark": "1",
+    "type": "DF",
+    "width": "3'-0\"",
+    "height": "7'-0\"",
+    "hw": "31",
+    "location": "ENTRY"
+   },
+   {
+    "mark": "2",
+    "type": "DC",
+    "width": "4'-0\"",
+    "height": "7'-0\"",
+    "hw": "38",
+    "location": "CLOSET"
+   },
+   {
+    "mark": "3",
+    "type": "DC",
+    "width": "4'-0\"",
+    "height": "7'-0\"",
+    "hw": "38",
+    "location": "CLOSET"
+   },
+   {
+    "mark": "4",
+    "type": "DA",
+    "width": "2'-6\"",
+    "height": "7'-0\"",
+    "hw": "38",
+    "location": "WALK-IN CLOSET"
+   },
+   {
+    "mark": "5",
+    "type": "DA",
+    "width": "2'-10\"",
+    "height": "6'-8\"",
+    "hw": "36",
+    "location": "BATH"
+   },
+   {
+    "mark": "6",
+    "type": "DC",
+    "width": "4'-0\"",
+    "height": "7'-0\"",
+    "hw": "34",
+    "location": "CLOSET"
+   }
+  ]
+ }
+]
