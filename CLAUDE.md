@@ -48,7 +48,11 @@ Text must be **precise, consistent and concise**. Students are engineering stude
   the prompt, open https://hokie.ai.vt.edu/, paste the output back, click Score).
 - **Sources:** end with `### Data and model sources`: one bullet per item (title, author or agency, year, licence, URL).
 - **No filler:** no motivation paragraphs, rhetorical questions, jokes or exclamation marks; emoji only in the
-  conventions (▶, ✅, 📝). American spelling and US units throughout.
+  conventions (▶, ✅, 📝).
+- **American English:** American spelling and usage everywhere students look (color, gray, meter, labeled, center,
+  license, -ize), including notebook text, result wordings, prompts, drawings and data files.
+- **Imperial units only:** every quantity in US customary units (ft, in, ft², yd³, lb, lb/yd³, psi, kip, °F, gal,
+  kWh). Convert source data that comes in metric before students see it; never mix units or show metric equivalents.
 
 ## 3. Notebook conventions
 
