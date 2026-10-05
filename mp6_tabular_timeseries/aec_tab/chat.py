@@ -440,19 +440,19 @@ def forecast_score(lab, meter_id: str, reply: str, name: str, texts: dict = None
         f = series.forecast(m, meth, lab.forecaster)
         mae = float(np.mean(np.abs(f.median[ok] - actual.values[ok])))
         ax.plot(actual.index, f.median, color=colors[f.method], lw=1, alpha=0.7, label=meth)
-        rows.append((meth, f"{mae:.1f}", f"{mae / actual.mean() * 100:.0f} %", f"{len(actual)}"))
+        rows.append((meth, f"{mae:.1f}", f"{len(actual)}"))
     chat_rows = []
     for r in lab.chat_runs[("forecast", m.id)]:
         s = pd.Series({pd.Timestamp(k): v for k, v in r["values"].items()}).reindex(actual.index)
         both = s.notna() & actual.notna()
         mae = float(np.mean(np.abs(s[both] - actual[both])))
         lab.results[("chat_forecast", m.id, r["name"])] = mae
-        chat_rows.append((("▶ " if r["name"] == run else "") + r["name"], f"{mae:.1f}", f"{mae / actual.mean() * 100:.0f} %", f"{int(s.notna().sum())}"))
+        chat_rows.append((("▶ " if r["name"] == run else "") + r["name"], f"{mae:.1f}", f"{int(s.notna().sum())}"))
     ax.plot(pred.index, pred.values, color=ORANGE, lw=2, label=run)
     ax.set_title(fill(text(texts, G, "plot_text"), building=m.label, week=week), fontsize=11); ax.set_ylabel("kWh"); ax.legend(fontsize=8, ncol=5)
     ui.show(fig)
     say(texts, G, "compare_text")
-    ui.table(pd.DataFrame(chat_rows + rows, columns=["forecast", "MAE (kWh per hour)", "MAE / mean load", "hours scored"]))
+    ui.table(pd.DataFrame(chat_rows + rows, columns=["forecast", "MAE (kWh per hour)", "hours scored"]))
     say(texts, G, "note_text", week=week)
 
 
