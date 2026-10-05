@@ -18,7 +18,7 @@ From Step 1c: Choose one building and describe its typical weekday, weekend, and
 
 ## Question 2
 
-From Step 2a: Report the MAE of each method for all four buildings (copy the tables). Which method performs best for each building? Is the seasonal naive baseline ever hard to beat?
+From Step 2a: Report the MAE of each method for all four buildings (copy the tables). Which method performs best for each building? Is *same hour last week* ever hard to beat?
 
 What does the 80 % prediction interval of Chronos-Bolt mean, and how could a facility manager use it?
 

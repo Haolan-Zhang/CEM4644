@@ -261,9 +261,9 @@ def anatomy(lab, meter_id: str, anatomy_text: Optional[str] = None, texts: Optio
     for a in ax:
         a.set_ylabel("kWh")
     fig.tight_layout(); show(fig)
-    t = m.temp
-    say(texts, G, "anatomy_text", building=m.label, mean=f"{s.mean():.0f}", busiest=f"{prof.max().max():.0f}",
-        quietest=f"{prof.min().min():.0f}", temp_min=f"{t.min():.0f}", temp_max=f"{t.max():.0f}")
+    t, day = m.temp, s.groupby(s.index.hour).median()          # a typical day: the median of each hour over the year
+    say(texts, G, "anatomy_text", building=m.label, mean=f"{day.mean():.0f}", maximum=f"{day.max():.0f}",
+        minimum=f"{day.min():.0f}", temp_min=f"{t.min():.0f}", temp_max=f"{t.max():.0f}")
 
 
 # ----------------------------------------------------------------------------- Part 5: next week

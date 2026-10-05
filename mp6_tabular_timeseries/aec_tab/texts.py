@@ -58,7 +58,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "total_text": "**{right} of 4** correct.",
     },
     "anatomy": {
-        "anatomy_text": "Mean **{mean}** kWh per hour; the busiest hour of a typical week runs at **{busiest}**, the quietest at **{quietest}**.\nSite air temperature ranged from {temp_min} to {temp_max} °F.",
+        "anatomy_text": "Typical day (the median of each hour over 2017): mean **{mean}** kWh per hour, maximum **{maximum}**, minimum **{minimum}**.\nSite air temperature ranged from {temp_min} to {temp_max} °F.",
         "year_title_text": "{building}: hourly electricity use in 2017 (kWh)",
         "week_title_text": "One week in March 2017 (Monday–Sunday)",
         "day_title_text": "Typical day: median hourly use for each weekday over 2017",

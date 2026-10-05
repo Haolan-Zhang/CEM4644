@@ -38,8 +38,8 @@ hidden. No GPU needed.
 
 1. **A time series**: four buildings unlabeled, a week and a year each: which is the office, the school, the residence
    hall, the assembly hall? Then the anatomy of one building's year.
-2. **Next week**: same hour last week, trees on the past weeks + calendar + temperature, and Chronos-Bolt (a pretrained
-   forecasting model used zero-shot, with an uncertainty band), each scored on the week of 16 October 2017.
+2. **Next week**: same hour last week, a decision tree on the past weeks + calendar + temperature, and a pretrained model
+   (Chronos-Bolt, used zero-shot, with an uncertainty band), each scored on the week of October 16, 2017.
 3. **The odd days**: each day against the building's usual pattern, a threshold slider, the US calendar next to the flags.
 4. **The same jobs, by a chat model**: four weeks of a building's meter and next week's temperature go to hokie.ai for
    a 168-hour forecast (on its own, then with its analysis tool), and the year's daily totals for the odd days; each is

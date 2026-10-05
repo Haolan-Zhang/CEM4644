@@ -611,12 +611,12 @@ A forecast predicts future values of a time series from its past. Here, three me
                        notes=[f"*{m1}*: repeats the use from the same hour one week earlier. It is the baseline any model should beat.",
                               f"*{m2}*: gradient-boosted decision trees trained on all data before the test week, with the use one and two weeks earlier, the hour of day, "
                               "the day of week, and the outdoor temperature as inputs.",
-                              f"*{m3}*: a pretrained time-series foundation model, used zero-shot: it was trained on many other time series and receives only this "
+                              f"*{m3}*: a time-series foundation model trained on many other time series and used zero-shot: it receives only this "
                               "building's recent history. The shaded area is its 80 % prediction interval."],
                        params=[choice("building", labels[0], labels), choice("method", "all three", ["all three"] + list(METHODS))]))
     cells.append(qv2(2,
                      "From Step 2a: Report the MAE of each method for all four buildings (copy the tables). Which method performs best for each building? "
-                     "Is the seasonal naive baseline ever hard to beat?",
+                     "Is *same hour last week* ever hard to beat?",
                      "What does the 80 % prediction interval of Chronos-Bolt mean, and how could a facility manager use it?")
                  if ws else
                  qv2(2,

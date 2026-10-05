@@ -14,8 +14,7 @@ from sklearn.ensemble import HistGradientBoostingRegressor
 from .config import FORECASTER_ID, HOLIDAYS_2017, HORIZON, TEST_START
 from .data import Meter
 
-METHODS = {"seasonal naive (same hour last week)": "naive", "decision tree (lagged use, calendar, temperature)": "trees",
-           "Chronos-Bolt (pretrained, zero-shot)": "chronos"}
+METHODS = {"same hour last week": "naive", "decision tree": "trees", "A pretrained model (Chronos-Bolt)": "chronos"}
 
 
 @contextlib.contextmanager

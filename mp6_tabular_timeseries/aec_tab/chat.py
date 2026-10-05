@@ -244,8 +244,6 @@ def table_score(lab, reply: str, name: str, texts: dict = None):
     if not have:
         print("No 'T01, number' lines found: check that you pasted HokieAI's full output."); return
     run, new = _add_run(lab, ("table", spec.key), name, {i: got[i] for i in have})
-    if not new:
-        print(f"This output is identical to '{run}': start a new chat for a new run.")
     if len(have) < len(ids):
         print(f"The output has {len(have)} of the {len(ids)} {spec.rows} ({', '.join(i for i in ids if i not in got)} missing); "
               f"only those {len(have)} are scored.")
@@ -429,8 +427,6 @@ def forecast_score(lab, meter_id: str, reply: str, name: str, texts: dict = None
     if n == 0:
         print("No 'timestamp, kWh' lines found: check that you pasted HokieAI's full output."); return
     run, new = _add_run(lab, ("forecast", m.id), name, {str(k): v for k, v in pred.dropna().items()})
-    if not new:
-        print(f"This output is identical to '{run}': start a new chat for a new run.")
     if n < len(actual):
         print(f"The output has {n} of the {len(actual)} hours; only those are scored.")
     ok = (pred.notna() & actual.notna()).values
