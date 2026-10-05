@@ -373,8 +373,7 @@ FORECAST_TOOL_PROMPT = (
     "Choose the input features yourself (for example hour of day, day of week, temperature, and the use at the same hour one week "
     "earlier). Then forecast every hour of the following week with {temperature_file}: {hours} values, from {first_hour} to {last_hour}.\n"
     "Reply in the following format, one line per hour for all {hours} hours. Use plain numbers without commas:\n"
-    "timestamp, kWh\n{first_hour}, ...\n{second_hour}, ...\n...\n\n"
-    "After the list, state in two sentences which model and which input features you used.")
+    "timestamp, kWh\n{first_hour}, ...\n{second_hour}, ...\n...")
 ODD_DAYS_PROMPT = (
     "Below is a dataset for a building on a North American university campus used as {use}: its total daily electricity use (kWh) "
     "and mean outdoor air temperature (°F) for every day of {year}.\n"
