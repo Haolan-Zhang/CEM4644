@@ -284,13 +284,13 @@ def forecast_view(lab, meter_id: str, method: str, texts: Optional[dict] = None)
         if f.low is not None:
             ax.fill_between(actual.index, f.low, f.high, color=colors[f.method], alpha=0.12)
         rows.append((meth, f"{f.mae:.1f}", f"{f.seconds:.1f} s",
-                     f"{f.coverage * 100:.0f} %" if f.coverage is not None else ""))
+                     f"{f.coverage * 100:.0f}" if f.coverage is not None else ""))
         lab.results[("forecast", m.id, f.method)] = f.mae
     ax.set_title(fill(text(texts, G, "title_text"), building=m.label, week=f"{actual.index[0]:%B %-d, %Y}"), fontsize=11)
     ax.set_ylabel("kWh"); ax.legend(fontsize=8, ncol=4)
     show(fig)
     say(texts, G, "table_text", hours=len(actual))
-    table(pd.DataFrame(rows, columns=["method", "MAE (kWh per hour)", "run time", "hours inside the 80 % band"]).set_index("method"))
+    table(pd.DataFrame(rows, columns=["method", "MAE (kWh per hour)", "run time", "% hours inside the prediction interval"]).set_index("method"))
 
 
 # ----------------------------------------------------------------------------- Part 6: odd days
