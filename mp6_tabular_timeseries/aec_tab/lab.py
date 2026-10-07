@@ -131,13 +131,13 @@ class TabLab:
         self._need(); from . import chat
         chat.chat_table(self, give, steps_text, paste_steps_text, paste_prompt_text, compare_text, plot_text, texts)
 
-    def chat_table_tool(self, model="gradient-boosted trees", steps_text=None, compare_text=None, plot_text=None, tool_prompt_text=None, **texts):
+    def chat_table_tool(self, model="a decision tree", steps_text=None, compare_text=None, plot_text=None, tool_prompt_text=None, **texts):
         self._need(); from . import chat; chat.chat_table_tool(self, model, steps_text, compare_text, plot_text, tool_prompt_text, texts)
 
     def chat_forecast(self, building, give="paste the data into the prompt", steps_text=None, paste_steps_text=None, paste_prompt_text=None, **texts):
         self._need(); from . import chat; chat.chat_forecast(self, building, give, steps_text, paste_steps_text, paste_prompt_text, texts)
 
-    def chat_forecast_tool(self, building, model="gradient-boosted trees", steps_text=None, tool_prompt_text=None, **texts):
+    def chat_forecast_tool(self, building, model="a decision tree", steps_text=None, tool_prompt_text=None, **texts):
         self._need(); from . import chat; chat.chat_forecast_tool(self, building, model, steps_text, tool_prompt_text, texts)
 
     def chat_odd_days(self, building, give="paste the data into the prompt", steps_text=None, paste_steps_text=None, paste_prompt_text=None, **texts):

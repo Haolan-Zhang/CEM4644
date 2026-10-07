@@ -32,8 +32,9 @@ across the grades, ids T01-T30, no answer), the same for every student; for a bu
 `<id>_daily_2017.csv`. A form option puts the data inside the prompt instead, for when attaching fails. The reply is
 read loosely (one line or many, tables, fences, extra words); a short reply is scored on the rows or hours it gave.
 Every reply scored stays in the step's table, so two new chats with the same prompt can be compared; the analysis-tool
-steps let the student pick the model the chat should train (gradient-boosted trees, a random forest, a straight line,
-a small neural network).
+steps let the student pick the model the chat should train (a decision tree, a random forest, a straight line, a small
+neural network); "a decision tree" is sent to HokieAI as a gradient-boosted tree model (HistGradientBoostingRegressor),
+the same kind as the notebook's own decision tree model.
 
 ## 2. Measured numbers (the answer keys)
 

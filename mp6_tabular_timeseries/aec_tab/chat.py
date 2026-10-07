@@ -19,7 +19,7 @@ GIVE = {"attach the files": "attach", "paste the data into the prompt": "inline"
 
 # what the student may ask the chat's analysis tool to train (label in the notebook -> words in the prompt)
 TOOL_MODELS = {
-    "gradient-boosted trees": "a gradient-boosted tree model (for example scikit-learn's HistGradientBoostingRegressor)",
+    "a decision tree": "a gradient-boosted tree model (for example scikit-learn's HistGradientBoostingRegressor)",   # the notebook's "decision tree model"
     "a random forest": "a random forest (for example scikit-learn's RandomForestRegressor)",
     "a straight line": "a linear regression (a straight line, for example scikit-learn's LinearRegression)",
     "a small neural network": "a small neural network (for example scikit-learn's MLPRegressor)",
