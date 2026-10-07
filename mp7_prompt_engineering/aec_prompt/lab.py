@@ -143,8 +143,8 @@ class PromptLab:
             label = self._version_label(version, CONTRACT_VERSIONS, prompt, sent, texts)
             r = score.contract(reply, self.questions, self.clauses)
             self._record("contract", f"{r['n']} questions", label, r["right"], r["n"])
-            say(texts, G, "result_text", version=label, right=r["right"], n=r["n"], made_up=r["made_up"], unanswerable=r["unanswerable"],
-                verified=r["verified"], quotes=r["quotes"])
+            say(texts, G, "result_text", version=label, right=r["right"], n=r["n"], made_up=r["made_up"], not_provided=r["not_provided"],
+                unanswerable=r["unanswerable"], verified=r["verified"], quotes=r["quotes"], misquotes=r["quotes"] - r["verified"])
             table = r["table"] if check_quotes else r["table"].drop(columns="quote found")
             say(texts, G, "table_text"); ui.table(self._named(table, texts, G))
         ui.hokieai_box([], prompt, on_score, texts, G)

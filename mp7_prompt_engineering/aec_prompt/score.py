@@ -161,7 +161,7 @@ def contract(reply: str, questions: List[dict], clauses: str) -> dict:
     for m in re.finditer(r"^\s*[*`]*\s*(Q\d\d)\s*[*`]*\s*[|.:)]\s*(.+)$", reply, re.M):
         lines.setdefault(m.group(1), m.group(2))
     ctext = _norm(clauses)
-    rows, right, made_up, quotes, verified = [], 0, 0, 0, 0
+    rows, right, made_up, not_provided, quotes, verified = [], 0, 0, 0, 0, 0
     for q in questions:
         parts = [p.strip() for p in lines.get(q["id"], "").split("|")]
         ans = parts[0] if parts and parts[0] else ""
@@ -174,6 +174,7 @@ def contract(reply: str, questions: List[dict], clauses: str) -> dict:
         else:
             ok = said_none
             made_up += bool(a) and not said_none
+            not_provided += said_none
         right += ok
         quote = parts[-1] if len(parts) >= 2 else ""
         qv = "—"
@@ -183,5 +184,5 @@ def contract(reply: str, questions: List[dict], clauses: str) -> dict:
             hit = _quote_found(quote, ctext)
             verified += hit; qv = "found" if hit else "misquote"
         rows.append({"question": q["id"], "ground truth": q["key"], "HokieAI": ans[:120] or "—", "": "✓" if ok else "✗", "quote found": qv})
-    return {"right": right, "n": len(questions), "made_up": made_up, "unanswerable": sum(not q["answerable"] for q in questions),
+    return {"right": right, "n": len(questions), "made_up": made_up, "not_provided": not_provided, "unanswerable": sum(not q["answerable"] for q in questions),
             "quotes": quotes, "verified": verified, "table": pd.DataFrame(rows)}

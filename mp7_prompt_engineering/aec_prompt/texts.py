@@ -119,8 +119,9 @@ ONE_PROMPT_TEXTS = {
                         "If the clauses do not answer a question, reply NOT IN TEXT and give no quote.\n"
                         "Reply with one line per question: Q01 | answer | exact quote (or: Q01 | NOT IN TEXT | -)\n\n"
                         "Questions:\n{questions}\n\nContract clauses:\n{clauses}"),
-        "result_text": ("**Correct answers:** {right} of {n}\n**Unsupported answers:** {made_up} of the {unanswerable} questions the clauses do not answer\n"
-                        "**Quotes found word for word:** {verified} of {quotes}"),
+        "result_text": ("**Correct answers:** {right} of {n}\n"
+                        "**Answer not provided:** {not_provided} of the {unanswerable} questions that cannot be answered from the provided clauses\n"
+                        "**Quotes found:** {verified} of {quotes} (**misquotes:** {misquotes})"),
         "columns_text": "Question | Ground truth | HokieAI's output | Correct | Quote"},
 }
 

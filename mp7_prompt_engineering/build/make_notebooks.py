@@ -321,11 +321,10 @@ For questions that can be answered from the provided clauses, HokieAI is asked t
 The notebook compares each response with the ground-truth answer and checks supporting quotes where applicable. A quote found means the quoted text appears in the provided clauses exactly as given; a misquote means it does not.
 """))
     cells.append(form("▶ Step 3a · Ask HokieAI About the Contract", "lab.contract_questions()",
-                      notes=["Run the cell and follow the instructions.",
-                             "Unsupported answer: an answer to one of the questions the clauses do not answer; the correct output says that the clauses do not answer it."],
+                      notes=["Run the cell and follow the instructions."],
                       texts=T1("contract")))
     cells.append(question(3,
-                          "From Step 3a: Report the correct answers, the unsupported answers, and the quotes found word for word. Include the table.",
+                          "From Step 3a: Report the correct answers, the number of questions for which HokieAI indicated that the answer is not provided, and the quotes found and misquotes. Include the table.",
                           "Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?"))
 
     cells.append(md("""
