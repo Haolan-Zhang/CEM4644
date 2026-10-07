@@ -65,6 +65,12 @@ class PromptLab:
         self.runs.append({"task": task, "example": drawing, "version": version, "correct": int(right), "of": int(n)})
 
     @staticmethod
+    def _named(df: pd.DataFrame, texts: dict, group: str) -> pd.DataFrame:
+        """The table with the column names of the cell's columns_text (names separated by |), if their number matches."""
+        names = [c.strip() for c in text(texts, group, "columns_text").split("|")]
+        return df.set_axis(names, axis=1) if len(names) == df.shape[1] else df
+
+    @staticmethod
     def _template(texts: dict, group: str, versions: dict, version: str) -> str:
         """The cell's own prompt (prompt_text, in the one-prompt notebook), else the chosen prompt version's."""
         if texts.get("prompt_text"):
@@ -106,7 +112,7 @@ class PromptLab:
             say(texts, G, "accuracy_text", version=label, right=r["right"], n=r["n"], accuracy=round(r["right"] / r["n"] * 100))
             say(texts, G, "matrix_text"); ui.matrix(r["matrix"])
             if len(r["disagree"]):
-                say(texts, G, "disagree_text"); ui.table(r["disagree"])
+                say(texts, G, "disagree_text"); ui.table(self._named(r["disagree"], texts, G))
         ui.hokieai_box([], prompt, on_score, texts, G)
 
     # ------------------------------------------------------------------ Part 2: submittal review
@@ -123,7 +129,7 @@ class PromptLab:
             r = score.submittal(reply, p)
             self._record("submittals", submittal, label, r["right"], r["n"])
             say(texts, G, "result_text", version=label, submittal=submittal, right=r["right"], n=r["n"], found=r["found"], planted=r["planted"], false=r["false"])
-            say(texts, G, "table_text"); ui.table(r["table"])
+            say(texts, G, "table_text"); ui.table(self._named(r["table"], texts, G))
         ui.hokieai_box([], prompt, on_score, texts, G)
 
     # ------------------------------------------------------------------ Part 3: contract questions
@@ -139,7 +145,7 @@ class PromptLab:
             self._record("contract", f"{r['n']} questions", label, r["right"], r["n"])
             say(texts, G, "result_text", version=label, right=r["right"], n=r["n"], made_up=r["made_up"], unanswerable=r["unanswerable"],
                 verified=r["verified"], quotes=r["quotes"])
-            say(texts, G, "table_text"); ui.table(r["table"])
+            say(texts, G, "table_text"); ui.table(self._named(r["table"], texts, G))
         ui.hokieai_box([], prompt, on_score, texts, G)
 
     # ------------------------------------------------------------------ Part 4: takeoff from drawings
@@ -158,7 +164,7 @@ class PromptLab:
             r = score.takeoff(reply, p["key"])
             self._record(p["family"], drawing, label, r["right"], r["n"])
             say(texts, G, "result_text", version=label, drawing=drawing, right=r["right"], n=r["n"])
-            say(texts, G, "table_text"); ui.table(r["table"])
+            say(texts, G, "table_text"); ui.table(self._named(r["table"], texts, G))
         ui.hokieai_box([img], prompt, on_score, texts, G)
 
     # ------------------------------------------------------------------ Part 5: door schedules
@@ -177,7 +183,7 @@ class PromptLab:
             r = score.schedule(reply, p["key"])
             self._record("schedule", sheet, label, r["right"], r["n"])
             say(texts, G, "result_text", version=label, sheet=sheet, right=r["right"], n=r["n"], fields_right=r["fields_right"], fields=r["fields"])
-            say(texts, G, "table_text"); ui.table(r["table"])
+            say(texts, G, "table_text"); ui.table(self._named(r["table"], texts, G))
         ui.hokieai_box(files, prompt, on_score, texts, G)
 
     # ------------------------------------------------------------------ comparisons

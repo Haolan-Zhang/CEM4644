@@ -38,6 +38,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "accuracy_text": "**{version}:** {right} of {n} reports classified as OSHA classified them (**{accuracy} %**).",
         "matrix_text": "Confusion matrix (rows: OSHA's classification; columns: HokieAI's output):",
         "disagree_text": "Reports where HokieAI's output differs from OSHA's classification:",
+        "columns_text": "Report | Report text | OSHA's classification | HokieAI's output",
         "missing_text": "HokieAI's output has {got} of the {n} reports; the missing ones count as wrong.",
     },
     "takeoff": {
@@ -49,6 +50,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
         **BOX,
         "result_text": "**{version}, {drawing}:** {right} of {n} quantities within tolerance of the ground truth.",
         "table_text": "Ground truth vs. HokieAI's output:",
+        "columns_text": "Question | Quantity | Ground truth | HokieAI's output | Unit | Correct",
     },
     "schedule": {
         "v1_prompt_text": "The attached drawing sheet contains a door schedule. List every door of UNIT TYPE {unit}.\n{format}",
@@ -61,6 +63,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
         **BOX,
         "result_text": "**{version}, {sheet}:** {right} of {n} doors transcribed exactly ({fields_right} of {fields} fields right).",
         "table_text": "Ground truth vs. HokieAI's output:",
+        "columns_text": "Door | Ground truth | HokieAI's output | Correct",
     },
     "submittals": {
         "v1_prompt_text": "Review the submittal below against the specification excerpt. List every noncompliance.\n{final}\n\nSpecification:\n{spec}\nSubmittal:\n{submittal}",
@@ -75,8 +78,10 @@ TEXTS: Dict[str, Dict[str, str]] = {
                        "If the submittal complies with every requirement, end with: NONCOMPLIANT | none"),
         "steps_text": PASTE_STEPS,
         **BOX,
-        "result_text": "**{version}, {submittal}:** {right} of {n} requirements judged correctly; noncompliances found {found} of {planted}, false flags {false}.",
+        "result_text": ("**{version}, {submittal}**\n**Requirements judged correctly:** {right} of {n}\n**Noncompliances found:** {found} of {planted}\n"
+                        "**False flags:** {false}"),
         "table_text": "Ground truth vs. HokieAI's output (each requirement the submittal is checked against):",
+        "columns_text": "Requirement | Ground truth | HokieAI's output | Correct",
     },
     "contract": {
         "v1_prompt_text": "Answer the questions about the construction contract clauses below.\nReply with one line per question: Q01 | answer\n\nQuestions:\n{questions}\n\nContract clauses:\n{clauses}",
@@ -88,9 +93,10 @@ TEXTS: Dict[str, Dict[str, str]] = {
                            "If the clauses do not answer the question, reply: Q01 | NOT IN TEXT | - | -\n\nQuestions:\n{questions}\n\nContract clauses:\n{clauses}"),
         "steps_text": PASTE_STEPS,
         **BOX,
-        "result_text": ("**{version}:** {right} of {n} questions answered correctly; {made_up} of the {unanswerable} questions the clauses do not answer were "
-                        "given an answer anyway; {verified} of {quotes} quotes found word for word in the clauses."),
+        "result_text": ("**{version}**\n**Correct answers:** {right} of {n}\n**Hallucinated answers:** {made_up} of the {unanswerable} questions the clauses do not answer\n"
+                        "**Quotes found word for word:** {verified} of {quotes}"),
         "table_text": "Ground truth vs. HokieAI's output:",
+        "columns_text": "Question | Ground truth | HokieAI's output | Correct | Quote found in the clauses",
     },
     "compare": {
         "title_text": "Share of correct outputs by prompt version",
@@ -105,9 +111,10 @@ TEXTS: Dict[str, Dict[str, str]] = {
 ONE_PROMPT = {"incidents": "v2", "submittals": "v1", "contract": "v2"}
 ONE_PROMPT_TEXTS = {
     "incidents": {"accuracy_text": "**Accuracy:** {right} of {n} reports classified as OSHA classified them (**{accuracy} %**)."},
-    "submittals": {"result_text": "**{submittal}:** {right} of {n} requirements judged correctly; noncompliances found {found} of {planted}, false flags {false}."},
-    "contract": {"result_text": ("**Contract questions:** {right} of {n} questions answered correctly; {made_up} of the {unanswerable} questions the clauses "
-                                 "do not answer were given an answer anyway; {verified} of {quotes} quotes found word for word in the clauses.")},
+    "submittals": {"result_text": ("**{submittal}**\n**Requirements judged correctly:** {right} of {n}\n**Noncompliances found:** {found} of {planted}\n"
+                                   "**False flags:** {false}")},
+    "contract": {"result_text": ("**Correct answers:** {right} of {n}\n**Hallucinated answers:** {made_up} of the {unanswerable} questions the clauses do not answer\n"
+                                 "**Quotes found word for word:** {verified} of {quotes}")},
 }
 
 FOUNDATION_CONVENTIONS = ("Estimating conventions: total wall length = sum of the outside dimensions (no deduction at corners); wall area = length x height; "

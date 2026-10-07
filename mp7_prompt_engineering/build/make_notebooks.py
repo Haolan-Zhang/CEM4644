@@ -167,6 +167,8 @@ Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), th
 """))
     cells.append(form("▶ Step 3a · Ask HokieAI About the Contract", "lab.contract_questions(prompt_version)",
                       notes=["Choose a prompt version, run the cell, and follow the instructions. Score every version.",
+                             "Hallucinated answer: an answer to one of the questions the clauses do not answer (the correct output says that the clauses do not answer it). "
+                             "Quote found word for word: the quoted sentence appears in the clauses exactly as quoted; a quote that is not found is a misquote.",
                              "v1 · questions only: the questions and the clauses.",
                              "v2 · answers with quotes: asks for the sentence of the contract that supports each answer.",
                              "v3 · only from the text, with quotes: restricts HokieAI to the clauses, asks it to apply the requirement to the facts of each situation, for the clause number and an exact quote, and for NOT IN TEXT when the clauses do not answer.",
@@ -176,7 +178,7 @@ Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), th
                       notes=["Run the cell after Step 3a. Each bar is the share of questions answered correctly, including NOT IN TEXT for the questions the clauses do not answer."],
                       texts=T("compare")))
     cells.append(question(3,
-                          "From Step 3a: Report, for each prompt version, the questions answered correctly, the answers given to questions the clauses do not answer, and the quotes found word for word.",
+                          "From Step 3a: Report, for each prompt version, the correct answers, the hallucinated answers, and the quotes found word for word.",
                           "Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?"))
 
     # ------------------------------------------------------------------ Part 4
@@ -315,10 +317,10 @@ Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), th
 """))
     cells.append(form("▶ Step 3a · Ask HokieAI About the Contract", "lab.contract_questions()",
                       notes=["Run the cell and follow the instructions. The prompt asks HokieAI to quote the sentence of the contract that supports each answer, so that each answer can be checked against the source.",
-                             "Quote found word for word: the quoted sentence appears in the clauses exactly as quoted. A quote that is not found is a misquote."],
+                             "Hallucinated answer: an answer to one of the questions the clauses do not answer (the correct output says that the clauses do not answer it). Quote found word for word: the quoted sentence appears in the clauses exactly as quoted; a quote that is not found is a misquote."],
                       texts=T1("contract")))
     cells.append(question(3,
-                          "From Step 3a: Report the questions answered correctly, the answers given to questions the clauses do not answer, and the quotes found word for word.",
+                          "From Step 3a: Report the correct answers, the hallucinated answers, and the quotes found word for word. Include the table.",
                           "Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?"))
 
     cells.append(md("""
