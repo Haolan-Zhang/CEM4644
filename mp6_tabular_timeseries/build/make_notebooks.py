@@ -481,7 +481,8 @@ def build_tabular_v2(variant, v, spec, cells):
 In this homework, you will use AI models to predict the heating load of buildings from tabular data, compare them with generative AI (HokieAI), and then collect your own tabular dataset to train a model.
 """))
     cells.append(step0(variant, "tabular"))
-    cells.append(wform("▶ Browse the Data", "lab.show_table(rows)", T("show_table", t),
+    cells.append(wform("▶ Browse the Data", "lab.show_table(rows, scatter=False)",
+                       {k: v for k, v in T("show_table", t).items() if k != "scatter_title_text"},
                        notes=[f"The table contains {len(load_table(REPO, t)):,} simulated residential buildings of the same volume but different shapes. Each row represents one building; "
                               "the columns describe its geometry (relative compactness; surface, wall, and roof areas; overall height), orientation, and glazing, and the last column "
                               f"is the heating load computed by a building-energy simulation. The heating load is the output the AI model will learn to predict from the other columns. "

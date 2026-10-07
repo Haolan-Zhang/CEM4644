@@ -44,16 +44,19 @@ def confusion(mat: pd.DataFrame):
 
 
 # ----------------------------------------------------------------------------- Part 1: the table
-def show_table(lab, rows: int = 10, texts: Optional[dict] = None):
+def show_table(lab, rows: int = 10, texts: Optional[dict] = None, scatter: bool = True):
     spec, df = lab.table_spec, lab.df
     G = "show_table"
     output = spec.label(spec.target)
     say(texts, G, "summary_text", n_rows=f"{len(df):,}", rows=spec.rows, n_inputs=len(spec.features), output=output, unit=spec.unit)
     view = df.sample(rows, random_state=1).sort_index(); view.columns = [spec.label(c) for c in view.columns]
     table(view.reset_index(drop=True))
-    fig, ax = plt.subplots(1, 2, figsize=(11, 3.4))
+    fig, ax = plt.subplots(1, 2 if scatter else 1, figsize=(11, 3.4) if scatter else (5.5, 3.4), squeeze=False)
+    ax = ax[0]
     ax[0].hist(df[spec.target], bins=30, color=BLUE); ax[0].set_xlabel(output); ax[0].set_ylabel(spec.rows)
     ax[0].set_title(fill(text(texts, G, "hist_title_text"), output=output), fontsize=10)
+    if not scatter:                          # the histogram only (MP6A homework)
+        show(fig); return
     top = spec.whatif[0]
     ax[1].scatter(df[top], df[spec.target], s=8, alpha=0.4, color=BLUE); ax[1].set_xlabel(spec.label(top)); ax[1].set_ylabel(output)
     ax[1].set_title(fill(text(texts, G, "scatter_title_text"), input=spec.label(top).split(" (")[0], output=output.split(" (")[0]), fontsize=10)

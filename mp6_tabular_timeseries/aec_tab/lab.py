@@ -91,8 +91,8 @@ class TabLab:
 
     # ------------------------------------------------------------------ steps
     # Every step takes the wordings its notebook cell carries (name_text="..."), which override the defaults in texts.py.
-    def show_table(self, rows=10, **texts):
-        self._need(); from . import ui; ui.show_table(self, int(rows), texts)
+    def show_table(self, rows=10, scatter=True, **texts):
+        self._need(); from . import ui; ui.show_table(self, int(rows), texts, scatter)
 
     def guess(self, **texts):
         self._need(); from . import ui; ui.guess_game(self, texts)
