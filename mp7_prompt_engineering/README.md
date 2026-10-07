@@ -3,10 +3,15 @@
 Teaching material for **CEM4644**. Students use generative AI (HokieAI, Virginia Tech's access to GPT models) on
 construction text and drawings, and benchmark how the wording of a prompt changes the accuracy of its outputs. The
 notebook gives the prompts; students send them to HokieAI, paste the output back, and the notebook scores it against
-an answer key and compares the prompt versions. No programming and no GPU needed.
+the ground truth and compares the prompt versions. No programming and no GPU needed.
+
+A one-prompt copy, `MP7_Workshop_Construction_Documents.ipynb`, has Parts 1–3 only (incident reports, submittals,
+contract) with one given prompt each and no prompt comparison: students use HokieAI and check its output against the
+ground truth. It comes first; the prompt-engineering notebook, with all prompt versions, is for the class on prompting.
 
 | Notebook | Open | Data |
 |---|---|---|
+| `MP7_Workshop_Construction_Documents.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp7_prompt_engineering/MP7_Workshop_Construction_Documents.ipynb) | Parts 1–3 with one prompt each: 30 OSHA incident reports; 12 practice submittals against UFGS excerpts; 29 FAR construction clauses |
 | `MP7_Workshop_Prompt_Engineering.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp7_prompt_engineering/MP7_Workshop_Prompt_Engineering.ipynb) | 30 OSHA construction incident reports; 12 practice submittals against UFGS excerpts; 29 FAR construction clauses; 15 practice drawings made for the course |
 
 ## What the students do
@@ -33,14 +38,15 @@ Each part ends with a comparison of the prompt versions over every output the st
 ## What is in this folder
 
 ```
-MP7_Workshop_Prompt_Engineering.ipynb   student notebook (generated)
+MP7_Workshop_Prompt_Engineering.ipynb   student notebook, Parts 1-5 with prompt versions (generated)
+MP7_Workshop_Construction_Documents.ipynb   its one-prompt copy, Parts 1-3 (generated)
 aec_prompt/      the hidden code: texts (every default wording and prompt), lab (the steps), score (reading and
                  scoring HokieAI's output), ui (the HokieAI box, tables, comparison chart)
 data/            incidents.csv and incident_examples.csv (OSHA, public domain); submittals/ (spec excerpts + submittals);
                  contract/ (FAR clauses + questions); practice/ (drawings + problems.json)
 build/           prepare_incidents.py (from OSHA's download), generate_submittals.py, prepare_contract.py (from acquisition.gov),
                  generate_practice.py (the drawings), make_notebooks.py
-docs/            report template, instructor guide
+docs/            report templates, instructor guide
 ```
 
 **Editing the text.** Every prompt, instruction and result line is written in its cell (`name_text = """..."""`,
@@ -54,7 +60,7 @@ python build/prepare_incidents.py <OSHA January2015toNovember2025.csv>   # data/
 python build/generate_submittals.py                                       # data/submittals/ (seed 4644)
 python build/prepare_contract.py                                          # data/contract/ (fetches the FAR clauses)
 python build/generate_practice.py                                         # data/practice/ (seed 4644; --seed for a new set)
-python build/make_notebooks.py                                            # the notebook + report template
+python build/make_notebooks.py                                            # both notebooks + report templates
 ```
 
 ## Sources and licences

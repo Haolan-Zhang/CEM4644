@@ -65,10 +65,21 @@ class PromptLab:
         self.runs.append({"task": task, "example": drawing, "version": version, "correct": int(right), "of": int(n)})
 
     @staticmethod
-    def _version_label(choice: str, versions: dict, original: str, sent: str) -> str:
+    def _template(texts: dict, group: str, versions: dict, version: str) -> str:
+        """The cell's own prompt (prompt_text, in the one-prompt notebook), else the chosen prompt version's."""
+        if texts.get("prompt_text"):
+            return texts["prompt_text"]
+        v = versions.get(version, "v3")
+        return text(texts, group, f"{'v3' if v == 'own' else v}_prompt_text")
+
+    @staticmethod
+    def _version_label(choice: str, versions: dict, original: str, sent: str, texts: Optional[dict] = None) -> str:
+        edited = sent.strip() != original.strip()
+        if (texts or {}).get("prompt_text"):
+            return "edited prompt" if edited else "given prompt"
         if versions.get(choice) == "own":
             return "my own prompt"
-        return choice if sent.strip() == original.strip() else f"my own prompt (edited {choice.split(' ·')[0]})"
+        return f"my own prompt (edited {choice.split(' ·')[0]})" if edited else choice
 
     # ------------------------------------------------------------------ Part 1: incident reports
     def show_reports(self, rows: int = 10, **texts):
@@ -78,8 +89,7 @@ class PromptLab:
         ui.table(self.incidents[["id", "report"]].head(int(rows)))
 
     def _incident_prompt(self, version: str, texts: dict) -> str:
-        v = INCIDENT_VERSIONS.get(version, "v3")
-        tmpl = text(texts, "incidents", f"{'v3' if v == 'own' else v}_prompt_text")
+        tmpl = self._template(texts, "incidents", INCIDENT_VERSIONS, version)
         reports = "\n".join(f"{r.id}: {r.report}" for r in self.incidents.itertuples())
         examples = "\n".join(f"Report: {r.report}\nCategory: {r.focus_four}" for r in self.examples.itertuples())
         return fill_prompt(tmpl, reports=reports, examples=examples)
@@ -90,7 +100,7 @@ class PromptLab:
         G = "incidents"
 
         def on_score(reply, sent):
-            label = self._version_label(version, INCIDENT_VERSIONS, prompt, sent)
+            label = self._version_label(version, INCIDENT_VERSIONS, prompt, sent, texts)
             r = score.incidents(reply, self.incidents)
             self._record("incidents", "30 reports", label, r["right"], r["n"])
             if r["got"] < r["n"]:
@@ -107,12 +117,11 @@ class PromptLab:
         p = self.by_submittal.get(submittal)
         if p is None:
             raise KeyError(f"No submittal called {submittal!r}")
-        v = SUBMITTAL_VERSIONS.get(version, "v3")
-        tmpl = text(texts, G, f"{'v3' if v == 'own' else v}_prompt_text")
+        tmpl = self._template(texts, G, SUBMITTAL_VERSIONS, version)
         prompt = fill_prompt(tmpl, final=text(texts, G, "final_text"), spec=self.specs[p["spec"]], submittal=p["text"])
 
         def on_score(reply, sent):
-            label = self._version_label(version, SUBMITTAL_VERSIONS, prompt, sent)
+            label = self._version_label(version, SUBMITTAL_VERSIONS, prompt, sent, texts)
             r = score.submittal(reply, p)
             self._record("submittals", submittal, label, r["right"], r["n"])
             say(texts, G, "result_text", version=label, submittal=submittal, right=r["right"], n=r["n"], found=r["found"], planted=r["planted"], false=r["false"])
@@ -122,13 +131,12 @@ class PromptLab:
     # ------------------------------------------------------------------ Part 3: contract questions
     def contract_questions(self, version: str = "v1 · questions only", **texts):
         self._need(); G = "contract"
-        v = CONTRACT_VERSIONS.get(version, "v3")
-        tmpl = text(texts, G, f"{'v3' if v == 'own' else v}_prompt_text")
+        tmpl = self._template(texts, G, CONTRACT_VERSIONS, version)
         qs = "\n".join(f"{q['id']}. {q['question']}" for q in self.questions)
         prompt = fill_prompt(tmpl, questions=qs, clauses=self.clauses)
 
         def on_score(reply, sent):
-            label = self._version_label(version, CONTRACT_VERSIONS, prompt, sent)
+            label = self._version_label(version, CONTRACT_VERSIONS, prompt, sent, texts)
             r = score.contract(reply, self.questions, self.clauses)
             self._record("contract", f"{r['n']} questions", label, r["right"], r["n"])
             say(texts, G, "result_text", version=label, right=r["right"], n=r["n"], made_up=r["made_up"], unanswerable=r["unanswerable"],
@@ -140,8 +148,7 @@ class PromptLab:
     def takeoff(self, drawing: str, version: str = "v1 · task only", **texts):
         self._need()
         p = self._problem(drawing); G = "takeoff"
-        v = TAKEOFF_VERSIONS.get(version, "v3")
-        tmpl = text(texts, G, f"{'v3' if v == 'own' else v}_prompt_text")
+        tmpl = self._template(texts, G, TAKEOFF_VERSIONS, version)
         lines = "\n".join(f"FINAL | {k['q']} | <number> | <unit>" for k in p["key"])
         conv = texts.get("conventions_text") or (FOUNDATION_CONVENTIONS if p["family"] == "foundation" else ROOF_CONVENTIONS)
         prompt = fill_prompt(tmpl, problem=p["text"], conventions=conv, finals=fill_prompt(text(texts, G, "finals_text"), lines=lines))
@@ -149,7 +156,7 @@ class PromptLab:
         ui.show_image(img, 760)
 
         def on_score(reply, sent):
-            label = self._version_label(version, TAKEOFF_VERSIONS, prompt, sent)
+            label = self._version_label(version, TAKEOFF_VERSIONS, prompt, sent, texts)
             r = score.takeoff(reply, p["key"])
             self._record(p["family"], drawing, label, r["right"], r["n"])
             say(texts, G, "result_text", version=label, drawing=drawing, right=r["right"], n=r["n"])
@@ -160,15 +167,15 @@ class PromptLab:
     def schedule(self, sheet: str, version: str = "v1 · whole sheet", **texts):
         self._need()
         p = self._problem(sheet); G = "schedule"
+        tmpl = self._template(texts, G, SCHEDULE_VERSIONS, version)
         v = SCHEDULE_VERSIONS.get(version, "v3")
-        tmpl = text(texts, G, f"{'v3' if v == 'own' else v}_prompt_text")
         prompt = fill_prompt(tmpl, unit=p["unit"], format=text(texts, G, "format_text"))
         full, crop = self.drawings / p["image"], self.drawings / p["crop"]
         files = [full] if v == "v1" else ([crop] if v in ("v2", "v3") else [full, crop])
         ui.show_image(files[0], 900)
 
         def on_score(reply, sent):
-            label = self._version_label(version, SCHEDULE_VERSIONS, prompt, sent)
+            label = self._version_label(version, SCHEDULE_VERSIONS, prompt, sent, texts)
             r = score.schedule(reply, p["key"])
             self._record("schedule", sheet, label, r["right"], r["n"])
             say(texts, G, "result_text", version=label, sheet=sheet, right=r["right"], n=r["n"], fields_right=r["fields_right"], fields=r["fields"])

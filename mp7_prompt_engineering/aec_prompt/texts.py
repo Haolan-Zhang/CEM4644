@@ -8,10 +8,10 @@ from typing import Dict, Optional
 CHAT_URL = "https://hokie.ai.vt.edu/"
 
 PASTE_STEPS = ("1. Copy the prompt below.\n2. Open {url} (sign in with your VT account), start a new chat, and paste the prompt.\n"
-               "3. Copy HokieAI's output and paste it into the box below.\n4. Click *Score HokieAI output* to compare it with the answer key.")
+               "3. Copy HokieAI's output and paste it into the box below.\n4. Click *Score HokieAI output* to compare it with the ground truth.")
 ATTACH_STEPS = ("1. Download {files} with the button below and copy the prompt.\n2. Open {url} (sign in with your VT account), start a new chat, "
                 "attach the image, and paste the prompt.\n3. Copy HokieAI's output and paste it into the box below.\n"
-                "4. Click *Score HokieAI output* to compare it with the answer key.")
+                "4. Click *Score HokieAI output* to compare it with the ground truth.")
 BOX = {"button_text": "Score HokieAI output", "reply_text": "Paste HokieAI's full output here.", "prompt_label_text": "prompt", "reply_label_text": "output"}
 
 DEFINITIONS = """Definitions (OSHA construction Focus Four, as coded in OSHA's injury records):
@@ -29,7 +29,7 @@ DOOR_FORMAT = ("Reply with one line per door and nothing else, in this format:\n
 
 TEXTS: Dict[str, Dict[str, str]] = {
     "reports": {
-        "summary_text": "**{n}** construction incident reports from OSHA's Severe Injury Reports ({years}). The answer key, OSHA's classification of each report, is hidden.",
+        "summary_text": "**{n}** construction incident reports from OSHA's Severe Injury Reports ({years}). OSHA's classification of each report, the ground truth, is hidden.",
     },
     "incidents": {
         "v1_prompt_text": INCIDENT_TASK,
@@ -50,8 +50,8 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "finals_text": "End your reply with one final line per question, in this format:\n{lines}",
         "steps_text": ATTACH_STEPS,
         **BOX,
-        "result_text": "**{version}, {drawing}:** {right} of {n} quantities within tolerance of the answer key.",
-        "table_text": "Answer key vs. HokieAI's output:",
+        "result_text": "**{version}, {drawing}:** {right} of {n} quantities within tolerance of the ground truth.",
+        "table_text": "Ground truth vs. HokieAI's output:",
     },
     "schedule": {
         "v1_prompt_text": "The attached drawing sheet contains a door schedule. List every door of UNIT TYPE {unit}.\n{format}",
@@ -63,7 +63,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "steps_text": ATTACH_STEPS,
         **BOX,
         "result_text": "**{version}, {sheet}:** {right} of {n} doors transcribed exactly ({fields_right} of {fields} fields right).",
-        "table_text": "Answer key vs. HokieAI's output:",
+        "table_text": "Ground truth vs. HokieAI's output:",
     },
     "submittals": {
         "v1_prompt_text": "Review the submittal below against the specification excerpt. List every noncompliance.\n{final}\n\nSpecification:\n{spec}\nSubmittal:\n{submittal}",
@@ -79,7 +79,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "steps_text": PASTE_STEPS,
         **BOX,
         "result_text": "**{version}, {submittal}:** {right} of {n} requirements judged correctly; noncompliances found {found} of {planted}, false flags {false}.",
-        "table_text": "Answer key vs. HokieAI's output (each requirement the submittal is checked against):",
+        "table_text": "Ground truth vs. HokieAI's output (each requirement the submittal is checked against):",
     },
     "contract": {
         "v1_prompt_text": "Answer the questions about the construction contract clauses below.\nReply with one line per question: Q01 | answer\n\nQuestions:\n{questions}\n\nContract clauses:\n{clauses}",
@@ -93,7 +93,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
         **BOX,
         "result_text": ("**{version}:** {right} of {n} questions answered correctly; {made_up} of the {unanswerable} questions the clauses do not answer were "
                         "given an answer anyway; {verified} of {quotes} quotes found word for word in the clauses."),
-        "table_text": "Answer key vs. HokieAI's output:",
+        "table_text": "Ground truth vs. HokieAI's output:",
     },
     "compare": {
         "title_text": "Share of correct outputs by prompt version",
@@ -101,6 +101,16 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "empty_text": "No scored outputs yet: run the step above first.",
         "axis_text": "correct (%)",
     },
+}
+
+# The one-prompt notebook (MP7_Workshop_Construction_Documents): which prompt version each part gives, and the result
+# wordings without a version.
+ONE_PROMPT = {"incidents": "v2", "submittals": "v1", "contract": "v2"}
+ONE_PROMPT_TEXTS = {
+    "incidents": {"accuracy_text": "**Accuracy:** {right} of {n} reports classified as OSHA classified them (**{accuracy} %**)."},
+    "submittals": {"result_text": "**{submittal}:** {right} of {n} requirements judged correctly; noncompliances found {found} of {planted}, false flags {false}."},
+    "contract": {"result_text": ("**Contract questions:** {right} of {n} questions answered correctly; {made_up} of the {unanswerable} questions the clauses "
+                                 "do not answer were given an answer anyway; {verified} of {quotes} quotes found word for word in the clauses.")},
 }
 
 FOUNDATION_CONVENTIONS = ("Estimating conventions: total wall length = sum of the outside dimensions (no deduction at corners); wall area = length x height; "

@@ -26,7 +26,8 @@ Text must be **precise, consistent and concise**. Students are engineering stude
   data, model output, prediction, threshold, binary classification task, confusion matrix, false pass (false positive),
   false fail (false negative), MAE, R², importance, predicted vs. actual, prompt, few-shot prompting.
 - **No made-up or childish terms.** "Model output", not "answers"; "Predict a New Recording", not "blind test" (not a
-  machine-learning term); "Make Your Own Predictions", not a "game". If a term is not used in the field, do not invent it.
+  machine-learning term); "Make Your Own Predictions", not a "game"; "ground truth", not "answer key". If a term is not
+  used in the field, do not invent it.
 - **One name per thing, everywhere.** The dropdown label, the note, the result line and the report question use the
   same name ("decision tree model", not "trees" in one cell and "gradient boosting" in another).
 - **Titles:** `# In-Class Activity: <Task>` or `# Homework: <Task>`, then one sentence: "In this activity, we will use

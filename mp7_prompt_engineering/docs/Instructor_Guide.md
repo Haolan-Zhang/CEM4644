@@ -1,8 +1,18 @@
 # MP7 · Instructor guide
 
+## 0. Two notebooks
+
+- `MP7_Workshop_Construction_Documents.ipynb` (first class): Parts 1–3 only, one given prompt each and no prompt
+  comparison. Students send the prompt, score HokieAI's output against the ground truth, and explain its errors. The
+  prompts are deliberately not the best versions, so the outputs have mistakes to discuss: Part 1 uses v2 (role and
+  definitions; without the definitions the categories are undefined), Part 2 uses v1 (task only), Part 3 uses v2
+  (answers with quotes, so the answers can be checked against the clauses, but no NOT IN TEXT instruction).
+- `MP7_Workshop_Prompt_Engineering.ipynb` (the class on prompting): all five parts with prompt versions v1–v3 and the
+  student's own, compared in a chart per part. Sections 1–4 below describe it.
+
 ## 1. The workshop
 
-| Part | Examples | Prompt versions | Answer key |
+| Part | Examples | Prompt versions | Ground truth |
 |---|---|---|---|
 | 1 · Incident reports | 30 OSHA construction reports (2023–2025), 6 per class | v1 task only · v2 role and definitions · v3 definitions and worked examples · own | OSHA's OIICS event title of each record, mapped to the Focus Four |
 | 2 · Submittal review | 12 practice submittals: 6 concrete mix designs, 6 mortar and grout mixes; each states its intended use, not the specification's portion of the structure; 0–3 planted noncompliances each (two comply fully) | v1 task only · v2 requirements first, then compare · v3 comparison table · own | the planted noncompliances; six requirements checked per submittal, each one decision |

@@ -1,4 +1,4 @@
-"""Specification excerpts and practice submittals for MP7 Part 2 (submittal review), with exact answer keys.
+"""Specification excerpts and practice submittals for MP7 Part 2 (submittal review), with the exact ground truth.
 
     python build/generate_submittals.py [--seed 4644]
 
@@ -7,7 +7,7 @@ UFGS 03 30 00 Cast-in-Place Concrete (2.5 Concrete Mix Design) and UFGS 04 20 00
 with one project's choices filled in for the guide specification's options. The 12 submittals are designed by hand for a
 fictional project: each describes its intended use the way a project would (so the applicable requirements must be
 identified), carries 0-3 planted noncompliances (some only visible after a calculation) and some values exactly at a
-limit, and the key lists the noncompliances.
+limit, and the ground truth lists the noncompliances.
 """
 import argparse
 import json

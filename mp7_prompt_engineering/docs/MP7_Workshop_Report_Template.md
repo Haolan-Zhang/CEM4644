@@ -32,7 +32,7 @@ Why does asking for the applicable requirements first change the result?
 
 From Step 3a: Report, for each prompt version, the questions answered correctly, the answers given to questions the clauses do not answer, and the quotes found word for word.
 
-Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, without an answer key?
+Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?
 
 *Your answer:*
 

@@ -1,4 +1,4 @@
-"""Original practice drawings for MP7, drawn by code, with problem text and exact answer keys.
+"""Original practice drawings for MP7, drawn by code, with problem text and the exact ground truth.
 
     python build/generate_practice.py [--out DIR] [--n 5] [--seed 4644]
 

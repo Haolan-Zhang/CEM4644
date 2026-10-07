@@ -1,4 +1,4 @@
-"""Reading HokieAI's pasted output and comparing it with the answer keys (loosely: extra words, tables and fences are fine)."""
+"""Reading HokieAI's pasted output and comparing it with the ground truth (loosely: extra words, tables and fences are fine)."""
 import re
 from typing import Dict, List, Tuple
 
@@ -56,7 +56,7 @@ def takeoff(reply: str, key: List[dict]) -> dict:
         if not ok and k["q"] == "Q3a" and g is not None:        # the starter course given per eave: accepted
             ok = abs(g - v / 2) <= tol / 2
         right += ok
-        rows.append({"question": k["q"], "quantity": k["quantity"], "answer key": round(v, 2), "HokieAI": g if g is not None else "—",
+        rows.append({"question": k["q"], "quantity": k["quantity"], "ground truth": round(v, 2), "HokieAI": g if g is not None else "—",
                      "unit": k["unit"].replace("ft2", "ft²"), "": "✓" if ok else "✗"})
     return {"right": right, "n": len(key), "table": pd.DataFrame(rows)}
 
@@ -80,7 +80,7 @@ def schedule(reply: str, key: List[dict]) -> dict:
         g = by_mark.get(k["mark"])
         same = [g is not None and _n(g[i]) == _n(k[f]) for i, f in enumerate(FIELDS)]
         exact += all(same); fields += sum(same)
-        rows.append({"mark": k["mark"], "answer key": " | ".join(k[f] for f in FIELDS[1:]),
+        rows.append({"mark": k["mark"], "ground truth": " | ".join(k[f] for f in FIELDS[1:]),
                      "HokieAI": " | ".join(g[1:]) if g else "—", "": "✓" if all(same) else "✗"})
     return {"right": exact, "n": len(key), "fields_right": fields, "fields": len(key) * len(FIELDS), "listed": len(got), "table": pd.DataFrame(rows)}
 
@@ -128,7 +128,7 @@ def submittal(reply: str, problem: dict) -> dict:
     for item in problem["checked"]:
         dev, flag = item in planted, item in flagged
         right += dev == flag
-        rows.append({"requirement": REQUIREMENT_NAMES.get(item, names.get(item, item)), "answer key": "noncompliant" if dev else "complies",
+        rows.append({"requirement": REQUIREMENT_NAMES.get(item, names.get(item, item)), "ground truth": "noncompliant" if dev else "complies",
                      "HokieAI": "noncompliant" if flag else "complies", "": "✓" if dev == flag else "✗"})
     false = len(flagged - planted) + len(unknown)
     return {"right": right, "n": len(problem["checked"]), "found": len(planted & flagged), "planted": len(planted), "false": false,
@@ -179,6 +179,6 @@ def contract(reply: str, questions: List[dict], clauses: str) -> dict:
             quotes += 1
             hit = _quote_found(quote, ctext)
             verified += hit; qv = "✓" if hit else "✗"
-        rows.append({"question": q["id"], "answer key": q["key"], "HokieAI": ans[:120] or "—", "": "✓" if ok else "✗", "quote found": qv})
+        rows.append({"question": q["id"], "ground truth": q["key"], "HokieAI": ans[:120] or "—", "": "✓" if ok else "✗", "quote found": qv})
     return {"right": right, "n": len(questions), "made_up": made_up, "unanswerable": sum(not q["answerable"] for q in questions),
             "quotes": quotes, "verified": verified, "table": pd.DataFrame(rows)}

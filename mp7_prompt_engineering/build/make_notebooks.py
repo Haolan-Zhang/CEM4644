@@ -1,4 +1,5 @@
-"""Generates the MP7 workshop notebook (+ report template).
+"""Generates the MP7 notebooks (+ report templates): the prompt-engineering workshop (Parts 1-5, prompt versions) and
+its one-prompt copy for construction documents (Parts 1-3, one given prompt each).
 
     python build/make_notebooks.py [--fresh-text]
 
@@ -18,7 +19,7 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 from aec_prompt.lab import (CONTRACT_VERSIONS, INCIDENT_VERSIONS, SCHEDULE_VERSIONS, SUBMITTAL_VERSIONS, TAKEOFF_VERSIONS,  # noqa: E402
                             drawing_label, submittal_label)
-from aec_prompt.texts import CHAT_URL, FOUNDATION_CONVENTIONS, ROOF_CONVENTIONS, TEXTS  # noqa: E402
+from aec_prompt.texts import CHAT_URL, FOUNDATION_CONVENTIONS, ONE_PROMPT, ONE_PROMPT_TEXTS, ROOF_CONVENTIONS, TEXTS  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
 FILE = "MP7_Workshop_Prompt_Engineering.ipynb"
@@ -115,10 +116,10 @@ In this activity, we will use generative AI (GPT/HokieAI) to classify constructi
 ## Part 1 · Classifying Incident Reports
 OSHA records every severe work-related injury reported by employers, with a short narrative and a code for the event that caused it. Here, you will use HokieAI to classify 30 construction incident reports into OSHA's construction Focus Four hazards (fall, struck-by, caught-in/between, electrocution) or other, and compare its output with OSHA's own classification.
 
-In every HokieAI step, the notebook gives you a prompt; you send it to HokieAI ({CHAT_URL}), paste HokieAI's output back, and the notebook scores it against the answer key. Each prompt version changes one thing, and every scored output is added to the comparison step that follows.
+In every HokieAI step, the notebook gives you a prompt; you send it to HokieAI ({CHAT_URL}), paste HokieAI's output back, and the notebook scores it against the ground truth (the correct output, known for every example). Each prompt version changes one thing, and every scored output is added to the comparison step that follows.
 """))
     cells.append(form("▶ Step 1a · Browse the Reports", "lab.show_reports(rows)",
-                      notes=["Run the cell to browse the incident reports HokieAI will classify. OSHA's classification of each report is the answer key; it stays hidden until you score an output."],
+                      notes=["Run the cell to browse the incident reports HokieAI will classify. OSHA's classification of each report is the ground truth; it stays hidden until you score an output."],
                       params=['rows = 10 #@param [5, 10, 30] {type:"raw"}'], texts=T("reports")))
     cells.append(form("▶ Step 1b · Classify with HokieAI", "lab.classify_incidents(prompt_version)",
                       notes=["Choose a prompt version, run the cell, and follow the instructions. Score every version, and run one version twice in new chats to check its consistency.",
@@ -141,7 +142,7 @@ In every HokieAI step, the notebook gives you a prompt; you send it to HokieAI (
     sub_labels = [submittal_label(p) for p in subs]
     cells.append(md("""
 ## Part 2 · Reviewing Submittals Against the Specification
-Before a material is used, its submittal (here, a concrete mix design or a mortar and grout mix) is checked against the specification. Twelve practice submittals were made for this course, each to be checked against a specification excerpt adapted from the Unified Facilities Guide Specifications (UFGS 03 30 00 Cast-in-Place Concrete and 04 20 00 Masonry). A submittal states its intended use, not the portion of the structure named in the specification, so the applicable requirements must be identified first. Some values must be computed from the batch weights, some are exactly at a limit, and two submittals comply fully. The answer key is the list of planted noncompliances. Every requirement the submittal is checked against counts as one decision (six per submittal); a flag on a requirement that sets no limit for the intended use is a false flag.
+Before a material is used, its submittal (here, a concrete mix design or a mortar and grout mix) is checked against the specification. Twelve practice submittals were made for this course, each to be checked against a specification excerpt adapted from the Unified Facilities Guide Specifications (UFGS 03 30 00 Cast-in-Place Concrete and 04 20 00 Masonry). A submittal states its intended use, not the portion of the structure named in the specification, so the applicable requirements must be identified first. Some values must be computed from the batch weights, some are exactly at a limit, and two submittals comply fully. The ground truth is the list of planted noncompliances. Every requirement the submittal is checked against counts as one decision (six per submittal); a flag on a requirement that sets no limit for the intended use is a false flag.
 """))
     cells.append(form("▶ Step 2a · Review a Submittal with HokieAI", "lab.review_submittal(submittal, prompt_version)",
                       notes=["Choose a submittal and a prompt version, run the cell, and follow the instructions. Run all three versions on at least three submittals, including a concrete and a masonry one.",
@@ -162,7 +163,7 @@ Before a material is used, its submittal (here, a concrete mix design or a morta
     # ------------------------------------------------------------------ Part 3: contract questions
     cells.append(md("""
 ## Part 3 · Answering Questions from a Contract
-Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), the standard terms of U.S. federal construction contracts, and 27 questions about them. Ten questions describe a project situation (a late notice, a withheld payment, a warranty claim), so the answer needs the requirement and its application to the facts. Seven cannot be answered from the text, although most have a common answer outside it. The answer key gives the answer from the clauses; quotes are checked word for word against the clauses.
+Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), the standard terms of U.S. federal construction contracts, and 27 questions about them. Ten questions describe a project situation (a late notice, a withheld payment, a warranty claim), so the answer needs the requirement and its application to the facts. Seven cannot be answered from the text, although most have a common answer outside it. The ground truth is the answer the clauses give; quotes are checked word for word against the clauses.
 """))
     cells.append(form("▶ Step 3a · Ask HokieAI About the Contract", "lab.contract_questions(prompt_version)",
                       notes=["Choose a prompt version, run the cell, and follow the instructions. Score every version.",
@@ -176,16 +177,16 @@ Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), th
                       texts=T("compare")))
     cells.append(question(3,
                           "From Step 3a: Report, for each prompt version, the questions answered correctly, the answers given to questions the clauses do not answer, and the quotes found word for word.",
-                          "Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, without an answer key?"))
+                          "Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?"))
 
     # ------------------------------------------------------------------ Part 4
     cells.append(md("""
 ## Part 4 · Quantity Takeoff from Drawings
-Five foundation plans and five gable roofs were drawn for this course. Each comes with estimating questions (CMUs and grout; roof area, underlayment, and shingles), and the answer key is computed exactly from the drawing's dimensions with standard estimating conventions. HokieAI reads the attached drawing and answers each question; quantities within 1–2 % of the answer key count as correct.
+Five foundation plans and five gable roofs were drawn for this course. Each comes with estimating questions (CMUs and grout; roof area, underlayment, and shingles), and the ground truth is computed exactly from the drawing's dimensions with standard estimating conventions. HokieAI reads the attached drawing and answers each question; quantities within 1–2 % of the ground truth count as correct.
 """))
     vnotes = ["v1 · task only: the questions and the output format.",
               "v2 · step-by-step reasoning: asks HokieAI to list the dimensions it reads and to solve each question step by step.",
-              "v3 · estimating conventions: adds the estimating conventions used for the answer key.",
+              "v3 · estimating conventions: adds the estimating conventions used to compute the ground truth.",
               "my own prompt: starts from v3; edit the prompt in the prompt box before copying it."]
     cells.append(form("▶ Step 4a · Foundation Plans", "lab.takeoff(drawing, prompt_version)",
                       notes=["Choose a drawing and a prompt version, run the cell, and follow the instructions. Run all three versions on at least two drawings."] + vnotes,
@@ -196,7 +197,7 @@ Five foundation plans and five gable roofs were drawn for this course. Each come
                       params=[choice("drawing", labels["roof"][0], labels["roof"]), choice("prompt_version", list(TAKEOFF_VERSIONS)[0], TAKEOFF_VERSIONS)],
                       texts=dict(T("takeoff"), conventions_text=ROOF_CONVENTIONS)))
     cells.append(form("▶ Step 4c · Compare Prompt Versions", 'lab.compare("takeoff")',
-                      notes=["Run the cell after Steps 4a and 4b. Each bar is the share of quantities within tolerance of the answer key, over all drawings scored with that version."],
+                      notes=["Run the cell after Steps 4a and 4b. Each bar is the share of quantities within tolerance of the ground truth, over all drawings scored with that version."],
                       texts=T("compare")))
     cells.append(question(4,
                           "From Step 4c: Report the share of correct quantities for each prompt version, across at least two foundation plans and two roofs.",
@@ -206,7 +207,7 @@ Five foundation plans and five gable roofs were drawn for this course. Each come
     # ------------------------------------------------------------------ Part 5
     cells.append(md("""
 ## Part 5 · Reading Schedules on a Drawing Sheet
-Five 36 × 24 in drawing sheets, made for this course, each carry the door schedules of several unit types, a window schedule, hardware sets, and door-type elevations. The task: list every door of one unit type. The answer key is the schedule's own data; a door counts as correct only if all six of its fields are transcribed exactly.
+Five 36 × 24 in drawing sheets, made for this course, each carry the door schedules of several unit types, a window schedule, hardware sets, and door-type elevations. The task: list every door of one unit type. The ground truth is the schedule's own data; a door counts as correct only if all six of its fields are transcribed exactly.
 """))
     cells.append(form("▶ Step 5a · Door Schedules", "lab.schedule(sheet, prompt_version)",
                       notes=["Choose a sheet and a prompt version, run the cell, and follow the instructions. Run all three versions on at least two sheets.",
@@ -231,11 +232,16 @@ Five 36 × 24 in drawing sheets, made for this course, each carry the door sched
 - Generative AI: GPT models via HokieAI (Virginia Tech).
 """))
 
+    write(cells, FILE, "MP7_Workshop_Report_Template.md", "In-Class Activity: Prompt Engineering")
+
+
+def write(cells, file, report, title):
+    """The notebook and its report template (the report questions, one section each)."""
     nb = new_notebook(cells=cells)
     nb.metadata.update({"colab": {"provenance": [], "toc_visible": True},
                         "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"}, "language_info": {"name": "python"}})
-    nbformat.write(nb, str(REPO / FILE)); print("wrote", REPO / FILE)
-    lines = ["# CEM4644 · MP7 report — In-Class Activity: Prompt Engineering", "", "Name: ______________________    Date: ____________", "",
+    nbformat.write(nb, str(REPO / file)); print("wrote", REPO / file)
+    lines = [f"# CEM4644 · MP7 report — {title}", "", "Name: ______________________    Date: ____________", "",
              "Answer every question in a few sentences. Paste screenshots where the question asks for tables or charts. Numbers must come from **your** run of the notebook.", ""]
     for c in cells:
         if c.cell_type == "markdown" and c.source.startswith("### 📝 Report question "):
@@ -243,9 +249,89 @@ Five 36 × 24 in drawing sheets, made for this course, each carry the door sched
             paras = [p.strip()[2:] for p in body.split("\n\n") if p.strip()]
             lines += [f"## Question {head.rsplit(' ', 1)[1]}", ""] + sum(([p, ""] for p in paras), []) + ["*Your answer:*", "", "", ""]
     (REPO / "docs").mkdir(exist_ok=True)
-    (REPO / "docs" / "MP7_Workshop_Report_Template.md").write_text("\n".join(lines)); print("wrote report template")
+    (REPO / "docs" / report).write_text("\n".join(lines)); print("wrote", REPO / "docs" / report)
+
+
+# ============================================================================ the one-prompt notebook (Parts 1-3)
+DOC_FILE = "MP7_Workshop_Construction_Documents.ipynb"
+
+
+def T1(group):
+    """A part's wordings for the one-prompt notebook: its one prompt (as prompt_text) and the result wordings without a version."""
+    out = {"prompt_text": TEXTS[group][f"{ONE_PROMPT[group]}_prompt_text"]}
+    out.update({k: v for k, v in TEXTS[group].items() if not re.fullmatch(r"v\d_prompt_text", k)})
+    out.update(ONE_PROMPT_TEXTS[group])
+    return out
+
+
+def build_documents():
+    """Parts 1-3 of the workshop with one given prompt each: the students use HokieAI and check its output against the
+    ground truth. The prompt versions stay in the prompt-engineering notebook for the next class."""
+    load_existing(REPO / DOC_FILE)
+    subs = json.loads((REPO / "data" / "submittals" / "problems.json").read_text())
+    sub_labels = [submittal_label(p) for p in subs]
+    cells = [md("""
+# In-Class Activity: Generative AI for Construction Documents
+In this activity, we will use generative AI (GPT/HokieAI) to classify construction incident reports, review submittals against a specification, and answer questions from a contract, and compare its outputs with the ground truth.
+"""), step0()]
+
+    cells.append(md(f"""
+## Part 1 · Classifying Incident Reports
+OSHA records every severe work-related injury reported by employers, with a short narrative and a code for the event that caused it. Here, you will use HokieAI to classify 30 construction incident reports into OSHA's construction Focus Four hazards (fall, struck-by, caught-in/between, electrocution) or other, and compare its output with OSHA's own classification.
+
+In every HokieAI step, the notebook gives you a prompt; you send it to HokieAI ({CHAT_URL}), paste HokieAI's output back, and the notebook scores it against the ground truth (the correct output, known for every example).
+"""))
+    cells.append(form("▶ Step 1a · Browse the Reports", "lab.show_reports(rows)",
+                      notes=["Run the cell to browse the incident reports HokieAI will classify. OSHA's classification of each report is the ground truth; it stays hidden until you score an output."],
+                      params=['rows = 10 #@param [5, 10, 30] {type:"raw"}'], texts=T("reports")))
+    cells.append(form("▶ Step 1b · Classify with HokieAI", "lab.classify_incidents()",
+                      notes=["Run the cell and follow the instructions. The prompt gives HokieAI a role and OSHA's definition of each category.",
+                             "Then send the same prompt in a second new chat and score that output too: a generative AI model can give a different output to the same prompt.",
+                             "Confusion matrix: a table that counts, for each of OSHA's classes (rows), the classes in HokieAI's output (columns); the diagonal holds the reports classified as OSHA classified them.",
+                             "If HokieAI declines the prompt or its output is blocked, start a new chat and send the prompt again."],
+                      texts=T1("incidents")))
+    cells.append(question(1,
+                          "From Step 1b: Report the accuracy of HokieAI's output and include its confusion matrix. Did the second chat give the same output?",
+                          "Choose two reports where HokieAI's output differs from OSHA's classification. From the report text, explain why each is hard to classify. "
+                          "Would you use HokieAI to classify a company's incident reports, and what would you check first?"))
+
+    cells.append(md("""
+## Part 2 · Reviewing Submittals Against the Specification
+Before a material is used, its submittal (here, a concrete mix design or a mortar and grout mix) is checked against the specification. Twelve practice submittals were made for this course, each to be checked against a specification excerpt adapted from the Unified Facilities Guide Specifications (UFGS 03 30 00 Cast-in-Place Concrete and 04 20 00 Masonry). A submittal states its intended use, not the portion of the structure named in the specification, so the applicable requirements must be identified first. Some values must be computed from the batch weights, some are exactly at a limit, and two submittals comply fully. The ground truth is the list of planted noncompliances. Every requirement the submittal is checked against counts as one decision (six per submittal); a flag on a requirement that sets no limit for the intended use is a false flag.
+"""))
+    cells.append(form("▶ Step 2a · Review a Submittal with HokieAI", "lab.review_submittal(submittal)",
+                      notes=["Choose a submittal, run the cell, and follow the instructions. Review at least three submittals, including a concrete and a masonry one.",
+                             "Noncompliance: a submitted value that does not meet a requirement of the specification. False flag: a requirement HokieAI marks as noncompliant that complies.",
+                             "Each submittal needs a new chat, so that HokieAI does not carry over an earlier review."],
+                      params=[choice("submittal", sub_labels[0], sub_labels)], texts=T1("submittals")))
+    cells.append(question(2,
+                          "From Step 2a: Report, for each submittal you reviewed, the requirements judged correctly, the noncompliances found, and the false flags. Include one table.",
+                          "For one missed noncompliance or false flag, explain from HokieAI's output why it happened: a misread requirement, a value that had to be computed, "
+                          "or a requirement that does not apply to the intended use. On a real project, which is more costly, a missed noncompliance or a false flag, and why?"))
+
+    cells.append(md("""
+## Part 3 · Answering Questions from a Contract
+Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), the standard terms of U.S. federal construction contracts, and 27 questions about them. Ten questions describe a project situation (a late notice, a withheld payment, a warranty claim), so the answer needs the requirement and its application to the facts. Seven cannot be answered from the text, although most have a common answer outside it. The ground truth is the answer the clauses give; quotes are checked word for word against the clauses.
+"""))
+    cells.append(form("▶ Step 3a · Ask HokieAI About the Contract", "lab.contract_questions()",
+                      notes=["Run the cell and follow the instructions. The prompt asks HokieAI to quote the sentence of the contract that supports each answer, so that each answer can be checked against the source.",
+                             "Quote found word for word: the quoted sentence appears in the clauses exactly as quoted. A quote that is not found is a misquote."],
+                      texts=T1("contract")))
+    cells.append(question(3,
+                          "From Step 3a: Report the questions answered correctly, the answers given to questions the clauses do not answer, and the quotes found word for word.",
+                          "Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?"))
+
+    cells.append(md("""
+### Data and model sources
+- Incident reports: Severe Injury Reports (2015–2025), Occupational Safety and Health Administration, U.S. Department of Labor, public domain, https://www.osha.gov/severe-injury-reports.
+- Specification excerpts: adapted from the Unified Facilities Guide Specifications 03 30 00 and 04 20 00, U.S. Department of Defense, public domain, https://www.wbdg.org/dod/ufgs; the submittals are practice submittals made for CEM4644.
+- Contract clauses: Federal Acquisition Regulation, Part 52 (29 construction clauses), public domain, https://www.acquisition.gov/far.
+- Generative AI: GPT models via HokieAI (Virginia Tech).
+"""))
+    write(cells, DOC_FILE, "MP7_Construction_Documents_Report_Template.md", "In-Class Activity: Generative AI for Construction Documents")
 
 
 if __name__ == "__main__":
     KEEP_TEXT = "--fresh-text" not in sys.argv
     build()
+    build_documents()
