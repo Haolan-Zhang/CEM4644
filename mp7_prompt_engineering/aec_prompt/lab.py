@@ -133,7 +133,7 @@ class PromptLab:
         ui.hokieai_box([], prompt, on_score, texts, G)
 
     # ------------------------------------------------------------------ Part 3: contract questions
-    def contract_questions(self, version: str = "v1 · questions only", **texts):
+    def contract_questions(self, version: str = "v1 · questions only", check_quotes: bool = True, **texts):
         self._need(); G = "contract"
         tmpl = self._template(texts, G, CONTRACT_VERSIONS, version)
         qs = "\n".join(f"{q['id']}. {q['question']}" for q in self.questions)
@@ -145,7 +145,8 @@ class PromptLab:
             self._record("contract", f"{r['n']} questions", label, r["right"], r["n"])
             say(texts, G, "result_text", version=label, right=r["right"], n=r["n"], made_up=r["made_up"], unanswerable=r["unanswerable"],
                 verified=r["verified"], quotes=r["quotes"])
-            say(texts, G, "table_text"); ui.table(self._named(r["table"], texts, G))
+            table = r["table"] if check_quotes else r["table"].drop(columns="quote found")
+            say(texts, G, "table_text"); ui.table(self._named(table, texts, G))
         ui.hokieai_box([], prompt, on_score, texts, G)
 
     # ------------------------------------------------------------------ Part 4: takeoff from drawings

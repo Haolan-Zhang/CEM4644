@@ -93,7 +93,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
                            "If the clauses do not answer the question, reply: Q01 | NOT IN TEXT | - | -\n\nQuestions:\n{questions}\n\nContract clauses:\n{clauses}"),
         "steps_text": PASTE_STEPS,
         **BOX,
-        "result_text": ("**{version}**\n**Correct answers:** {right} of {n}\n**Hallucinated answers:** {made_up} of the {unanswerable} questions the clauses do not answer\n"
+        "result_text": ("**{version}**\n**Correct answers:** {right} of {n}\n**Unsupported answers:** {made_up} of the {unanswerable} questions the clauses do not answer\n"
                         "**Quotes found word for word:** {verified} of {quotes}"),
         "table_text": "Ground truth vs. HokieAI's output:",
         "columns_text": "Question | Ground truth | HokieAI's output | Correct | Quote found in the clauses",
@@ -113,8 +113,8 @@ ONE_PROMPT_TEXTS = {
     "incidents": {"accuracy_text": "**Accuracy:** {right} of {n} reports classified as OSHA classified them (**{accuracy} %**)."},
     "submittals": {"result_text": ("**{submittal}**\n**Requirements judged correctly:** {right} of {n}\n**Noncompliances found:** {found} of {planted}\n"
                                    "**False flags:** {false}")},
-    "contract": {"result_text": ("**Correct answers:** {right} of {n}\n**Hallucinated answers:** {made_up} of the {unanswerable} questions the clauses do not answer\n"
-                                 "**Quotes found word for word:** {verified} of {quotes}")},
+    "contract": {"result_text": "**Correct answers:** {right} of {n}\n**Unsupported answers:** {made_up} of the {unanswerable} questions the clauses do not answer",
+                 "columns_text": "Question | Ground truth | HokieAI's output | Correct"},
 }
 
 FOUNDATION_CONVENTIONS = ("Estimating conventions: total wall length = sum of the outside dimensions (no deduction at corners); wall area = length x height; "
