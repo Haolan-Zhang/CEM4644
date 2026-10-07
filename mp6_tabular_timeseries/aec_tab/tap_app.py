@@ -1,4 +1,4 @@
-"""Gradio app for the tap test: upload recordings named by material, get one row per tap, look, train, test, blind test.
+"""Gradio app for the tap test: upload recordings named by material, get one row per tap, train and test a model, predict a new recording.
 Opened from a link (works on a phone, so students can upload straight from where they recorded)."""
 import tempfile
 from pathlib import Path
@@ -16,6 +16,8 @@ from .texts import fill, labels
 LABELS = {
     "title": "## Tap Test",
     "make_header": "### 1 · Build the Dataset",
+    "make_note": ("After you build the dataset, the app shows it as a table (one row per tap, with the features of each tap) and shows each "
+                  "recording with the detected taps marked by red lines."),
     "upload": "recordings (one file per spot, named by material and spot number)",
     "make_button": "Build dataset",
     "summary": "**{taps} taps** in **{recordings} recordings** of **{materials} materials**: {details}",
@@ -23,23 +25,15 @@ LABELS = {
     "table": "dataset: one row per tap",
     "waves": "recordings with the detected taps (red lines)",
     "wave_title": "{recording}: {taps} taps",
-    "look_header": "### 2 · Explore the Features",
-    "spectrum": "mean spectrum of one tap, per material",
-    "spectrum_title": "Mean spectrum of one tap, per material",
-    "spectrum_x": "frequency (Hz)",
-    "spectrum_y": "relative power",
-    "x_feature": "x-axis feature",
-    "y_feature": "y-axis feature",
-    "scatter": "feature scatter plot (one point per tap)",
-    "train_header": "### 3 · Train and Evaluate",
+    "train_header": "### 2 · Train and Evaluate",
+    "train_note": "The app trains the model on a random 80 % of the taps (training data) and tests it on the other 20 % (test data).",
     "model": "model",
-    "split": "evaluation",
+    "models": "straight line | decision tree | neural network",
     "train_button": "Train and evaluate",
-    "score": "**Accuracy: {right} of {n} test taps ({accuracy} %)** · {model} · {split}",
+    "score": "**Accuracy: {right} of {n} test taps ({accuracy} %)** · {model}",
     "matrix": "confusion matrix (rows: actual; columns: predicted)",
-    "per_recording": "results per recording",
-    "rules": "rules learned by the decision tree (trained on all taps)",
-    "new_header": "### 4 · Predict a New Recording",
+    "per_recording": "test taps per recording",
+    "new_header": "### 3 · Predict a New Recording",
     "new_file": "new recording (a spot not in the dataset)",
     "new_button": "Predict",
     "new_result": "**{material}**: predicted for {votes} of {n} taps{others}. Model: {model}, trained on all {train} taps of the dataset.",
@@ -62,7 +56,22 @@ def _view(df: pd.DataFrame) -> pd.DataFrame:
     v = df.copy()
     for c in taps.MEASURES:
         v[c] = v[c].round(2 if c.endswith("share") else 1)
-    return v.rename(columns=taps.MEASURES)
+    return v.rename(columns={**taps.MEASURES, "time_s": "time (s)"})
+
+
+DATASET_COLUMNS = ["recording", "material", "tap", "time_s", *taps.MEASURES]
+PER_COLUMNS = ["recording", "material", "test taps", "correct", "most frequent prediction"]
+NEW_COLUMNS = ["tap", "time_s", "predicted", *taps.MEASURES]
+
+
+def _empty(columns) -> pd.DataFrame:
+    return _view(pd.DataFrame(columns=columns))
+
+
+def _model_key(name: str) -> str:
+    """The model list shows the wordings of the 'models' label; they map, in order, to the three models."""
+    names = [m.strip() for m in L["models"].split("|")]
+    return list(taps.MODELS)[names.index(name)] if name in names else list(taps.MODELS)[0]
 
 
 def _colors(materials):
@@ -86,46 +95,18 @@ def waves_png(audio: dict, df: pd.DataFrame):
     return fig_png(fig)
 
 
-def spectra_png(audio: dict, df: pd.DataFrame):
-    col = _colors(df.material.unique())
-    by = {}
-    for name, (x, on) in audio.items():
-        for i in on:
-            hz, sp = taps.spectrum(x, i)
-            by.setdefault(taps.material_of(name), []).append(sp ** 2)
-    fig, ax = plt.subplots(figsize=(10, 3.6))
-    for m, specs in sorted(by.items()):
-        s = np.mean(specs, 0); keep = (hz >= 50) & (hz <= 4000)
-        ax.semilogy(hz[keep], s[keep] / s[keep].max(), color=col[m], lw=1.2, label=f"{m} ({len(specs)} taps)")
-    ax.set_xlabel(L["spectrum_x"]); ax.set_ylabel(L["spectrum_y"]); ax.legend(fontsize=8); ax.set_title(L["spectrum_title"], fontsize=10)
-    fig.tight_layout()
-    return fig_png(fig)
-
-
-def scatter_png(df: pd.DataFrame, x_label: str, y_label: str):
-    inv = {v: k for k, v in taps.MEASURES.items()}
-    xc, yc = inv.get(x_label, "pitch_Hz"), inv.get(y_label, "ring_ms")
-    col = _colors(df.material.unique())
-    fig, ax = plt.subplots(figsize=(6.4, 4.6))
-    for m, g in df.groupby("material"):
-        ax.scatter(g[xc], g[yc], s=28, alpha=0.8, color=col[m], label=m)
-    ax.set_xlabel(taps.MEASURES[xc]); ax.set_ylabel(taps.MEASURES[yc]); ax.legend(fontsize=8)
-    fig.tight_layout()
-    return fig_png(fig)
-
-
 def make_table(files):
     paths = _paths(files)
     if not paths:
-        return None, "Upload your recordings first.", None, None, None, None, None
+        return None, "Upload your recordings first.", _empty(DATASET_COLUMNS), None, None
     bad = [Path(p).name for p in paths if not Path(p).suffix.lower() in taps.AUDIO]
     paths = [p for p in paths if Path(p).suffix.lower() in taps.AUDIO]
     try:
         df, audio = taps.table(paths)
     except Exception as e:  # noqa: BLE001
-        return None, f"Could not read a recording: {e}", None, None, None, None, None
+        return None, f"Could not read a recording: {e}", _empty(DATASET_COLUMNS), None, None
     if df.empty:
-        return None, "No taps found: tap harder, closer to the phone, in a quieter room.", None, None, None, None, None
+        return None, "No taps found: tap harder, closer to the phone, in a quieter room.", _empty(DATASET_COLUMNS), None, None
     per = df.groupby(["material", "recording"]).size().reset_index(name="taps")
     details = ", ".join(f"{m} ({g.recording.nunique()} recording{'s' if g.recording.nunique() > 1 else ''}, {len(g)} taps)" for m, g in df.groupby("material"))
     lines = [fill(L["summary"], taps=len(df), recordings=df.recording.nunique(), materials=df.material.nunique(), details=details)]
@@ -136,57 +117,50 @@ def make_table(files):
         lines.append("Not a sound file, skipped: " + ", ".join(bad) + ".")
     out = Path(tempfile.gettempdir()) / "tap_table.csv"
     df.round(3).to_csv(out, index=False)
-    return (df, "\n\n".join(lines), _view(df), str(out), waves_png(audio, df), spectra_png(audio, df),
-            scatter_png(df, taps.MEASURES["pitch_Hz"], taps.MEASURES["ring_ms"]))
+    return df, "\n\n".join(lines), _view(df), str(out), waves_png(audio, df)
 
 
-def train_test(df, model, split):
+def train_test(df, model):
+    empty = (pd.DataFrame(columns=["actual"]), pd.DataFrame(columns=PER_COLUMNS))
     if df is None or df.empty:
-        return "Make the table first.", None, None, ""
+        return ("Build the dataset first.", *empty)
     if df.material.nunique() < 2:
-        return "Record at least two materials.", None, None, ""
-    res = taps.evaluate(df, model, split)
-    lines = []
-    if taps.SPLITS.get(split) == "spot":
-        single = taps.single_recording_materials(df)
-        if single:
-            lines.append("Not evaluated (only one recording, so no training data for that material): " + ", ".join(single) + ".")
-    if res.empty:
-        return "\n\n".join(lines + ["Nothing could be evaluated: record at least two spots of each material."]), None, None, ""
+        return ("Record at least two materials.", *empty)
+    res = taps.evaluate(df, _model_key(model))
     right = int((res.material == res.predicted).sum())
-    lines.insert(0, fill(L["score"], right=right, n=len(res), accuracy=f"{right / len(res) * 100:.0f}", model=model, split=split))
+    score = fill(L["score"], right=right, n=len(res), accuracy=f"{right / len(res) * 100:.0f}", model=model)
     per = (res.assign(right=res.material == res.predicted).groupby(["recording", "material"])
            .agg(taps=("tap", "size"), correct=("right", "sum"),
                 most_frequent_prediction=("predicted", lambda s: s.value_counts().index[0])).reset_index())
-    per.columns = [c.replace("_", " ") for c in per.columns]
-    rules = taps.tree_rules(df) if model.startswith("decision tree") else ""
-    return "\n\n".join(lines), taps.confusion(res).reset_index(names=""), per, rules
+    per.columns = PER_COLUMNS
+    return score, taps.confusion(res), per
 
 
 def predict_new(df, model, file):
+    empty = _empty(NEW_COLUMNS)
     if df is None or df.empty:
-        return "Make the table first.", None
+        return "Build the dataset first.", empty
     paths = _paths(file)
     if not paths:
-        return "Upload one recording of a spot that is not in the dataset.", None
+        return "Upload one recording of a spot that is not in the dataset.", empty
     _, _, rows = taps.read_recording(paths[0])
     if not rows:
-        return "No taps found in that recording.", None
+        return "No taps found in that recording.", empty
     new = pd.DataFrame(rows)
-    m = taps.fit_all(df, model)
+    m = taps.fit_all(df, _model_key(model))
     new["predicted"] = m.predict(new[list(taps.MEASURES)].values)
     votes = new.predicted.value_counts()
     others = (" (others: " + ", ".join(f"{k} {v}" for k, v in votes.iloc[1:].items()) + ")") if len(votes) > 1 else ""
     text = fill(L["new_result"], material=votes.index[0], votes=votes.iloc[0], n=len(new), others=others, model=model, train=len(df))
-    return text, _view(new[["tap", "time_s", "predicted", *taps.MEASURES]])
+    return text, _view(new[NEW_COLUMNS])
 
 
 def build(labels_text=None):
     import gradio as gr
     L.clear(); L.update(labels(labels_text, LABELS))
-    names = list(taps.MEASURES.values())
+    model_names = [m.strip() for m in L["models"].split("|")]
     with gr.Blocks(title="Tap Test") as demo:
-        gr.Markdown(L["title"] + "\n" + L["make_header"])
+        gr.Markdown(L["title"] + "\n" + L["make_header"] + "\n\n" + L["make_note"])
         state = gr.State(None)
         with gr.Row():
             up = gr.File(label=L["upload"], file_count="multiple", type="filepath")
@@ -194,34 +168,23 @@ def build(labels_text=None):
                 go = gr.Button(L["make_button"], variant="primary")
                 summary = gr.Markdown()
                 dl = gr.File(label=L["download"], interactive=False)
-        tbl = gr.Dataframe(label=L["table"], interactive=False, wrap=True)
+        tbl = gr.Dataframe(value=_empty(DATASET_COLUMNS), label=L["table"], interactive=False, wrap=True)
         waves = gr.Image(label=L["waves"], type="pil", interactive=False)
-        gr.Markdown(L["look_header"])
-        spec = gr.Image(label=L["spectrum"], type="pil", interactive=False)
-        with gr.Row():
-            xs = gr.Dropdown(names, value=taps.MEASURES["pitch_Hz"], label=L["x_feature"])
-            ys = gr.Dropdown(names, value=taps.MEASURES["ring_ms"], label=L["y_feature"])
-        sc = gr.Image(label=L["scatter"], type="pil", interactive=False)
-        gr.Markdown(L["train_header"])
-        with gr.Row():
-            model = gr.Dropdown(list(taps.MODELS), value=list(taps.MODELS)[0], label=L["model"])
-            split = gr.Radio(list(taps.SPLITS), value=list(taps.SPLITS)[0], label=L["split"])
+        gr.Markdown(L["train_header"] + "\n\n" + L["train_note"])
+        model = gr.Dropdown(model_names, value=model_names[0], label=L["model"])
         run = gr.Button(L["train_button"], variant="primary")
         score = gr.Markdown()
-        conf = gr.Dataframe(label=L["matrix"], interactive=False)
-        per = gr.Dataframe(label=L["per_recording"], interactive=False)
-        rules = gr.Textbox(label=L["rules"], lines=8, interactive=False)
+        conf = gr.Dataframe(value=pd.DataFrame(columns=["actual"]), label=L["matrix"], interactive=False)
+        per = gr.Dataframe(value=pd.DataFrame(columns=PER_COLUMNS), label=L["per_recording"], interactive=False)
         gr.Markdown(L["new_header"])
         with gr.Row():
             new = gr.File(label=L["new_file"], file_count="single", type="filepath")
             guess = gr.Button(L["new_button"], variant="primary")
         verdict = gr.Markdown()
-        new_tbl = gr.Dataframe(label=L["new_table"], interactive=False)
+        new_tbl = gr.Dataframe(value=_empty(NEW_COLUMNS), label=L["new_table"], interactive=False)
 
-        go.click(make_table, [up], [state, summary, tbl, dl, waves, spec, sc])
-        for d in (xs, ys):
-            d.change(lambda df, a, b: scatter_png(df, a, b) if df is not None else None, [state, xs, ys], [sc])
-        run.click(train_test, [state, model, split], [score, conf, per, rules])
+        go.click(make_table, [up], [state, summary, tbl, dl, waves])
+        run.click(train_test, [state, model], [score, conf, per])
         guess.click(predict_new, [state, model, new], [verdict, new_tbl])
     return demo
 

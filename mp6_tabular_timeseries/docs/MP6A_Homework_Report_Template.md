@@ -44,9 +44,7 @@ Finally, ask HokieAI how it made its predictions in Step 3a and briefly summariz
 
 Report the materials you recorded (number of spots and taps for each) and include the confusion matrix of your best model.
 
-Compare the accuracy from the random split with the accuracy from leave-one-recording-out. Why are they different, and which one better estimates the accuracy on a new spot?
-
-Which features separate your materials best (use the scatter plot and the decision tree's rules)? Was the material of your new recording predicted correctly?
+Compare the accuracy of the straight line, decision tree, and neural network models. Was the material of your new recording predicted correctly?
 
 Would the model still work in another room, with another phone, or with another person tapping? Briefly explain.
 

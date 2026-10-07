@@ -30,9 +30,9 @@ hidden. No GPU needed.
    model of the student's choice with its data-analysis tool; each reply is scored next to the trees and the line.
 5. **Their own table** (homework). **The tap test:** they record taps on 4-5 materials with the phone's voice
    recorder, name each file by material and spot (`wooden table 2.m4a`), and upload them to an app opened from a link
-   (works on a phone), which finds each tap, measures it (one row per tap), shows each material's average tap and a
-   scatter plot, trains a model of their choice on random taps or with whole recordings held out, and names the
-   material of a new recording.
+   (works on a phone), which finds each tap, measures it (one row per tap), shows the dataset and the detected taps,
+   trains a straight line, decision tree or neural network model on a random 80 % of the taps and tests it on the other
+   20 %, and names the material of a new recording.
 
 **MP6B · Time series**
 

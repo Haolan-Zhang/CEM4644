@@ -13,11 +13,10 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import LeaveOneGroupOut, train_test_split
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.tree import DecisionTreeClassifier, export_text
 
 SR = 48000
 AUDIO = (".m4a", ".wav", ".mp3", ".aac", ".caf", ".ogg", ".webm", ".3gp", ".amr", ".flac", ".mp4", ".mov")
@@ -32,13 +31,13 @@ MEASURES = {
     "middle_share": "middle share (300-800 Hz)",
     "high_share": "high share (above 800 Hz)",
 }
+# the three models of the app, in the order of its model list; the straight line and decision tree models are the same
+# kinds as in Parts 1-3 (models.fit_classifier), with leaves small enough for a few dozen taps
 MODELS = {
-    "decision tree (max depth 3)": lambda: DecisionTreeClassifier(max_depth=3, random_state=0),
-    "k-nearest neighbors (k = 5)": lambda: make_pipeline(StandardScaler(), KNeighborsClassifier(5)),
-    "logistic regression": lambda: make_pipeline(StandardScaler(), LogisticRegression(max_iter=5000)),
-    "gradient-boosted trees": lambda: HistGradientBoostingClassifier(min_samples_leaf=3, random_state=0),
+    "line": lambda: make_pipeline(StandardScaler(), LogisticRegression(max_iter=5000)),
+    "tree": lambda: HistGradientBoostingClassifier(min_samples_leaf=3, random_state=0),
+    "net": lambda: make_pipeline(StandardScaler(), MLPClassifier(hidden_layer_sizes=(32, 16), max_iter=3000, random_state=0)),
 }
-SPLITS = {"random split (80 % of taps train, 20 % test)": "random", "leave-one-recording-out": "spot"}
 
 
 # ----------------------------------------------------------------------------- reading
@@ -146,43 +145,23 @@ def table(paths: List[str]) -> Tuple[pd.DataFrame, Dict[str, tuple]]:
 
 
 # ----------------------------------------------------------------------------- training and testing
-def evaluate(df: pd.DataFrame, model: str, split: str, features: List[str] = None):
-    """Each test tap's true and predicted material, under the chosen split."""
+def evaluate(df: pd.DataFrame, model: str, features: List[str] = None):
+    """Each test tap's true and predicted material: trained on a random 80 % of the taps, tested on the other 20 %."""
     features = features or list(MEASURES)
-    X, y, g = df[features].values, df.material.values, df.recording.values
-    kind = SPLITS.get(split, split)
-    pred = np.array([""] * len(df), dtype=object); tested = np.zeros(len(df), bool)
-    if kind == "random":
-        idx = np.arange(len(df))
-        strat = y if min(pd.Series(y).value_counts()) >= 2 else None
-        tr, te = train_test_split(idx, test_size=0.2, random_state=0, stratify=strat)
-        m = MODELS[model]().fit(X[tr], y[tr]); pred[te] = m.predict(X[te]); tested[te] = True
-    else:
-        for tr, te in LeaveOneGroupOut().split(X, y, g):
-            if y[te][0] not in set(y[tr]) or len(set(y[tr])) < 2:
-                continue                                           # the only recording of its material: nothing to learn it from
-            m = MODELS[model]().fit(X[tr], y[tr]); pred[te] = m.predict(X[te]); tested[te] = True
-    out = df.loc[tested, ["recording", "material", "tap"]].copy()
-    out["predicted"] = pred[tested]
+    X, y = df[features].values, df.material.values
+    idx = np.arange(len(df))
+    strat = y if min(pd.Series(y).value_counts()) >= 2 else None
+    tr, te = train_test_split(idx, test_size=0.2, random_state=0, stratify=strat)
+    out = df.iloc[te][["recording", "material", "tap"]].copy()
+    out["predicted"] = MODELS[model]().fit(X[tr], y[tr]).predict(X[te])
     return out
-
-
-def single_recording_materials(df: pd.DataFrame) -> List[str]:
-    """Materials recorded at one spot only (they cannot be tested with whole recordings held out)."""
-    n = df.groupby("material").recording.nunique()
-    return sorted(n[n < 2].index)
 
 
 def confusion(res: pd.DataFrame) -> pd.DataFrame:
     labels = sorted(set(res.material) | set(res.predicted))
     m = pd.crosstab(res.material, res.predicted).reindex(index=labels, columns=labels, fill_value=0)
-    m.index = [f"actual: {l}" for l in m.index]; m.columns = [f"predicted: {l}" for l in m.columns]
-    return m
-
-
-def tree_rules(df: pd.DataFrame, depth: int = 3) -> str:
-    t = DecisionTreeClassifier(max_depth=depth, random_state=0).fit(df[list(MEASURES)].values, df.material.values)
-    return export_text(t, feature_names=[MEASURES[c] for c in MEASURES], decimals=2)
+    m.columns = [f"predicted: {l}" for l in m.columns]
+    return m.rename_axis("actual").reset_index()
 
 
 def fit_all(df: pd.DataFrame, model: str):

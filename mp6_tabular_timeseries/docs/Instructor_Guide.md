@@ -116,16 +116,16 @@ MP6A:
    which is the answer to "why does it agree". Not yet measured: the other tool models (a straight line should land
    near the notebook's straight line), the chat's column ranking against Step 3a, and the homework table, where the trees
    are near perfect and the test is whether the chat on its own gets anywhere close.
-4. (Homework) The tap test (Step 5): students name each recording by material and spot number (`wooden table 2.m4a`);
+4. (Homework) The tap test (Step 4): students name each recording by material and spot number (`wooden table 2.m4a`);
    the app reads the material from the name with the number dropped. It finds the taps (onsets well above the room's
    loudness; the first 0.15 s, the recorder's start click, is skipped), measures seven numbers per tap, and trains one
-   of four models (a small decision tree whose rules are shown, nearest neighbors, logistic regression, gradient-boosted
-   trees) on random taps or with whole recordings held out (a material with one recording is left out of that test).
-   Measured on three example recordings (an interior wall, a metal stand, a wooden table; one spot each, 10 taps, an
-   iPhone's Voice Memos): typical pitch about 190, 800 and 380-500 Hz; every model 100 % on random taps; the decision
-   tree splits on the share of sound below 300 Hz (under 17 % metal, over 58 % wall). With one spot per material the
-   honest test cannot run, which is the point of asking for 3-4 spots. The iPhone recordings lose everything above
-   about 2 kHz, so the measurements use the sound below that.
+   of three models: straight line (logistic regression), decision tree (gradient-boosted trees, as in Parts 1-3) or
+   neural network (a small multilayer perceptron, two hidden layers of 32 and 16 units). Each is trained on a random
+   80 % of the taps and tested on the other 20 %. Measured on three example recordings (an interior wall, a metal
+   stand, a wooden table; one spot each, 10 taps, an iPhone's Voice Memos): typical pitch about 190, 800 and 380-500 Hz;
+   all three models 6 of 6 test taps. A random split tests taps from spots the model was trained on, so it overstates
+   the accuracy on a new spot; Predict a New Recording (a spot not in the dataset) is the check for that. The iPhone
+   recordings lose everything above about 2 kHz, so the measurements use the sound below that.
 
 MP6B:
 

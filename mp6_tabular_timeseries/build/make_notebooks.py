@@ -557,21 +557,22 @@ So far, you used AI models trained specifically to predict heating load (in **St
     cells.append(md(TAP_TEST))
     cells.append(form("▶ Step 4 · Tap Test App", "lab.tap_app(labels_text=labels_text)",
                       notes=["1. Run the cell and open the printed link in a new tab. The app also works on a phone, so you can upload directly from the phone you recorded with.",
-                             "2. **Build the dataset.** Upload all recordings and click **Build dataset**. Check the detected taps (red lines): each tap you made should have one line. "
-                             "If taps are missing, tap harder or closer to the phone and record that spot again.",
+                             "2. **Build the dataset.** Upload all recordings and click **Build dataset**. The app shows the dataset (one row per tap, with its features) and each "
+                             "recording with the detected taps (red lines): each tap you made should have one line. If taps are missing, tap harder or closer to the phone and "
+                             "record that spot again.",
                              "3. **Download the dataset** (CSV, one row per tap) for your report and for HokieAI.",
-                             "4. **Explore the features.** Compare the mean spectra of the materials, then choose two features for the scatter plot. Do the materials form separate clusters?",
-                             "5. **Train and evaluate** with both evaluation methods: a *random split* (80 % of the taps for training, 20 % for testing) and *leave-one-recording-out* "
-                             "(each recording is tested by a model trained on all other recordings, so the test spot is never seen in training). Compare the accuracies.",
-                             "6. **Read the rules.** With the *decision tree* model, read the rules it learned: which feature does it split on first?",
-                             "7. **Predict a new recording.** Record a spot that is not in the dataset, upload it, and click **Predict**. Check whether the predicted material is correct.",
-                             "8. **Ask HokieAI.** Give HokieAI your dataset (CSV), ask it to train a classifier with its data-analysis tool, and compare its accuracy with the app's."],
+                             "4. **Train and evaluate** each of the three models. The app trains the model on a random 80 % of the taps (training data) and tests it on the "
+                             "other 20 % (test data). Compare the accuracies.",
+                             "Straight line model: learns a simple linear relationship between the features and the material.",
+                             "Decision tree model: learns a series of splits in the features (for example, pitch above or below 500 Hz) to make predictions.",
+                             "Neural network model: layers of connected units that learn combinations of the features (for example, a low pitch together with a short ring "
+                             "time). It can capture more complex relationships but needs more data.",
+                             "5. **Predict a new recording.** Record a spot that is not in the dataset, upload it, and click **Predict**. Check whether the predicted material is correct.",
+                             "6. **Ask HokieAI.** Give HokieAI your dataset (CSV), ask it to train a classifier with its data-analysis tool, and compare its accuracy with the app's."],
                       texts={"labels_text": texts_block(TAP_LABELS)}))
     cells.append(qv2(4,
                      "Report the materials you recorded (number of spots and taps for each) and include the confusion matrix of your best model.",
-                     "Compare the accuracy from the random split with the accuracy from leave-one-recording-out. Why are they different, and which one better estimates "
-                     "the accuracy on a new spot?",
-                     "Which features separate your materials best (use the scatter plot and the decision tree's rules)? Was the material of your new recording predicted correctly?",
+                     "Compare the accuracy of the straight line, decision tree, and neural network models. Was the material of your new recording predicted correctly?",
                      "Would the model still work in another room, with another phone, or with another person tapping? Briefly explain."))
     return ["table", "chat"]
 
