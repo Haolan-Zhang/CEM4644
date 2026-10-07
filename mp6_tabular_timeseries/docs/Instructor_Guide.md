@@ -118,7 +118,7 @@ MP6A:
    are near perfect and the test is whether the chat on its own gets anywhere close.
 4. (Homework) The tap test (Step 4): students name each recording by material and spot number (`wooden table 2.m4a`);
    the app reads the material from the name with the number dropped. It finds the taps (onsets well above the room's
-   loudness; the first 0.15 s, the recorder's start click, is skipped), measures seven numbers per tap, and trains one
+   loudness; the first 0.15 s, the recorder's start click, is skipped), measures three features per tap (pitch, ring time, and the share of power below 300 Hz), and trains one
    of three models: straight line (logistic regression), decision tree (gradient-boosted trees, as in Parts 1-3) or
    neural network (a small multilayer perceptron, two hidden layers of 32 and 16 units). Each is trained on a random
    80 % of the taps and tested on the other 20 %. Measured on three example recordings (an interior wall, a metal

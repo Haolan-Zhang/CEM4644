@@ -32,7 +32,6 @@ LABELS = {
     "train_button": "Train and evaluate",
     "score": "**Accuracy: {right} of {n} test taps ({accuracy} %)** · {model}",
     "matrix": "confusion matrix (rows: actual; columns: predicted)",
-    "per_recording": "test taps per recording",
     "new_header": "### 3 · Predict a New Recording",
     "new_file": "new recording (a spot not in the dataset)",
     "new_button": "Predict",
@@ -56,12 +55,11 @@ def _view(df: pd.DataFrame) -> pd.DataFrame:
     v = df.copy()
     for c in taps.MEASURES:
         v[c] = v[c].round(2 if c.endswith("share") else 1)
-    return v.rename(columns={**taps.MEASURES, "time_s": "time (s)"})
+    return v.rename(columns=taps.MEASURES)
 
 
-DATASET_COLUMNS = ["recording", "material", "tap", "time_s", *taps.MEASURES]
-PER_COLUMNS = ["recording", "material", "test taps", "correct", "most frequent prediction"]
-NEW_COLUMNS = ["tap", "time_s", "predicted", *taps.MEASURES]
+DATASET_COLUMNS = ["recording", "material", "tap", *taps.MEASURES]
+NEW_COLUMNS = ["tap", "predicted", *taps.MEASURES]
 
 
 def _empty(columns) -> pd.DataFrame:
@@ -116,24 +114,20 @@ def make_table(files):
     if bad:
         lines.append("Not a sound file, skipped: " + ", ".join(bad) + ".")
     out = Path(tempfile.gettempdir()) / "tap_table.csv"
-    df.round(3).to_csv(out, index=False)
+    _view(df).to_csv(out, index=False)                    # the same column names as the table
     return df, "\n\n".join(lines), _view(df), str(out), waves_png(audio, df)
 
 
 def train_test(df, model):
-    empty = (pd.DataFrame(columns=["actual"]), pd.DataFrame(columns=PER_COLUMNS))
+    empty = pd.DataFrame(columns=["actual"])
     if df is None or df.empty:
-        return ("Build the dataset first.", *empty)
+        return "Build the dataset first.", empty
     if df.material.nunique() < 2:
-        return ("Record at least two materials.", *empty)
+        return "Record at least two materials.", empty
     res = taps.evaluate(df, _model_key(model))
     right = int((res.material == res.predicted).sum())
     score = fill(L["score"], right=right, n=len(res), accuracy=f"{right / len(res) * 100:.0f}", model=model)
-    per = (res.assign(right=res.material == res.predicted).groupby(["recording", "material"])
-           .agg(taps=("tap", "size"), correct=("right", "sum"),
-                most_frequent_prediction=("predicted", lambda s: s.value_counts().index[0])).reset_index())
-    per.columns = PER_COLUMNS
-    return score, taps.confusion(res), per
+    return score, taps.confusion(res)
 
 
 def predict_new(df, model, file):
@@ -175,7 +169,6 @@ def build(labels_text=None):
         run = gr.Button(L["train_button"], variant="primary")
         score = gr.Markdown()
         conf = gr.Dataframe(value=pd.DataFrame(columns=["actual"]), label=L["matrix"], interactive=False)
-        per = gr.Dataframe(value=pd.DataFrame(columns=PER_COLUMNS), label=L["per_recording"], interactive=False)
         gr.Markdown(L["new_header"])
         with gr.Row():
             new = gr.File(label=L["new_file"], file_count="single", type="filepath")
@@ -184,7 +177,7 @@ def build(labels_text=None):
         new_tbl = gr.Dataframe(value=_empty(NEW_COLUMNS), label=L["new_table"], interactive=False)
 
         go.click(make_table, [up], [state, summary, tbl, dl, waves])
-        run.click(train_test, [state, model], [score, conf, per])
+        run.click(train_test, [state, model], [score, conf])
         guess.click(predict_new, [state, model, new], [verdict, new_tbl])
     return demo
 

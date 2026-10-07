@@ -24,12 +24,8 @@ AUDIO = (".m4a", ".wav", ".mp3", ".aac", ".caf", ".ogg", ".webm", ".3gp", ".amr"
 # measurement -> the words students see
 MEASURES = {
     "pitch_Hz": "pitch (Hz)",
-    "brightness_Hz": "brightness (Hz)",
     "ring_ms": "ring time (ms)",
-    "loudness_dB": "loudness (dB above the room)",
     "low_share": "low share (below 300 Hz)",
-    "middle_share": "middle share (300-800 Hz)",
-    "high_share": "high share (above 800 Hz)",
 }
 # the three models of the app, in the order of its model list; the straight line and decision tree models are the same
 # kinds as in Parts 1-3 (models.fit_classifier), with leaves small enough for a few dozen taps
@@ -106,29 +102,24 @@ def spectrum(x: np.ndarray, i: int, n: int = 4096) -> Tuple[np.ndarray, np.ndarr
     return np.fft.rfftfreq(n, 1 / SR), np.abs(np.fft.rfft(seg * np.hanning(n)))
 
 
-def measure(x: np.ndarray, i: int, env: np.ndarray, floor: float, win: float = 0.25) -> Dict[str, float]:
+def measure(x: np.ndarray, i: int, env: np.ndarray, win: float = 0.25) -> Dict[str, float]:
     hz, sp = spectrum(x, i)
     band = (hz >= 80) & (hz <= 12000)
     f, e = hz[band], sp[band] ** 2
-    tot = e.sum() + 1e-12
     peak_i = i + int(np.argmax(env[i: i + int(0.03 * SR)]))
     pk = env[peak_i]
     after = env[peak_i: peak_i + int(win * SR)]
     below = np.flatnonzero(after < pk * 0.1)                       # 20 dB down
-    return {"pitch_Hz": float(f[np.argmax(e)]), "brightness_Hz": float((f * e).sum() / tot),
-            "ring_ms": float(below[0] / SR * 1000 if len(below) else win * 1000),
-            "loudness_dB": float(20 * np.log10(pk / floor)),
-            "low_share": float(e[f < 300].sum() / tot), "middle_share": float(e[(f >= 300) & (f < 800)].sum() / tot),
-            "high_share": float(e[f >= 800].sum() / tot)}
+    return {"pitch_Hz": float(f[np.argmax(e)]), "ring_ms": float(below[0] / SR * 1000 if len(below) else win * 1000),
+            "low_share": float(e[f < 300].sum() / (e.sum() + 1e-12))}
 
 
 def read_recording(path, name: str = None):
     """(samples, taps, rows) for one recording."""
     name = name or Path(path).name
     x = decode(path)
-    on, env, floor = find_taps(x)
-    rows = [{"recording": name, "material": material_of(name), "tap": k + 1, "time_s": round(i / SR, 2), **measure(x, i, env, floor)}
-            for k, i in enumerate(on)]
+    on, env, _ = find_taps(x)
+    rows = [{"recording": name, "material": material_of(name), "tap": k + 1, **measure(x, i, env)} for k, i in enumerate(on)]
     return x, on, rows
 
 
@@ -140,7 +131,7 @@ def table(paths: List[str]) -> Tuple[pd.DataFrame, Dict[str, tuple]]:
         x, on, r = read_recording(p, name)
         audio[name] = (x, on)
         rows += r
-    df = pd.DataFrame(rows, columns=["recording", "material", "tap", "time_s", *MEASURES])
+    df = pd.DataFrame(rows, columns=["recording", "material", "tap", *MEASURES])
     return df, audio
 
 

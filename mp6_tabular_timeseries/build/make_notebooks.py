@@ -49,12 +49,10 @@ Knocking on a surface and listening is a common inspection technique (a *soundin
 2. **Recording.** At each spot, tap 10 times, about half a second apart, always with the same object (a coin or a pen cap). Hold the phone about 8 inches away in a quiet room and record with the phone's voice recorder (*Voice Memos* on iPhone; *Recorder* or *Voice Recorder* on Android). Make one recording per spot.
 3. **File names.** Name each recording by its material and spot number, for example `wooden table 1`, `wooden table 2`, `metal stand 1`. The app takes the material label from the file name, so all spots of one material must use the same words.
 
-**Features extracted from each tap**
+**Features extracted from each tap** (the input variables of the AI model)
 - *pitch (Hz)*: the frequency with the highest power
-- *brightness (Hz)*: the spectral centroid (power-weighted mean frequency)
 - *ring time (ms)*: the time for the tap to decay to 10 % of its peak amplitude
-- *loudness (dB)*: the peak level above the room's background noise
-- *low / middle / high share*: the fraction of power below 300 Hz, between 300 and 800 Hz, and above 800 Hz
+- *low share (below 300 Hz)*: the fraction of the tap's power below 300 Hz
 """
 ACTIVITY = """
 ## Part 5 · Collect Your Own Data: Activity Recognition
