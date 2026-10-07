@@ -84,8 +84,6 @@ class PromptLab:
     # ------------------------------------------------------------------ Part 1: incident reports
     def show_reports(self, rows: int = 10, **texts):
         self._need()
-        years = pd.to_datetime(self.incidents.event_date).dt.year
-        say(texts, "reports", "summary_text", n=len(self.incidents), years=f"{years.min()}–{years.max()}")
         ui.table(self.incidents[["id", "report"]].head(int(rows)))
 
     def _incident_prompt(self, version: str, texts: dict) -> str:

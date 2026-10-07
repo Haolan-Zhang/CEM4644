@@ -28,9 +28,6 @@ DOOR_FORMAT = ("Reply with one line per door and nothing else, in this format:\n
                "mark | door type | width | height | hardware set | location\n1 | DF | 3'-0\" | 7'-0\" | 32 | ENTRY")
 
 TEXTS: Dict[str, Dict[str, str]] = {
-    "reports": {
-        "summary_text": "**{n}** construction incident reports from OSHA's Severe Injury Reports ({years}). OSHA's classification of each report, the ground truth, is hidden.",
-    },
     "incidents": {
         "v1_prompt_text": INCIDENT_TASK,
         "v2_prompt_text": "You are a construction safety analyst coding OSHA severe-injury reports.\n" + DEFINITIONS + "\n\n" + INCIDENT_TASK,

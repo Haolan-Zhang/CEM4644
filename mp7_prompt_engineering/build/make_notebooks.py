@@ -120,7 +120,7 @@ In every HokieAI step, the notebook gives you a prompt; you send it to HokieAI (
 """))
     cells.append(form("▶ Step 1a · Browse the Reports", "lab.show_reports(rows)",
                       notes=["Run the cell to browse the incident reports HokieAI will classify. OSHA's classification of each report is the ground truth; it stays hidden until you score an output."],
-                      params=['rows = 10 #@param [5, 10, 30] {type:"raw"}'], texts=T("reports")))
+                      params=['rows = 10 #@param [5, 10, 30] {type:"raw"}']))
     cells.append(form("▶ Step 1b · Classify with HokieAI", "lab.classify_incidents(prompt_version)",
                       notes=["Choose a prompt version, run the cell, and follow the instructions. Score every version, and run one version twice in new chats to check its consistency.",
                              "v1 · task only: the categories and the output format.",
@@ -283,7 +283,7 @@ In every HokieAI step, the notebook gives you a prompt; you send it to HokieAI (
 """))
     cells.append(form("▶ Step 1a · Browse the Reports", "lab.show_reports(rows)",
                       notes=["Run the cell to browse the incident reports HokieAI will classify. OSHA's classification of each report is the ground truth; it stays hidden until you score an output."],
-                      params=['rows = 10 #@param [5, 10, 30] {type:"raw"}'], texts=T("reports")))
+                      params=['rows = 10 #@param [5, 10, 30] {type:"raw"}']))
     cells.append(form("▶ Step 1b · Classify with HokieAI", "lab.classify_incidents()",
                       notes=["Run the cell and follow the instructions. The prompt gives HokieAI a role and OSHA's definition of each category.",
                              "Then send the same prompt in a second new chat and score that output too: a generative AI model can give a different output to the same prompt.",
