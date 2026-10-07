@@ -26,7 +26,7 @@ For one missed noncompliance or false flag, explain from HokieAI's output why it
 
 ## Question 3
 
-From Step 3a: Report the correct answers and the unsupported answers. Include the table.
+From Step 3a: Report the correct answers, the unsupported answers, and the quotes found word for word. Include the table.
 
 Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?
 

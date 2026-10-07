@@ -147,10 +147,13 @@ NOT_IN_TEXT = r"^\W*not in (the )?(provided |supplied )?(text|clauses?)"
 
 
 def _quote_found(quote: str, ctext: str) -> bool:
-    """Every quoted passage (several may be joined with ' / ') appears word for word; quotation marks and end punctuation ignored."""
-    strip = lambda t: re.sub(r"[\"'\\]", "", t)
-    parts = [x for x in re.split(r"\s+/\s+|\s*\.\.\.\s*|\s*…\s*", strip(_norm(quote))) if len(x.strip(" .;:,")) > 15]
-    return bool(parts) and all(x.strip(" .;:,") in strip(ctext) for x in parts)
+    """Every quoted passage (several may be joined with ' / ' or '...') appears word for word in the clauses. Only the
+    letters and digits are compared, so spacing, punctuation and quotation marks do not matter (the published clause
+    text has a few spacing errors, such as "(1)by"); a changed, added or missing word does."""
+    words = lambda t: re.sub(r"[^a-z0-9]", "", t)
+    parts = [words(x) for x in re.split(r"\s+/\s+|\s*\.\.\.\s*|\s*…\s*", _norm(quote))]
+    parts = [x for x in parts if len(x) > 15]
+    return bool(parts) and all(x in words(ctext) for x in parts)
 
 
 def contract(reply: str, questions: List[dict], clauses: str) -> dict:
@@ -178,7 +181,7 @@ def contract(reply: str, questions: List[dict], clauses: str) -> dict:
         if quote and not no_quote:
             quotes += 1
             hit = _quote_found(quote, ctext)
-            verified += hit; qv = "✓" if hit else "✗"
+            verified += hit; qv = "found" if hit else "misquote"
         rows.append({"question": q["id"], "ground truth": q["key"], "HokieAI": ans[:120] or "—", "": "✓" if ok else "✗", "quote found": qv})
     return {"right": right, "n": len(questions), "made_up": made_up, "unanswerable": sum(not q["answerable"] for q in questions),
             "quotes": quotes, "verified": verified, "table": pd.DataFrame(rows)}

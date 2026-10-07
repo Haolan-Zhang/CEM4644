@@ -108,13 +108,20 @@ TEXTS: Dict[str, Dict[str, str]] = {
 
 # The one-prompt notebook (MP7_Workshop_Construction_Documents): which prompt version each part gives, and the result
 # wordings without a version.
-ONE_PROMPT = {"incidents": "v2", "submittals": "v1", "contract": "v2"}
+ONE_PROMPT = {"incidents": "v2", "submittals": "v1"}             # the contract part has its own prompt (below)
 ONE_PROMPT_TEXTS = {
     "incidents": {"accuracy_text": "**Accuracy:** {right} of {n} reports classified as OSHA classified them (**{accuracy} %**)."},
     "submittals": {"result_text": ("**{submittal}**\n**Requirements judged correctly:** {right} of {n}\n**Noncompliances found:** {found} of {planted}\n"
                                    "**False flags:** {false}")},
-    "contract": {"result_text": "**Correct answers:** {right} of {n}\n**Unsupported answers:** {made_up} of the {unanswerable} questions the clauses do not answer",
-                 "columns_text": "Question | Ground truth | HokieAI's output | Correct"},
+    "contract": {
+        "prompt_text": ("Answer the questions about the construction contract clauses below, using only these clauses; do not use outside knowledge.\n"
+                        "For each question the clauses answer, quote the sentence of the contract that supports your answer.\n"
+                        "If the clauses do not answer a question, reply NOT IN TEXT and give no quote.\n"
+                        "Reply with one line per question: Q01 | answer | exact quote (or: Q01 | NOT IN TEXT | -)\n\n"
+                        "Questions:\n{questions}\n\nContract clauses:\n{clauses}"),
+        "result_text": ("**Correct answers:** {right} of {n}\n**Unsupported answers:** {made_up} of the {unanswerable} questions the clauses do not answer\n"
+                        "**Quotes found word for word:** {verified} of {quotes}"),
+        "columns_text": "Question | Ground truth | HokieAI's output | Correct | Quote"},
 }
 
 FOUNDATION_CONVENTIONS = ("Estimating conventions: total wall length = sum of the outside dimensions (no deduction at corners); wall area = length x height; "

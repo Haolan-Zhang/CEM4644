@@ -5,8 +5,11 @@
 - `MP7_Workshop_Construction_Documents.ipynb` (first class): Parts 1–3 only, one given prompt each and no prompt
   comparison. Students send the prompt, score HokieAI's output against the ground truth, and explain its errors. The
   prompts are deliberately not the best versions, so the outputs have mistakes to discuss: Part 1 uses v2 (role and
-  definitions; without the definitions the categories are undefined), Part 2 uses v1 (task only), Part 3 uses v2
-  (answers with quotes, so the answers can be checked against the clauses, but no NOT IN TEXT instruction).
+  definitions; without the definitions the categories are undefined), Part 2 uses v1 (task only), Part 3 uses its own
+  prompt: only from the clauses, a quote for each answer, NOT IN TEXT (no quote) when the clauses do not answer. Its
+  output shows correct answers, unsupported answers (answers to the 7 questions the clauses do not answer) and quotes
+  found word for word. A quote is compared on its words only (spacing, punctuation and quotation marks ignored, since
+  the published clause text has a few spacing errors such as "(1)by"); a changed, added or missing word is a misquote.
 - `MP7_Workshop_Prompt_Engineering.ipynb` (the class on prompting): all five parts with prompt versions v1–v3 and the
   student's own, compared in a chart per part. Sections 1–4 below describe it.
 

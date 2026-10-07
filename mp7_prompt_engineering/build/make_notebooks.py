@@ -260,9 +260,10 @@ DOC_FILE = "MP7_Workshop_Construction_Documents.ipynb"
 
 def T1(group):
     """A part's wordings for the one-prompt notebook: its one prompt (as prompt_text) and the result wordings without a version."""
-    out = {"prompt_text": TEXTS[group][f"{ONE_PROMPT[group]}_prompt_text"]}
+    own = ONE_PROMPT_TEXTS[group]
+    out = {"prompt_text": own.get("prompt_text") or TEXTS[group][f"{ONE_PROMPT[group]}_prompt_text"]}     # the prompt first in the cell
     out.update({k: v for k, v in TEXTS[group].items() if not re.fullmatch(r"v\d_prompt_text", k)})
-    out.update(ONE_PROMPT_TEXTS[group])
+    out.update(own)
     return out
 
 
@@ -313,14 +314,18 @@ Before a material is used, its submittal (here, a concrete mix design or a morta
 
     cells.append(md("""
 ## Part 3 · Answering Questions from a Contract
-Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), the standard terms of U.S. federal construction contracts, and 27 questions about them. Ten questions describe a project situation (a late notice, a withheld payment, a warranty claim), so the answer needs the requirement and its application to the facts. Seven cannot be answered from the text, although most have a common answer outside it. The ground truth is the answer the clauses give.
+In this part, you will use HokieAI to answer 27 questions based on 29 construction clauses from the Federal Acquisition Regulation (FAR) used in U.S. federal construction contracts. Some questions ask directly about contract requirements, while others describe a project situation (such as a late notice, withheld payment, or warranty claim) and require applying the relevant clause to the facts.
+
+For questions that can be answered from the provided clauses, HokieAI is asked to quote the sentence that supports its answer, allowing the answer to be verified against the source. Seven questions cannot be answered from the provided clauses; for these, HokieAI is asked to indicate that the answer is not provided rather than rely on outside knowledge or provide a supporting quote.
+
+The notebook compares each response with the ground-truth answer and checks supporting quotes where applicable. A quote found means the quoted text appears in the provided clauses exactly as given; a misquote means it does not.
 """))
-    cells.append(form("▶ Step 3a · Ask HokieAI About the Contract", "lab.contract_questions(check_quotes=False)",
-                      notes=["Run the cell and follow the instructions. The prompt asks HokieAI to quote the sentence of the contract that supports each answer, so that each answer can be checked against the source.",
+    cells.append(form("▶ Step 3a · Ask HokieAI About the Contract", "lab.contract_questions()",
+                      notes=["Run the cell and follow the instructions.",
                              "Unsupported answer: an answer to one of the questions the clauses do not answer; the correct output says that the clauses do not answer it."],
                       texts=T1("contract")))
     cells.append(question(3,
-                          "From Step 3a: Report the correct answers and the unsupported answers. Include the table.",
+                          "From Step 3a: Report the correct answers, the unsupported answers, and the quotes found word for word. Include the table.",
                           "Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?"))
 
     cells.append(md("""
