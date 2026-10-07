@@ -555,9 +555,9 @@ So far, you used AI models trained specifically to predict heating load (in **St
     cells.append(md(TAP_TEST))
     cells.append(form("▶ Step 4 · Tap Test App", "lab.tap_app(labels_text=labels_text)",
                       notes=["1. Run the cell and open the printed link in a new tab. The app also works on a phone, so you can upload directly from the phone you recorded with.",
-                             "2. **Build the dataset.** Upload all recordings and click **Build dataset**. The app shows the dataset (one row per tap, with its features) and each "
-                             "recording with the detected taps (red lines): each tap you made should have one line. If taps are missing, tap harder or closer to the phone and "
-                             "record that spot again.",
+                             "2. **Build the dataset.** Upload all recordings and click **Build dataset**. The app shows each recording as time-series data (the sound amplitude over time) "
+                             "with the detected taps (red lines), and the dataset as a table (one row per tap, with its features). Each tap you made should have one red line. "
+                             "If taps are missing, tap harder or closer to the phone and record that spot again.",
                              "3. **Download the dataset** (CSV, one row per tap) for your report and for HokieAI.",
                              "4. **Train and evaluate** each of the three models. The app trains the model on a random 80 % of the taps (training data) and tests it on the "
                              "other 20 % (test data). Compare the accuracies.",

@@ -16,15 +16,17 @@ from .texts import fill, labels
 LABELS = {
     "title": "## Tap Test",
     "make_header": "### 1 · Build the Dataset",
-    "make_note": ("After you build the dataset, the app shows it as a table (one row per tap, with the features of each tap) and shows each "
-                  "recording with the detected taps marked by red lines."),
+    "make_note": ("After you build the dataset, the app shows each recording as time-series data (the sound amplitude over time), with the "
+                  "detected taps marked by red lines, and the dataset as a table (one row per tap, with the features of each tap)."),
     "upload": "recordings (one file per spot, named by material and spot number)",
     "make_button": "Build dataset",
     "summary": "**{taps} taps** in **{recordings} recordings** of **{materials} materials**: {details}",
     "download": "dataset (CSV)",
     "table": "dataset: one row per tap",
-    "waves": "recordings with the detected taps (red lines)",
+    "waves": "recordings as time-series data, with the detected taps (red lines)",
     "wave_title": "{recording}: {taps} taps",
+    "wave_x": "time (s)",
+    "wave_y": "amplitude",
     "train_header": "### 2 · Train and Evaluate",
     "train_note": "The app trains the model on a random 80 % of the taps (training data) and tests it on the other 20 % (test data).",
     "model": "model",
@@ -88,7 +90,8 @@ def waves_png(audio: dict, df: pd.DataFrame):
         for i in on:
             ax.axvline(i / taps.SR, color="r", lw=0.6)
         ax.set_title(fill(L["wave_title"], recording=name, taps=len(on)), fontsize=9, loc="left"); ax.tick_params(labelsize=7)
-    axes[-1, 0].set_xlabel("seconds")
+        ax.set_ylabel(L["wave_y"], fontsize=8)
+    axes[-1, 0].set_xlabel(L["wave_x"])
     fig.tight_layout()
     return fig_png(fig)
 
