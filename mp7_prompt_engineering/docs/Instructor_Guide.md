@@ -12,6 +12,12 @@
   the published clause text has a few spacing errors such as "(1)by"); a changed, added or missing word is a misquote.
 - `MP7_Workshop_Prompt_Versions.ipynb`: Parts 1-2 of the construction-documents notebook (incident reports, submittals),
   worded the same way, with prompt versions v1-v3 and the student's own, and a comparison step after each part.
+- `MP7_Homework_Prompt_Engineering.ipynb`: Part 1 is the contract part of the construction-documents notebook as it is;
+  Parts 2-3 are the takeoff and door-schedule parts of the prompt-engineering notebook (every prompt version); Part 4
+  is the student's own document (a text document or a drawing sheet): the student writes at least five questions with
+  expected answers, including one the document does not answer (NOT IN TEXT); the notebook makes the prompt, and an
+  answer counts as correct if it contains every part of the expected answer (parts separated by ";"; capitals, spaces,
+  commas and dollar signs ignored). The student then edits the prompt and compares the given and edited prompts (Step 4b).
 - `MP7_Workshop_Prompt_Engineering.ipynb` (the class on prompting): all five parts with prompt versions v1–v3 and the
   student's own, compared in a chart per part. Sections 1–4 below describe it.
 

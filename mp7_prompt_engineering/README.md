@@ -13,6 +13,7 @@ ground truth. It comes first; the prompt-engineering notebook, with all prompt v
 |---|---|---|
 | `MP7_Workshop_Construction_Documents.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp7_prompt_engineering/MP7_Workshop_Construction_Documents.ipynb) | Parts 1–3 with one prompt each: 30 OSHA incident reports; 12 practice submittals against UFGS excerpts; 29 FAR construction clauses |
 | `MP7_Workshop_Prompt_Versions.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp7_prompt_engineering/MP7_Workshop_Prompt_Versions.ipynb) | Parts 1–2 of the construction-documents notebook (incident reports, submittals) with every prompt version and a comparison step |
+| `MP7_Homework_Prompt_Engineering.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp7_prompt_engineering/MP7_Homework_Prompt_Engineering.ipynb) | Homework: the contract part of the construction-documents notebook, takeoff and door schedules with every prompt version, and questions on a document of the student's own |
 | `MP7_Workshop_Prompt_Engineering.ipynb` | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp7_prompt_engineering/MP7_Workshop_Prompt_Engineering.ipynb) | 30 OSHA construction incident reports; 12 practice submittals against UFGS excerpts; 29 FAR construction clauses; 15 practice drawings made for the course |
 
 ## What the students do
@@ -42,6 +43,7 @@ Each part ends with a comparison of the prompt versions over every output the st
 MP7_Workshop_Prompt_Engineering.ipynb   student notebook, Parts 1-5 with prompt versions (generated)
 MP7_Workshop_Construction_Documents.ipynb   its one-prompt copy, Parts 1-3 (generated)
 MP7_Workshop_Prompt_Versions.ipynb      Parts 1-2 of the one-prompt copy with every prompt version (generated)
+MP7_Homework_Prompt_Engineering.ipynb   homework: contract, takeoff, door schedules, the student's own document (generated)
 aec_prompt/      the hidden code: texts (every default wording and prompt), lab (the steps), score (reading and
                  scoring HokieAI's output), ui (the HokieAI box, tables, comparison chart)
 data/            incidents.csv and incident_examples.csv (OSHA, public domain); submittals/ (spec excerpts + submittals);

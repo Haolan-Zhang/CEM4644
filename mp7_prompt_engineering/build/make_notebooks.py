@@ -183,49 +183,8 @@ Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), th
                           "From Step 3a: Report, for each prompt version, the correct answers, the unsupported answers, and the quotes found word for word.",
                           "Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?"))
 
-    # ------------------------------------------------------------------ Part 4
-    cells.append(md("""
-## Part 4 · Quantity Takeoff from Drawings
-Five foundation plans and five gable roofs were drawn for this course. Each comes with estimating questions (CMUs and grout; roof area, underlayment, and shingles), and the ground truth is computed exactly from the drawing's dimensions with standard estimating conventions. HokieAI reads the attached drawing and answers each question; quantities within 1–2 % of the ground truth count as correct.
-"""))
-    vnotes = ["v1 · task only: the questions and the output format.",
-              "v2 · step-by-step reasoning: asks HokieAI to list the dimensions it reads and to solve each question step by step.",
-              "v3 · estimating conventions: adds the estimating conventions used to compute the ground truth.",
-              "my own prompt: starts from v3; edit the prompt in the prompt box before copying it."]
-    cells.append(form("▶ Step 4a · Foundation Plans", "lab.takeoff(drawing, prompt_version)",
-                      notes=["Choose a drawing and a prompt version, run the cell, and follow the instructions. Run all three versions on at least two drawings."] + vnotes,
-                      params=[choice("drawing", labels["foundation"][0], labels["foundation"]), choice("prompt_version", list(TAKEOFF_VERSIONS)[0], TAKEOFF_VERSIONS)],
-                      texts=dict(T("takeoff"), conventions_text=FOUNDATION_CONVENTIONS)))
-    cells.append(form("▶ Step 4b · Gable Roofs", "lab.takeoff(drawing, prompt_version)",
-                      notes=["Choose a drawing and a prompt version, run the cell, and follow the instructions. Run all three versions on at least two drawings."] + vnotes,
-                      params=[choice("drawing", labels["roof"][0], labels["roof"]), choice("prompt_version", list(TAKEOFF_VERSIONS)[0], TAKEOFF_VERSIONS)],
-                      texts=dict(T("takeoff"), conventions_text=ROOF_CONVENTIONS)))
-    cells.append(form("▶ Step 4c · Compare Prompt Versions", 'lab.compare("takeoff")',
-                      notes=["Run the cell after Steps 4a and 4b. Each bar is the share of quantities within tolerance of the ground truth, over all drawings scored with that version."],
-                      texts=T("compare")))
-    cells.append(question(4,
-                          "From Step 4c: Report the share of correct quantities for each prompt version, across at least two foundation plans and two roofs.",
-                          "For one wrong quantity, find in HokieAI's output where the error came from: a misread dimension, a different estimating convention, or an arithmetic error.",
-                          "Why does stating the estimating conventions help more than asking for step-by-step reasoning?"))
-
-    # ------------------------------------------------------------------ Part 5
-    cells.append(md("""
-## Part 5 · Reading Schedules on a Drawing Sheet
-Five 36 × 24 in drawing sheets, made for this course, each carry the door schedules of several unit types, a window schedule, hardware sets, and door-type elevations. The task: list every door of one unit type. The ground truth is the schedule's own data; a door counts as correct only if all six of its fields are transcribed exactly.
-"""))
-    cells.append(form("▶ Step 5a · Door Schedules", "lab.schedule(sheet, prompt_version)",
-                      notes=["Choose a sheet and a prompt version, run the cell, and follow the instructions. Run all three versions on at least two sheets.",
-                             "v1 · whole sheet: HokieAI receives the whole sheet.",
-                             "v2 · cropped schedule: HokieAI receives only the part of the schedule for the unit type.",
-                             "v3 · cropped schedule and column names: adds the column names and asks for an exact transcription.",
-                             "my own prompt: starts from v3 with both images; edit the prompt in the prompt box before copying it."],
-                      params=[choice("sheet", labels["schedule"][0], labels["schedule"]), choice("prompt_version", list(SCHEDULE_VERSIONS)[0], SCHEDULE_VERSIONS)],
-                      texts=T("schedule")))
-    cells.append(form("▶ Step 5b · Compare Prompt Versions", 'lab.compare("schedule")',
-                      notes=["Run the cell after Step 5a. Each bar is the share of doors transcribed exactly, over all sheets scored with that version."], texts=T("compare")))
-    cells.append(question(5,
-                          "From Step 5b: Report the number of doors transcribed exactly with the whole sheet and with the cropped schedule. Why does cropping change the result?",
-                          "Before using a door count from HokieAI in an estimate, what would you check, and how?"))
+    part_takeoff(cells, 4, labels)
+    part_schedule(cells, 5, labels)
 
     cells.append(md("""
 ### Data and model sources
@@ -237,6 +196,72 @@ Five 36 × 24 in drawing sheets, made for this course, each carry the door sched
 """))
 
     write(cells, FILE, "MP7_Workshop_Report_Template.md", "In-Class Activity: Prompt Engineering")
+
+
+def part_contract(cells, n):
+    """Contract questions with the construction-documents notebook's own prompt (answers from the clauses only, quotes, NOT IN TEXT)."""
+    cells.append(md(f"""
+## Part {n} · Answering Questions from a Contract
+In this part, you will use HokieAI to answer 27 questions based on 29 construction clauses from the Federal Acquisition Regulation (FAR) used in U.S. federal construction contracts. Some questions ask directly about contract requirements, while others describe a project situation (such as a late notice, withheld payment, or warranty claim) and require applying the relevant clause to the facts.
+
+For questions that can be answered from the provided clauses, HokieAI is asked to quote the sentence that supports its answer, allowing the answer to be verified against the source. Seven questions cannot be answered from the provided clauses; for these, HokieAI is asked to indicate that the answer is not provided rather than rely on outside knowledge or provide a supporting quote.
+
+The notebook compares each response with the ground-truth answer and checks supporting quotes where applicable. A quote found means the quoted text appears in the provided clauses exactly as given; a misquote means it does not.
+"""))
+    cells.append(form(f"▶ Step {n}a · Ask HokieAI About the Contract", "lab.contract_questions()",
+                      notes=["Run the cell and follow the instructions."],
+                      texts=T1("contract")))
+    cells.append(question(n,
+                          f"From Step {n}a: Report the correct answers, the number of questions for which HokieAI indicated that the answer is not provided, and the quotes found and misquotes. Include the table.",
+                          "Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?"))
+
+
+def part_takeoff(cells, n, labels):
+    """Quantity takeoff from drawings: foundation plans and gable roofs, every prompt version, and the comparison."""
+    cells.append(md(f"""
+## Part {n} · Quantity Takeoff from Drawings
+Five foundation plans and five gable roofs were drawn for this course. Each comes with estimating questions (CMUs and grout; roof area, underlayment, and shingles), and the ground truth is computed exactly from the drawing's dimensions with standard estimating conventions. HokieAI reads the attached drawing and answers each question; quantities within 1–2 % of the ground truth count as correct.
+"""))
+    vnotes = ["v1 · task only: the questions and the output format.",
+              "v2 · step-by-step reasoning: asks HokieAI to list the dimensions it reads and to solve each question step by step.",
+              "v3 · estimating conventions: adds the estimating conventions used to compute the ground truth.",
+              "my own prompt: starts from v3; edit the prompt in the prompt box before copying it."]
+    cells.append(form(f"▶ Step {n}a · Foundation Plans", "lab.takeoff(drawing, prompt_version)",
+                      notes=["Choose a drawing and a prompt version, run the cell, and follow the instructions. Run all three versions on at least two drawings."] + vnotes,
+                      params=[choice("drawing", labels["foundation"][0], labels["foundation"]), choice("prompt_version", list(TAKEOFF_VERSIONS)[0], TAKEOFF_VERSIONS)],
+                      texts=dict(T("takeoff"), conventions_text=FOUNDATION_CONVENTIONS)))
+    cells.append(form(f"▶ Step {n}b · Gable Roofs", "lab.takeoff(drawing, prompt_version)",
+                      notes=["Choose a drawing and a prompt version, run the cell, and follow the instructions. Run all three versions on at least two drawings."] + vnotes,
+                      params=[choice("drawing", labels["roof"][0], labels["roof"]), choice("prompt_version", list(TAKEOFF_VERSIONS)[0], TAKEOFF_VERSIONS)],
+                      texts=dict(T("takeoff"), conventions_text=ROOF_CONVENTIONS)))
+    cells.append(form(f"▶ Step {n}c · Compare Prompt Versions", 'lab.compare("takeoff")',
+                      notes=[f"Run the cell after Steps {n}a and {n}b. Each bar is the share of quantities within tolerance of the ground truth, over all drawings scored with that version."],
+                      texts=T("compare")))
+    cells.append(question(n,
+                          f"From Step {n}c: Report the share of correct quantities for each prompt version, across at least two foundation plans and two roofs.",
+                          "For one wrong quantity, find in HokieAI's output where the error came from: a misread dimension, a different estimating convention, or an arithmetic error.",
+                          "Why does stating the estimating conventions help more than asking for step-by-step reasoning?"))
+
+
+def part_schedule(cells, n, labels):
+    """Door schedules on a drawing sheet, every prompt version, and the comparison."""
+    cells.append(md(f"""
+## Part {n} · Reading Schedules on a Drawing Sheet
+Five 36 × 24 in drawing sheets, made for this course, each carry the door schedules of several unit types, a window schedule, hardware sets, and door-type elevations. The task: list every door of one unit type. The ground truth is the schedule's own data; a door counts as correct only if all six of its fields are transcribed exactly.
+"""))
+    cells.append(form(f"▶ Step {n}a · Door Schedules", "lab.schedule(sheet, prompt_version)",
+                      notes=["Choose a sheet and a prompt version, run the cell, and follow the instructions. Run all three versions on at least two sheets.",
+                             "v1 · whole sheet: HokieAI receives the whole sheet.",
+                             "v2 · cropped schedule: HokieAI receives only the part of the schedule for the unit type.",
+                             "v3 · cropped schedule and column names: adds the column names and asks for an exact transcription.",
+                             "my own prompt: starts from v3 with both images; edit the prompt in the prompt box before copying it."],
+                      params=[choice("sheet", labels["schedule"][0], labels["schedule"]), choice("prompt_version", list(SCHEDULE_VERSIONS)[0], SCHEDULE_VERSIONS)],
+                      texts=T("schedule")))
+    cells.append(form(f"▶ Step {n}b · Compare Prompt Versions", 'lab.compare("schedule")',
+                      notes=[f"Run the cell after Step {n}a. Each bar is the share of doors transcribed exactly, over all sheets scored with that version."], texts=T("compare")))
+    cells.append(question(n,
+                          f"From Step {n}b: Report the number of doors transcribed exactly with the whole sheet and with the cropped schedule. Why does cropping change the result?",
+                          "Before using a door count from HokieAI in an estimate, what would you check, and how?"))
 
 
 def write(cells, file, report, title):
@@ -314,20 +339,7 @@ Before a material is used, its submittal (here, a concrete mix design or a morta
                           "For one missed noncompliance or false flag, explain from HokieAI's output why it happened: a misread requirement, a value that had to be computed, "
                           "or a requirement that does not apply to the intended use. On a real project, which is more costly, a missed noncompliance or a false flag, and why?"))
 
-    cells.append(md("""
-## Part 3 · Answering Questions from a Contract
-In this part, you will use HokieAI to answer 27 questions based on 29 construction clauses from the Federal Acquisition Regulation (FAR) used in U.S. federal construction contracts. Some questions ask directly about contract requirements, while others describe a project situation (such as a late notice, withheld payment, or warranty claim) and require applying the relevant clause to the facts.
-
-For questions that can be answered from the provided clauses, HokieAI is asked to quote the sentence that supports its answer, allowing the answer to be verified against the source. Seven questions cannot be answered from the provided clauses; for these, HokieAI is asked to indicate that the answer is not provided rather than rely on outside knowledge or provide a supporting quote.
-
-The notebook compares each response with the ground-truth answer and checks supporting quotes where applicable. A quote found means the quoted text appears in the provided clauses exactly as given; a misquote means it does not.
-"""))
-    cells.append(form("▶ Step 3a · Ask HokieAI About the Contract", "lab.contract_questions()",
-                      notes=["Run the cell and follow the instructions."],
-                      texts=T1("contract")))
-    cells.append(question(3,
-                          "From Step 3a: Report the correct answers, the number of questions for which HokieAI indicated that the answer is not provided, and the quotes found and misquotes. Include the table.",
-                          "Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?"))
+    part_contract(cells, 3)
 
     cells.append(md("""
 ### Data and model sources
@@ -415,8 +427,61 @@ Before a material is used, its submittal (here, a concrete mix design or a morta
     write(cells, VERSIONS_FILE, "MP7_Prompt_Versions_Report_Template.md", "In-Class Activity: Prompt Engineering for Construction Documents")
 
 
+# ============================================================================ the homework
+HOMEWORK_FILE = "MP7_Homework_Prompt_Engineering.ipynb"
+
+
+def build_homework():
+    """The contract part of the construction-documents notebook (as it is), the takeoff and door-schedule parts of the
+    prompt-engineering notebook (every prompt version), and a part on a document of the student's own."""
+    load_existing(REPO / HOMEWORK_FILE)
+    probs = json.loads((REPO / "data" / "practice" / "problems.json").read_text())
+    labels = {f: [drawing_label(p) for p in probs if p["family"] == f] for f in ("foundation", "roof", "schedule")}
+    cells = [md(f"""
+# Homework: Generative AI for Construction Contracts and Drawings
+In this homework, we will use generative AI (GPT/HokieAI) to answer questions from a contract, take off quantities from drawings, read door schedules, and analyze a construction document of your own, and compare its outputs with the ground truth.
+
+In every HokieAI step, the notebook gives you a prompt; you send it to HokieAI ({CHAT_URL}), paste HokieAI's output back, and the notebook scores it against the ground truth (the correct output, known for every example).
+"""), step0()]
+    part_contract(cells, 1)
+    part_takeoff(cells, 2, labels)
+    part_schedule(cells, 3, labels)
+
+    cells.append(md("""
+## Part 4 · Analyzing Your Own Document
+In this part, you will test HokieAI on a construction document of your own choice: a text document of 1–10 pages or a drawing sheet (for example, a specification section, a daily report, a site safety plan, meeting minutes, an RFI, or a submittal from an internship or a public project). You write the questions and the answers you find in the document yourself; your expected answers are the ground truth.
+
+Write at least five questions with short, checkable answers (a number, a date, a name, a material), and include at least one question the document does not answer (expected answer: NOT IN TEXT).
+"""))
+    cells.append(form("▶ Step 4a · Ask HokieAI About Your Document", "lab.own_document()",
+                      notes=["Write a short name for your document and your questions, one per line, as: question | expected answer. Click **Make prompt** and follow the instructions.",
+                             "An answer counts as correct if it contains every part of your expected answer, ignoring capitals, spaces, and commas; separate required parts with a semicolon "
+                             "(for example, March 3; 7:00 am). Write numbers as digits.",
+                             "Then improve the prompt in the prompt box (for example, a role, a required answer format, or how to handle information the document does not give), "
+                             "send it in a new chat, and score it again: the output is recorded as *edited prompt*.",
+                             "Do not use confidential or personal documents: the document leaves your computer when you attach it to HokieAI."],
+                      texts=T("own")))
+    cells.append(form("▶ Step 4b · Compare the Given and Edited Prompts", 'lab.compare("own")',
+                      notes=["Run the cell after Step 4a. Each bar is the share of your questions answered correctly, over all outputs of that prompt."],
+                      texts=T("compare")))
+    cells.append(question(4,
+                          "From Step 4a: Describe your document (type, length, and source) and your questions, and include the table for the given prompt.",
+                          "From Step 4b: Report the correct answers with the given prompt and with your edited prompt. What did you change in the prompt, and did it help?",
+                          "Choose one wrong answer and explain from HokieAI's output why it happened. Would you rely on HokieAI for this kind of document on a real project, and what would you check first?"))
+
+    cells.append(md("""
+### Data and model sources
+- Contract clauses: Federal Acquisition Regulation, Part 52 (29 construction clauses), public domain, https://www.acquisition.gov/far.
+- Drawings: original practice drawings made for CEM4644 (not for construction).
+- Your document: provided by you.
+- Generative AI: GPT models via HokieAI (Virginia Tech).
+"""))
+    write(cells, HOMEWORK_FILE, "MP7_Homework_Report_Template.md", "Homework: Generative AI for Construction Contracts and Drawings")
+
+
 if __name__ == "__main__":
     KEEP_TEXT = "--fresh-text" not in sys.argv
     build()
     build_documents()
     build_versions()
+    build_homework()
