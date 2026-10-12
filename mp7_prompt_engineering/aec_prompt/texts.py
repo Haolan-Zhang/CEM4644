@@ -125,6 +125,12 @@ ONE_PROMPT_TEXTS = {
         "columns_text": "Question | Ground truth | HokieAI's output | Correct | Quote"},
 }
 
+# The prompt-versions notebook (MP7_Workshop_Prompt_Versions): Parts 1-2 of the construction-documents notebook with every
+# prompt version; the result wordings it changes.
+VERSIONS_TEXTS = {
+    "incidents": {"accuracy_text": "**Accuracy ({version}):** {right} of {n} reports classified as OSHA classified them (**{accuracy} %**)."},
+}
+
 FOUNDATION_CONVENTIONS = ("Estimating conventions: total wall length = sum of the outside dimensions (no deduction at corners); wall area = length x height; "
                           "one CMU covers 8 in x 16 in = 0.889 ft²; round CMUs up after adding waste. Grout = CMUs before waste x grout per CMU, "
                           "converted to CY (27 ft³ = 1 CY), then add grout waste. Cells are 8 in apart, so grouting at S in on center fills 8/S of the cells.")

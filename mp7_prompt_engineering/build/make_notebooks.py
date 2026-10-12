@@ -1,5 +1,6 @@
-"""Generates the MP7 notebooks (+ report templates): the prompt-engineering workshop (Parts 1-5, prompt versions) and
-its one-prompt copy for construction documents (Parts 1-3, one given prompt each).
+"""Generates the MP7 notebooks (+ report templates): the prompt-engineering workshop (Parts 1-5, prompt versions), its
+one-prompt copy for construction documents (Parts 1-3, one given prompt each), and the prompt-versions notebook (Parts
+1-2 of the construction-documents notebook, with every prompt version).
 
     python build/make_notebooks.py [--fresh-text]
 
@@ -19,7 +20,8 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 from aec_prompt.lab import (CONTRACT_VERSIONS, INCIDENT_VERSIONS, SCHEDULE_VERSIONS, SUBMITTAL_VERSIONS, TAKEOFF_VERSIONS,  # noqa: E402
                             drawing_label, submittal_label)
-from aec_prompt.texts import CHAT_URL, FOUNDATION_CONVENTIONS, ONE_PROMPT, ONE_PROMPT_TEXTS, ROOF_CONVENTIONS, TEXTS  # noqa: E402
+from aec_prompt.texts import (CHAT_URL, FOUNDATION_CONVENTIONS, ONE_PROMPT, ONE_PROMPT_TEXTS, ROOF_CONVENTIONS, TEXTS,  # noqa: E402
+                              VERSIONS_TEXTS)
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
 FILE = "MP7_Workshop_Prompt_Engineering.ipynb"
@@ -337,7 +339,84 @@ The notebook compares each response with the ground-truth answer and checks supp
     write(cells, DOC_FILE, "MP7_Construction_Documents_Report_Template.md", "In-Class Activity: Generative AI for Construction Documents")
 
 
+# ============================================================================ the prompt-versions notebook (Parts 1-2)
+VERSIONS_FILE = "MP7_Workshop_Prompt_Versions.ipynb"
+
+
+def build_versions():
+    """Parts 1-2 of the construction-documents notebook, worded the same way, with every prompt version of the
+    prompt-engineering notebook and a comparison step after each part."""
+    load_existing(REPO / VERSIONS_FILE)
+    subs = json.loads((REPO / "data" / "submittals" / "problems.json").read_text())
+    sub_labels = [submittal_label(p) for p in subs]
+    cells = [md("""
+# In-Class Activity: Prompt Engineering for Construction Documents
+In this activity, we will use generative AI (GPT/HokieAI) to classify construction incident reports and review submittals against a specification, and compare how the wording of the prompt changes the accuracy of its outputs against the ground truth.
+"""), step0()]
+
+    cells.append(md(f"""
+## Part 1 · Classifying Incident Reports
+OSHA records every severe work-related injury reported by employers, with a short narrative and a code for the event that caused it. Here, you will use HokieAI to classify 30 construction incident reports into OSHA's construction Focus Four hazards (fall, struck-by, caught-in/between, electrocution) or other, and compare its output with OSHA's own classification.
+
+In every HokieAI step, the notebook gives you a prompt; you send it to HokieAI ({CHAT_URL}), paste HokieAI's output back, and the notebook scores it against the ground truth (the correct output, known for every example). Each prompt version changes one thing, and the comparison step after each part charts every scored output by prompt version.
+"""))
+    cells.append(form("▶ Step 1a · Browse the Reports", "lab.show_reports(rows)",
+                      notes=["Run the cell to browse the incident reports HokieAI will classify. OSHA's classification of each report is the ground truth; it stays hidden until you score an output."],
+                      params=['rows = 10 #@param [5, 10, 30] {type:"raw"}']))
+    cells.append(form("▶ Step 1b · Classify with HokieAI", "lab.classify_incidents(prompt_version)",
+                      notes=["Choose a prompt version, run the cell, and follow the instructions. Score every version, each in a new chat.",
+                             "Then send one version in a second new chat and score that output too: a generative AI model can give a different output to the same prompt.",
+                             "v1 · task only: the categories and the output format.",
+                             "v2 · role and definitions: adds a role and OSHA's definition of each category.",
+                             "v3 · definitions and worked examples: adds five reports with OSHA's classification (few-shot prompting).",
+                             "my own prompt: starts from v3; edit the prompt in the prompt box before copying it.",
+                             "Confusion matrix: a table that counts, for each of OSHA's classes (rows), the classes in HokieAI's output (columns); the diagonal holds the reports classified as OSHA classified them.",
+                             "If HokieAI declines the prompt or its output is blocked, start a new chat and send the prompt again."],
+                      params=[choice("prompt_version", list(INCIDENT_VERSIONS)[0], INCIDENT_VERSIONS)],
+                      texts={**T("incidents"), **VERSIONS_TEXTS["incidents"]}))
+    cells.append(form("▶ Step 1c · Compare Prompt Versions", 'lab.compare("incidents")',
+                      notes=["Run the cell after scoring the prompt versions in Step 1b. Each bar is the share of reports classified as OSHA classified them, over all outputs of that version."],
+                      texts=T("compare")))
+    cells.append(question(1,
+                          "From Step 1b: Report the accuracy of each prompt version and include the confusion matrix of the best one. Did the second chat give the same output?",
+                          "From Step 1c: Which change to the prompt (role, definitions, worked examples) improved the accuracy most?",
+                          "Choose two reports where HokieAI's output differs from OSHA's classification. From the report text, explain why each is hard to classify, and how you would change the prompt to fix it. "
+                          "Would you use HokieAI to classify a company's incident reports, and what would you check first?"))
+
+    cells.append(md("""
+## Part 2 · Reviewing Submittals Against the Specification
+Before a material is used, its submittal (here, a concrete mix design or a mortar and grout mix) is checked against the specification. Twelve practice submittals were made for this course, each to be checked against a specification excerpt adapted from the Unified Facilities Guide Specifications (UFGS 03 30 00 Cast-in-Place Concrete and 04 20 00 Masonry). A submittal states its intended use, not the portion of the structure named in the specification, so the applicable requirements must be identified first. Some values must be computed from the batch weights, some are exactly at a limit, and two submittals comply fully. The ground truth is the list of planted noncompliances. Every requirement the submittal is checked against counts as one decision (six per submittal); a flag on a requirement that sets no limit for the intended use is a false flag.
+"""))
+    cells.append(form("▶ Step 2a · Review a Submittal with HokieAI", "lab.review_submittal(submittal, prompt_version)",
+                      notes=["Choose a submittal and a prompt version, run the cell, and follow the instructions. Run all three versions on at least two submittals, including a concrete and a masonry one.",
+                             "Noncompliance: a submitted value that does not meet a requirement of the specification. False flag: a requirement HokieAI marks as noncompliant that complies.",
+                             "v1 · task only: the specification, the submittal, and the request to list every noncompliance.",
+                             "v2 · requirements first, then compare: asks HokieAI to list the applicable requirements first and then check them one by one (task decomposition).",
+                             "v3 · comparison table: adds a fixed comparison table and asks HokieAI to compute values the submittal does not state, such as w/cm.",
+                             "my own prompt: starts from v3; edit the prompt in the prompt box before copying it.",
+                             "Each review needs a new chat, so that HokieAI does not carry over an earlier review."],
+                      params=[choice("submittal", sub_labels[0], sub_labels), choice("prompt_version", list(SUBMITTAL_VERSIONS)[0], SUBMITTAL_VERSIONS)],
+                      texts=T("submittals")))
+    cells.append(form("▶ Step 2b · Compare Prompt Versions", 'lab.compare("submittals")',
+                      notes=["Run the cell after Step 2a. Each bar is the share of requirements judged correctly (complies or noncompliant), over all submittals scored with that version."],
+                      texts=T("compare")))
+    cells.append(question(2,
+                          "From Step 2a: Report, for each prompt version, the requirements judged correctly, the noncompliances found, and the false flags. Include one table.",
+                          "From Step 2b: Which prompt version judged the most requirements correctly? Why does asking for the applicable requirements first change the result?",
+                          "For one missed noncompliance or false flag, explain from HokieAI's output why it happened: a misread requirement, a value that had to be computed, "
+                          "or a requirement that does not apply to the intended use. On a real project, which is more costly, a missed noncompliance or a false flag, and why?"))
+
+    cells.append(md("""
+### Data and model sources
+- Incident reports: Severe Injury Reports (2015–2025), Occupational Safety and Health Administration, U.S. Department of Labor, public domain, https://www.osha.gov/severe-injury-reports.
+- Specification excerpts: adapted from the Unified Facilities Guide Specifications 03 30 00 and 04 20 00, U.S. Department of Defense, public domain, https://www.wbdg.org/dod/ufgs; the submittals are practice submittals made for CEM4644.
+- Generative AI: GPT models via HokieAI (Virginia Tech).
+"""))
+    write(cells, VERSIONS_FILE, "MP7_Prompt_Versions_Report_Template.md", "In-Class Activity: Prompt Engineering for Construction Documents")
+
+
 if __name__ == "__main__":
     KEEP_TEXT = "--fresh-text" not in sys.argv
     build()
     build_documents()
+    build_versions()

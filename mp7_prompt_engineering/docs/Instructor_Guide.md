@@ -10,6 +10,8 @@
   output shows correct answers, unsupported answers (answers to the 7 questions the clauses do not answer) and quotes
   found word for word. A quote is compared on its words only (spacing, punctuation and quotation marks ignored, since
   the published clause text has a few spacing errors such as "(1)by"); a changed, added or missing word is a misquote.
+- `MP7_Workshop_Prompt_Versions.ipynb`: Parts 1-2 of the construction-documents notebook (incident reports, submittals),
+  worded the same way, with prompt versions v1-v3 and the student's own, and a comparison step after each part.
 - `MP7_Workshop_Prompt_Engineering.ipynb` (the class on prompting): all five parts with prompt versions v1–v3 and the
   student's own, compared in a chart per part. Sections 1–4 below describe it.
 
