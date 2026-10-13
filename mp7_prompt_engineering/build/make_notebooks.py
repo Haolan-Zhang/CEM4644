@@ -162,26 +162,7 @@ Before a material is used, its submittal (here, a concrete mix design or a morta
                           "For one missed noncompliance or false flag, explain from HokieAI's output why it happened: a misread requirement, a value that had to be computed, or a requirement that does not apply to the intended use.",
                           "Why does asking for the applicable requirements first change the result?"))
 
-    # ------------------------------------------------------------------ Part 3: contract questions
-    cells.append(md("""
-## Part 3 · Answering Questions from a Contract
-Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), the standard terms of U.S. federal construction contracts, and 27 questions about them. Ten questions describe a project situation (a late notice, a withheld payment, a warranty claim), so the answer needs the requirement and its application to the facts. Seven cannot be answered from the text, although most have a common answer outside it. The ground truth is the answer the clauses give; quotes are checked word for word against the clauses.
-"""))
-    cells.append(form("▶ Step 3a · Ask HokieAI About the Contract", "lab.contract_questions(prompt_version)",
-                      notes=["Choose a prompt version, run the cell, and follow the instructions. Score every version.",
-                             "Unsupported answer: an answer to one of the questions the clauses do not answer; the correct output says that the clauses do not answer it. "
-                             "Quote found word for word: the quoted sentence appears in the clauses exactly as quoted; a quote that is not found is a misquote.",
-                             "v1 · questions only: the questions and the clauses.",
-                             "v2 · answers with quotes: asks for the sentence of the contract that supports each answer.",
-                             "v3 · only from the text, with quotes: restricts HokieAI to the clauses, asks it to apply the requirement to the facts of each situation, for the clause number and an exact quote, and for NOT IN TEXT when the clauses do not answer.",
-                             "my own prompt: starts from v3; edit the prompt in the prompt box before copying it."],
-                      params=[choice("prompt_version", list(CONTRACT_VERSIONS)[0], CONTRACT_VERSIONS)], texts=T("contract")))
-    cells.append(form("▶ Step 3b · Compare Prompt Versions", 'lab.compare("contract")',
-                      notes=["Run the cell after Step 3a. Each bar is the share of questions answered correctly, including NOT IN TEXT for the questions the clauses do not answer."],
-                      texts=T("compare")))
-    cells.append(question(3,
-                          "From Step 3a: Report, for each prompt version, the correct answers, the unsupported answers, and the quotes found word for word.",
-                          "Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?"))
+    part_contract_versions(cells, 3)
 
     part_takeoff(cells, 4, labels)
     part_schedule(cells, 5, labels)
@@ -196,6 +177,29 @@ Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), th
 """))
 
     write(cells, FILE, "MP7_Workshop_Report_Template.md", "In-Class Activity: Prompt Engineering")
+
+
+def part_contract_versions(cells, n):
+    """Contract questions with every prompt version (v1-v3 and the student's own) and the comparison."""
+    cells.append(md(f"""
+## Part {n} · Answering Questions from a Contract
+Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), the standard terms of U.S. federal construction contracts, and 27 questions about them. Ten questions describe a project situation (a late notice, a withheld payment, a warranty claim), so the answer needs the requirement and its application to the facts. Seven cannot be answered from the text, although most have a common answer outside it. The ground truth is the answer the clauses give; quotes are checked word for word against the clauses.
+"""))
+    cells.append(form(f"▶ Step {n}a · Ask HokieAI About the Contract", "lab.contract_questions(prompt_version)",
+                      notes=["Choose a prompt version, run the cell, and follow the instructions. Score every version.",
+                             "Unsupported answer: an answer to one of the questions the clauses do not answer; the correct output says that the clauses do not answer it. "
+                             "Quote found word for word: the quoted sentence appears in the clauses exactly as quoted; a quote that is not found is a misquote.",
+                             "v1 · questions only: the questions and the clauses.",
+                             "v2 · answers with quotes: asks for the sentence of the contract that supports each answer.",
+                             "v3 · only from the text, with quotes: restricts HokieAI to the clauses, asks it to apply the requirement to the facts of each situation, for the clause number and an exact quote, and for NOT IN TEXT when the clauses do not answer.",
+                             "my own prompt: starts from v3; edit the prompt in the prompt box before copying it."],
+                      params=[choice("prompt_version", list(CONTRACT_VERSIONS)[0], CONTRACT_VERSIONS)], texts=T("contract")))
+    cells.append(form(f"▶ Step {n}b · Compare Prompt Versions", 'lab.compare("contract")',
+                      notes=[f"Run the cell after Step {n}a. Each bar is the share of questions answered correctly, including NOT IN TEXT for the questions the clauses do not answer."],
+                      texts=T("compare")))
+    cells.append(question(n,
+                          f"From Step {n}a: Report, for each prompt version, the correct answers, the unsupported answers, and the quotes found word for word.",
+                          "Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?"))
 
 
 def part_contract(cells, n):
@@ -432,8 +436,8 @@ HOMEWORK_FILE = "MP7_Homework_Prompt_Engineering.ipynb"
 
 
 def build_homework():
-    """The contract part of the construction-documents notebook (as it is), the takeoff and door-schedule parts of the
-    prompt-engineering notebook (every prompt version), and a part on a document of the student's own."""
+    """The contract, takeoff and door-schedule parts of the prompt-engineering notebook (every prompt version), and a
+    part on a document of the student's own."""
     load_existing(REPO / HOMEWORK_FILE)
     probs = json.loads((REPO / "data" / "practice" / "problems.json").read_text())
     labels = {f: [drawing_label(p) for p in probs if p["family"] == f] for f in ("foundation", "roof", "schedule")}
@@ -443,7 +447,7 @@ In this homework, we will use generative AI (GPT/HokieAI) to answer questions fr
 
 In every HokieAI step, the notebook gives you a prompt; you send it to HokieAI ({CHAT_URL}), paste HokieAI's output back, and the notebook scores it against the ground truth (the correct output, known for every example).
 """), step0()]
-    part_contract(cells, 1)
+    part_contract_versions(cells, 1)
     part_takeoff(cells, 2, labels)
     part_schedule(cells, 3, labels)
 

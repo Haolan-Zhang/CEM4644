@@ -6,7 +6,7 @@ Answer every question in a few sentences. Paste screenshots where the question a
 
 ## Question 1
 
-From Step 1a: Report the correct answers, the number of questions for which HokieAI indicated that the answer is not provided, and the quotes found and misquotes. Include the table.
+From Step 1a: Report, for each prompt version, the correct answers, the unsupported answers, and the quotes found word for word.
 
 Choose one answer that HokieAI took from outside the clauses or misquoted. How could you detect this on a real project, where no ground truth is available?
 
