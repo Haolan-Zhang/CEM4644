@@ -8,9 +8,9 @@ from typing import Dict, Optional
 CHAT_URL = "https://hokie.ai.vt.edu/"
 
 PASTE_STEPS = ("1. Copy the prompt below.\n2. Open {url} (sign in with your VT account), start a new chat, and paste the prompt.\n"
-               "3. Copy HokieAI's output with the copy button below its reply (selecting the text with the mouse and copying it loses the line breaks), and paste it into the box below.\n4. Click *Score HokieAI output* to compare it with the ground truth.")
+               "3. Copy HokieAI's output with the **copy button** below its reply, and paste it into the box below.\n4. Click *Score HokieAI output* to compare it with the ground truth.")
 ATTACH_STEPS = ("1. Download {files} with the button below and copy the prompt.\n2. Open {url} (sign in with your VT account), start a new chat, "
-                "attach the image, and paste the prompt.\n3. Copy HokieAI's output with the copy button below its reply (selecting the text with the mouse and copying it loses the line breaks), and paste it into the box below.\n"
+                "attach the image, and paste the prompt.\n3. Copy HokieAI's output with the **copy button** below its reply, and paste it into the box below.\n"
                 "4. Click *Score HokieAI output* to compare it with the ground truth.")
 BOX = {"button_text": "Score HokieAI output", "reply_text": "Paste HokieAI's full output here.", "prompt_label_text": "prompt", "reply_label_text": "output"}
 
@@ -111,7 +111,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "make_text": "Make prompt",
         "too_few_text": "Write at least 5 questions, one per line, as: question | expected answer.",
         "steps_text": ("1. Copy the prompt below.\n2. Open {url} (sign in with your VT account), start a new chat, attach your document "
-                       "(or paste its text after the prompt), and paste the prompt.\n3. Copy HokieAI's output with the copy button below its reply (selecting the text with the mouse and copying it loses the line breaks), and paste it into the box below.\n"
+                       "(or paste its text after the prompt), and paste the prompt.\n3. Copy HokieAI's output with the **copy button** below its reply, and paste it into the box below.\n"
                        "4. Click *Show HokieAI's answers* to list them next to your expected answers."),
         **BOX,
         "button_text": "Show HokieAI's answers",
