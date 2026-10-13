@@ -179,11 +179,19 @@ Before a material is used, its submittal (here, a concrete mix design or a morta
     write(cells, FILE, "MP7_Workshop_Report_Template.md", "In-Class Activity: Prompt Engineering")
 
 
-def part_contract_versions(cells, n):
-    """Contract questions with every prompt version (v1-v3 and the student's own) and the comparison."""
+PE_CONTRACT_DESCRIPTION = """Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), the standard terms of U.S. federal construction contracts, and 27 questions about them. Ten questions describe a project situation (a late notice, a withheld payment, a warranty claim), so the answer needs the requirement and its application to the facts. Seven cannot be answered from the text, although most have a common answer outside it. The ground truth is the answer the clauses give; quotes are checked word for word against the clauses."""
+CONTRACT_DESCRIPTION = """In this part, you will use HokieAI to answer 27 questions based on 29 construction clauses from the Federal Acquisition Regulation (FAR) used in U.S. federal construction contracts. Some questions ask directly about contract requirements, while others describe a project situation (such as a late notice, withheld payment, or warranty claim) and require applying the relevant clause to the facts.
+
+For questions that can be answered from the provided clauses, HokieAI is asked to quote the sentence that supports its answer, allowing the answer to be verified against the source. Seven questions cannot be answered from the provided clauses; for these, HokieAI is asked to indicate that the answer is not provided rather than rely on outside knowledge or provide a supporting quote.
+
+The notebook compares each response with the ground-truth answer and checks supporting quotes where applicable. A quote found means the quoted text appears in the provided clauses exactly as given; a misquote means it does not."""
+
+def part_contract_versions(cells, n, description=None):
+    """Contract questions with every prompt version (v1-v3 and the student's own) and the comparison; description
+    replaces the part's introduction."""
     cells.append(md(f"""
 ## Part {n} · Answering Questions from a Contract
-Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), the standard terms of U.S. federal construction contracts, and 27 questions about them. Ten questions describe a project situation (a late notice, a withheld payment, a warranty claim), so the answer needs the requirement and its application to the facts. Seven cannot be answered from the text, although most have a common answer outside it. The ground truth is the answer the clauses give; quotes are checked word for word against the clauses.
+{description or PE_CONTRACT_DESCRIPTION}
 """))
     cells.append(form(f"▶ Step {n}a · Ask HokieAI About the Contract", "lab.contract_questions(prompt_version)",
                       notes=["Choose a prompt version, run the cell, and follow the instructions. Score every version.",
@@ -206,11 +214,7 @@ def part_contract(cells, n):
     """Contract questions with the construction-documents notebook's own prompt (answers from the clauses only, quotes, NOT IN TEXT)."""
     cells.append(md(f"""
 ## Part {n} · Answering Questions from a Contract
-In this part, you will use HokieAI to answer 27 questions based on 29 construction clauses from the Federal Acquisition Regulation (FAR) used in U.S. federal construction contracts. Some questions ask directly about contract requirements, while others describe a project situation (such as a late notice, withheld payment, or warranty claim) and require applying the relevant clause to the facts.
-
-For questions that can be answered from the provided clauses, HokieAI is asked to quote the sentence that supports its answer, allowing the answer to be verified against the source. Seven questions cannot be answered from the provided clauses; for these, HokieAI is asked to indicate that the answer is not provided rather than rely on outside knowledge or provide a supporting quote.
-
-The notebook compares each response with the ground-truth answer and checks supporting quotes where applicable. A quote found means the quoted text appears in the provided clauses exactly as given; a misquote means it does not.
+{CONTRACT_DESCRIPTION}
 """))
     cells.append(form(f"▶ Step {n}a · Ask HokieAI About the Contract", "lab.contract_questions()",
                       notes=["Run the cell and follow the instructions."],
@@ -447,7 +451,7 @@ In this homework, we will use generative AI (GPT/HokieAI) to answer questions fr
 
 In every HokieAI step, the notebook gives you a prompt; you send it to HokieAI ({CHAT_URL}), paste HokieAI's output back, and the notebook scores it against the ground truth (the correct output, known for every example).
 """), step0()]
-    part_contract_versions(cells, 1)
+    part_contract_versions(cells, 1, CONTRACT_DESCRIPTION)
     part_takeoff(cells, 2, labels)
     part_schedule(cells, 3, labels)
 
