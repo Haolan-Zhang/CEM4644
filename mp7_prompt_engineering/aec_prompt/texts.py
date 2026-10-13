@@ -112,11 +112,12 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "too_few_text": "Write at least 5 questions, one per line, as: question | expected answer.",
         "steps_text": ("1. Copy the prompt below.\n2. Open {url} (sign in with your VT account), start a new chat, attach your document "
                        "(or paste its text after the prompt), and paste the prompt.\n3. Copy HokieAI's output and paste it into the box below.\n"
-                       "4. Click *Score HokieAI output* to compare it with your expected answers."),
+                       "4. Click *Show HokieAI's answers* to list them next to your expected answers."),
         **BOX,
-        "result_text": "**{version}, {document}**\n**Correct answers:** {right} of {n}",
+        "button_text": "Show HokieAI's answers",
+        "result_text": "**{version}, {document}**",
         "table_text": "Your expected answers (the ground truth) vs. HokieAI's output:",
-        "columns_text": "Question | Ground truth | HokieAI's output | Correct",
+        "columns_text": "Question | Your expected answer | HokieAI's output",
     },
     "compare": {
         "title_text": "Share of correct outputs by prompt version",

@@ -190,7 +190,8 @@ class PromptLab:
     # ------------------------------------------------------------------ your own document
     def own_document(self, **texts):
         """The student names a document and writes questions with expected answers; the notebook makes the prompt,
-        HokieAI answers from the attached document, and the answers are scored against the student's expected answers."""
+        HokieAI answers from the attached document, and its answers are listed next to the expected answers (not scored:
+        the student judges each answer)."""
         import ipywidgets as w
         from IPython.display import display
         G = "own"
@@ -213,17 +214,15 @@ class PromptLab:
 
                 def on_score(reply, sent):
                     label = "given prompt" if sent.strip() == prompt.strip() else "edited prompt"
-                    r = score.own(reply, questions)
-                    self._record("own", name, label, r["right"], r["n"])
-                    say(texts, G, "result_text", version=label, document=name, right=r["right"], n=r["n"])
-                    say(texts, G, "table_text"); ui.table(self._named(r["table"], texts, G))
+                    say(texts, G, "result_text", version=label, document=name, n=len(questions))
+                    say(texts, G, "table_text"); ui.table(self._named(score.own(reply, questions), texts, G))
                 ui.hokieai_box([], prompt, on_score, texts, G)
         btn.on_click(_make)
         display(w.VBox([doc, qs, btn, out]))
 
     # ------------------------------------------------------------------ comparisons
     def compare(self, task: str, **texts):
-        """task: "incidents", "submittals", "contract", "takeoff" (foundation plans and roofs), "schedule" or "own"."""
+        """task: "incidents", "submittals", "contract", "takeoff" (foundation plans and roofs) or "schedule"."""
         self._need()
         tasks = {"takeoff": ("foundation", "roof")}.get(task, (task,))
         runs = pd.DataFrame(self.runs, columns=["task", "example", "version", "correct", "of"])

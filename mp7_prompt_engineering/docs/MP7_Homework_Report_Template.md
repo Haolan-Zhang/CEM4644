@@ -38,11 +38,11 @@ Before using a door count from HokieAI in an estimate, what would you check, and
 
 ## Question 4
 
-From Step 4a: Describe your document (type, length, and source) and your questions, and include the table for the given prompt.
+From Step 4a: Describe your document (type, length, and source) and include the tables for the given prompt and your edited prompt. For each prompt, how many of HokieAI's answers are correct, and did it reply NOT IN TEXT where the document does not give the answer?
 
-From Step 4b: Report the correct answers with the given prompt and with your edited prompt. What did you change in the prompt, and did it help?
+What did you change in the prompt, and did it help? Choose one wrong answer and explain from HokieAI's output why it happened.
 
-Choose one wrong answer and explain from HokieAI's output why it happened. Would you rely on HokieAI for this kind of document on a real project, and what would you check first?
+Would you rely on HokieAI for this kind of document on a real project, and what would you check first?
 
 *Your answer:*
 

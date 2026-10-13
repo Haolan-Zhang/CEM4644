@@ -459,19 +459,16 @@ Write at least five questions with short, checkable answers (a number, a date, a
 """))
     cells.append(form("▶ Step 4a · Ask HokieAI About Your Document", "lab.own_document()",
                       notes=["Write a short name for your document and your questions, one per line, as: question | expected answer. Click **Make prompt** and follow the instructions.",
-                             "An answer counts as correct if it contains every part of your expected answer, ignoring capitals, spaces, and commas; separate required parts with a semicolon "
-                             "(for example, March 3; 7:00 am). Write numbers as digits.",
+                             "The notebook lists HokieAI's answers next to your expected answers; you decide which answers are correct.",
                              "Then improve the prompt in the prompt box (for example, a role, a required answer format, or how to handle information the document does not give), "
-                             "send it in a new chat, and score it again: the output is recorded as *edited prompt*.",
+                             "send it in a new chat, and show the answers again: the output is labeled *edited prompt*.",
                              "Do not use confidential or personal documents: the document leaves your computer when you attach it to HokieAI."],
                       texts=T("own")))
-    cells.append(form("▶ Step 4b · Compare the Given and Edited Prompts", 'lab.compare("own")',
-                      notes=["Run the cell after Step 4a. Each bar is the share of your questions answered correctly, over all outputs of that prompt."],
-                      texts=T("compare")))
     cells.append(question(4,
-                          "From Step 4a: Describe your document (type, length, and source) and your questions, and include the table for the given prompt.",
-                          "From Step 4b: Report the correct answers with the given prompt and with your edited prompt. What did you change in the prompt, and did it help?",
-                          "Choose one wrong answer and explain from HokieAI's output why it happened. Would you rely on HokieAI for this kind of document on a real project, and what would you check first?"))
+                          "From Step 4a: Describe your document (type, length, and source) and include the tables for the given prompt and your edited prompt. "
+                          "For each prompt, how many of HokieAI's answers are correct, and did it reply NOT IN TEXT where the document does not give the answer?",
+                          "What did you change in the prompt, and did it help? Choose one wrong answer and explain from HokieAI's output why it happened.",
+                          "Would you rely on HokieAI for this kind of document on a real project, and what would you check first?"))
 
     cells.append(md("""
 ### Data and model sources

@@ -15,9 +15,9 @@
 - `MP7_Homework_Prompt_Engineering.ipynb`: Parts 1-3 are the contract, takeoff and door-schedule parts of the
   prompt-engineering notebook (every prompt version, with a comparison step each); Part 4
   is the student's own document (a text document or a drawing sheet): the student writes at least five questions with
-  expected answers, including one the document does not answer (NOT IN TEXT); the notebook makes the prompt, and an
-  answer counts as correct if it contains every part of the expected answer (parts separated by ";"; capitals, spaces,
-  commas and dollar signs ignored). The student then edits the prompt and compares the given and edited prompts (Step 4b).
+  expected answers, including one the document does not answer (NOT IN TEXT); the notebook makes the prompt and lists
+  HokieAI's answers next to the expected answers, without scoring them (rules cannot judge free-form answers on a
+  student's own document): the student counts the correct answers in the report, for the given prompt and an edited one.
 - `MP7_Workshop_Prompt_Engineering.ipynb` (the class on prompting): all five parts with prompt versions v1–v3 and the
   student's own, compared in a chart per part. Sections 1–4 below describe it.
 

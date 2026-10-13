@@ -202,21 +202,10 @@ def own_questions(text: str) -> List[dict]:
     return out
 
 
-def own(reply: str, questions: List[dict]) -> dict:
-    """Q1 | answer lines: correct if every part of the expected answer appears in the answer (case, spacing, commas and
-    dollar signs ignored), or, for NOT IN TEXT, if the answer says the document does not answer the question."""
+def own(reply: str, questions: List[dict]) -> pd.DataFrame:
+    """Q1 | answer lines, next to the student's expected answers; not scored (the student judges each answer)."""
     lines = {}
     for m in re.finditer(r"^\s*[*`]*\s*(Q\d+)\s*[*`]*\s*[|.:)]\s*(.+)$", reply, re.M | re.I):
         lines.setdefault(m.group(1).upper(), m.group(2).split("|")[0].strip())
-    squash = lambda t: re.sub(r"[\s,$]", "", _norm(t))
-    rows, right = [], 0
-    for q in questions:
-        ans = lines.get(q["id"], "")
-        if re.search(NOT_IN_TEXT, _norm(q["expected"])):
-            ok = bool(re.search(NONE_RX, _norm(ans)))
-        else:
-            parts = [squash(x) for x in q["expected"].split(";") if x.strip()]
-            ok = bool(ans) and bool(parts) and all(x in squash(ans) for x in parts)
-        right += ok
-        rows.append({"question": f"{q['id']}. {q['question']}", "ground truth": q["expected"], "HokieAI": ans[:150] or "—", "": "✓" if ok else "✗"})
-    return {"right": right, "n": len(questions), "table": pd.DataFrame(rows)}
+    return pd.DataFrame([{"question": f"{q['id']}. {q['question']}", "expected": q["expected"], "HokieAI": lines.get(q["id"], "") or "—"}
+                         for q in questions])
