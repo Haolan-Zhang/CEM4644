@@ -1,0 +1,71 @@
+[
+ {
+  "id": "P1",
+  "question": "What is the maximum water-cementitious ratio (w/cm) for the foundation walls on this project?",
+  "kind": "number",
+  "value": 0.48,
+  "tolerance": 0.001,
+  "unit": "",
+  "tools": [
+   "search_spec"
+  ]
+ },
+ {
+  "id": "P2",
+  "question": "A continuous footing is 187 ft long, 2 ft 7 in wide, and 1 ft 2 in deep. How many cubic yards of concrete are needed, including 7 % waste?",
+  "kind": "number",
+  "value": 22.34,
+  "tolerance": 0.01,
+  "unit": "CY",
+  "tools": [
+   "calculator"
+  ]
+ },
+ {
+  "id": "P3",
+  "question": "What is the review status of submittal 03 30 00-03?",
+  "kind": "text",
+  "value": "Revise and resubmit",
+  "accept": [
+   "revise\\s*(and|&)\\s*resubmit"
+  ],
+  "tools": [
+   "lookup_log"
+  ]
+ },
+ {
+  "id": "P4",
+  "question": "How many working days are scheduled to place the slab-on-ground: the activity's quantity divided by its daily output, rounded up to a whole day?",
+  "kind": "number",
+  "value": 5,
+  "tolerance": 0.001,
+  "unit": "days",
+  "tools": [
+   "lookup_log",
+   "calculator"
+  ]
+ },
+ {
+  "id": "P5",
+  "question": "Does the mix in submittal 03 30 00-02 meet this project's maximum w/cm for its element? Answer YES or NO.",
+  "kind": "yesno",
+  "value": "NO",
+  "note": "w/cm = 290 / (560 + 100) = 0.44 > 0.42",
+  "tools": [
+   "lookup_log",
+   "calculator",
+   "search_spec"
+  ]
+ },
+ {
+  "id": "P6",
+  "question": "Does the target slump of the mix in submittal 03 30 00-05 meet this project's maximum slump for its element? Answer YES or NO.",
+  "kind": "yesno",
+  "value": "NO",
+  "note": "target slump 7 in > 6 in (columns)",
+  "tools": [
+   "lookup_log",
+   "search_spec"
+  ]
+ }
+]

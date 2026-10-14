@@ -1,0 +1,84 @@
+[
+ {
+  "id": "T1",
+  "shape": "rectangle",
+  "segments": [
+   48.0,
+   40.0,
+   48.0,
+   40.0
+  ],
+  "thickness": 6,
+  "height": 4,
+  "waste": 6,
+  "grout_waste": 5,
+  "spacing": 32,
+  "grout_per_cmu": 0.17,
+  "text": "The foundation is a rectangle with outside dimensions of 48 ft x 40 ft. It has a 6 in CMU foundation wall, 4 ft high, with no openings. Use 8 in x 16 in (nominal) CMUs.\nQ1. How many CMUs must be purchased, including 6 % waste?\nQ2. If every cell is grouted, how many cubic yards of grout are needed, including 5 % waste? A fully grouted 6 in CMU takes 0.17 ft³ of grout.\nQ3. If only the cells with vertical reinforcement at 32 in on center are grouted, how many cubic yards of grout are needed, including 5 % waste?",
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 840,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 5.236,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 32 in O.C.",
+    "value": 1.309,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ },
+ {
+  "id": "T2",
+  "shape": "L",
+  "segments": [
+   30.0,
+   20.0,
+   14.0,
+   16.0,
+   16.0,
+   36.0
+  ],
+  "thickness": 6,
+  "height": 8,
+  "waste": 3,
+  "grout_waste": 10,
+  "spacing": 32,
+  "grout_per_cmu": 0.17,
+  "text": "The foundation is L-shaped; going around the outside face of the wall, its sides are 30 ft, 20 ft, 14 ft, 16 ft, 16 ft, 36 ft. It has a 6 in CMU foundation wall, 8 ft high, with no openings. Use 8 in x 16 in (nominal) CMUs.\nQ1. How many CMUs must be purchased, including 3 % waste?\nQ2. If every cell is grouted, how many cubic yards of grout are needed, including 10 % waste? A fully grouted 6 in CMU takes 0.17 ft³ of grout.\nQ3. If only the cells with vertical reinforcement at 32 in on center are grouted, how many cubic yards of grout are needed, including 10 % waste?",
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 1224,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 8.228,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 32 in O.C.",
+    "value": 2.057,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ }
+]

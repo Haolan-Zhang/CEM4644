@@ -1,0 +1,236 @@
+[
+ {
+  "id": "foundation_1",
+  "label": "Foundation plan 1",
+  "image": "foundation_1.png",
+  "shape": "L",
+  "hidden_segment": -1,
+  "segments": [
+   44.0,
+   26.0,
+   24.0,
+   8.0,
+   20.0,
+   34.0
+  ],
+  "wall_length_ft": 156.0,
+  "thickness": 6,
+  "height": 10,
+  "waste": 5,
+  "grout_waste": 10,
+  "spacing": 32,
+  "grout_per_cmu": 0.17,
+  "text": "The attached foundation plan shows a 6 in CMU foundation wall, 10 ft high, with no openings. Use 8 in x 16 in (nominal) CMUs.\nQ1. How many CMUs must be purchased, including 5 % waste?\nQ2. If every cell is grouted, how many cubic yards of grout are needed, including 10 % waste? A fully grouted 6 in CMU takes 0.17 ft³ of grout.\nQ3. If only the cells with vertical reinforcement at 32 in on center are grouted, how many cubic yards of grout are needed, including 10 % waste?",
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 1843,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 12.155,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 32 in O.C.",
+    "value": 3.039,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ },
+ {
+  "id": "foundation_2",
+  "label": "Foundation plan 2",
+  "image": "foundation_2.png",
+  "shape": "rectangle",
+  "hidden_segment": 0,
+  "segments": [
+   48.0,
+   26.0,
+   48.0,
+   26.0
+  ],
+  "wall_length_ft": 148.0,
+  "thickness": 6,
+  "height": 8,
+  "waste": 6,
+  "grout_waste": 10,
+  "spacing": 24,
+  "grout_per_cmu": 0.17,
+  "text": "The attached foundation plan shows a 6 in CMU foundation wall, 8 ft high, with no openings. Use 8 in x 16 in (nominal) CMUs.\nQ1. How many CMUs must be purchased, including 6 % waste?\nQ2. If every cell is grouted, how many cubic yards of grout are needed, including 10 % waste? A fully grouted 6 in CMU takes 0.17 ft³ of grout.\nQ3. If only the cells with vertical reinforcement at 24 in on center are grouted, how many cubic yards of grout are needed, including 10 % waste?",
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 1412,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 9.225,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 24 in O.C.",
+    "value": 3.075,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ },
+ {
+  "id": "foundation_3",
+  "label": "Foundation plan 3",
+  "image": "foundation_3.png",
+  "shape": "notch",
+  "hidden_segment": -1,
+  "segments": [
+   16.0,
+   6.0,
+   10.0,
+   6.0,
+   6.0,
+   28.0,
+   32.0,
+   28.0
+  ],
+  "wall_length_ft": 132.0,
+  "thickness": 6,
+  "height": 4,
+  "waste": 5,
+  "grout_waste": 7,
+  "spacing": 24,
+  "grout_per_cmu": 0.17,
+  "text": "The attached foundation plan shows a 6 in CMU foundation wall, 4 ft high, with no openings. Use 8 in x 16 in (nominal) CMUs.\nQ1. How many CMUs must be purchased, including 5 % waste?\nQ2. If every cell is grouted, how many cubic yards of grout are needed, including 7 % waste? A fully grouted 6 in CMU takes 0.17 ft³ of grout.\nQ3. If only the cells with vertical reinforcement at 24 in on center are grouted, how many cubic yards of grout are needed, including 7 % waste?",
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 624,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 4.002,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 24 in O.C.",
+    "value": 1.334,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ },
+ {
+  "id": "foundation_4",
+  "label": "Foundation plan 4",
+  "image": "foundation_4.png",
+  "shape": "bump",
+  "hidden_segment": 3,
+  "segments": [
+   40.0,
+   4.0,
+   8.0,
+   24.0,
+   8.0,
+   6.0,
+   40.0,
+   34.0
+  ],
+  "wall_length_ft": 164.0,
+  "thickness": 8,
+  "height": 4,
+  "waste": 6,
+  "grout_waste": 7,
+  "spacing": 16,
+  "grout_per_cmu": 0.26,
+  "text": "The attached foundation plan shows a 8 in CMU foundation wall, 4 ft high, with no openings. Use 8 in x 16 in (nominal) CMUs.\nQ1. How many CMUs must be purchased, including 6 % waste?\nQ2. If every cell is grouted, how many cubic yards of grout are needed, including 7 % waste? A fully grouted 8 in CMU takes 0.26 ft³ of grout.\nQ3. If only the cells with vertical reinforcement at 16 in on center are grouted, how many cubic yards of grout are needed, including 7 % waste?",
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 783,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 7.604,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 16 in O.C.",
+    "value": 3.802,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ },
+ {
+  "id": "foundation_5",
+  "label": "Foundation plan 5",
+  "image": "foundation_5.png",
+  "shape": "bump",
+  "hidden_segment": -1,
+  "segments": [
+   46.0,
+   12.0,
+   14.0,
+   16.0,
+   14.0,
+   2.0,
+   46.0,
+   30.0
+  ],
+  "wall_length_ft": 180.0,
+  "thickness": 8,
+  "height": 4,
+  "waste": 6,
+  "grout_waste": 7,
+  "spacing": 16,
+  "grout_per_cmu": 0.26,
+  "text": "The attached foundation plan shows a 8 in CMU foundation wall, 4 ft high, with no openings. Use 8 in x 16 in (nominal) CMUs.\nQ1. How many CMUs must be purchased, including 6 % waste?\nQ2. If every cell is grouted, how many cubic yards of grout are needed, including 7 % waste? A fully grouted 8 in CMU takes 0.26 ft³ of grout.\nQ3. If only the cells with vertical reinforcement at 16 in on center are grouted, how many cubic yards of grout are needed, including 7 % waste?",
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 859,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 8.346,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 16 in O.C.",
+    "value": 4.173,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ }
+]
