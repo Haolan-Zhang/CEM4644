@@ -98,27 +98,6 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "table_text": "Ground truth vs. HokieAI's output:",
         "columns_text": "Question | Ground truth | HokieAI's output | Correct | Quote found in the clauses",
     },
-    "own": {
-        "prompt_text": ("Answer the questions about the attached document ({document}), using only the document; do not use outside knowledge.\n"
-                        "If the document does not answer a question, reply NOT IN TEXT.\n"
-                        "Reply with one line per question and nothing else: Q1 | answer\n\nQuestions:\n{questions}"),
-        "document_label_text": "document",
-        "document_placeholder_text": "a short name for your document, for example: Daily report, March 3",
-        "questions_label_text": "questions",
-        "questions_placeholder_text": ("One question per line: question | expected answer\n"
-                                       "What is the specified concrete strength? | 4,000 psi\n"
-                                       "Who is the inspector on site? | NOT IN TEXT"),
-        "make_text": "Make prompt",
-        "too_few_text": "Write at least 5 questions, one per line, as: question | expected answer.",
-        "steps_text": ("1. Copy the prompt below.\n2. Open {url} (sign in with your VT account), start a new chat, attach your document "
-                       "(or paste its text after the prompt), and paste the prompt.\n3. Copy HokieAI's output with the **copy button** below its reply, and paste it into the box below.\n"
-                       "4. Click *Show HokieAI's answers* to list them next to your expected answers."),
-        **BOX,
-        "button_text": "Show HokieAI's answers",
-        "result_text": "**{version}, {document}**",
-        "table_text": "Your expected answers (the ground truth) vs. HokieAI's output:",
-        "columns_text": "Question | Your expected answer | HokieAI's output",
-    },
     "compare": {
         "title_text": "Share of correct outputs by prompt version",
         "table_text": "All scored outputs so far:",

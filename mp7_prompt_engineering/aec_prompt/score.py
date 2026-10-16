@@ -189,23 +189,3 @@ def contract(reply: str, questions: List[dict], clauses: str) -> dict:
 
 
 # ---------------------------------------------------------------------------- your own document
-def own_questions(text: str) -> List[dict]:
-    """The student's questions, one per line: question | expected answer (the expected answer may list several
-    required parts separated by ';'; NOT IN TEXT for a question the document does not answer)."""
-    out = []
-    for line in text.splitlines():
-        if "|" not in line or not line.strip():
-            continue
-        q, exp = [x.strip() for x in line.split("|", 1)]
-        if q and exp:
-            out.append({"id": f"Q{len(out) + 1}", "question": q, "expected": exp})
-    return out
-
-
-def own(reply: str, questions: List[dict]) -> pd.DataFrame:
-    """Q1 | answer lines, next to the student's expected answers; not scored (the student judges each answer)."""
-    lines = {}
-    for m in re.finditer(r"^\s*[*`]*\s*(Q\d+)\s*[*`]*\s*[|.:)]\s*(.+)$", reply, re.M | re.I):
-        lines.setdefault(m.group(1).upper(), m.group(2).split("|")[0].strip())
-    return pd.DataFrame([{"question": f"{q['id']}. {q['question']}", "expected": q["expected"], "HokieAI": lines.get(q["id"], "") or "—"}
-                         for q in questions])

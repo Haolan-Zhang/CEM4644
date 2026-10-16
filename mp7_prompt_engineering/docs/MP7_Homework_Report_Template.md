@@ -38,9 +38,19 @@ Before using a door count from HokieAI in an estimate, what would you check, and
 
 ## Question 4
 
-From Step 4a: Describe your document (type, length, and source) and include the tables for the given prompt and your edited prompt. For each prompt, how many of HokieAI's answers are correct, and did it reply NOT IN TEXT where the document does not give the answer?
+Describe your document (type, length, and source) and include the prompt you sent to HokieAI.
 
-What did you change in the prompt, and did it help? Choose one wrong answer and explain from HokieAI's output why it happened.
+Fill in the table, one row per question (at least five, and at least one the document does not answer):
+
+| # | Your question | HokieAI's answer | Correct answer (from the document) | Correct? |
+|---|---|---|---|---|
+| 1 | | | | |
+| 2 | | | | |
+| 3 | | | | |
+| 4 | | | | |
+| 5 | | | | |
+
+If you changed the prompt (for example, a role, an answer format, or how to handle information the document does not give), what changed in HokieAI's answers? Choose one wrong answer and explain why it happened.
 
 Would you rely on HokieAI for this kind of document on a real project, and what would you check first?
 

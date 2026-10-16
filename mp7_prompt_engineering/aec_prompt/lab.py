@@ -187,39 +187,6 @@ class PromptLab:
             say(texts, G, "table_text"); ui.table(self._named(r["table"], texts, G))
         ui.hokieai_box(files, prompt, on_score, texts, G)
 
-    # ------------------------------------------------------------------ your own document
-    def own_document(self, **texts):
-        """The student names a document and writes questions with expected answers; the notebook makes the prompt,
-        HokieAI answers from the attached document, and its answers are listed next to the expected answers (not scored:
-        the student judges each answer)."""
-        import ipywidgets as w
-        from IPython.display import display
-        G = "own"
-        doc = w.Text(placeholder=text(texts, G, "document_placeholder_text"), description=text(texts, G, "document_label_text"),
-                     layout=w.Layout(width="100%"), style={"description_width": "80px"})
-        qs = w.Textarea(placeholder=text(texts, G, "questions_placeholder_text"), description=text(texts, G, "questions_label_text"),
-                        layout=w.Layout(width="100%", height="180px"), style={"description_width": "80px"})
-        btn = w.Button(description=text(texts, G, "make_text"), button_style="primary", layout=w.Layout(width="auto"))
-        out = w.Output()
-
-        def _make(_):
-            with out:
-                out.clear_output()
-                questions = score.own_questions(qs.value)
-                if len(questions) < 5:
-                    say(texts, G, "too_few_text"); return
-                name = doc.value.strip() or "my document"
-                prompt = fill_prompt(text(texts, G, "prompt_text"), document=name,
-                                     questions="\n".join(f"{q['id']}. {q['question']}" for q in questions))
-
-                def on_score(reply, sent):
-                    label = "given prompt" if sent.strip() == prompt.strip() else "edited prompt"
-                    say(texts, G, "result_text", version=label, document=name, n=len(questions))
-                    say(texts, G, "table_text"); ui.table(self._named(score.own(reply, questions), texts, G))
-                ui.hokieai_box([], prompt, on_score, texts, G)
-        btn.on_click(_make)
-        display(w.VBox([doc, qs, btn, out]))
-
     # ------------------------------------------------------------------ comparisons
     def compare(self, task: str, **texts):
         """task: "incidents", "submittals", "contract", "takeoff" (foundation plans and roofs) or "schedule"."""

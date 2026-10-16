@@ -179,6 +179,24 @@ Before a material is used, its submittal (here, a concrete mix design or a morta
     write(cells, FILE, "MP7_Workshop_Report_Template.md", "In-Class Activity: Prompt Engineering")
 
 
+OWN_PART = """
+## Part 4 · Analyzing Your Own Document
+In this part, you will test HokieAI on a construction document of your own choice: a text document of 1–10 pages or a drawing sheet (for example, a specification section, a daily report, a site safety plan, meeting minutes, an RFI, or a submittal from an internship or a public project). Use HokieAI as you like: attach the document, ask at least five questions with short, checkable answers (a number, a date, a name, a material), including at least one the document does not answer, and check every answer against the document.
+
+An example prompt to start from:
+```
+Answer the questions about the attached document, using only the document; do not use outside knowledge.
+If the document does not answer a question, reply NOT IN TEXT.
+
+Questions:
+1. What is the specified compressive strength of the concrete?
+2. Who is the special inspector for the project?
+3. ...
+```
+Do not use confidential or personal documents: the document leaves your computer when you attach it to HokieAI.
+"""
+
+
 PE_CONTRACT_DESCRIPTION = """Twenty-nine construction clauses of the Federal Acquisition Regulation (FAR), the standard terms of U.S. federal construction contracts, and 27 questions about them. Ten questions describe a project situation (a late notice, a withheld payment, a warranty claim), so the answer needs the requirement and its application to the facts. Seven cannot be answered from the text, although most have a common answer outside it. The ground truth is the answer the clauses give; quotes are checked word for word against the clauses."""
 CONTRACT_DESCRIPTION = """In this part, you will use HokieAI to answer 27 questions based on 29 construction clauses from the Federal Acquisition Regulation (FAR) used in U.S. federal construction contracts. Some questions ask directly about contract requirements, while others describe a project situation (such as a late notice, withheld payment, or warranty claim) and require applying the relevant clause to the facts.
 
@@ -283,7 +301,7 @@ def write(cells, file, report, title):
     for c in cells:
         if c.cell_type == "markdown" and c.source.startswith("### 📝 Report question "):
             head, _, body = c.source.partition("\n")
-            paras = [p.strip()[2:] for p in body.split("\n\n") if p.strip()]
+            paras = ["\n".join(l[2:] if l.startswith("> ") else l.lstrip(">") for l in p.strip().split("\n")) for p in body.split("\n\n") if p.strip()]
             lines += [f"## Question {head.rsplit(' ', 1)[1]}", ""] + sum(([p, ""] for p in paras), []) + ["*Your answer:*", "", "", ""]
     (REPO / "docs").mkdir(exist_ok=True)
     (REPO / "docs" / report).write_text("\n".join(lines)); print("wrote", REPO / "docs" / report)
@@ -455,23 +473,20 @@ In every HokieAI step, the notebook gives you a prompt; you send it to HokieAI (
     part_takeoff(cells, 2, labels)
     part_schedule(cells, 3, labels)
 
-    cells.append(md("""
-## Part 4 · Analyzing Your Own Document
-In this part, you will test HokieAI on a construction document of your own choice: a text document of 1–10 pages or a drawing sheet (for example, a specification section, a daily report, a site safety plan, meeting minutes, an RFI, or a submittal from an internship or a public project). You write the questions and the answers you find in the document yourself; your expected answers are the ground truth.
-
-Write at least five questions with short, checkable answers (a number, a date, a name, a material), and include at least one question the document does not answer (expected answer: NOT IN TEXT).
-"""))
-    cells.append(form("▶ Step 4a · Ask HokieAI About Your Document", "lab.own_document()",
-                      notes=["Write a short name for your document and your questions, one per line, as: question | expected answer. Click **Make prompt** and follow the instructions.",
-                             "The notebook lists HokieAI's answers next to your expected answers; you decide which answers are correct.",
-                             "Then improve the prompt in the prompt box (for example, a role, a required answer format, or how to handle information the document does not give), "
-                             "send it in a new chat, and show the answers again: the output is labeled *edited prompt*.",
-                             "Do not use confidential or personal documents: the document leaves your computer when you attach it to HokieAI."],
-                      texts=T("own")))
+    cells.append(md(OWN_PART))
     cells.append(question(4,
-                          "From Step 4a: Describe your document (type, length, and source) and include the tables for the given prompt and your edited prompt. "
-                          "For each prompt, how many of HokieAI's answers are correct, and did it reply NOT IN TEXT where the document does not give the answer?",
-                          "What did you change in the prompt, and did it help? Choose one wrong answer and explain from HokieAI's output why it happened.",
+                          "Describe your document (type, length, and source) and include the prompt you sent to HokieAI.",
+                          "Fill in the table, one row per question (at least five, and at least one the document does not answer):\n"
+                          "> \n"
+                          "> | # | Your question | HokieAI's answer | Correct answer (from the document) | Correct? |\n"
+                          "> |---|---|---|---|---|\n"
+                          "> | 1 | | | | |\n"
+                          "> | 2 | | | | |\n"
+                          "> | 3 | | | | |\n"
+                          "> | 4 | | | | |\n"
+                          "> | 5 | | | | |",
+                          "If you changed the prompt (for example, a role, an answer format, or how to handle information the document does not give), what changed in HokieAI's answers? "
+                          "Choose one wrong answer and explain why it happened.",
                           "Would you rely on HokieAI for this kind of document on a real project, and what would you check first?"))
 
     cells.append(md("""
