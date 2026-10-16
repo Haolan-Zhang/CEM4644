@@ -189,6 +189,8 @@ class AgentLab:
             tools["load_skill"] = {"description": text(texts, G, "load_skill_text"), "parameters": PARAMETERS["load_skill"]}
             system += "\n\n" + fill_prompt(text(texts, G, "skills_list_text"), name=name, description=desc)
             skills = {name: body}
+        if use_skill:                                       # the skill itself, so it is seen without opening the code
+            say(texts, G, "card_text", name=name, description=desc); ui.show_text(body)
         rows, loaded, calls, model_calls, prog = [], [], 0, 0, ui.Progress()
         try:
             for i, q in enumerate(self._skill_questions()):

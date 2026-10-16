@@ -44,7 +44,9 @@ aec_agent/       the hidden code: texts (every default prompt, tool description,
                  score (reading and scoring outputs), ui (tables, traces, the HokieAI box), lab (the steps)
 data/            project/ (spec_03_30_00.txt, submittal_log.csv, schedule.csv, questions.json, takeoff_questions.json);
                  drawings/ (5 foundation plans + problems.json); cache/ (stored Gemini outputs)
-build/           generate_project.py (the project and the drawings), precompute.py (fills the cache), make_notebooks.py
+figures/         the three concept diagrams of the markdown cells (workflow, agent loop, prompt vs. skill)
+build/           generate_project.py (the project and the drawings), make_figures.py (the diagrams), precompute.py (fills
+                 the cache), make_notebooks.py
 docs/            report template, instructor guide
 ```
 
@@ -58,6 +60,7 @@ rerun `precompute.py` after changing a default.
 
 ```
 python build/generate_project.py                       # the project files, the questions and the drawings
+python build/make_figures.py                           # the diagrams (shown in the notebook from GitHub)
 GEMINI_API_KEY=... python build/precompute.py          # the stored outputs of every default setting
 python build/make_notebooks.py                         # the notebook and the report template
 ```

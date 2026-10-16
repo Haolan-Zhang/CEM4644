@@ -20,6 +20,7 @@ from aec_agent.lab import DOCUMENTS  # noqa: E402
 from aec_agent.texts import CHAT_URL, MODEL, TEXTS  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
+FIG = "https://raw.githubusercontent.com/Haolan-Zhang/CEM4644/master/mp8_agents/figures"   # the diagrams (build/make_figures.py)
 FILE = "MP8_Workshop_AI_Agents.ipynb"
 KEEP_TEXT = True
 EXISTING, EXISTING_TEXTS = {}, {}
@@ -101,8 +102,8 @@ from aec_agent import lab
 model = "{MODEL}"
 lab.setup(api_key=api_key, model=model)"""
     return form("▶ Step 0 · Run me first (1 minute)", body,
-                notes=["Click ▶ and wait for the ✅ line. Paste your Gemini API key from MP5 into *api_key*, or leave it empty to use the Colab secret GEMINI_API_KEY.",
-                       "The default settings of every step run without a key (their outputs are stored); a key is needed only when you edit a prompt, a tool description, or the skill."],
+                notes=["Click ▶ and wait for the ✅ line. Paste your Gemini API key from MP5 into *api_key* (or leave it empty to use the Colab secret GEMINI_API_KEY).",
+                       "Without a key, every step runs with its default settings (stored outputs); editing a prompt, a tool description, or the skill needs the key."],
                 params=['api_key = "" #@param {type:"string"}'])
 
 
@@ -111,25 +112,25 @@ def build():
     drawings = json.loads((REPO / "data" / "drawings" / "problems.json").read_text())
     questions = json.loads((REPO / "data" / "project" / "questions.json").read_text())
     cells = [md("""
-# In-Class Activity: AI Workflows and AI Agents for a Construction Project
-In this activity, we will use AI to take off quantities from foundation plans and to answer questions about a construction project from its specification, submittal log, and schedule, first as a fixed workflow, then as an AI agent that chooses its own tools, and finally with a skill and a HokieAI agent of your own.
+# In-Class Activity: AI Workflows and AI Agents
+In this activity, we will use AI to take off quantities from foundation plans and answer questions about a construction project: first as a fixed workflow, then as an AI agent with tools and a skill.
 """), step0()]
 
     # ------------------------------------------------------------------ Part 1: workflows
     cells.append(md("""
 ## Part 1 · AI Workflows: Fixed Steps
-In this part, we will explore an AI workflow: a task split into fixed steps, some done by an AI model and some by code. The task is a takeoff from five foundation plans (CMUs and grout), done once with one prompt and once as a workflow; both are scored against the ground truth.
-"""))
+A workflow splits a task into fixed steps, each done by an AI model or by code. We compare one prompt with a two-step workflow on a takeoff from five foundation plans.
+
+![One prompt vs. a workflow]({FIG}/workflow.png)
+""".replace("{FIG}", FIG)))
     cells.append(form("▶ Step 1a · Look at the Drawings", "lab.show_drawing(drawing)",
-                      notes=["Choose a drawing and run the cell to see it with its three takeoff questions. Some plans leave one side undimensioned: its length follows from the other dimensions."],
+                      notes=["Choose a drawing to see it with its three questions. Some plans leave one side undimensioned."],
                       params=[choice("drawing", drawings[0]["label"], [p["label"] for p in drawings])]))
     cells.append(form("▶ Step 1b · One Prompt: The AI Model Does Everything", "lab.one_prompt()",
-                      notes=["Run the cell to send each drawing with its questions to the AI model (Gemini) in one prompt: the model reads the dimensions and computes every quantity."],
+                      notes=["Run the cell: the AI model (Gemini) reads each drawing and computes every quantity in one reply."],
                       texts=T("one_prompt")))
     cells.append(form("▶ Step 1c · Workflow: The AI Model Reads, Code Computes", "lab.workflow()",
-                      notes=["Run the cell to do the same takeoff as a workflow of two fixed steps:",
-                             "Step 1 (AI model): read the length of every side of the wall from the drawing (the prompt below).",
-                             "Step 2 (code): add the sides and apply the estimating conventions (for example, grouting at 32 in on center fills 8/32 of the cells)."],
+                      notes=["Run the cell: step 1, the AI model reads the length of every side; step 2, code adds them and applies the estimating conventions."],
                       texts=T("workflow")))
     cells.append(form("▶ Step 1d · Compare One Prompt and the Workflow", "lab.compare_workflow()",
                       notes=["Run the cell after Steps 1b and 1c."], texts=T("compare_workflow")))
@@ -140,25 +141,25 @@ In this part, we will explore an AI workflow: a task split into fixed steps, som
 
     # ------------------------------------------------------------------ Part 2: agents and tools
     cells.append(md(f"""
-## Part 2 · AI Agents: Choose the Tools
-In this part, we will explore an AI agent: an AI model that decides by itself which tool to call, with which inputs, and when it has enough information to answer. You choose which tools the agent may use, and every run answers the same six questions about the CEM4644 practice project (fictional): its specification, submittal log, and schedule are available only through the tools.
+## Part 2 · AI Agents: Tool Calling
+An AI agent decides by itself which tool to call and when it has enough to answer. You choose its tools; it answers six questions about a practice project whose documents it can reach only through the tools.
 
-- **search_spec**: searches the specification (Section 03 30 00).
-- **calculator**: evaluates an arithmetic expression exactly.
-- **lookup_log**: reads rows of the submittal log or the schedule.
-"""))
+![How an AI agent calls a tool]({FIG}/agent.png)
+
+- **search_spec**: searches the specification.
+- **calculator**: exact arithmetic.
+- **lookup_log**: reads the submittal log or the schedule.
+""".replace("{FIG}", FIG)))
     cells.append(form("▶ Step 2a · Look at the Project Documents", "lab.show_document(document)",
-                      notes=["Choose a document and run the cell to see what the tools read."],
+                      notes=["Choose a document to see what the tools read."],
                       params=[choice("document", list(DOCUMENTS)[0], DOCUMENTS)]))
     cells.append(form("▶ Step 2b · Run the Agent with the Tools You Choose", "lab.agent_tools(search_spec, calculator, lookup_log)",
-                      notes=["Tick the tools the agent may use and run the cell; every run is added to the table of runs. Run at least: no tools, each tool alone, and all three.",
-                             "Tool calling: the AI model does not run a tool itself; it asks for one (the tool's name and inputs), the notebook runs it, and the tool's output goes back to the model.",
-                             "UNKNOWN: the agent answered that it could not find the value; a wrong answer means it guessed.",
-                             "The system prompt and the tool descriptions below are what the agent reads. If you edit one, the run needs your Gemini key (Step 0)."],
+                      notes=["Tick the tools and run the cell; each run is added to the table. Try no tools, each tool alone, and all three.",
+                             "UNKNOWN: the agent said it could not find the value. Wrong: it guessed."],
                       params=['search_spec = True #@param {type:"boolean"}', 'calculator = True #@param {type:"boolean"}', 'lookup_log = True #@param {type:"boolean"}'],
                       texts=T("tools")))
     cells.append(form("▶ Step 2c · Inspect the Tool Calls", "lab.show_trace(question)",
-                      notes=["Choose a question and run the cell to see, for every run of Step 2b, each tool the agent called, its inputs, and the tool's output."],
+                      notes=["Choose a question to see, for each run of Step 2b, the tools the agent called, with their inputs and outputs."],
                       params=[choice("question", f"{questions[4]['id']}. {questions[4]['question']}", [f"{q['id']}. {q['question']}" for q in questions])],
                       texts=T("trace")))
     cells.append(question(2,
@@ -168,17 +169,24 @@ In this part, we will explore an AI agent: an AI model that decides by itself wh
 
     # ------------------------------------------------------------------ Part 3: skills
     cells.append(md("""
-## Part 3 · Skills: Instructions the Agent Loads When Needed
-In this part, we will explore skills: written instructions, with a name and a description, that an agent loads only when a task needs them. The agent sees every skill's description; when the description matches the task, it loads the skill's full instructions (the body). The skill here holds the estimating conventions of Part 1, and the agent answers two takeoff questions (T1, T2) and one project question (P3).
-"""))
+## Part 3 · Skills
+A skill is a saved set of instructions with a name and a description. The agent sees only the descriptions and loads a skill's instructions when a task matches; a prompt is read every time.
+
+![A prompt vs. a skill]({FIG}/skills.png)
+
+| | Prompt | Skill |
+|---|---|---|
+| Written | in each message | once, saved with a name and a description |
+| Read by the model | every time | only when the task matches the description |
+| Example | the conventions pasted above every takeoff question | *cmu-foundation-takeoff*, loaded for CMU questions only |
+""".replace("{FIG}", FIG)))
     cells.append(form("▶ Step 3a · Run the Agent with and without the Skill", "lab.agent_skill(use_skill)",
-                      notes=["Run the cell once with *use_skill* ticked and once unticked, and compare the quantities correct and the questions the skill was loaded for.",
-                             "The agent has the calculator and the project logs; with *use_skill*, it also has the tool load_skill.",
-                             "Then make the description vague (for example, *Useful notes.*) and run again: does the agent still load the skill? If you edit the skill, the run needs your Gemini key (Step 0)."],
+                      notes=["Run the cell with *use_skill* ticked and unticked: the agent answers two takeoff questions (T1, T2) and one project question (P3).",
+                             "Then make the skill's description vague (for example, *Useful notes.*) and run again: is the skill still loaded?"],
                       params=['use_skill = True #@param {type:"boolean"}'],
                       texts=T("skills")))
     cells.append(form("▶ Step 3b · Create the Skill in HokieAI", "lab.hokieai_skill(skill)",
-                      notes=["Create the skill of Step 3a in HokieAI, then send the takeoff questions T1 and T2 once without and once with the skill, and score both outputs."],
+                      notes=["Create the same skill in HokieAI, then send the takeoff questions without and with it."],
                       params=[choice("skill", "with the skill", ["without the skill", "with the skill"])],
                       texts=T("hokieai_skill")))
     cells.append(question(3,
@@ -189,13 +197,13 @@ In this part, we will explore skills: written instructions, with a name and a de
     # ------------------------------------------------------------------ Part 4: your own HokieAI agent
     cells.append(md("""
 ## Part 4 · Your Own HokieAI Agent
-In this part, we will build an agent in HokieAI: instructions plus knowledge sources (the project files), asked the six questions of Part 2. Its output is scored against the ground truth and compared with the Gemini agent's runs.
+A HokieAI agent is instructions plus knowledge sources (files it can read). Build one with the project files and ask it the six questions of Part 2.
 """))
     cells.append(form("▶ Step 4a · Create Your HokieAI Agent", "lab.create_agent()",
-                      notes=["Run the cell and follow the steps. The instructions below are a starting point: edit them in the box before pasting."],
+                      notes=["Run the cell and follow the steps; edit the instructions in the box before pasting them."],
                       texts=T("hokieai_agent", keep=("create_steps_text", "instructions_text"))))
     cells.append(form("▶ Step 4b · Ask Your HokieAI Agent", "lab.hokieai_agent()",
-                      notes=["Run the cell after Step 4a and follow the instructions. If you change your agent's instructions, start a new chat and score its output again."],
+                      notes=["Run the cell after Step 4a and follow the steps."],
                       texts=T("hokieai_agent", drop=("create_steps_text", "instructions_text"))))
     cells.append(question(4,
                           "From Step 4b: Report your agent's correct, UNKNOWN, and wrong answers, next to the Gemini agent's run with all three tools, and include the table.",

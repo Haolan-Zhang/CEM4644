@@ -90,6 +90,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "lookup_log_text": TOOLS["lookup_log"],
         "load_skill_text": TOOLS["load_skill"],
         "skills_list_text": "Available skills (load one with load_skill when its description matches the task):\n- {name}: {description}",
+        "card_text": "**The skill** · **name:** {name}\n**description:** {description}\n**body:**",
         "skill_name_text": SKILL["name"],
         "skill_description_text": SKILL["description"],
         "skill_body_text": SKILL["body"],
