@@ -52,11 +52,59 @@ def call_text(step: dict) -> str:
     return f"{step['tool']}({args})"
 
 
-def trace(steps: List[dict], columns_text: str):
-    if not steps:
-        return
-    df = pd.DataFrame([{"step": i + 1, "call": call_text(s), "output": s["output"]} for i, s in enumerate(steps)])
-    table(named(df, columns_text))
+# ----------------------------------------------------------------------------- the agent's trace, drawn as cards
+CARD = {"question": ("#eef1f5", "#8d99ae"), "call": ("#dbe9f6", "#457b9d"), "output": ("#d8f0ec", "#2a9d8f"),
+        "correct": ("#d8f0ec", "#2a9d8f"), "wrong": ("#fde2e4", "#e63946"), "UNKNOWN": ("#f3f3f3", "#999999")}
+
+
+def readable(output: str) -> str:
+    """A tool's output as short lines: each table row as 'column: value' pairs, other lines as they are."""
+    lines = [l for l in output.split("\n") if l.strip()]
+    out, head = [], None
+    for l in lines:
+        cells = [c.strip() for c in l.split("|")]
+        if len(cells) > 2 and head is None and (cells[0].lower() in ("submittal", "activity", "element")):
+            head = cells; continue
+        if len(cells) > 2 and head and len(cells) == len(head):
+            out.append(" · ".join(f"{h}: {c}" for h, c in zip(head, cells) if c))
+        else:
+            out.append(l.strip())
+    return "\n".join(out)
+
+
+def _box(kind: str, label: str, body: str, title: str = "") -> str:
+    face, edge = CARD[kind]
+    return (f"<div title='{html.escape(title)}' style='background:{face}; border:2px solid {edge}; border-radius:8px; padding:5px 9px; "
+            f"max-width:260px; color:#111'><div style='font-size:11px; color:{edge}; font-weight:bold'>{html.escape(label)}</div>"
+            f"<div style='font-size:12.5px; white-space:pre-wrap; max-height:90px; overflow:auto'>{html.escape(body)}</div></div>")
+
+
+def _step(k: int, step: dict, labels: dict) -> str:
+    """One tool call and its output in one card: the call (blue) above the output (green)."""
+    (cf, ce), (of, oe) = CARD["call"], CARD["output"]
+    args = ", ".join(f"{a}={v!r}" for a, v in step["args"].items())
+    return (f"<div style='border:2px solid {ce}; border-radius:8px; overflow:hidden; width:250px; color:#111'>"
+            f"<div style='background:{cf}; padding:5px 9px'><div style='font-size:11px; color:{ce}; font-weight:bold'>{k} · {html.escape(labels['call'])}</div>"
+            f"<div style='font-family:monospace; font-size:12px; font-weight:bold'>{html.escape(step['tool'])}</div>"
+            f"<div style='font-family:monospace; font-size:11px; white-space:pre-wrap'>{html.escape(args)}</div></div>"
+            f"<div style='background:{of}; border-top:2px solid {oe}; padding:5px 9px'><div style='font-size:11px; color:{oe}; font-weight:bold'>"
+            f"{html.escape(labels['output'])}</div><div style='font-size:11.5px; white-space:pre-wrap; max-height:80px; overflow:auto'>"
+            f"{html.escape(readable(step['output']))}</div></div></div>")
+
+
+ARROW = "<div style='font-size:20px; color:#555; padding:0 2px; align-self:center'>→</div>"
+
+
+def trace_flow(question: str, runs: List[dict], labels: dict):
+    """The question once, then one row per run: each tool call with its output, and the answer coloured by its result."""
+    parts = [f"<div style='margin-bottom:12px'>{_box('question', labels['question'], question)}</div>"]
+    for r in runs:
+        cards = [_step(k, st, labels) for k, st in enumerate(r["steps"], 1)]
+        cards.append(_box(r["result"] if r["result"] in CARD else "UNKNOWN", f"{labels['answer']} · {r['result']}", r["answer"], title=r["full"]))
+        parts.append("<div style='display:flex; gap:10px; align-items:flex-start; margin-bottom:14px'>"
+                     f"<div style='width:150px; flex:none; color:#111; font-size:13px'>{md_html(r['title'])}</div>"
+                     "<div style='display:flex; flex-wrap:wrap; gap:4px; align-items:center'>" + ARROW.join(cards) + "</div></div>")
+    display(HTML("<div style='background:white; padding:6px'>" + "".join(parts) + "</div>"))
 
 
 class Progress:

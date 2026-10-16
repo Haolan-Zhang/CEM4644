@@ -79,9 +79,11 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "runs_columns_text": "Run | Tools | Correct | UNKNOWN | Wrong | Tool calls | Model calls",
     },
     "trace": {
-        "run_text": "**Run {run} · tools: {tools}** · result: **{result}**",
-        "columns_text": "Step | Tool call | Tool output",
-        "answer_text": "**Agent output:** {answer}",
+        "run_text": "**Run {run}**\ntools: {tools}",
+        "question_label_text": "question",
+        "call_label_text": "tool call",
+        "output_label_text": "tool output",
+        "answer_label_text": "answer",
         "empty_text": "No runs yet: run Step 2b first.",
     },
     "skills": {

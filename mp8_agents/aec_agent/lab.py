@@ -8,7 +8,7 @@ import pandas as pd
 
 from . import score, ui
 from .client import Gemini, NoKey, find_api_key
-from .texts import FINALS, MODEL, SKILL, fill_prompt, say, text
+from .texts import FINALS, MODEL, SKILL, fill, fill_prompt, say, text
 from .tools import PARAMETERS, Project, run_tool
 
 TOOL_NAMES = ["search_spec", "calculator", "lookup_log"]
@@ -162,11 +162,14 @@ class AgentLab:
         if not self.tool_runs:
             say(texts, G, "empty_text"); return
         qid = question.split(".")[0].strip()
+        q = next(x for x in self.questions if x["id"] == qid)
+        runs = []
         for run in self.tool_runs:
             r = next(x for x in run["results"] if x["q"]["id"] == qid)
-            say(texts, G, "run_text", run=run["run"], tools=run["tools"], result=r["result"])
-            ui.trace(r["run"]["steps"], text(texts, G, "columns_text"))
-            say(texts, G, "answer_text", answer=r["run"]["answer"].replace("\n", "  \n") or "—")
+            runs.append({"title": fill(text(texts, G, "run_text"), run=run["run"], tools=run["tools"], result=r["result"]),
+                         "steps": r["run"]["steps"], "answer": r["answer"], "full": r["run"]["answer"], "result": r["result"]})
+        labels = {k: text(texts, G, f"{k}_label_text") for k in ("question", "call", "output", "answer")}
+        ui.trace_flow(q["question"], runs, labels)
 
     def question_labels(self) -> List[str]:
         return [f"{q['id']}. {q['question']}" for q in self.questions]
