@@ -4,6 +4,7 @@
 
 workflow.png  one prompt vs. a workflow of fixed steps
 agent.png     how an AI agent calls a tool (the loop), with question P5 as the example
+codeexec.png  tool calling vs. code execution (the agent writes and runs its own code)
 skills.png    a prompt vs. a skill (name, description, body), and when the agent loads it
 """
 from pathlib import Path
@@ -123,5 +124,28 @@ def skills():
     save(fig, "skills.png")
 
 
+def codeexec():
+    fig, ax = canvas(11, 4.3)
+    ax.text(0.15, 3.25, "Tool\ncalling\n(Part 2)", fontsize=11, weight="bold", va="center", family=FONT)
+    box(ax, 1.6, 2.75, 3.0, 3.75, "Question")
+    box(ax, 3.4, 2.75, 5.4, 3.75, "AI model\npicks a tool", "model")
+    box(ax, 5.8, 2.75, 8.6, 3.75, "a tool someone wrote for it\ncalculator · lookup_log · search_spec", "code", size=9.5)
+    box(ax, 9.0, 2.75, 10.9, 3.75, "Answer")
+    for a_, b_ in ((3.02, 3.38), (5.42, 5.78), (8.62, 8.98)):
+        arrow(ax, (a_, 3.25), (b_, 3.25))
+
+    ax.text(0.15, 1.35, "Code\nexecution\n(Part 3)", fontsize=11, weight="bold", va="center", family=FONT)
+    box(ax, 1.6, 0.85, 3.0, 1.85, "Task")
+    box(ax, 3.4, 0.85, 5.4, 1.85, "AI model\nwrites code\n(Python, HTML)", "model")
+    box(ax, 5.8, 0.85, 7.6, 1.85, "runs it", "code")
+    box(ax, 8.0, 0.85, 10.9, 1.85, "something you can see and use:\na Gantt chart · a calculator page\n· a drawn outline", size=9.5)
+    for a_, b_ in ((3.02, 3.38), (5.42, 5.78), (7.62, 7.98)):
+        arrow(ax, (a_, 1.35), (b_, 1.35))
+    ax.text(6.25, 0.45, "No one wrote a tool for this task: the agent builds it. The code runs, but its numbers can still be wrong, so test it.",
+            ha="center", fontsize=9.5, style="italic", color="#444", family=FONT)
+    legend(ax, 1.6, 0.05, [("data", "data"), ("AI model", "model"), ("code", "code")])
+    save(fig, "codeexec.png")
+
+
 if __name__ == "__main__":
-    workflow(); agent(); skills()
+    workflow(); agent(); codeexec(); skills()

@@ -1,0 +1,122 @@
+[
+ {
+  "id": "C1",
+  "sides": [
+   48.0,
+   40.0,
+   48.0,
+   40.0
+  ],
+  "height": 4,
+  "thickness": 6,
+  "waste": 6,
+  "grout_per_cmu": 0.17,
+  "grout_waste": 5,
+  "spacing": 32,
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 840,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 5.236,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 32 in O.C.",
+    "value": 1.309,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ },
+ {
+  "id": "C2",
+  "sides": [
+   30.0,
+   20.0,
+   14.0,
+   16.0,
+   16.0,
+   36.0
+  ],
+  "height": 8,
+  "thickness": 6,
+  "waste": 3,
+  "grout_per_cmu": 0.17,
+  "grout_waste": 10,
+  "spacing": 32,
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 1224,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 8.228,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 32 in O.C.",
+    "value": 2.057,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ },
+ {
+  "id": "C3",
+  "sides": [
+   40.0,
+   4.0,
+   8.0,
+   24.0,
+   8.0,
+   6.0,
+   40.0,
+   34.0
+  ],
+  "height": 4,
+  "thickness": 8,
+  "waste": 6,
+  "grout_per_cmu": 0.26,
+  "grout_waste": 7,
+  "spacing": 16,
+  "key": [
+   {
+    "q": "Q1",
+    "quantity": "CMUs to purchase",
+    "value": 783,
+    "unit": "CMU",
+    "tolerance": 0.01
+   },
+   {
+    "q": "Q2",
+    "quantity": "grout, all cells",
+    "value": 7.604,
+    "unit": "CY",
+    "tolerance": 0.02
+   },
+   {
+    "q": "Q3",
+    "quantity": "grout, 16 in O.C.",
+    "value": 3.802,
+    "unit": "CY",
+    "tolerance": 0.02
+   }
+  ]
+ }
+]

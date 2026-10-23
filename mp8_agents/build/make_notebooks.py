@@ -167,9 +167,35 @@ An AI agent decides by itself which tool to call and when it has enough to answe
                           "From Step 2c: For question P5, describe the agent's steps with all three tools. Without the tools it needed, did the agent answer UNKNOWN or guess?",
                           "Which is more concerning on a real project, an agent that answers UNKNOWN or one that guesses, and how would you check an agent's answer?"))
 
-    # ------------------------------------------------------------------ Part 3: skills
+    # ------------------------------------------------------------------ Part 3: code execution
     cells.append(md("""
-## Part 3 · Skills
+## Part 3 · Code Execution: The Agent Builds Its Own Tool
+In Part 2 the agent chose from tools written for it. Here HokieAI writes and runs its own code (Python, or a web page), and the result is something you can see and use: a chart, a calculator, a drawing. Each result is checked against the ground truth, because code that runs can still give wrong numbers.
+
+![Tool calling vs. code execution]({FIG}/codeexec.png)
+""".replace("{FIG}", FIG)))
+    cells.append(form("▶ Step 3a · Look-Ahead Schedule: A Gantt Chart in Python", "lab.lookahead()",
+                      notes=["Run the cell and follow the steps: HokieAI computes each activity's duration and start day, draws a Gantt chart, and marks in red the concrete placements whose mix design is not approved.",
+                             "Look-ahead schedule: the near-term part of the project schedule that the field team plans from."],
+                      texts=T("lookahead")))
+    cells.append(form("▶ Step 3b · Build a Takeoff Calculator", "lab.calculator(version)",
+                      notes=["Run the cell and follow the steps: HokieAI builds a calculator web page (an artifact); you test it with the three cases and enter its outputs."],
+                      params=['version = "without the skill"'],
+                      texts=T("calculator")))
+    cells.append(form("▶ Step 3c · Check a Takeoff by Drawing It", "lab.outline(drawing)",
+                      notes=["Choose a drawing, run the cell, and follow the steps: HokieAI reads the sides and draws the outline with Python.",
+                             "The notebook redraws the outline from HokieAI's sides with the drawing's own corners: a misread side shows as an outline that does not close."],
+                      params=[choice("drawing", drawings[3]["label"], [p["label"] for p in drawings])],
+                      texts=T("outline")))
+    cells.append(question(3,
+                          "From Step 3a: Include HokieAI's Gantt chart and the score. Which activities did it mark red, and did any start or finish day differ from the ground truth? Open the code it wrote: which step went wrong, if any?",
+                          "From Step 3b: Include a screenshot of your calculator and the score on the three test cases. Which output was wrong, and which formula did the calculator use for it?",
+                          "From Step 3c: Include the outline HokieAI drew and the notebook's comparison. Did the outline close? How does drawing a result help you check it?",
+                          "When would you let an agent write and run code for a project task, and what would you check before using its output?"))
+
+    # ------------------------------------------------------------------ Part 4: skills
+    cells.append(md("""
+## Part 4 · Skills
 A skill is a saved set of instructions with a name and a description. The agent sees only the descriptions and loads a skill's instructions when a task matches; a prompt is read every time.
 
 ![A prompt vs. a skill]({FIG}/skills.png)
@@ -180,33 +206,37 @@ A skill is a saved set of instructions with a name and a description. The agent 
 | Read by the model | every time | only when the task matches the description |
 | Example | the conventions pasted above every takeoff question | *cmu-foundation-takeoff*, loaded for CMU questions only |
 """.replace("{FIG}", FIG)))
-    cells.append(form("▶ Step 3a · Run the Agent with and without the Skill", "lab.agent_skill(use_skill)",
+    cells.append(form("▶ Step 4a · Run the Agent with and without the Skill", "lab.agent_skill(use_skill)",
                       notes=["Run the cell with *use_skill* ticked and unticked: the agent answers two takeoff questions (T1, T2) and one project question (P3).",
                              "Then make the skill's description vague (for example, *Useful notes.*) and run again: is the skill still loaded?"],
                       params=['use_skill = True #@param {type:"boolean"}'],
                       texts=T("skills")))
-    cells.append(form("▶ Step 3b · Create the Skill in HokieAI", "lab.hokieai_skill(skill)",
+    cells.append(form("▶ Step 4b · Create the Skill in HokieAI", "lab.hokieai_skill(skill)",
                       notes=["Create the same skill in HokieAI, then send the takeoff questions without and with it."],
                       params=[choice("skill", "with the skill", ["without the skill", "with the skill"])],
                       texts=T("hokieai_skill")))
-    cells.append(question(3,
-                          "From Step 3a: Report the quantities correct with and without the skill, and the questions the skill was loaded for. Did the agent load the skill for P3? What happened with a vague description?",
-                          "From Step 3b: Report HokieAI's quantities correct without and with the skill.",
+    cells.append(form("▶ Step 4c · Rebuild the Calculator with the Skill", "lab.calculator(version)",
+                      notes=["Run the cell and follow the steps: the same calculator prompt as in Step 3b, this time with the skill turned on. The table compares both calculators."],
+                      params=['version = "with the skill"'],
+                      texts=T("calculator_skill")))
+    cells.append(question(4,
+                          "From Step 4a: Report the quantities correct with and without the skill, and the questions the skill was loaded for. Did the agent load the skill for P3? What happened with a vague description?",
+                          "From Steps 4b and 4c: Report HokieAI's quantities correct without and with the skill, and your two calculators' scores. Which outputs did the skill fix?",
                           "What estimating conventions or company rules from your own experience would you write as a skill, and what would its description say?"))
 
-    # ------------------------------------------------------------------ Part 4: your own HokieAI agent
+    # ------------------------------------------------------------------ Part 5: your own HokieAI agent
     cells.append(md("""
-## Part 4 · Your Own HokieAI Agent
+## Part 5 · Your Own HokieAI Agent
 A HokieAI agent is instructions plus knowledge sources (files it can read). Build one with the project files and ask it the six questions of Part 2.
 """))
-    cells.append(form("▶ Step 4a · Create Your HokieAI Agent", "lab.create_agent()",
+    cells.append(form("▶ Step 5a · Create Your HokieAI Agent", "lab.create_agent()",
                       notes=["Run the cell and follow the steps; edit the instructions in the box before pasting them."],
                       texts=T("hokieai_agent", keep=("create_steps_text", "instructions_text"))))
-    cells.append(form("▶ Step 4b · Ask Your HokieAI Agent", "lab.hokieai_agent()",
-                      notes=["Run the cell after Step 4a and follow the steps."],
+    cells.append(form("▶ Step 5b · Ask Your HokieAI Agent", "lab.hokieai_agent()",
+                      notes=["Run the cell after Step 5a and follow the steps."],
                       texts=T("hokieai_agent", drop=("create_steps_text", "instructions_text"))))
-    cells.append(question(4,
-                          "From Step 4b: Report your agent's correct, UNKNOWN, and wrong answers, next to the Gemini agent's run with all three tools, and include the table.",
+    cells.append(question(5,
+                          "From Step 5b: Report your agent's correct, UNKNOWN, and wrong answers, next to the Gemini agent's run with all three tools, and include the table.",
                           "Which instructions did you change, and what changed in the output? For one wrong answer, explain from the output which value or calculation went wrong.",
                           "What would you need to see before you let an agent answer project questions for your team?"))
 

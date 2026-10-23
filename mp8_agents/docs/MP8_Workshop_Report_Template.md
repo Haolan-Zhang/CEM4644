@@ -30,11 +30,13 @@ Which is more concerning on a real project, an agent that answers UNKNOWN or one
 
 ## Question 3
 
-From Step 3a: Report the quantities correct with and without the skill, and the questions the skill was loaded for. Did the agent load the skill for P3? What happened with a vague description?
+From Step 3a: Include HokieAI's Gantt chart and the score. Which activities did it mark red, and did any start or finish day differ from the ground truth? Open the code it wrote: which step went wrong, if any?
 
-From Step 3b: Report HokieAI's quantities correct without and with the skill.
+From Step 3b: Include a screenshot of your calculator and the score on the three test cases. Which output was wrong, and which formula did the calculator use for it?
 
-What estimating conventions or company rules from your own experience would you write as a skill, and what would its description say?
+From Step 3c: Include the outline HokieAI drew and the notebook's comparison. Did the outline close? How does drawing a result help you check it?
+
+When would you let an agent write and run code for a project task, and what would you check before using its output?
 
 *Your answer:*
 
@@ -42,7 +44,19 @@ What estimating conventions or company rules from your own experience would you 
 
 ## Question 4
 
-From Step 4b: Report your agent's correct, UNKNOWN, and wrong answers, next to the Gemini agent's run with all three tools, and include the table.
+From Step 4a: Report the quantities correct with and without the skill, and the questions the skill was loaded for. Did the agent load the skill for P3? What happened with a vague description?
+
+From Steps 4b and 4c: Report HokieAI's quantities correct without and with the skill, and your two calculators' scores. Which outputs did the skill fix?
+
+What estimating conventions or company rules from your own experience would you write as a skill, and what would its description say?
+
+*Your answer:*
+
+
+
+## Question 5
+
+From Step 5b: Report your agent's correct, UNKNOWN, and wrong answers, next to the Gemini agent's run with all three tools, and include the table.
 
 Which instructions did you change, and what changed in the output? For one wrong answer, explain from the output which value or calculation went wrong.
 

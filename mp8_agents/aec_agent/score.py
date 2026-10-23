@@ -109,3 +109,64 @@ def answers_by_id(text: str, ids: List[str]) -> Dict[str, str]:
         if m and m.group(1) in ids:
             out[m.group(1)] = m.group(2).strip().strip("|").strip()
     return out
+
+
+# ----------------------------------------------------------------------------- Part 3: code execution
+def lookahead(text: str, key: List[dict]) -> pd.DataFrame:
+    """'A-110 | 1 | 3 | NO' lines (tables, bold and extra words are fine) against the look-ahead ground truth."""
+    got = {}
+    for line in (text or "").split("\n"):
+        m = re.search(r"\b(A-\d{3})\b(.*)", line)
+        if not m:
+            continue
+        nums = re.findall(r"(?<![\d.])\d+(?![\d.])", m.group(2))
+        flag = re.search(r"\b(YES|NO|red|gray|grey)\b", m.group(2), re.I)
+        if len(nums) >= 2:
+            f = None if not flag else ("YES" if flag.group(1).lower() in ("yes", "red") else "NO")
+            got[m.group(1)] = (int(nums[0]), int(nums[1]), f)            # the last line per activity wins
+    rows = []
+    for k in key:
+        g = got.get(k["activity"])
+        ok = g is not None and g == (k["start"], k["finish"], k["flag"])
+        rows.append({"activity": f"{k['activity']} {k['description']}", "truth": f"{k['start']} – {k['finish']}, {k['flag']}",
+                     "output": "—" if g is None else f"{g[0]} – {g[1]}, {g[2] or '?'}", "correct": "✓" if ok else "✗"})
+    return pd.DataFrame(rows)
+
+
+def calculator(text: str, cases: List[dict]) -> pd.DataFrame:
+    """'C1 | 840 | 5.24 | 1.31' lines (CMUs, grout all cells, grout at the spacing) against each case's ground truth."""
+    got = {}
+    for line in (text or "").split("\n"):
+        m = re.search(r"\b(C\d)\b(.*)", line)
+        if m:
+            got[m.group(1)] = [float(v.replace(",", "")) for v in re.findall(NUM, m.group(2))]
+    rows = []
+    for c in cases:
+        vals = got.get(c["id"], [])
+        for i, k in enumerate(c["key"]):
+            v = vals[i] if i < len(vals) else None
+            ok = v is not None and abs(v - k["value"]) <= k["tolerance"] * abs(k["value"]) + 1e-9
+            rows.append({"case": c["id"], "quantity": k["quantity"].replace(f"{c['spacing']} in O.C.", "at the spacing"), "truth": f"{k['value']:g}",
+                         "output": "—" if v is None else f"{v:g}", "unit": k["unit"], "correct": "✓" if ok else "✗"})
+    return pd.DataFrame(rows)
+
+
+def outline(text: str, segments: List[float], corners: List[List[float]]):
+    """The sides of the SIDES line against the drawing, and the outline drawn from them with the drawing's turns:
+    returns (table, points of that outline, gap in ft between its end and its start)."""
+    import numpy as np
+    got = sides(text)
+    rows = []
+    for i, t in enumerate(segments):
+        v = got[i] if i < len(got) else None
+        rows.append({"side": i + 1, "truth": f"{t:g}", "output": "—" if v is None else f"{v:g}",
+                     "correct": "✓" if v is not None and abs(v - t) < 0.05 else "✗"})
+    for j in range(len(segments), len(got)):
+        rows.append({"side": j + 1, "truth": "—", "output": f"{got[j]:g}", "correct": "✗"})
+    P = np.array(corners, float)
+    dirs = [(P[(i + 1) % len(P)] - P[i]) / np.linalg.norm(P[(i + 1) % len(P)] - P[i]) for i in range(len(P))]
+    pts = [np.zeros(2)]
+    for i, v in enumerate(got[:len(dirs)]):
+        pts.append(pts[-1] + v * dirs[i])
+    gap = float(np.linalg.norm(pts[-1] - pts[0])) if len(got) >= len(dirs) else float("nan")
+    return pd.DataFrame(rows), np.array(pts), gap

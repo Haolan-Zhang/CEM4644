@@ -40,6 +40,30 @@ PASTE_STEPS = ("1. Copy the prompt below.\n2. Open {url} (sign in with your VT a
                "4. Click *Score HokieAI output* to compare it with the ground truth.")
 BOX = {"button_text": "Score HokieAI output", "reply_text": "Paste HokieAI's full output here.", "prompt_label_text": "prompt", "reply_label_text": "output"}
 
+HOKIE_RESULT_STEPS = ("3. Copy HokieAI's output with the **copy button** below its reply, and paste it into the box below.\n"
+                      "4. Click *Score HokieAI output* to compare it with the ground truth.")
+CALCULATOR_PROMPT = ("Build an interactive calculator as an artifact (a web page I can use): a takeoff calculator for a CMU foundation wall.\n"
+                     "Inputs: the lengths of all sides of the wall, measured on the outside face (ft, separated by commas); the wall height (ft); "
+                     "CMU waste (%); grout per fully grouted CMU (ft³); grout waste (%); the spacing of the grouted cells (in on center).\n"
+                     "Outputs: the total wall length (ft), the number of 8 in x 16 in CMUs to purchase, grout for all cells (CY), and grout for "
+                     "only the cells at the given spacing (CY).\nShow the formula used for each output.")
+CALCULATOR = {
+    "prompt_text": CALCULATOR_PROMPT,
+    "steps_text": ("1. Copy the prompt below, open {url} (sign in with your VT account), start a new chat, and paste the prompt.\n"
+                   "2. Open the calculator HokieAI builds (the artifact) and type in each test case below.\n"
+                   "3. Enter your calculator's outputs in the box below, one line per case, and click *Score my calculator*."),
+    "cases_text": "Test cases (type each one into your calculator):",
+    "cases_columns_text": "Case | Sides (ft) | Height (ft) | CMU waste (%) | Grout per CMU (ft³) | Grout waste (%) | Grouted cells (in O.C.)",
+    "button_text": "Score my calculator",
+    "reply_text": "C1 | <CMUs> | <grout, all cells (CY)> | <grout at the spacing (CY)>\nC2 | ...\nC3 | ...",
+    "prompt_label_text": "prompt", "reply_label_text": "results",
+    "result_text": "**Your calculator ({version}):** {right} of {n} outputs within tolerance of the ground truth.",
+    "table_text": "Ground truth vs. your calculator:",
+    "columns_text": "Case | Quantity | Ground truth | Your calculator | Unit | Correct",
+    "runs_text": "Your calculators so far:",
+    "runs_columns_text": "Calculator | Outputs correct",
+}
+
 TEXTS: Dict[str, Dict[str, str]] = {
     "drawing": {},
     "one_prompt": {
@@ -86,6 +110,45 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "answer_label_text": "answer",
         "empty_text": "No runs yet: run Step 2b first.",
     },
+    "lookahead": {
+        "prompt_text": ("Use your Python tool to make a look-ahead schedule from the two attached files, schedule.csv and submittal_log.csv.\n"
+                        "1. For each activity, the duration in working days = quantity / daily output, rounded up to a whole day.\n"
+                        "2. {sequence}\n"
+                        "3. Draw a Gantt chart: one horizontal bar per activity, from its start day to its finish day, with working days on the x-axis. "
+                        "Color a bar red if the activity places concrete (its description starts with \"Place\") and the mix-design submittal for its element "
+                        "in submittal_log.csv is not Approved; color the other bars gray.\n"
+                        "4. Below the chart, print one line per activity, in this format:\nA-110 | <start day> | <finish day> | <red: YES or NO>"),
+        "steps_text": ("1. Download {files} with the buttons below and copy the prompt.\n2. Open {url} (sign in with your VT account), start a new chat, "
+                       "attach both files, and paste the prompt. Look at the chart and open the code HokieAI wrote.\n" + HOKIE_RESULT_STEPS),
+        **BOX,
+        "result_text": "**Look-ahead schedule:** {right} of {n} activities with the correct start day, finish day, and flag.",
+        "chart_title_text": "Ground truth: the look-ahead schedule (red = the mix design for the element is not approved)",
+        "axis_text": "working day",
+        "table_text": "Ground truth vs. HokieAI's output:",
+        "columns_text": "Activity | Ground truth (start – finish, red) | HokieAI's output | Correct",
+    },
+    "calculator": CALCULATOR,
+    "calculator_skill": {**CALCULATOR, "steps_text": (
+        "1. In HokieAI ({url}), start a new chat and turn on the skill of Step 4b (*cmu-foundation-takeoff*) from the chat menu.\n"
+        "2. Copy the prompt below (the same as in Step 3b), paste it, and open the new calculator.\n"
+        "3. Type in the same test cases, enter the outputs in the box below, and click *Score my calculator*.")},
+    "outline": {
+        "prompt_text": ("The attached foundation plan shows a CMU foundation wall; the dimensions are to the outside face of the wall.\n"
+                        "1. List the length of every side of the wall, going counterclockwise around the outside face: start at the bottom-left "
+                        "corner and go right along the bottom side. If a side is not dimensioned, work out its length from the other dimensions.\n"
+                        "2. Use your Python tool to draw the outline from your side lengths: start at (0, 0), go right along the first side, and turn "
+                        "90° at each corner as the drawing does. Label each side with its length.\n"
+                        "3. End your reply with one line, in this format:\nSIDES: <length 1>, <length 2>, ... (in feet)"),
+        "steps_text": ("1. Download {files} with the button below and copy the prompt.\n2. Open {url} (sign in with your VT account), start a new chat, "
+                       "attach the drawing, and paste the prompt. Compare the outline HokieAI draws with the drawing.\n" + HOKIE_RESULT_STEPS),
+        **BOX,
+        "result_text": "**{drawing}:** {right} of {n} sides read correctly; the outline drawn from them {closes}.",
+        "closed_text": "closes",
+        "open_text": "misses its starting point by {gap} ft",
+        "figure_title_text": "The drawing's outline (gray) vs. the outline drawn from HokieAI's sides (orange)",
+        "table_text": "Ground truth vs. HokieAI's output:",
+        "columns_text": "Side | Ground truth (ft) | HokieAI's output (ft) | Correct",
+    },
     "skills": {
         "system_text": AGENT_SYSTEM,
         "calculator_text": TOOLS["calculator"],
@@ -107,7 +170,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
     },
     "hokieai_skill": {
         "prompt_text": "{problems}\n\n" + FINALS,
-        "steps_text": ("1. In HokieAI ({url}), open **Account → My Skills → Create Skill**. Copy the skill's name, description, and body from Step 3a into the form, "
+        "steps_text": ("1. In HokieAI ({url}), open **Account → My Skills → Create Skill**. Copy the skill's name, description, and body from Step 4a into the form, "
                        "switch *Always On* off, and click *Create Skill*.\n"
                        "2. Choose *with the skill* or *without the skill* above and run this cell. Start a new chat; for *with the skill*, turn the skill on "
                        "from the chat menu.\n3. Copy the prompt below, paste it into the chat, and send.\n"

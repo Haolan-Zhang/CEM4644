@@ -29,6 +29,9 @@ class AgentLab:
         self.takeoffs = json.loads((d / "project" / "takeoff_questions.json").read_text(encoding="utf-8"))
         self.drawings = json.loads((d / "drawings" / "problems.json").read_text(encoding="utf-8"))
         self.by_drawing = {p["label"]: p for p in self.drawings}
+        self.lookahead_key = json.loads((d / "project" / "lookahead_key.json").read_text(encoding="utf-8"))
+        self.cases = json.loads((d / "project" / "calculator_cases.json").read_text(encoding="utf-8"))
+        self.calculator_runs: List[dict] = []
         self.workflow_runs: Dict[str, dict] = {}
         self.tool_runs: List[dict] = []
         self.skill_runs: List[dict] = []
@@ -174,7 +177,56 @@ class AgentLab:
     def question_labels(self) -> List[str]:
         return [f"{q['id']}. {q['question']}" for q in self.questions]
 
-    # ================================================================== Part 3: skills
+    # ================================================================== Part 3: code execution (HokieAI writes and runs the code)
+    def lookahead(self, **texts):
+        """A look-ahead schedule: HokieAI computes it and draws a Gantt chart with Python; scored on start, finish and flag."""
+        self._need(); G = "lookahead"
+        k = self.lookahead_key
+        prompt = fill_prompt(text(texts, G, "prompt_text"), sequence=k["sequence_text"])
+        files = [self.root / "data" / "project" / f for f in ("schedule.csv", "submittal_log.csv")]
+
+        def on_score(reply):
+            df = score.lookahead(reply, k["rows"])
+            say(texts, G, "result_text", right=int((df.correct == "✓").sum()), n=len(df))
+            ui.gantt(k["rows"], text(texts, G, "chart_title_text"), text(texts, G, "axis_text"))
+            say(texts, G, "table_text"); ui.table(ui.named(df, text(texts, G, "columns_text")))
+        ui.hokieai_box(prompt, on_score, texts, G, files)
+
+    def calculator(self, version: str = "without the skill", **texts):
+        """HokieAI builds a calculator page (an artifact); the student types in the test cases and enters its outputs."""
+        self._need(); G = "calculator"
+        cases = pd.DataFrame([{"case": c["id"], "sides": ", ".join(f"{v:g}" for v in c["sides"]), "height": c["height"], "waste": c["waste"],
+                               "grout": c["grout_per_cmu"], "grout_waste": c["grout_waste"], "spacing": c["spacing"]} for c in self.cases])
+        say(texts, G, "cases_text"); ui.table(ui.named(cases, text(texts, G, "cases_columns_text")), wrap=False)
+
+        def on_score(reply):
+            df = score.calculator(reply, self.cases)
+            right = int((df.correct == "✓").sum())
+            self.calculator_runs = [r for r in self.calculator_runs if r["version"] != version] + [{"version": version, "right": right, "n": len(df)}]
+            say(texts, G, "result_text", version=version, right=right, n=len(df))
+            say(texts, G, "table_text"); ui.table(ui.named(df, text(texts, G, "columns_text")))
+            runs = pd.DataFrame([{"calculator": r["version"], "correct": f"{r['right']} of {r['n']}"} for r in self.calculator_runs])
+            say(texts, G, "runs_text"); ui.table(ui.named(runs, text(texts, G, "runs_columns_text")))
+        ui.hokieai_box(text(texts, G, "prompt_text"), on_score, texts, G)
+
+    def outline(self, drawing: str, **texts):
+        """HokieAI reads the sides of a foundation plan and draws the outline with Python; the notebook redraws it from
+        those sides with the drawing's own turns, so a misread side shows as an outline that does not close."""
+        self._need(); G = "outline"
+        p = self.by_drawing[drawing]
+        img = self._image(p)
+        ui.show_image(img, 600)
+
+        def on_score(reply):
+            df, pts, gap = score.outline(reply, p["segments"], p["corners"])
+            closes = text(texts, G, "closed_text") if gap == gap and gap < 0.05 else fill_prompt(text(texts, G, "open_text"),
+                                                                                                 gap=f"{gap:.1f}" if gap == gap else "?")
+            say(texts, G, "result_text", drawing=drawing, right=int((df.correct == "✓").sum()), n=len(p["segments"]), closes=closes)
+            ui.outline_figure(p["corners"], pts, text(texts, G, "figure_title_text"))
+            say(texts, G, "table_text"); ui.table(ui.named(df, text(texts, G, "columns_text")))
+        ui.hokieai_box(text(texts, G, "prompt_text"), on_score, texts, G, [img])
+
+    # ================================================================== Part 4: skills
     def _skill_questions(self):
         """The two takeoff questions (the skill applies) and one project question (it does not)."""
         tq = [{"id": t["id"], "question": t["text"] + "\n\n" + FINALS.replace("{lines}", self._finals(t["key"])), "key": t["key"]} for t in self.takeoffs]
@@ -244,7 +296,7 @@ class AgentLab:
             say(texts, G, "table_text"); ui.table(ui.named(df, text(texts, G, "columns_text")))
         ui.hokieai_box(prompt, on_score, texts, G)
 
-    # ================================================================== Part 4: your own HokieAI agent
+    # ================================================================== Part 5: your own HokieAI agent
     def project_files(self) -> List[Path]:
         return [self.root / "data" / "project" / f for f in DOCUMENTS.values()]
 

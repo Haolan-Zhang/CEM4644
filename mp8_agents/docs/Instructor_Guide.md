@@ -1,8 +1,9 @@
 # MP8 · Instructor guide
 
-One in-class notebook, `MP8_Workshop_AI_Agents.ipynb`, about 75–90 minutes. Parts 1–3 call Gemini
-(`gemini-3.5-flash-lite`) through the students' own API key from MP5; every default setting is stored in
-`data/cache/`, so it runs at once without a key. Parts 3b and 4 use HokieAI in the browser.
+One in-class notebook, `MP8_Workshop_AI_Agents.ipynb`, about 90–120 minutes with every step; Part 3 (code execution) and
+Part 5 are the natural pieces to move to a homework. Parts 1, 2 and 4a call Gemini (`gemini-3.5-flash-lite`) through
+the students' own API key from MP5; every default setting is stored in `data/cache/`, so it runs at once without a
+key. Part 3, Steps 4b-4c and Part 5 use HokieAI in the browser (paste-back).
 
 ## 1. What the students get
 
@@ -10,8 +11,26 @@ One in-class notebook, `MP8_Workshop_AI_Agents.ipynb`, about 75–90 minutes. Pa
 |---|---|---|
 | 1 · AI Workflows | 1a drawings, 1b one prompt, 1c workflow, 1d compare | A task split into fixed steps: the AI model reads the drawing, code applies the estimating conventions |
 | 2 · AI Agents | 2a documents, 2b run with chosen tools, 2c trace | An AI model that decides which tool to call; the student ticks the tools; correct / UNKNOWN / wrong (guessed) per run |
-| 3 · Skills | 3a agent with / without the skill, 3b the same skill in HokieAI | Instructions with a name and a description that the agent loads only when the task matches |
-| 4 · Your Own HokieAI Agent | 4a create, 4b ask and score | Instructions + knowledge sources (the three project files), compared with the Gemini agent |
+| 3 · Code Execution | 3a look-ahead Gantt chart (Python), 3b takeoff calculator (artifact), 3c outline drawn from the sides read (Python) | The agent writes and runs its own code; each result is something to see and is scored against the ground truth |
+| 4 · Skills | 4a agent with / without the skill, 4b the same skill in HokieAI, 4c the calculator rebuilt with the skill | Instructions with a name and a description that the agent loads only when the task matches |
+| 5 · Your Own HokieAI Agent | 5a create, 5b ask and score | Instructions + knowledge sources (the three project files), compared with the Gemini agent |
+
+**Part 3 ground truth** (`build/generate_project.py`: `lookahead_key.json`, `calculator_cases.json`, `corners` in
+`drawings/problems.json`):
+- 3a: duration = quantity / daily output rounded up (3, 3, 6, 5, 3, 3 working days); the sequence is given in the prompt
+  (A-110 → A-120 → A-210 → A-310 → A-410, A-510 after A-210): A-110 1–3, A-120 4–6, A-210 7–12, A-310 13–17,
+  A-410 18–20, A-510 13–15. Red (mix design not approved): A-210 (revise and resubmit), A-410 and A-510 (under
+  review). Scored per activity on start, finish and flag; the notebook draws the correct chart next to the student's.
+  If you edit the sequence in the prompt, the ground truth no longer matches it.
+- 3b / 4c: C1 = T1 (840 CMU, 5.24 CY, 1.31 CY), C2 = T2 (1,224, 8.23, 2.06), C3 = foundation plan 4 (783, 7.60, 3.80);
+  tolerances 1 % (CMUs) and 2 % (grout). The prompt does not give the conventions, so the expected failure without the
+  skill is the partial grout (as in Part 1); with the skill it should pass. Students type the cases into the artifact
+  and enter its outputs; the table keeps the two calculators side by side.
+- 3c: the sides of the chosen plan (default plan 4, the bump with one undimensioned side: 40, 4, 8, 24, 8, 6, 40, 34);
+  the notebook redraws the outline from the student's sides with the drawing's own corners, so a misread side shows
+  as a gap at the start point.
+- Not measured from here: what HokieAI actually produces (its Python charts, its artifacts). Try the three prompts
+  once before class.
 
 **The practice project** (`build/generate_project.py`, fictional): a concrete specification table with
 project-specific limits (for example maximum w/cm 0.48 for foundation walls, 0.42 for exterior slabs), a submittal log
@@ -54,7 +73,7 @@ it uses the calculator anyway (13 tool calls instead of 9). The guesses: with on
 (a typical w/cm, not this project's 0.48); with only the calculator, P4 is answered "12 days". Without tools the
 model once asked for a tool that does not exist; the trace shows the notebook's reply ("There is no tool called ...").
 
-**Part 3 · skill** (T1 rectangle, T2 L-shape, 3 quantities each; P3 as the question the skill does not apply to):
+**Part 4 · skill** (T1 rectangle, T2 L-shape, 3 quantities each; P3 as the question the skill does not apply to):
 
 | Skill | Quantities correct | Skill loaded for |
 |---|---|---|
@@ -76,10 +95,14 @@ differ. That is worth saying in class: Part 1's one prompt gave 8 and 11 of 15 i
    for these questions (a fair finding). With missing tools the agent mostly said UNKNOWN, but it also guessed
    (P1 = 0.50 with only the logs). A guess is the more dangerous failure; checking the trace (which tool, which
    output) is how to verify an answer.
-3. The skill fixes the partial grout and is loaded only for the takeoff questions. With a vague description the agent
+3. Code execution: a good answer shows the chart, the calculator and the outline, says which number was wrong and finds
+   the line of code or the formula behind it (often the partial grout, a rounding of the duration, or a finish-to-start
+   off by one day), and concludes that code that runs is not code that is right: test it on cases with a known answer
+   or check it by drawing it.
+4. The skill fixes the partial grout and is loaded only for the takeoff questions. With a vague description the agent
    may not load it: the description is what the agent reads to decide. Skills students suggest: company estimating
    rules, a report format, a submittal-review checklist.
-4. The HokieAI agent (gpt-5) with the three files usually answers all six; differences come from the instructions
+5. The HokieAI agent (gpt-5) with the three files usually answers all six; differences come from the instructions
    (UNKNOWN vs. a guess) and from reading the CSV files. Not measured from here: students' HokieAI outputs (Steps 3b, 4b).
 
 ## 4. Running it

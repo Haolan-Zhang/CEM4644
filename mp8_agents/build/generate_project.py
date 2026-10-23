@@ -2,7 +2,7 @@
 documents the AI agent's tools read), the project questions, the takeoff questions of the skills part, and original
 foundation plans for the workflow part, each with its exact ground truth.
 
-    python build/generate_project.py
+    python build/generate_project.py [--no-draw]
 
 The foundation plans are drawn with the MP7 drawing code (../mp7_prompt_engineering/build/generate_practice.py),
 with new seeds and an MP8 title block. Everything here is fictional and made for the course.
@@ -130,7 +130,8 @@ def params(rng):
         "grout_waste": int(rng.choice([5, 7, 10])), "spacing": int(rng.choice([16, 24, 32, 48])), "grout_per_cmu": G.GROUT_PER_CMU[thick]}
 
 
-def drawings(n=5, seed=4653):
+def drawings(n=5, seed=4653, draw=True):
+    """draw=False rebuilds problems.json only, leaving the drawings (and the stored outputs keyed by them) untouched."""
     rng = np.random.default_rng(seed)
     out = DATA / "drawings"; out.mkdir(parents=True, exist_ok=True)
     problems = []
@@ -139,10 +140,11 @@ def drawings(n=5, seed=4653):
         hide = int(rng.integers(0, len(pts))) if i % 2 == 1 else -1
         p = params(rng)
         name = f"foundation_{i + 1}"
-        G.draw_foundation(pts, hide, p["thickness"], out / f"{name}.png", f"S-20{i + 1}")
+        if draw:
+            G.draw_foundation(pts, hide, p["thickness"], out / f"{name}.png", f"S-20{i + 1}")
         segs = segments(pts)
         problems.append({"id": name, "label": f"Foundation plan {i + 1}", "image": f"{name}.png", "shape": kind, "hidden_segment": hide,
-                         "segments": segs, "wall_length_ft": round(sum(segs), 3), **p,
+                         "segments": segs, "corners": [list(map(float, q)) for q in pts], "wall_length_ft": round(sum(segs), 3), **p,
                          "text": takeoff_text(p, "The attached foundation plan shows"), "key": takeoff_key(sum(segs), p)})
     return problems
 
@@ -163,22 +165,56 @@ def skill_questions(seed=4649):
     return out
 
 
+# ----------------------------------------------------------------------------- Part 3: code execution
+SEQUENCE = {"A-110": None, "A-120": "A-110", "A-210": "A-120", "A-310": "A-210", "A-410": "A-310", "A-510": "A-210"}
+SEQUENCE_TEXT = ("A-110 starts on working day 1. Each activity starts the working day after its predecessor finishes: A-120 after A-110, "
+                 "A-210 after A-120, A-310 after A-210, A-410 after A-310, and A-510 after A-210 (at the same time as A-310).")
+
+
+def lookahead_key():
+    """Step 3a: duration = quantity / daily output rounded up; finish-to-start; a concrete placement is flagged when the
+    mix-design submittal of its element is not Approved."""
+    status = {s[2]: s[4] for s in SUBMITTALS}
+    rows, finish = [], {}
+    for a, desc, element, qty, unit, output in SCHEDULE:
+        dur = math.ceil(qty / float(output.split()[0]))
+        start = 1 if SEQUENCE[a] is None else finish[SEQUENCE[a]] + 1
+        finish[a] = start + dur - 1
+        flag = desc.startswith("Place") and status.get(element) != "Approved"
+        rows.append({"activity": a, "description": desc, "element": element, "duration": dur, "start": start, "finish": finish[a],
+                     "flag": "YES" if flag else "NO", "submittal status": status.get(element, "-") if desc.startswith("Place") else "-"})
+    return {"sequence": SEQUENCE, "sequence_text": SEQUENCE_TEXT, "rows": rows}
+
+
+def calculator_cases():
+    """Steps 3b and 4c: three walls to type into the calculator the agent built (two from Part 4, one from Part 1)."""
+    tk = skill_questions(); fp = {p["id"]: p for p in drawings(draw=False)}
+    walls = [("C1", tk[0]), ("C2", tk[1]), ("C3", fp["foundation_4"])]
+    out = []
+    for cid, w in walls:
+        out.append({"id": cid, "sides": w["segments"], "height": w["height"], "thickness": w["thickness"], "waste": w["waste"],
+                    "grout_per_cmu": w["grout_per_cmu"], "grout_waste": w["grout_waste"], "spacing": w["spacing"], "key": w["key"]})
+    return out
+
+
 # ----------------------------------------------------------------------------- write
 def write_csv(path, head, rows):
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f); w.writerow(head); w.writerows(rows)
 
 
-def main():
+def main(draw=True):
     proj = DATA / "project"; proj.mkdir(parents=True, exist_ok=True)
     (proj / "spec_03_30_00.txt").write_text(SPEC, encoding="utf-8")
     write_csv(proj / "submittal_log.csv", SUBMITTAL_HEAD, SUBMITTALS)
     write_csv(proj / "schedule.csv", SCHEDULE_HEAD, SCHEDULE)
     (proj / "questions.json").write_text(json.dumps(project_questions(), indent=1, ensure_ascii=False), encoding="utf-8")
     (proj / "takeoff_questions.json").write_text(json.dumps(skill_questions(), indent=1, ensure_ascii=False), encoding="utf-8")
-    (DATA / "drawings" / "problems.json").write_text(json.dumps(drawings(), indent=1, ensure_ascii=False), encoding="utf-8")
+    (DATA / "drawings" / "problems.json").write_text(json.dumps(drawings(draw=draw), indent=1, ensure_ascii=False), encoding="utf-8")
+    (proj / "lookahead_key.json").write_text(json.dumps(lookahead_key(), indent=1, ensure_ascii=False), encoding="utf-8")
+    (proj / "calculator_cases.json").write_text(json.dumps(calculator_cases(), indent=1, ensure_ascii=False), encoding="utf-8")
     print("wrote", proj, DATA / "drawings")
 
 
 if __name__ == "__main__":
-    main()
+    main(draw="--no-draw" not in sys.argv)

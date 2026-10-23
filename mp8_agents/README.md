@@ -20,19 +20,25 @@ output is scored against the ground truth. No programming and no GPU needed.
    arithmetic), `lookup_log` (the submittal log and the schedule). Each tool is needed by at least two questions; the
    runs table counts correct, UNKNOWN (the agent said it could not find the value) and wrong (it guessed) answers,
    tool calls and time; a trace shows every tool call with its inputs and output.
-3. **Skills** (Gemini, then HokieAI): the estimating conventions written as a skill (name, description, body) that the
+3. **Code execution** (HokieAI): the agent writes and runs its own code, and the result is something to see: a
+   look-ahead Gantt chart in Python that marks the concrete placements whose mix design is not approved, a takeoff
+   calculator built as an artifact and tested on three cases, and a foundation outline drawn from the sides it read
+   (the notebook redraws it with the drawing's corners, so a misread side leaves a gap). Each is scored against the
+   ground truth.
+4. **Skills** (Gemini, then HokieAI): the estimating conventions written as a skill (name, description, body) that the
    agent loads with `load_skill` only when the description matches the task; two takeoff questions and one project
    question, with and without the skill, and with a vague description. Then the same skill created in HokieAI
-   (*Account → My Skills*) and the takeoff questions sent without and with it.
-4. **Your own HokieAI agent**: instructions plus the three project files as knowledge sources (*Explore Agents →
+   (*Account → My Skills*) and the takeoff questions sent without and with it, and the Part 3 calculator rebuilt with
+   the skill turned on.
+5. **Your own HokieAI agent**: instructions plus the three project files as knowledge sources (*Explore Agents →
    Create*), asked the six questions of Part 2; scored and compared with the Gemini agent's runs.
 
 ## How the AI model runs
 
-Parts 1–3 call Gemini (`gemini-3.5-flash-lite`, the free tier) with the student's own key from MP5 (typed in Step 0
-or the Colab secret `GEMINI_API_KEY`). Every default setting (Part 1, all eight tool combinations of Part 2, Part 3
+Parts 1, 2 and 4a call Gemini (`gemini-3.5-flash-lite`, the free tier) with the student's own key from MP5 (typed in Step 0
+or the Colab secret `GEMINI_API_KEY`). Every default setting (Part 1, all eight tool combinations of Part 2, Step 4a
 with and without the skill) is stored in `data/cache/`, so it runs at once without a key and without the free tier's
-rate limits; a key is needed only for an edited prompt, tool description, system prompt or skill. Parts 3b and 4 use
+rate limits; a key is needed only for an edited prompt, tool description, system prompt or skill. Part 3, Steps 4b-4c and Part 5 use
 HokieAI in the browser (paste-back, as in MP6 and MP7).
 
 ## What is in this folder
@@ -43,8 +49,9 @@ aec_agent/       the hidden code: texts (every default prompt, tool description,
                  (Gemini requests, the agent loop, the cache), tools (search_spec, calculator, lookup_log, load_skill),
                  score (reading and scoring outputs), ui (tables, traces, the HokieAI box), lab (the steps)
 data/            project/ (spec_03_30_00.txt, submittal_log.csv, schedule.csv, questions.json, takeoff_questions.json);
+                 lookahead_key.json, calculator_cases.json;
                  drawings/ (5 foundation plans + problems.json); cache/ (stored Gemini outputs)
-figures/         the three concept diagrams of the markdown cells (workflow, agent loop, prompt vs. skill)
+figures/         the four concept diagrams of the markdown cells (workflow, agent loop, code execution, prompt vs. skill)
 build/           generate_project.py (the project and the drawings), make_figures.py (the diagrams), precompute.py (fills
                  the cache), make_notebooks.py
 docs/            report template, instructor guide
