@@ -11,12 +11,11 @@ key. Part 3, Steps 4b-4c and Part 5 use HokieAI in the browser (paste-back).
 |---|---|---|
 | 1 · AI Workflows | 1a drawings, 1b one prompt, 1c workflow, 1d compare | A task split into fixed steps: the AI model reads the drawing, code applies the estimating conventions |
 | 2 · AI Agents | 2a documents, 2b run with chosen tools, 2c trace | An AI model that decides which tool to call; the student ticks the tools; correct / UNKNOWN / wrong (guessed) per run |
-| 3 · Code Execution | 3a look-ahead Gantt chart (Python), 3b takeoff calculator (artifact), 3c outline drawn from the sides read (Python) | The agent writes and runs its own code; each result is something to see and is scored against the ground truth |
+| 3 · Code Execution | 3a look-ahead Gantt chart (HokieAI's Python tool), 3b takeoff calculator (artifact) | The agent writes and runs its own code; each result is something to see and is scored against the ground truth |
 | 4 · Skills | 4a agent with / without the skill, 4b the same skill in HokieAI, 4c the calculator rebuilt with the skill | Instructions with a name and a description that the agent loads only when the task matches |
 | 5 · Your Own HokieAI Agent | 5a create, 5b ask and score | Instructions + knowledge sources (the three project files), compared with the Gemini agent |
 
-**Part 3 ground truth** (`build/generate_project.py`: `lookahead_key.json`, `calculator_cases.json`, `corners` in
-`drawings/problems.json`):
+**Part 3 ground truth** (`build/generate_project.py`: `lookahead_key.json`, `calculator_cases.json`):
 - 3a: duration = quantity / daily output rounded up (3, 3, 6, 5, 3, 3 working days); the sequence is given in the prompt
   (A-110 → A-120 → A-210 → A-310 → A-410, A-510 after A-210): A-110 1–3, A-120 4–6, A-210 7–12, A-310 13–17,
   A-410 18–20, A-510 13–15. Red (mix design not approved): A-210 (revise and resubmit), A-410 and A-510 (under
@@ -26,11 +25,8 @@ key. Part 3, Steps 4b-4c and Part 5 use HokieAI in the browser (paste-back).
   tolerances 1 % (CMUs) and 2 % (grout). The prompt does not give the conventions, so the expected failure without the
   skill is the partial grout (as in Part 1); with the skill it should pass. Students type the cases into the artifact
   and enter its outputs; the table keeps the two calculators side by side.
-- 3c: the sides of the chosen plan (default plan 4, the bump with one undimensioned side: 40, 4, 8, 24, 8, 6, 40, 34);
-  the notebook redraws the outline from the student's sides with the drawing's own corners, so a misread side shows
-  as a gap at the start point.
-- Not measured from here: what HokieAI actually produces (its Python charts, its artifacts). Try the three prompts
-  once before class.
+- 3a tried in HokieAI (instructor, October 2026): the chart and all six lines exactly right. The prompt asks for the
+  lines as plain text in the reply, because HokieAI otherwise prints them inside the chart image. 3b not yet tried.
 
 **The practice project** (`build/generate_project.py`, fictional): a concrete specification table with
 project-specific limits (for example maximum w/cm 0.48 for foundation walls, 0.42 for exterior slabs), a submittal log
@@ -95,10 +91,9 @@ differ. That is worth saying in class: Part 1's one prompt gave 8 and 11 of 15 i
    for these questions (a fair finding). With missing tools the agent mostly said UNKNOWN, but it also guessed
    (P1 = 0.50 with only the logs). A guess is the more dangerous failure; checking the trace (which tool, which
    output) is how to verify an answer.
-3. Code execution: a good answer shows the chart, the calculator and the outline, says which number was wrong and finds
+3. Code execution: a good answer shows the chart and the calculator, says which number was wrong and finds
    the line of code or the formula behind it (often the partial grout, a rounding of the duration, or a finish-to-start
-   off by one day), and concludes that code that runs is not code that is right: test it on cases with a known answer
-   or check it by drawing it.
+   off by one day), and concludes that code that runs is not code that is right: test it on cases with a known answer.
 4. The skill fixes the partial grout and is loaded only for the takeoff questions. With a vague description the agent
    may not load it: the description is what the agent reads to decide. Skills students suggest: company estimating
    rules, a report format, a submittal-review checklist.

@@ -144,7 +144,7 @@ def drawings(n=5, seed=4653, draw=True):
             G.draw_foundation(pts, hide, p["thickness"], out / f"{name}.png", f"S-20{i + 1}")
         segs = segments(pts)
         problems.append({"id": name, "label": f"Foundation plan {i + 1}", "image": f"{name}.png", "shape": kind, "hidden_segment": hide,
-                         "segments": segs, "corners": [list(map(float, q)) for q in pts], "wall_length_ft": round(sum(segs), 3), **p,
+                         "segments": segs, "wall_length_ft": round(sum(segs), 3), **p,
                          "text": takeoff_text(p, "The attached foundation plan shows"), "key": takeoff_key(sum(segs), p)})
     return problems
 

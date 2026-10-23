@@ -21,10 +21,8 @@ output is scored against the ground truth. No programming and no GPU needed.
    runs table counts correct, UNKNOWN (the agent said it could not find the value) and wrong (it guessed) answers,
    tool calls and time; a trace shows every tool call with its inputs and output.
 3. **Code execution** (HokieAI): the agent writes and runs its own code, and the result is something to see: a
-   look-ahead Gantt chart in Python that marks the concrete placements whose mix design is not approved, a takeoff
-   calculator built as an artifact and tested on three cases, and a foundation outline drawn from the sides it read
-   (the notebook redraws it with the drawing's corners, so a misread side leaves a gap). Each is scored against the
-   ground truth.
+   look-ahead Gantt chart that marks the concrete placements whose mix design is not approved, and a takeoff
+   calculator built as an artifact and tested on three cases. Each is scored against the ground truth.
 4. **Skills** (Gemini, then HokieAI): the estimating conventions written as a skill (name, description, body) that the
    agent loads with `load_skill` only when the description matches the task; two takeoff questions and one project
    question, with and without the skill, and with a vague description. Then the same skill created in HokieAI

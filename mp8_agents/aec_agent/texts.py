@@ -117,7 +117,8 @@ TEXTS: Dict[str, Dict[str, str]] = {
                         "3. Draw a Gantt chart: one horizontal bar per activity, from its start day to its finish day, with working days on the x-axis. "
                         "Color a bar red if the activity places concrete (its description starts with \"Place\") and the mix-design submittal for its element "
                         "in submittal_log.csv is not Approved; color the other bars gray.\n"
-                        "4. Below the chart, print one line per activity, in this format:\nA-110 | <start day> | <finish day> | <red: YES or NO>"),
+                        "4. After the chart, write the schedule as plain text in your reply (not inside the chart image), one line per activity, "
+                        "in this format (the last column: YES if the bar is red, otherwise NO):\nA-110 | <start day> | <finish day> | <YES or NO>"),
         "steps_text": ("1. Download {files} with the buttons below and copy the prompt.\n2. Open {url} (sign in with your VT account), start a new chat, "
                        "attach both files, and paste the prompt. Look at the chart and open the code HokieAI wrote.\n" + HOKIE_RESULT_STEPS),
         **BOX,
@@ -132,23 +133,6 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "1. In HokieAI ({url}), start a new chat and turn on the skill of Step 4b (*cmu-foundation-takeoff*) from the chat menu.\n"
         "2. Copy the prompt below (the same as in Step 3b), paste it, and open the new calculator.\n"
         "3. Type in the same test cases, enter the outputs in the box below, and click *Score my calculator*.")},
-    "outline": {
-        "prompt_text": ("The attached foundation plan shows a CMU foundation wall; the dimensions are to the outside face of the wall.\n"
-                        "1. List the length of every side of the wall, going counterclockwise around the outside face: start at the bottom-left "
-                        "corner and go right along the bottom side. If a side is not dimensioned, work out its length from the other dimensions.\n"
-                        "2. Use your Python tool to draw the outline from your side lengths: start at (0, 0), go right along the first side, and turn "
-                        "90° at each corner as the drawing does. Label each side with its length.\n"
-                        "3. End your reply with one line, in this format:\nSIDES: <length 1>, <length 2>, ... (in feet)"),
-        "steps_text": ("1. Download {files} with the button below and copy the prompt.\n2. Open {url} (sign in with your VT account), start a new chat, "
-                       "attach the drawing, and paste the prompt. Compare the outline HokieAI draws with the drawing.\n" + HOKIE_RESULT_STEPS),
-        **BOX,
-        "result_text": "**{drawing}:** {right} of {n} sides read correctly; the outline drawn from them {closes}.",
-        "closed_text": "closes",
-        "open_text": "misses its starting point by {gap} ft",
-        "figure_title_text": "The drawing's outline (gray) vs. the outline drawn from HokieAI's sides (orange)",
-        "table_text": "Ground truth vs. HokieAI's output:",
-        "columns_text": "Side | Ground truth (ft) | HokieAI's output (ft) | Correct",
-    },
     "skills": {
         "system_text": AGENT_SYSTEM,
         "calculator_text": TOOLS["calculator"],

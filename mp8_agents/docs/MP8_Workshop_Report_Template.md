@@ -34,8 +34,6 @@ From Step 3a: Include HokieAI's Gantt chart and the score. Which activities did 
 
 From Step 3b: Include a screenshot of your calculator and the score on the three test cases. Which output was wrong, and which formula did the calculator use for it?
 
-From Step 3c: Include the outline HokieAI drew and the notebook's comparison. Did the outline close? How does drawing a result help you check it?
-
 When would you let an agent write and run code for a project task, and what would you check before using its output?
 
 *Your answer:*

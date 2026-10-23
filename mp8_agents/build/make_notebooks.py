@@ -170,11 +170,11 @@ An AI agent decides by itself which tool to call and when it has enough to answe
     # ------------------------------------------------------------------ Part 3: code execution
     cells.append(md("""
 ## Part 3 · Code Execution: The Agent Builds Its Own Tool
-In Part 2 the agent chose from tools written for it. Here HokieAI writes and runs its own code (Python, or a web page), and the result is something you can see and use: a chart, a calculator, a drawing. Each result is checked against the ground truth, because code that runs can still give wrong numbers.
+In Part 2 the agent chose from tools written for it. Here HokieAI writes and runs its own code, and the result is something you can see and use: a chart or a calculator. Each result is checked against the ground truth, because code that runs can still give wrong numbers.
 
 ![Tool calling vs. code execution]({FIG}/codeexec.png)
 """.replace("{FIG}", FIG)))
-    cells.append(form("▶ Step 3a · Look-Ahead Schedule: A Gantt Chart in Python", "lab.lookahead()",
+    cells.append(form("▶ Step 3a · Look-Ahead Schedule: A Gantt Chart", "lab.lookahead()",
                       notes=["Run the cell and follow the steps: HokieAI computes each activity's duration and start day, draws a Gantt chart, and marks in red the concrete placements whose mix design is not approved.",
                              "Look-ahead schedule: the near-term part of the project schedule that the field team plans from."],
                       texts=T("lookahead")))
@@ -182,15 +182,9 @@ In Part 2 the agent chose from tools written for it. Here HokieAI writes and run
                       notes=["Run the cell and follow the steps: HokieAI builds a calculator web page (an artifact); you test it with the three cases and enter its outputs."],
                       params=['version = "without the skill"'],
                       texts=T("calculator")))
-    cells.append(form("▶ Step 3c · Check a Takeoff by Drawing It", "lab.outline(drawing)",
-                      notes=["Choose a drawing, run the cell, and follow the steps: HokieAI reads the sides and draws the outline with Python.",
-                             "The notebook redraws the outline from HokieAI's sides with the drawing's own corners: a misread side shows as an outline that does not close."],
-                      params=[choice("drawing", drawings[3]["label"], [p["label"] for p in drawings])],
-                      texts=T("outline")))
     cells.append(question(3,
                           "From Step 3a: Include HokieAI's Gantt chart and the score. Which activities did it mark red, and did any start or finish day differ from the ground truth? Open the code it wrote: which step went wrong, if any?",
                           "From Step 3b: Include a screenshot of your calculator and the score on the three test cases. Which output was wrong, and which formula did the calculator use for it?",
-                          "From Step 3c: Include the outline HokieAI drew and the notebook's comparison. Did the outline close? How does drawing a result help you check it?",
                           "When would you let an agent write and run code for a project task, and what would you check before using its output?"))
 
     # ------------------------------------------------------------------ Part 4: skills

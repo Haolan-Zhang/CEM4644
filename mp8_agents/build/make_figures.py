@@ -136,9 +136,9 @@ def codeexec():
 
     ax.text(0.15, 1.35, "Code\nexecution\n(Part 3)", fontsize=11, weight="bold", va="center", family=FONT)
     box(ax, 1.6, 0.85, 3.0, 1.85, "Task")
-    box(ax, 3.4, 0.85, 5.4, 1.85, "AI model\nwrites code\n(Python, HTML)", "model")
+    box(ax, 3.4, 0.85, 5.4, 1.85, "AI model\nwrites code", "model")
     box(ax, 5.8, 0.85, 7.6, 1.85, "runs it", "code")
-    box(ax, 8.0, 0.85, 10.9, 1.85, "something you can see and use:\na Gantt chart · a calculator page\n· a drawn outline", size=9.5)
+    box(ax, 8.0, 0.85, 10.9, 1.85, "something you can see and use:\na Gantt chart · a calculator page", size=9.5)
     for a_, b_ in ((3.02, 3.38), (5.42, 5.78), (7.62, 7.98)):
         arrow(ax, (a_, 1.35), (b_, 1.35))
     ax.text(6.25, 0.45, "No one wrote a tool for this task: the agent builds it. The code runs, but its numbers can still be wrong, so test it.",

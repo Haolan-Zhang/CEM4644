@@ -209,23 +209,6 @@ class AgentLab:
             say(texts, G, "runs_text"); ui.table(ui.named(runs, text(texts, G, "runs_columns_text")))
         ui.hokieai_box(text(texts, G, "prompt_text"), on_score, texts, G)
 
-    def outline(self, drawing: str, **texts):
-        """HokieAI reads the sides of a foundation plan and draws the outline with Python; the notebook redraws it from
-        those sides with the drawing's own turns, so a misread side shows as an outline that does not close."""
-        self._need(); G = "outline"
-        p = self.by_drawing[drawing]
-        img = self._image(p)
-        ui.show_image(img, 600)
-
-        def on_score(reply):
-            df, pts, gap = score.outline(reply, p["segments"], p["corners"])
-            closes = text(texts, G, "closed_text") if gap == gap and gap < 0.05 else fill_prompt(text(texts, G, "open_text"),
-                                                                                                 gap=f"{gap:.1f}" if gap == gap else "?")
-            say(texts, G, "result_text", drawing=drawing, right=int((df.correct == "✓").sum()), n=len(p["segments"]), closes=closes)
-            ui.outline_figure(p["corners"], pts, text(texts, G, "figure_title_text"))
-            say(texts, G, "table_text"); ui.table(ui.named(df, text(texts, G, "columns_text")))
-        ui.hokieai_box(text(texts, G, "prompt_text"), on_score, texts, G, [img])
-
     # ================================================================== Part 4: skills
     def _skill_questions(self):
         """The two takeoff questions (the skill applies) and one project question (it does not)."""

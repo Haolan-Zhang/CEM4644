@@ -120,9 +120,10 @@ def lookahead(text: str, key: List[dict]) -> pd.DataFrame:
         if not m:
             continue
         nums = re.findall(r"(?<![\d.])\d+(?![\d.])", m.group(2))
-        flag = re.search(r"\b(YES|NO|red|gray|grey)\b", m.group(2), re.I)
+        yn = re.findall(r"\b(YES|NO)\b", m.group(2), re.I)              # "red: NO" is NO: the YES / NO decides
+        colour = re.findall(r"\b(red|gray|grey)\b", m.group(2), re.I)
         if len(nums) >= 2:
-            f = None if not flag else ("YES" if flag.group(1).lower() in ("yes", "red") else "NO")
+            f = yn[-1].upper() if yn else ("YES" if colour and colour[-1].lower() == "red" else ("NO" if colour else None))
             got[m.group(1)] = (int(nums[0]), int(nums[1]), f)            # the last line per activity wins
     rows = []
     for k in key:
@@ -149,24 +150,3 @@ def calculator(text: str, cases: List[dict]) -> pd.DataFrame:
             rows.append({"case": c["id"], "quantity": k["quantity"].replace(f"{c['spacing']} in O.C.", "at the spacing"), "truth": f"{k['value']:g}",
                          "output": "—" if v is None else f"{v:g}", "unit": k["unit"], "correct": "✓" if ok else "✗"})
     return pd.DataFrame(rows)
-
-
-def outline(text: str, segments: List[float], corners: List[List[float]]):
-    """The sides of the SIDES line against the drawing, and the outline drawn from them with the drawing's turns:
-    returns (table, points of that outline, gap in ft between its end and its start)."""
-    import numpy as np
-    got = sides(text)
-    rows = []
-    for i, t in enumerate(segments):
-        v = got[i] if i < len(got) else None
-        rows.append({"side": i + 1, "truth": f"{t:g}", "output": "—" if v is None else f"{v:g}",
-                     "correct": "✓" if v is not None and abs(v - t) < 0.05 else "✗"})
-    for j in range(len(segments), len(got)):
-        rows.append({"side": j + 1, "truth": "—", "output": f"{got[j]:g}", "correct": "✗"})
-    P = np.array(corners, float)
-    dirs = [(P[(i + 1) % len(P)] - P[i]) / np.linalg.norm(P[(i + 1) % len(P)] - P[i]) for i in range(len(P))]
-    pts = [np.zeros(2)]
-    for i, v in enumerate(got[:len(dirs)]):
-        pts.append(pts[-1] + v * dirs[i])
-    gap = float(np.linalg.norm(pts[-1] - pts[0])) if len(got) >= len(dirs) else float("nan")
-    return pd.DataFrame(rows), np.array(pts), gap

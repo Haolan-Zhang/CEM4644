@@ -121,20 +121,6 @@ def gantt(rows: List[dict], title: str, axis: str):
     display(Image(buf.getvalue()))
 
 
-def outline_figure(corners, pts, title: str):
-    """The drawing's outline (gray) and the one drawn from the model's sides (orange), with the end point marked."""
-    import numpy as np
-    P = np.array(corners + [corners[0]], float)
-    fig, ax = plt.subplots(figsize=(6, 4.6))
-    ax.plot(P[:, 0], P[:, 1], color=GREY, lw=6, alpha=0.5, label="the drawing")
-    if len(pts) > 1:
-        ax.plot(pts[:, 0], pts[:, 1], color=ORANGE, lw=2, marker="o", ms=3, label="from the model's sides")
-        ax.plot(*pts[-1], marker="x", color="#e63946", ms=10, mew=2)
-    ax.set_aspect("equal"); ax.legend(fontsize=8, loc="best"); ax.set_title(title, fontsize=10); ax.set_xlabel("ft"); ax.set_ylabel("ft")
-    buf = io.BytesIO(); fig.savefig(buf, format="png", dpi=100, bbox_inches="tight"); plt.close(fig)
-    display(Image(buf.getvalue()))
-
-
 class Progress:
     """One line that says which question is running (live runs take a few seconds each), cleared at the end."""
 
