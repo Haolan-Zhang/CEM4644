@@ -12,6 +12,7 @@ from .texts import FINALS, MODEL, SKILL, fill, fill_prompt, say, text
 from .tools import PARAMETERS, Project, run_tool
 
 TOOL_NAMES = ["search_spec", "calculator", "lookup_log"]
+DEFAULT_QUESTIONS = ["P1", "P4", "P5"]          # the questions of Step 2b (the others are for the homework)
 DOCUMENTS = {"specification (Section 03 30 00)": "spec_03_30_00.txt", "submittal log": "submittal_log.csv", "schedule": "schedule.csv"}
 
 
@@ -34,6 +35,7 @@ class AgentLab:
         self.calculator_runs: List[dict] = []
         self.workflow_runs: Dict[str, dict] = {}
         self.tool_runs: List[dict] = []
+        self.selected = list(DEFAULT_QUESTIONS)
         self.skill_runs: List[dict] = []
         self.ready = True
         print(f"✅ Ready in {time.time() - t0:.0f} s.")
@@ -126,16 +128,26 @@ class AgentLab:
     def _run_agent(self, system, question, tools, skills=None, extra=None):
         return self.gemini.agent(system, question, tools, lambda name, args: run_tool(self.project, skills or {}, name, args), extra)
 
-    def agent_tools(self, search_spec: bool = True, calculator: bool = True, lookup_log: bool = True, **texts):
-        """The six project questions, answered by the agent with the tools ticked."""
+    def _questions(self, ids=None) -> List[dict]:
+        """The project questions with these ids (P1-P6), in their order; all of them if ids is empty."""
+        ids = [str(i).strip().upper() for i in (ids or [])]
+        chosen = [q for q in self.questions if not ids or q["id"] in ids]
+        if not chosen:
+            raise ValueError(f"No project question called {ids}; the questions are " + ", ".join(q["id"] for q in self.questions))
+        return chosen
+
+    def agent_tools(self, search_spec: bool = True, calculator: bool = True, lookup_log: bool = True, questions=DEFAULT_QUESTIONS, **texts):
+        """The chosen project questions (questions: ids such as ["P1", "P4", "P5"]), answered by the agent with the tools ticked."""
         self._need(); G = "tools"
+        chosen = self._questions(questions)
+        self.selected = [q["id"] for q in chosen]
         names = [n for n, on in zip(TOOL_NAMES, (search_spec, calculator, lookup_log)) if on]
         tools = self._tools(names, texts, G)
         system = text(texts, G, "system_text")
         results, prog = [], ui.Progress()
         try:
-            for i, q in enumerate(self.questions):
-                prog.say(f"{q['id']} ({i + 1} of {len(self.questions)})")
+            for i, q in enumerate(chosen):
+                prog.say(f"{q['id']} ({i + 1} of {len(chosen)})")
                 r = self._run_agent(system, q["question"], tools)
                 ans = score.final_answer(r["answer"])
                 results.append({"q": q, "run": r, "answer": ans, "result": score.judge(ans, q)})
@@ -168,7 +180,9 @@ class AgentLab:
         q = next(x for x in self.questions if x["id"] == qid)
         runs = []
         for run in self.tool_runs:
-            r = next(x for x in run["results"] if x["q"]["id"] == qid)
+            r = next((x for x in run["results"] if x["q"]["id"] == qid), None)
+            if r is None:                                   # a run made with a question list without this question
+                continue
             runs.append({"title": fill(text(texts, G, "run_text"), run=run["run"], tools=run["tools"], result=r["result"]),
                          "steps": r["run"]["steps"], "answer": r["answer"], "full": r["run"]["answer"], "result": r["result"]})
         labels = {k: text(texts, G, f"{k}_label_text") for k in ("question", "call", "output", "answer")}
@@ -295,13 +309,14 @@ class AgentLab:
 
     def hokieai_agent(self, **texts):
         self._need(); G = "hokieai_agent"
-        qs = "\n".join(f"{q['id']}. {q['question']}" for q in self.questions)
+        chosen = self._questions(self.selected)             # the questions of Step 2b, so the comparison counts the same ones
+        qs = "\n".join(f"{q['id']}. {q['question']}" for q in chosen)
         prompt = fill_prompt(text(texts, G, "prompt_text"), questions=qs)
-        ids = [q["id"] for q in self.questions]
+        ids = [q["id"] for q in chosen]
 
         def on_score(reply):
             got = score.answers_by_id(reply, ids)
-            res = [(q, got.get(q["id"], ""), score.judge(got.get(q["id"], ""), q) if q["id"] in got else "wrong") for q in self.questions]
+            res = [(q, got.get(q["id"], ""), score.judge(got.get(q["id"], ""), q) if q["id"] in got else "wrong") for q in chosen]
             right = sum(r == "correct" for *_, r in res); unknown = sum(r == "UNKNOWN" for *_, r in res); wrong = len(res) - right - unknown
             say(texts, G, "result_text", right=right, unknown=unknown, wrong=wrong, n=len(res))
             df = pd.DataFrame([{"q": f"{q['id']}. {q['question']}", "truth": score.truth_text(q), "answer": a or "—", "result": r} for q, a, r in res])

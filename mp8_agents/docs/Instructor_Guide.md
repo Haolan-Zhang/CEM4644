@@ -50,7 +50,24 @@ one last request with the tools switched off forces an answer.
 | One prompt | 11 of 15 (8 of 15 in an earlier run) | Misses the partial grout on plans 1 and 5 (6.13 CY instead of 3.04; 8.35 CY, the all-cell value, instead of 4.17) and both grout quantities on plan 3; the earlier run missed every partial grout and all of plan 4 (its undimensioned side) |
 | Workflow | 15 of 15 (both runs) | Gemini read every side right, including the two undimensioned ones; code did the rest |
 
-**Part 2 · tools** (6 questions per run):
+**Part 2 · the questions of Step 2b.** The cell's `questions = ["P1", "P4", "P5"]` (under *Show code*; the default is
+`DEFAULT_QUESTIONS` in `aec_agent/lab.py`) picks the questions the agent answers; Step 2c and the HokieAI agent of Part 5
+use the same ones, and any subset runs from the stored outputs. P1 needs the specification (with only the logs the agent
+guesses 0.50), P4 the schedule (with only the calculator it guesses 12 days), P5 all three tools. P2, P3 and P6 are
+for the homework. On P1, P4 and P5:
+
+| Tools | Correct | UNKNOWN | Wrong (guessed) |
+|---|---|---|---|
+| none | 0 | 3 | 0 |
+| lookup_log | 1 | 1 | 1 |
+| calculator | 0 | 2 | 1 |
+| calculator, lookup_log | 1 | 1 | 1 |
+| search_spec | 1 | 2 | 0 |
+| search_spec, lookup_log | **3** | 0 | 0 |
+| search_spec, calculator | 1 | 2 | 0 |
+| all three | **3** | 0 | 0 |
+
+**Part 2 · tools, all six questions** (6 questions per run):
 
 | Tools | Correct | UNKNOWN | Wrong (guessed) | Tool calls |
 |---|---|---|---|---|

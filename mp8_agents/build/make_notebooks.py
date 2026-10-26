@@ -16,7 +16,7 @@ from nbformat.v4 import new_code_cell, new_markdown_cell, new_notebook
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
-from aec_agent.lab import DOCUMENTS  # noqa: E402
+from aec_agent.lab import DEFAULT_QUESTIONS as STEP2_QUESTIONS, DOCUMENTS  # noqa: E402
 from aec_agent.texts import CHAT_URL, MODEL, TEXTS  # noqa: E402
 
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
@@ -111,6 +111,7 @@ def build():
     load_existing(REPO / FILE)
     drawings = json.loads((REPO / "data" / "drawings" / "problems.json").read_text())
     questions = json.loads((REPO / "data" / "project" / "questions.json").read_text())
+    step2 = [q for q in questions if q["id"] in STEP2_QUESTIONS]
     cells = [md("""
 # In-Class Activity: AI Workflows and AI Agents
 In this activity, we will use AI to take off quantities from foundation plans and answer questions about a construction project: first as a fixed workflow, then as an AI agent with tools and a skill.
@@ -142,7 +143,7 @@ A workflow splits a task into fixed steps, each done by an AI model or by code. 
     # ------------------------------------------------------------------ Part 2: agents and tools
     cells.append(md(f"""
 ## Part 2 · AI Agents: Tool Calling
-An AI agent decides by itself which tool to call and when it has enough to answer. You choose its tools; it answers six questions about a practice project whose documents it can reach only through the tools.
+An AI agent decides by itself which tool to call and when it has enough to answer. You choose its tools; it answers questions about a practice project whose documents it can reach only through the tools.
 
 ![How an AI agent calls a tool]({FIG}/agent.png)
 
@@ -153,14 +154,15 @@ An AI agent decides by itself which tool to call and when it has enough to answe
     cells.append(form("▶ Step 2a · Look at the Project Documents", "lab.show_document(document)",
                       notes=["Choose a document to see what the tools read."],
                       params=[choice("document", list(DOCUMENTS)[0], DOCUMENTS)]))
-    cells.append(form("▶ Step 2b · Run the Agent with the Tools You Choose", "lab.agent_tools(search_spec, calculator, lookup_log)",
+    cells.append(form("▶ Step 2b · Run the Agent with the Tools You Choose", "lab.agent_tools(search_spec, calculator, lookup_log, questions)",
                       notes=["Tick the tools and run the cell; each run is added to the table. Try no tools, each tool alone, and all three.",
                              "UNKNOWN: the agent said it could not find the value. Wrong: it guessed."],
-                      params=['search_spec = True #@param {type:"boolean"}', 'calculator = True #@param {type:"boolean"}', 'lookup_log = True #@param {type:"boolean"}'],
+                      params=['search_spec = True #@param {type:"boolean"}', 'calculator = True #@param {type:"boolean"}', 'lookup_log = True #@param {type:"boolean"}',
+                              "questions = " + json.dumps(STEP2_QUESTIONS) + "          # the project questions the agent answers (P1-P6); Step 2c and Part 5 use the same ones"],
                       texts=T("tools")))
     cells.append(form("▶ Step 2c · Inspect the Tool Calls", "lab.show_trace(question)",
                       notes=["Choose a question to see, for each run of Step 2b, the tools the agent called, with their inputs and outputs."],
-                      params=[choice("question", f"{questions[4]['id']}. {questions[4]['question']}", [f"{q['id']}. {q['question']}" for q in questions])],
+                      params=[choice("question", f"{step2[-1]['id']}. {step2[-1]['question']}", [f"{q['id']}. {q['question']}" for q in step2])],
                       texts=T("trace")))
     cells.append(question(2,
                           "From Step 2b: Include the table of runs. For each tool, report which questions it was needed for.",
@@ -221,7 +223,7 @@ A skill is a saved set of instructions with a name and a description. The agent 
     # ------------------------------------------------------------------ Part 5: your own HokieAI agent
     cells.append(md("""
 ## Part 5 · Your Own HokieAI Agent
-A HokieAI agent is instructions plus knowledge sources (files it can read). Build one with the project files and ask it the six questions of Part 2.
+A HokieAI agent is instructions plus knowledge sources (files it can read). Build one with the project files and ask it the questions of Part 2.
 """))
     cells.append(form("▶ Step 5a · Create Your HokieAI Agent", "lab.create_agent()",
                       notes=["Run the cell and follow the steps; edit the instructions in the box before pasting them."],
