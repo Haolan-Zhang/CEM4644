@@ -83,17 +83,13 @@ def agent():
     ax.text(8.55, 4.0, "lookup_log(log='submittals', search='03 30 00-02')", ha="center", fontsize=8.5, family="DejaVu Sans Mono")
     box(ax, 8.7, 2.25, 10.8, 3.25, "2 · The notebook\nruns the tool", "code")
     box(ax, 6.3, 0.65, 10.8, 1.75, "3 · Tool output, back to the model\n(the submittal's row of the log)\nExterior slabs and walks | cement 560 | fly ash 100 | water 290 | ...", "code", size=9)
-    box(ax, 0.2, 0.65, 2.7, 2.05, "Answer\nFINAL: NO\n(w/cm 0.44 > 0.42)", weight="bold")
+    box(ax, 0.2, 0.65, 2.7, 2.05, "4 · Answer\nFINAL: NO\n(w/cm 0.44 > 0.42)", weight="bold")
     arrow(ax, (2.72, 3.9), (3.38, 3.0))
     arrow(ax, (5.62, 3.15), (6.28, 4.1))
     arrow(ax, (10.0, 3.73), (10.0, 3.27))
     arrow(ax, (10.0, 2.23), (10.0, 1.77))
     arrow(ax, (6.28, 1.2), (5.0, 2.13))
     arrow(ax, (3.9, 2.13), (2.72, 1.4))
-    ax.text(6.0, 2.2, "repeat until\nit has enough", fontsize=9, color="#457b9d", style="italic", ha="left", family=FONT)
-    ax.text(3.05, 1.6, "enough:\nanswer", fontsize=9, color="#333", ha="left", family=FONT)
-    ax.text(5.5, 0.18, "Next rounds of the same loop:  search_spec('exterior slabs walks w/cm') → maximum w/cm 0.42  ·  "
-            "calculator('290 / (560 + 100)') → 0.44", ha="center", fontsize=9, color="#333", family=FONT)
     save(fig, "agent.png")
 
 
