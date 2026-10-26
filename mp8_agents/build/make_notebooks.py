@@ -158,7 +158,7 @@ An AI agent decides by itself which tool to call and when it has enough to answe
                       notes=["Tick the tools and run the cell; each run is added to the table. Try no tools, each tool alone, and all three.",
                              "UNKNOWN: the agent said it could not find the value. Wrong: it guessed."],
                       params=['search_spec = True #@param {type:"boolean"}', 'calculator = True #@param {type:"boolean"}', 'lookup_log = True #@param {type:"boolean"}',
-                              "questions = " + json.dumps(STEP2_QUESTIONS) + "          # the project questions the agent answers (P1-P6); Step 2c and Part 5 use the same ones"],
+                              "questions = " + json.dumps(STEP2_QUESTIONS) + "          # the project questions the agent answers (Q1-Q6); Step 2c and Part 5 use the same ones"],
                       texts=T("tools")))
     cells.append(form("▶ Step 2c · Inspect the Tool Calls", "lab.show_trace(question)",
                       notes=["Choose a question to see, for each run of Step 2b, the tools the agent called, with their inputs and outputs."],
@@ -166,7 +166,7 @@ An AI agent decides by itself which tool to call and when it has enough to answe
                       texts=T("trace")))
     cells.append(question(2,
                           "From Step 2b: Include the table of runs. For each tool, report which questions it was needed for.",
-                          "From Step 2c: For question P5, describe the agent's steps with all three tools. Without the tools it needed, did the agent answer UNKNOWN or guess?",
+                          "From Step 2c: For question Q3, describe the agent's steps with all three tools. Without the tools it needed, did the agent answer UNKNOWN or guess?",
                           "Which is more concerning on a real project, an agent that answers UNKNOWN or one that guesses, and how would you check an agent's answer?"))
 
     # ------------------------------------------------------------------ Part 3: code execution
@@ -203,7 +203,7 @@ A skill is a saved set of instructions with a name and a description. The agent 
 | Example | the conventions pasted above every takeoff question | *cmu-foundation-takeoff*, loaded for CMU questions only |
 """.replace("{FIG}", FIG)))
     cells.append(form("▶ Step 4a · Run the Agent with and without the Skill", "lab.agent_skill(use_skill)",
-                      notes=["Run the cell with *use_skill* ticked and unticked: the agent answers two takeoff questions (T1, T2) and one project question (P3).",
+                      notes=["Run the cell with *use_skill* ticked and unticked: the agent answers two takeoff questions (T1, T2) and one project question (Q5).",
                              "Then make the skill's description vague (for example, *Useful notes.*) and run again: is the skill still loaded?"],
                       params=['use_skill = True #@param {type:"boolean"}'],
                       texts=T("skills")))
@@ -216,7 +216,7 @@ A skill is a saved set of instructions with a name and a description. The agent 
                       params=['version = "with the skill"'],
                       texts=T("calculator_skill")))
     cells.append(question(4,
-                          "From Step 4a: Report the quantities correct with and without the skill, and the questions the skill was loaded for. Did the agent load the skill for P3? What happened with a vague description?",
+                          "From Step 4a: Report the quantities correct with and without the skill, and the questions the skill was loaded for. Did the agent load the skill for Q5? What happened with a vague description?",
                           "From Steps 4b and 4c: Report HokieAI's quantities correct without and with the skill, and your two calculators' scores. Which outputs did the skill fix?",
                           "What estimating conventions or company rules from your own experience would you write as a skill, and what would its description say?"))
 

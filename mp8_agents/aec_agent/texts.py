@@ -171,7 +171,7 @@ TEXTS: Dict[str, Dict[str, str]] = {
                               "2. In HokieAI ({url}), open **Explore Agents** and click *Create* next to *My Agents*; enter a name, for example *CEM4644 project agent*.\n"
                               "3. Under **Agent Instructions → Specific**, paste the instructions below.\n"
                               "4. Under **Knowledge Sources → Add → Upload Files**, upload the three files.\n5. Click *Create*."),
-        "prompt_text": ("Answer the questions below. Reply with one line per question and nothing else, in this format:\nP1 | <answer>\n\n"
+        "prompt_text": ("Answer the questions below. Reply with one line per question and nothing else, in this format:\nQ1 | <answer>\n\n"
                         "Questions:\n{questions}"),
         "steps_text": ("1. Open your agent in HokieAI ({url}) and start a new chat with it.\n2. Copy the prompt below, paste it into the chat, and send.\n"
                        "3. Copy the agent's output with the **copy button** below its reply, and paste it into the box below.\n"

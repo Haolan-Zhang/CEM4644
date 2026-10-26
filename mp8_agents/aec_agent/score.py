@@ -102,10 +102,10 @@ def compute(length: float, p: dict) -> Dict[str, float]:
 
 
 def answers_by_id(text: str, ids: List[str]) -> Dict[str, str]:
-    """'P1 | 0.48' lines -> {"P1": "0.48"} (the HokieAI agent's output)."""
+    """'Q1 | 0.48' lines -> {"Q1": "0.48"} (the HokieAI agent's output)."""
     out = {}
     for line in (text or "").split("\n"):
-        m = re.match(r"^\W*(P\d)\W*[|:.\-–]\s*(.+)$", line.strip())
+        m = re.match(r"^\W*(Q\d)\W*[|:.\-–]\s*(.+)$", line.strip())
         if m and m.group(1) in ids:
             out[m.group(1)] = m.group(2).strip().strip("|").strip()
     return out

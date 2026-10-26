@@ -1,6 +1,6 @@
 [
  {
-  "id": "P1",
+  "id": "Q1",
   "question": "What is the maximum water-cementitious ratio (w/cm) for the foundation walls on this project?",
   "kind": "number",
   "value": 0.48,
@@ -11,30 +11,7 @@
   ]
  },
  {
-  "id": "P2",
-  "question": "A continuous footing is 187 ft long, 2 ft 7 in wide, and 1 ft 2 in deep. How many cubic yards of concrete are needed, including 7 % waste?",
-  "kind": "number",
-  "value": 22.34,
-  "tolerance": 0.01,
-  "unit": "CY",
-  "tools": [
-   "calculator"
-  ]
- },
- {
-  "id": "P3",
-  "question": "What is the review status of submittal 03 30 00-03?",
-  "kind": "text",
-  "value": "Revise and resubmit",
-  "accept": [
-   "revise\\s*(and|&)\\s*resubmit"
-  ],
-  "tools": [
-   "lookup_log"
-  ]
- },
- {
-  "id": "P4",
+  "id": "Q2",
   "question": "How many working days are scheduled to place the slab-on-ground: the activity's quantity divided by its daily output, rounded up to a whole day?",
   "kind": "number",
   "value": 5,
@@ -46,7 +23,7 @@
   ]
  },
  {
-  "id": "P5",
+  "id": "Q3",
   "question": "Does the mix in submittal 03 30 00-02 meet this project's maximum w/cm for its element? Answer YES or NO.",
   "kind": "yesno",
   "value": "NO",
@@ -58,7 +35,30 @@
   ]
  },
  {
-  "id": "P6",
+  "id": "Q4",
+  "question": "A continuous footing is 187 ft long, 2 ft 7 in wide, and 1 ft 2 in deep. How many cubic yards of concrete are needed, including 7 % waste?",
+  "kind": "number",
+  "value": 22.34,
+  "tolerance": 0.01,
+  "unit": "CY",
+  "tools": [
+   "calculator"
+  ]
+ },
+ {
+  "id": "Q5",
+  "question": "What is the review status of submittal 03 30 00-03?",
+  "kind": "text",
+  "value": "Revise and resubmit",
+  "accept": [
+   "revise\\s*(and|&)\\s*resubmit"
+  ],
+  "tools": [
+   "lookup_log"
+  ]
+ },
+ {
+  "id": "Q6",
   "question": "Does the target slump of the mix in submittal 03 30 00-05 meet this project's maximum slump for its element? Answer YES or NO.",
   "kind": "yesno",
   "value": "NO",

@@ -31,9 +31,10 @@ key. Part 3, Steps 4b-4c and Part 5 use HokieAI in the browser (paste-back).
 **The practice project** (`build/generate_project.py`, fictional): a concrete specification table with
 project-specific limits (for example maximum w/cm 0.48 for foundation walls, 0.42 for exterior slabs), a submittal log
 of five mix designs (batch weights, air, slump, status) and a schedule of six activities (quantity, daily output). The
-six questions: P1 a specification value; P2 footing concrete volume (arithmetic only); P3 a submittal status; P4
-working days (log + arithmetic); P5 w/cm of a submittal against its element (log + arithmetic + specification); P6
-slump against its element (log + specification). Ground truth in `data/project/questions.json`.
+six questions: Q1 a specification value; Q2 working days (log + arithmetic); Q3 w/cm of a submittal against its
+element (log + arithmetic + specification); Q4 footing concrete volume (arithmetic only); Q5 a submittal status; Q6
+slump against its element (log + specification). Q1-Q3 are the workshop's Step 2b, Q4-Q6 the homework's (they were
+P1, P4, P5, P2, P3, P6 before October 2026). Ground truth in `data/project/questions.json`.
 
 **The tools** (`aec_agent/tools.py`): `search_spec` returns the three specification lines that share the most words
 with the query (plus the table header); `lookup_log` returns the log rows containing the search text; `calculator`
@@ -50,11 +51,11 @@ one last request with the tools switched off forces an answer.
 | One prompt | 11 of 15 (8 of 15 in an earlier run) | Misses the partial grout on plans 1 and 5 (6.13 CY instead of 3.04; 8.35 CY, the all-cell value, instead of 4.17) and both grout quantities on plan 3; the earlier run missed every partial grout and all of plan 4 (its undimensioned side) |
 | Workflow | 15 of 15 (both runs) | Gemini read every side right, including the two undimensioned ones; code did the rest |
 
-**Part 2 · the questions of Step 2b.** The cell's `questions = ["P1", "P4", "P5"]` (under *Show code*; the default is
+**Part 2 · the questions of Step 2b.** The cell's `questions = ["Q1", "Q2", "Q3"]` (under *Show code*; the default is
 `DEFAULT_QUESTIONS` in `aec_agent/lab.py`) picks the questions the agent answers; Step 2c and the HokieAI agent of Part 5
-use the same ones, and any subset runs from the stored outputs. P1 needs the specification (with only the logs the agent
-guesses 0.50), P4 the schedule (with only the calculator it guesses 12 days), P5 all three tools. P2, P3 and P6 are
-for the homework. On P1, P4 and P5:
+use the same ones, and any subset runs from the stored outputs. Q1 needs the specification (with only the logs the agent
+guesses 0.50), Q2 the schedule (with only the calculator it guesses 12 days), Q3 all three tools. Q4, Q5 and Q6 are
+for the homework. On Q1, Q2 and Q3:
 
 | Tools | Correct | UNKNOWN | Wrong (guessed) |
 |---|---|---|---|
@@ -81,17 +82,17 @@ for the homework. On P1, P4 and P5:
 | all three | **6** | 0 | 0 | 13 |
 
 The documents decide the score: only the runs with both `search_spec` and `lookup_log` answer all six. The calculator
-barely matters: the model does this arithmetic (P2, P4, the w/cm of P5) correctly by itself, and with all three tools
-it uses the calculator anyway (13 tool calls instead of 9). The guesses: with only the logs, P1 is answered "0.50"
-(a typical w/cm, not this project's 0.48); with only the calculator, P4 is answered "12 days". Without tools the
+barely matters: the model does this arithmetic (Q4, Q2, the w/cm of Q3) correctly by itself, and with all three tools
+it uses the calculator anyway (13 tool calls instead of 9). The guesses: with only the logs, Q1 is answered "0.50"
+(a typical w/cm, not this project's 0.48); with only the calculator, Q2 is answered "12 days". Without tools the
 model once asked for a tool that does not exist; the trace shows the notebook's reply ("There is no tool called ...").
 
-**Part 4 · skill** (T1 rectangle, T2 L-shape, 3 quantities each; P3 as the question the skill does not apply to):
+**Part 4 · skill** (T1 rectangle, T2 L-shape, 3 quantities each; Q5 as the question the skill does not apply to):
 
 | Skill | Quantities correct | Skill loaded for |
 |---|---|---|
 | not available | 3 of 6 (both partial-grout quantities, and T2's all-cell grout) | — |
-| cmu-foundation-takeoff | 6 of 6 | T1, T2 (not P3) |
+| cmu-foundation-takeoff | 6 of 6 | T1, T2 (not Q5) |
 
 A vague description (for example *Useful notes.*) is not stored: it runs live with a key, and is the students'
 experiment.
@@ -106,7 +107,7 @@ differ. That is worth saying in class: Part 1's one prompt gave 8 and 11 of 15 i
    model, fixed rules and arithmetic with code or a spreadsheet, and keep a person checking the model's reading.
 2. Each document tool is needed by the questions that use its document; the calculator turned out not to be needed
    for these questions (a fair finding). With missing tools the agent mostly said UNKNOWN, but it also guessed
-   (P1 = 0.50 with only the logs). A guess is the more dangerous failure; checking the trace (which tool, which
+   (Q1 = 0.50 with only the logs). A guess is the more dangerous failure; checking the trace (which tool, which
    output) is how to verify an answer.
 3. Code execution: a good answer shows the chart and the calculator, says which number was wrong and finds
    the line of code or the formula behind it (often the partial grout, a rounding of the duration, or a finish-to-start

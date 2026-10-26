@@ -3,7 +3,7 @@
     python build/make_figures.py
 
 workflow.png  one prompt vs. a workflow of fixed steps
-agent.png     how an AI agent calls a tool (the loop), with question P5 as the example
+agent.png     how an AI agent calls a tool (the loop), with question Q3 as the example
 codeexec.png  tool calling vs. code execution (the agent writes and runs its own code)
 skills.png    a prompt vs. a skill (name, description, body), and when the agent loads it
 """
@@ -77,7 +77,7 @@ def workflow():
 
 def agent():
     fig, ax = canvas(11, 5.0)
-    box(ax, 0.2, 3.2, 2.7, 4.6, "Question (P5)\nDoes submittal\n03 30 00-02 meet the\nmaximum w/cm?")
+    box(ax, 0.2, 3.2, 2.7, 4.6, "Question (Q3)\nDoes submittal\n03 30 00-02 meet the\nmaximum w/cm?")
     box(ax, 3.4, 2.15, 5.6, 3.35, "AI model\n(the agent)\ndecides the next step", "model", weight="bold")
     box(ax, 6.3, 3.75, 10.8, 4.85, "1 · Tool call: the model asks for a tool (name + inputs)", "model", size=9.5)
     ax.text(8.55, 4.0, "lookup_log(log='submittals', search='03 30 00-02')", ha="center", fontsize=8.5, family="DejaVu Sans Mono")

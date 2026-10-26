@@ -66,24 +66,25 @@ def wcm(s):
 
 
 def project_questions():
-    """Six questions: each tool is needed by at least two, two need more than one tool."""
+    """Six questions: each tool is needed by at least two, two need more than one tool. Q1-Q3 are the workshop's Step 2b,
+    Q4-Q6 the homework's."""
     s2, s5 = SUBMITTALS[1], SUBMITTALS[4]
     footing = 187 * (31 / 12) * (14 / 12) / 27 * 1.07
-    return [
-        {"id": "P1", "question": "What is the maximum water-cementitious ratio (w/cm) for the foundation walls on this project?",
+    return sorted([
+        {"id": "Q1", "question": "What is the maximum water-cementitious ratio (w/cm) for the foundation walls on this project?",
          "kind": "number", "value": 0.48, "tolerance": 0.001, "unit": "", "tools": ["search_spec"]},
-        {"id": "P2", "question": "A continuous footing is 187 ft long, 2 ft 7 in wide, and 1 ft 2 in deep. How many cubic yards of concrete are needed, including 7 % waste?",
+        {"id": "Q4", "question": "A continuous footing is 187 ft long, 2 ft 7 in wide, and 1 ft 2 in deep. How many cubic yards of concrete are needed, including 7 % waste?",
          "kind": "number", "value": round(footing, 2), "tolerance": 0.01, "unit": "CY", "tools": ["calculator"]},
-        {"id": "P3", "question": "What is the review status of submittal 03 30 00-03?",
+        {"id": "Q5", "question": "What is the review status of submittal 03 30 00-03?",
          "kind": "text", "value": "Revise and resubmit", "accept": [r"revise\s*(and|&)\s*resubmit"], "tools": ["lookup_log"]},
-        {"id": "P4", "question": "How many working days are scheduled to place the slab-on-ground: the activity's quantity divided by its daily output, rounded up to a whole day?",
+        {"id": "Q2", "question": "How many working days are scheduled to place the slab-on-ground: the activity's quantity divided by its daily output, rounded up to a whole day?",
          "kind": "number", "value": math.ceil(212 / 48), "tolerance": 0.001, "unit": "days", "tools": ["lookup_log", "calculator"]},
-        {"id": "P5", "question": "Does the mix in submittal 03 30 00-02 meet this project's maximum w/cm for its element? Answer YES or NO.",
+        {"id": "Q3", "question": "Does the mix in submittal 03 30 00-02 meet this project's maximum w/cm for its element? Answer YES or NO.",
          "kind": "yesno", "value": "NO", "note": f"w/cm = {s2[7]} / ({s2[5]} + {s2[6]}) = {wcm(s2):.2f} > 0.42",
          "tools": ["lookup_log", "calculator", "search_spec"]},
-        {"id": "P6", "question": "Does the target slump of the mix in submittal 03 30 00-05 meet this project's maximum slump for its element? Answer YES or NO.",
+        {"id": "Q6", "question": "Does the target slump of the mix in submittal 03 30 00-05 meet this project's maximum slump for its element? Answer YES or NO.",
          "kind": "yesno", "value": "NO", "note": f"target slump {s5[9]} in > 6 in (columns)", "tools": ["lookup_log", "search_spec"]},
-    ]
+    ], key=lambda q: q["id"])
 
 
 # ----------------------------------------------------------------------------- foundation takeoffs

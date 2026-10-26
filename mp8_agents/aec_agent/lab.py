@@ -12,7 +12,7 @@ from .texts import FINALS, MODEL, SKILL, fill, fill_prompt, say, text
 from .tools import PARAMETERS, Project, run_tool
 
 TOOL_NAMES = ["search_spec", "calculator", "lookup_log"]
-DEFAULT_QUESTIONS = ["P1", "P4", "P5"]          # the questions of Step 2b (the others are for the homework)
+DEFAULT_QUESTIONS = ["Q1", "Q2", "Q3"]          # the questions of Step 2b (the others are for the homework)
 DOCUMENTS = {"specification (Section 03 30 00)": "spec_03_30_00.txt", "submittal log": "submittal_log.csv", "schedule": "schedule.csv"}
 
 
@@ -129,7 +129,7 @@ class AgentLab:
         return self.gemini.agent(system, question, tools, lambda name, args: run_tool(self.project, skills or {}, name, args), extra)
 
     def _questions(self, ids=None) -> List[dict]:
-        """The project questions with these ids (P1-P6), in their order; all of them if ids is empty."""
+        """The project questions with these ids (Q1-Q6), in their order; all of them if ids is empty."""
         ids = [str(i).strip().upper() for i in (ids or [])]
         chosen = [q for q in self.questions if not ids or q["id"] in ids]
         if not chosen:
@@ -137,7 +137,7 @@ class AgentLab:
         return chosen
 
     def agent_tools(self, search_spec: bool = True, calculator: bool = True, lookup_log: bool = True, questions=DEFAULT_QUESTIONS, **texts):
-        """The chosen project questions (questions: ids such as ["P1", "P4", "P5"]), answered by the agent with the tools ticked."""
+        """The chosen project questions (questions: ids such as ["Q1", "Q2", "Q3"]), answered by the agent with the tools ticked."""
         self._need(); G = "tools"
         chosen = self._questions(questions)
         self.selected = [q["id"] for q in chosen]
@@ -227,8 +227,8 @@ class AgentLab:
     def _skill_questions(self):
         """The two takeoff questions (the skill applies) and one project question (it does not)."""
         tq = [{"id": t["id"], "question": t["text"] + "\n\n" + FINALS.replace("{lines}", self._finals(t["key"])), "key": t["key"]} for t in self.takeoffs]
-        p3 = next(q for q in self.questions if q["id"] == "P3")
-        return tq + [{"id": p3["id"], "question": p3["question"], "q": p3}]
+        q5 = next(q for q in self.questions if q["id"] == "Q5")
+        return tq + [{"id": q5["id"], "question": q5["question"], "q": q5}]
 
     def agent_skill(self, use_skill: bool = True, **texts):
         self._need(); G = "skills"
