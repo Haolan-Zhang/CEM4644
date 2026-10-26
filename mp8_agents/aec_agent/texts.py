@@ -94,13 +94,12 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "search_spec_text": TOOLS["search_spec"],
         "calculator_text": TOOLS["calculator"],
         "lookup_log_text": TOOLS["lookup_log"],
-        "result_text": ("**Run {run} · tools: {tools}**\n**Correct:** {right} of {n}   **UNKNOWN:** {unknown}   **Wrong:** {wrong}\n"
-                        "**Tool calls:** {calls}   **Model calls:** {model_calls}"),
+        "result_text": "**Run {run} · tools: {tools}**\n**Correct:** {right} of {n}   **UNKNOWN:** {unknown}   **Wrong:** {wrong}",
         "none_text": "no tools",
         "table_text": "Ground truth vs. agent output (this run):",
         "columns_text": "Question | Ground truth | Agent output | Result | Tools called",
         "runs_text": "All runs so far:",
-        "runs_columns_text": "Run | Tools | Correct | UNKNOWN | Wrong | Tool calls | Model calls",
+        "runs_columns_text": "Run | Tools | Correct | UNKNOWN | Wrong",
     },
     "trace": {
         "run_text": "**Run {run}**\ntools: {tools}",

@@ -157,7 +157,7 @@ class AgentLab:
 
     def _runs_table(self) -> pd.DataFrame:
         return pd.DataFrame([{"run": r["run"], "tools": r["tools"], "correct": f"{r['right']} of {len(r['results'])}", "unknown": r["unknown"],
-                              "wrong": r["wrong"], "calls": r["calls"], "model_calls": r["model_calls"]} for r in self.tool_runs])
+                              "wrong": r["wrong"]} for r in self.tool_runs])
 
     def show_trace(self, question: str, **texts):
         """Every run's tool calls for one question."""
