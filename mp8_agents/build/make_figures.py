@@ -54,22 +54,22 @@ def save(fig, name):
 
 
 def workflow():
-    fig, ax = canvas(11, 4.3)
-    ax.text(0.15, 3.25, "One\nprompt", fontsize=12, weight="bold", va="center", family=FONT)
-    box(ax, 1.3, 2.75, 2.7, 3.75, "Drawing\n+ 3 questions")
-    box(ax, 3.1, 2.75, 9.5, 3.75, "AI model (Gemini)\nreads the drawing and computes every quantity in one reply", "model")
-    box(ax, 9.9, 2.75, 10.9, 3.75, "CMUs\ngrout")
-    arrow(ax, (2.72, 3.25), (3.08, 3.25)); arrow(ax, (9.52, 3.25), (9.88, 3.25))
+    fig, ax = canvas(11, 4.6)
+    ax.text(0.15, 3.6, "One\nprompt", fontsize=12, weight="bold", va="center", family=FONT)
+    box(ax, 1.3, 3.1, 2.6, 4.1, "Drawing\n+ 3 questions")
+    box(ax, 3.0, 3.1, 9.15, 4.1, "AI model (Gemini)\nreads the drawing and computes every quantity in one reply", "model")
+    box(ax, 9.55, 3.1, 10.9, 4.1, "CMU and grout\nquantities")
+    arrow(ax, (2.62, 3.6), (2.98, 3.6)); arrow(ax, (9.17, 3.6), (9.53, 3.6))
 
-    ax.text(0.15, 1.35, "Workflow", fontsize=12, weight="bold", va="center", family=FONT)
-    box(ax, 1.3, 0.85, 2.7, 1.85, "Drawing")
-    box(ax, 3.1, 0.85, 5.4, 1.85, "Step 1 · AI model\nreads the length\nof every side", "model")
-    box(ax, 5.8, 0.85, 7.0, 1.85, "44, 26, 24,\n8, 20, 34 ft", size=9)
-    box(ax, 7.4, 0.85, 9.5, 1.85, "Step 2 · Code\nadds the sides and\napplies the rules", "code")
-    box(ax, 9.9, 0.85, 10.9, 1.85, "CMUs\ngrout")
-    for a, b in ((2.72, 3.08), (5.42, 5.78), (7.02, 7.38), (9.52, 9.88)):
-        arrow(ax, (a, 1.35), (b, 1.35))
-    ax.text(6.3, 0.55, "The steps and their order are fixed in advance; each step does one small job.", ha="center", fontsize=9.5,
+    ax.text(0.15, 1.55, "Workflow", fontsize=12, weight="bold", va="center", family=FONT)
+    box(ax, 1.3, 0.85, 2.6, 2.25, "Drawing")
+    box(ax, 3.0, 0.85, 5.35, 2.25, "Step 1 · AI model\nreads the drawing and\nextracts or infers the\nlength of each side", "model", size=9.5)
+    box(ax, 5.75, 0.85, 6.85, 2.25, "44, 26, 24,\n8, 20, 34 ft", size=9)
+    box(ax, 7.25, 0.85, 9.15, 2.25, "Step 2 · Python code\ncalculates quantities\nusing the extracted\ndimensions and\nestimating rules", "code", size=9.5)
+    box(ax, 9.55, 0.85, 10.9, 2.25, "CMU and grout\nquantities")
+    for a, b in ((2.62, 2.98), (5.37, 5.73), (6.87, 7.23), (9.17, 9.53)):
+        arrow(ax, (a, 1.55), (b, 1.55))
+    ax.text(6.1, 0.55, "The steps and their order are fixed in advance; each step does one small job.", ha="center", fontsize=9.5,
             style="italic", color="#444", family=FONT)
     legend(ax, 1.3, 0.1, [("data", "data"), ("AI model", "model"), ("code", "code")])
     save(fig, "workflow.png")
