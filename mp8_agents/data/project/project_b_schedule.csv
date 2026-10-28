@@ -1,0 +1,7 @@
+activity,description,element,quantity,unit,daily output
+B-100,Excavate pile caps,Pile caps,300,CY,100 CY per day
+B-110,Place pile caps,Pile caps,130,CY,26 CY per day
+B-120,Place grade beams,Grade beams,88,CY,20 CY per day
+B-210,Place slab-on-ground,Interior slab-on-ground,260,CY,55 CY per day
+B-220,Place loading dock walls,Retaining walls,45,CY,12 CY per day
+B-310,Place equipment pads,Equipment pads,14,CY,7 CY per day

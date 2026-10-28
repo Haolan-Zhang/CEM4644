@@ -8,11 +8,12 @@ import pandas as pd
 
 from . import score, ui
 from .client import Gemini, NoKey, find_api_key
-from .texts import FINALS, MODEL, SKILL, fill, fill_prompt, say, text
+from .texts import CHAT_URL, FINALS, MODEL, SKILL, fill, fill_prompt, say, text
 from .tools import PARAMETERS, Project, run_tool
 
 TOOL_NAMES = ["search_spec", "calculator", "lookup_log"]
 DEFAULT_QUESTIONS = ["Q1", "Q2", "Q3"]          # the questions of Step 2b (the others are for the homework)
+LOOKAHEAD_FILES = {"A": ("schedule.csv", "submittal_log.csv"), "B": ("project_b_schedule.csv", "project_b_submittal_log.csv")}
 DOCUMENTS = {"specification (Section 03 30 00)": "spec_03_30_00.txt", "submittal log": "submittal_log.csv", "schedule": "schedule.csv"}
 
 
@@ -30,7 +31,10 @@ class AgentLab:
         self.takeoffs = json.loads((d / "project" / "takeoff_questions.json").read_text(encoding="utf-8"))
         self.drawings = json.loads((d / "drawings" / "problems.json").read_text(encoding="utf-8"))
         self.by_drawing = {p["label"]: p for p in self.drawings}
-        self.lookahead_key = json.loads((d / "project" / "lookahead_key.json").read_text(encoding="utf-8"))
+        self.lookahead_keys = {x: json.loads((d / "project" / f).read_text(encoding="utf-8"))
+                               for x, f in (("A", "lookahead_key.json"), ("B", "lookahead_key_b.json"))}
+        self.lookahead_key = self.lookahead_keys["A"]
+        self.lookahead_runs: Dict[str, dict] = {}
         self.cases = json.loads((d / "project" / "calculator_cases.json").read_text(encoding="utf-8"))
         self.calculator_runs: List[dict] = []
         self.workflow_runs: Dict[str, dict] = {}
@@ -197,13 +201,43 @@ class AgentLab:
         self._need(); G = "lookahead"
         k = self.lookahead_key
         prompt = fill_prompt(text(texts, G, "prompt_text"), sequence=k["sequence_text"])
-        files = [self.root / "data" / "project" / f for f in ("schedule.csv", "submittal_log.csv")]
+        files = [self.root / "data" / "project" / f for f in LOOKAHEAD_FILES["A"]]
 
         def on_score(reply):
             df = score.lookahead(reply, k["rows"])
-            say(texts, G, "result_text", right=int((df.correct == "✓").sum()), n=len(df))
+            right = int((df.correct == "✓").sum())
+            self.lookahead_runs[text(texts, G, "run_text")] = {"right": right, "n": len(df)}
+            say(texts, G, "result_text", right=right, n=len(df))
             ui.gantt(k["rows"], text(texts, G, "chart_title_text"), text(texts, G, "axis_text"))
             say(texts, G, "table_text"); ui.table(ui.named(df, text(texts, G, "columns_text")))
+        ui.hokieai_box(prompt, on_score, texts, G, files)
+
+    def lookahead_skill_card(self, **texts):
+        """The homework's look-ahead skill to create in HokieAI: its name, description and body in boxes to copy and edit."""
+        self._need(); G = "lookahead_skill_create"
+        import ipywidgets as w
+        from IPython.display import display
+        lw = {"description_width": "80px"}
+        boxes = [w.Textarea(value=text(texts, G, f"skill_{k}_text").strip(), description=text(texts, G, f"{k}_label_text"), style=lw,
+                            layout=w.Layout(width="100%", height=h)) for k, h in (("name", "34px"), ("description", "70px"), ("body", "330px"))]
+        display(w.VBox([w.HTML(ui.md_html(fill(text(texts, G, "steps_text"), url=CHAT_URL))), *boxes]))
+
+    def lookahead_skill(self, project: str = "A", **texts):
+        """A short request with only the project's data (sequence and files); the student's skill supplies the rules and the format."""
+        self._need(); G = "lookahead_skill"
+        k = self.lookahead_keys[project]
+        files = [self.root / "data" / "project" / f for f in LOOKAHEAD_FILES[project]]
+        prompt = fill_prompt(text(texts, G, "prompt_text"), files=" and ".join(f.name for f in files), sequence=k["sequence_text"])
+
+        def on_score(reply):
+            df = score.lookahead(reply, k["rows"])
+            right = int((df.correct == "✓").sum())
+            self.lookahead_runs[fill(text(texts, G, "run_text"), project=project)] = {"right": right, "n": len(df)}
+            say(texts, G, "result_text", project=project, right=right, n=len(df))
+            ui.gantt(k["rows"], fill(text(texts, G, "chart_title_text"), project=project), text(texts, G, "axis_text"))
+            say(texts, G, "table_text"); ui.table(ui.named(df, text(texts, G, "columns_text")))
+            runs = pd.DataFrame([{"run": n, "correct": f"{r['right']} of {r['n']}"} for n, r in self.lookahead_runs.items()])
+            say(texts, G, "runs_text"); ui.table(ui.named(runs, text(texts, G, "runs_columns_text")))
         ui.hokieai_box(prompt, on_score, texts, G, files)
 
     def calculator(self, version: str = "without the skill", **texts):
@@ -303,14 +337,14 @@ class AgentLab:
         self._need(); G = "hokieai_agent"
         import ipywidgets as w
         from IPython.display import display
-        from .texts import CHAT_URL, fill
         how = ui.md_html(fill(text(texts, G, "create_steps_text"), url=CHAT_URL))
         box = w.Textarea(value=text(texts, G, "instructions_text"), layout=w.Layout(width="100%", height="120px"))
         display(w.VBox([w.HTML(how), *ui.download_buttons(self.project_files()), box]))
 
-    def hokieai_agent(self, **texts):
+    def hokieai_agent(self, questions=None, **texts):
+        """questions: ids such as ["Q1", ..., "Q6"]; by default the questions of Step 2b, so the comparison counts the same ones."""
         self._need(); G = "hokieai_agent"
-        chosen = self._questions(self.selected)             # the questions of Step 2b, so the comparison counts the same ones
+        chosen = self._questions(questions or self.selected)
         qs = "\n".join(f"{q['id']}. {q['question']}" for q in chosen)
         prompt = fill_prompt(text(texts, G, "prompt_text"), questions=qs)
         ids = [q["id"] for q in chosen]
@@ -318,14 +352,29 @@ class AgentLab:
         def on_score(reply):
             got = score.answers_by_id(reply, ids)
             res = [(q, got.get(q["id"], ""), score.judge(got.get(q["id"], ""), q) if q["id"] in got else "wrong") for q in chosen]
-            right = sum(r == "correct" for *_, r in res); unknown = sum(r == "UNKNOWN" for *_, r in res); wrong = len(res) - right - unknown
+
+            def counts(rs):
+                right = sum(r == "correct" for *_, r in rs); unknown = sum(r == "UNKNOWN" for *_, r in rs)
+                return right, unknown, len(rs) - right - unknown
+            right, unknown, wrong = counts(res)
             say(texts, G, "result_text", right=right, unknown=unknown, wrong=wrong, n=len(res))
             df = pd.DataFrame([{"q": f"{q['id']}. {q['question']}", "truth": score.truth_text(q), "answer": a or "—", "result": r} for q, a, r in res])
             say(texts, G, "table_text"); ui.table(ui.named(df, text(texts, G, "columns_text")))
-            comp = [{"agent": "HokieAI agent", "correct": f"{right} of {len(res)}", "unknown": unknown, "wrong": wrong}]
-            comp += [{"agent": f"Gemini agent, run {r['run']} ({r['tools']})", "correct": f"{r['right']} of {len(r['results'])}",
-                      "unknown": r["unknown"], "wrong": r["wrong"]} for r in self.tool_runs]
-            say(texts, G, "compare_text"); ui.table(ui.named(pd.DataFrame(comp), text(texts, G, "compare_columns_text")))
+            comp, seen = [], set()
+            for run in self.tool_runs:                      # the HokieAI agent counted on the same questions as each Gemini run
+                same = tuple(r["q"]["id"] for r in run["results"] if r["q"]["id"] in ids)
+                if not same:
+                    continue
+                if same not in seen:
+                    seen.add(same); c = counts([x for x in res if x[0]["id"] in same])
+                    comp.append({"agent": fill(text(texts, G, "hokieai_row_text"), questions=", ".join(same)), "correct": f"{c[0]} of {len(same)}",
+                                 "unknown": c[1], "wrong": c[2]})
+                ok = [r for r in run["results"] if r["q"]["id"] in same]
+                comp.append({"agent": fill(text(texts, G, "gemini_row_text"), run=run["run"], tools=run["tools"], questions=", ".join(same)),
+                             "correct": f"{sum(r['result'] == 'correct' for r in ok)} of {len(ok)}",
+                             "unknown": sum(r["result"] == "UNKNOWN" for r in ok), "wrong": sum(r["result"] == "wrong" for r in ok)})
+            if comp:
+                say(texts, G, "compare_text"); ui.table(ui.named(pd.DataFrame(comp), text(texts, G, "compare_columns_text")))
         ui.hokieai_box(prompt, on_score, texts, G)
 
 

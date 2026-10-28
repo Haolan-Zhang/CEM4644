@@ -172,19 +172,41 @@ SEQUENCE_TEXT = ("A-110 starts on working day 1. Each activity starts the workin
                  "A-210 after A-120, A-310 after A-210, A-410 after A-310, and A-510 after A-210 (at the same time as A-310).")
 
 
-def lookahead_key():
-    """Step 3a: duration = quantity / daily output rounded up; finish-to-start; a concrete placement is flagged when the
-    mix-design submittal of its element is not Approved."""
-    status = {s[2]: s[4] for s in SUBMITTALS}
+# A second practice project (the homework's skill part): the look-ahead skill is reused on it unchanged. Its log has no
+# submittal for the equipment pads, a case the prompt of Step 3a never meets.
+SUBMITTALS_B = [
+    ("03 30 00-01", "Pile cap mix P-4000", "Pile caps", "2026-09-08", "Approved", 540, 110, 300, 2.0, 5, 4000),
+    ("03 30 00-02", "Grade beam mix G-4000", "Grade beams", "2026-09-10", "Under review", 520, 120, 295, 2.0, 5, 4000),
+    ("03 30 00-03", "Slab mix S-4000", "Interior slab-on-ground", "2026-09-10", "Approved", 520, 0, 255, 2.0, 5, 4000),
+    ("03 30 00-04", "Retaining wall mix R-4500", "Retaining walls", "2026-09-14", "Revise and resubmit", 560, 140, 320, 6.0, 4, 4500),
+]
+SCHEDULE_B = [
+    ("B-100", "Excavate pile caps", "Pile caps", 300, "CY", "100 CY per day"),
+    ("B-110", "Place pile caps", "Pile caps", 130, "CY", "26 CY per day"),
+    ("B-120", "Place grade beams", "Grade beams", 88, "CY", "20 CY per day"),
+    ("B-210", "Place slab-on-ground", "Interior slab-on-ground", 260, "CY", "55 CY per day"),
+    ("B-220", "Place loading dock walls", "Retaining walls", 45, "CY", "12 CY per day"),
+    ("B-310", "Place equipment pads", "Equipment pads", 14, "CY", "7 CY per day"),
+]
+SEQUENCE_B = {"B-100": None, "B-110": "B-100", "B-120": "B-110", "B-210": "B-120", "B-220": "B-120", "B-310": "B-210"}
+SEQUENCE_B_TEXT = ("B-100 starts on working day 1. Each activity starts the working day after its predecessor finishes: B-110 after B-100, "
+                   "B-120 after B-110, B-210 after B-120, B-220 after B-120 (at the same time as B-210), and B-310 after B-210.")
+
+
+def lookahead_key(schedule=SCHEDULE, submittals=SUBMITTALS, sequence=SEQUENCE, sequence_text=SEQUENCE_TEXT):
+    """Step 3a (and the homework's skill part): duration = quantity / daily output rounded up; finish-to-start; a concrete
+    placement is flagged when the mix-design submittal of its element is not Approved (or the log has none)."""
+    status = {s[2]: s[4] for s in submittals}
     rows, finish = [], {}
-    for a, desc, element, qty, unit, output in SCHEDULE:
+    for a, desc, element, qty, unit, output in schedule:
         dur = math.ceil(qty / float(output.split()[0]))
-        start = 1 if SEQUENCE[a] is None else finish[SEQUENCE[a]] + 1
+        start = 1 if sequence[a] is None else finish[sequence[a]] + 1
         finish[a] = start + dur - 1
         flag = desc.startswith("Place") and status.get(element) != "Approved"
         rows.append({"activity": a, "description": desc, "element": element, "duration": dur, "start": start, "finish": finish[a],
-                     "flag": "YES" if flag else "NO", "submittal status": status.get(element, "-") if desc.startswith("Place") else "-"})
-    return {"sequence": SEQUENCE, "sequence_text": SEQUENCE_TEXT, "rows": rows}
+                     "flag": "YES" if flag else "NO",
+                     "submittal status": status.get(element, "no submittal") if desc.startswith("Place") else "-"})
+    return {"sequence": sequence, "sequence_text": sequence_text, "rows": rows}
 
 
 def calculator_cases():
@@ -213,6 +235,10 @@ def main(draw=True):
     (proj / "takeoff_questions.json").write_text(json.dumps(skill_questions(), indent=1, ensure_ascii=False), encoding="utf-8")
     (DATA / "drawings" / "problems.json").write_text(json.dumps(drawings(draw=draw), indent=1, ensure_ascii=False), encoding="utf-8")
     (proj / "lookahead_key.json").write_text(json.dumps(lookahead_key(), indent=1, ensure_ascii=False), encoding="utf-8")
+    write_csv(proj / "project_b_submittal_log.csv", SUBMITTAL_HEAD, SUBMITTALS_B)
+    write_csv(proj / "project_b_schedule.csv", SCHEDULE_HEAD, SCHEDULE_B)
+    (proj / "lookahead_key_b.json").write_text(json.dumps(lookahead_key(SCHEDULE_B, SUBMITTALS_B, SEQUENCE_B, SEQUENCE_B_TEXT), indent=1,
+                                                          ensure_ascii=False), encoding="utf-8")
     (proj / "calculator_cases.json").write_text(json.dumps(calculator_cases(), indent=1, ensure_ascii=False), encoding="utf-8")
     print("wrote", proj, DATA / "drawings")
 

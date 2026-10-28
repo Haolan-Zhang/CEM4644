@@ -1,6 +1,6 @@
 # MP8 · Instructor guide
 
-One in-class notebook, `MP8_Workshop_AI_Agents.ipynb`, about 90–120 minutes with every step; Part 3 (code execution) and
+One in-class notebook, `MP8_Workshop_AI_Agents.ipynb` (and a homework, section 5), about 90–120 minutes with every step; Part 3 (code execution) and
 Part 5 are the natural pieces to move to a homework. Parts 1, 2 and 4a call Gemini (`gemini-3.5-flash-lite`) through
 the students' own API key from MP5; every default setting is stored in `data/cache/`, so it runs at once without a
 key. Part 3, Steps 4b-4c and Part 5 use HokieAI in the browser (paste-back).
@@ -126,3 +126,35 @@ differ. That is worth saying in class: Part 1's one prompt gave 8 and 11 of 15 i
 - The free tier allows a few requests per minute; the client waits and retries. A live agent run takes 10–60 s.
 - After changing a default wording that the model reads (a prompt, a tool description, the system prompt, the skill),
   rerun `build/precompute.py` with a key so the class does not need one.
+
+## 5. The homework (`MP8_Homework_AI_Agents.ipynb`)
+
+| Part | Steps | Taken from the workshop |
+|---|---|---|
+| 1 · Tools: Code Execution and Tool Calling | 1a look-ahead Gantt chart, 1b documents, 1c agent with chosen tools on Q4-Q6, 1d trace | Step 3a; Part 2 with the homework questions |
+| 2 · AI Agents: Your Own HokieAI Agent | 2a create, 2b ask all six questions (Q1-Q6) | Part 5 |
+| 3 · Skills: A Look-Ahead Schedule Skill | 3a write the skill, 3b use it on project A, 3c reuse it on project B | new |
+
+**Part 1 stored outputs (Q4, Q5, Q6).** Q4 (footing volume) is answered correctly by every run, even without tools.
+Q5 needs `lookup_log`, and Q6 needs `lookup_log` and `search_spec`. The calculator adds nothing. With a missing tool
+the agent always answered UNKNOWN; no run guessed.
+
+| Tools | Correct | UNKNOWN | Wrong |
+|---|---|---|---|
+| none, calculator, search_spec, search_spec + calculator | 1 | 2 | 0 |
+| lookup_log, calculator + lookup_log | 2 | 1 | 0 |
+| search_spec + lookup_log, all three | **3** | 0 | 0 |
+
+**Part 2.** Step 2b compares the HokieAI agent with the Gemini runs of Step 1c on the questions both answered (Q4-Q6);
+its score on all six is reported separately.
+
+**Part 3 (open-ended).** Step 3a's starter skill (`LOOKAHEAD_SKILL` in `aec_agent/texts.py`) holds the required rules
+(duration, sequence, flag rule, chart, the `activity | start | finish | YES/NO` lines). Students add at least three
+conventions of their own. The requests of Steps 3b and 3c carry only the project's files and sequence. Scoring reads
+only the text lines, so a student's extra tables that name the activities (an approvals list, for example) do not
+confuse it, but it does not check the chart. Project B (`project_b_schedule.csv`, `project_b_submittal_log.csv`,
+`lookahead_key_b.json`): B-100 1-3, B-110 4-8, B-120 9-13 red (under review), B-210 14-18, B-220 14-17 red (revise and
+resubmit), B-310 19-20 red, because its element has **no submittal** in the log (the case the Step 1a prompt never
+meets). Example answer (local, not in the repository): `MP8_Homework_Answer_Sheet_Part3.md`. With gpt-5 through the
+HokieAI API, an example skill scored 6 of 6 on both projects. It followed all five conventions, but version 1 drew
+every bar one day long and the legend hid a bar. Two added conventions fixed both.

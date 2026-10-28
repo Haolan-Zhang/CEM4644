@@ -35,6 +35,26 @@ SKILL = {
              "- Cells are 8 in apart, so grouting the cells at S in on center fills 8/S of the cells: grout = grout for all cells x 8 / S."),
 }
 
+LOOKAHEAD_SKILL = {
+    "name": "look-ahead-schedule",
+    "description": ("Company conventions for a look-ahead schedule of concrete work: durations, sequence, flagged concrete placements, "
+                    "the Gantt chart, and the schedule lines. Use it whenever a request asks for a look-ahead schedule."),
+    "body": ("# Look-ahead schedule\n"
+             "## Required rules (keep these: the notebook scores them)\n"
+             "- Read the activities from the attached schedule file and the mix-design submittals from the attached submittal log.\n"
+             "- Duration in working days = quantity / daily output, rounded up to a whole day.\n"
+             "- Follow the sequence given in the request: the first activity starts on working day 1, and each activity starts the working day "
+             "after its predecessor finishes.\n"
+             "- Flag an activity if it places concrete (its description starts with \"Place\") and its element has no Approved mix-design "
+             "submittal in the log (a missing submittal counts as not approved).\n"
+             "- Use the Python tool to draw a Gantt chart: one horizontal bar per activity, from its start day to its finish day, with working "
+             "days on the x-axis; flagged bars in red.\n"
+             "- After the chart, write the schedule as plain text in the reply (not inside the chart image), one line per activity:\n"
+             "  <activity> | <start day> | <finish day> | <YES if flagged, otherwise NO>\n\n"
+             "## Our conventions\n"
+             "- (write your own conventions here, one per line)"),
+}
+
 PASTE_STEPS = ("1. Copy the prompt below.\n2. Open {url} (sign in with your VT account), start a new chat, and paste the prompt.\n"
                "3. Copy HokieAI's output with the **copy button** below its reply, and paste it into the box below.\n"
                "4. Click *Score HokieAI output* to compare it with the ground truth.")
@@ -126,6 +146,30 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "axis_text": "working day",
         "table_text": "Ground truth vs. HokieAI's output:",
         "columns_text": "Activity | Ground truth (start – finish, red) | HokieAI's output | Correct",
+        "run_text": "prompt with every rule, project A",
+    },
+    "lookahead_skill_create": {
+        "steps_text": ("1. In HokieAI ({url}), open **Account → My Skills → Create Skill**.\n"
+                       "2. Copy the name, description, and body below into the form. Keep the required rules, and write your own conventions "
+                       "under *Our conventions*.\n3. Switch *Always On* off and click *Create Skill*."),
+        "skill_name_text": LOOKAHEAD_SKILL["name"],
+        "skill_description_text": LOOKAHEAD_SKILL["description"],
+        "skill_body_text": LOOKAHEAD_SKILL["body"],
+        "name_label_text": "name", "description_label_text": "description", "body_label_text": "body",
+    },
+    "lookahead_skill": {
+        "prompt_text": "Make a look-ahead schedule from the two attached files, {files}.\n{sequence}",
+        "steps_text": ("1. Download {files} with the buttons below and copy the prompt.\n2. In HokieAI ({url}), start a new chat, turn on your "
+                       "skill from the chat menu, attach both files, and paste the prompt.\n" + HOKIE_RESULT_STEPS),
+        **BOX,
+        "result_text": "**Look-ahead schedule, project {project}:** {right} of {n} activities with the correct start day, finish day, and flag.",
+        "chart_title_text": "Ground truth: the look-ahead schedule of project {project} (red = flagged)",
+        "axis_text": "working day",
+        "table_text": "Ground truth vs. HokieAI's output:",
+        "columns_text": "Activity | Ground truth (start – finish, red) | HokieAI's output | Correct",
+        "run_text": "your skill, project {project}",
+        "runs_text": "Your look-ahead schedules so far:",
+        "runs_columns_text": "Run | Activities correct",
     },
     "calculator": CALCULATOR,
     "calculator_skill": {**CALCULATOR, "steps_text": (
@@ -180,7 +224,9 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "result_text": "**Your HokieAI agent:** {right} of {n} correct, {unknown} UNKNOWN, {wrong} wrong.",
         "table_text": "Ground truth vs. your HokieAI agent's output:",
         "columns_text": "Question | Ground truth | HokieAI agent output | Result",
-        "compare_text": "Your HokieAI agent vs. the Gemini agent's runs in Step 2b:",
+        "compare_text": "Your HokieAI agent vs. the Gemini agent's runs in Step 2b (on the questions both answered):",
+        "hokieai_row_text": "HokieAI agent ({questions})",
+        "gemini_row_text": "Gemini agent, run {run} ({tools})",
         "compare_columns_text": "Agent | Correct | UNKNOWN | Wrong",
     },
 }

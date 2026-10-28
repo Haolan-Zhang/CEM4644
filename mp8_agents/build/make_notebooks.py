@@ -1,6 +1,7 @@
-"""Generates the MP8 notebook (+ report template): AI workflows, AI agents and their tools, skills, and a HokieAI agent.
+"""Generates the MP8 notebooks (+ report templates): the in-class activity (AI workflows, AI agents and their tools,
+skills, a HokieAI agent) and the homework (tools, your own HokieAI agent, a look-ahead schedule skill).
 
-    python build/make_notebooks.py [--fresh-text]
+    python build/make_notebooks.py [workshop | homework] [--fresh-text]      (both notebooks without a name)
 
 The notebook is where the wording lives: a rebuild keeps every markdown cell, every cell's #@markdown notes and every
 wording written in a cell (name_text = \"\"\"...\"\"\") it finds in the existing notebook (matched by the cell's first
@@ -22,6 +23,9 @@ from aec_agent.texts import CHAT_URL, MODEL, TEXTS  # noqa: E402
 GITHUB_URL = "https://github.com/Haolan-Zhang/CEM4644.git"
 FIG = "https://raw.githubusercontent.com/Haolan-Zhang/CEM4644/master/mp8_agents/figures"   # the diagrams (build/make_figures.py)
 FILE = "MP8_Workshop_AI_Agents.ipynb"
+FILE_HW = "MP8_Homework_AI_Agents.ipynb"
+HW_QUESTIONS = ["Q4", "Q5", "Q6"]          # the homework's tool-calling questions (Q1-Q3 are the in-class ones)
+ALL_QUESTIONS = ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6"]
 KEEP_TEXT = True
 EXISTING, EXISTING_TEXTS = {}, {}
 
@@ -74,7 +78,7 @@ def T(group, keep=None, drop=()):
     return {k: v for k, v in TEXTS[group].items() if (keep is None or k in keep) and k not in drop}
 
 
-def step0():
+def step0(edits="editing a prompt, a tool description, or the skill needs the key."):
     body = f"""import importlib, os, shutil, subprocess, sys
 REPO, FOLDER, PKG = "CEM4644", "mp8_agents", "aec_agent"
 FOLDERS = ["mp8_agents"]                      # only this lab folder is downloaded, not the whole course repository
@@ -103,7 +107,7 @@ model = "{MODEL}"
 lab.setup(api_key=api_key, model=model)"""
     return form("▶ Step 0 · Run me first (1 minute)", body,
                 notes=["Click ▶ and wait for the ✅ line. Paste your Gemini API key from MP5 into *api_key* (or leave it empty to use the Colab secret GEMINI_API_KEY).",
-                       "Without a key, every step runs with its default settings (stored outputs); editing a prompt, a tool description, or the skill needs the key."],
+                       "Without a key, every step runs with its default settings (stored outputs); " + edits],
                 params=['api_key = "" #@param {type:"string"}'])
 
 
@@ -241,15 +245,118 @@ A HokieAI agent is instructions plus knowledge sources (files it can read). Buil
 - AI model: Gemini (gemini-3.5-flash-lite), Google, via the Gemini API with your own key.
 - Generative AI: GPT models via HokieAI (Virginia Tech).
 """))
-    write(cells)
+    write(cells, FILE, "In-Class Activity: AI Workflows and AI Agents", "MP8_Workshop_Report_Template.md")
 
 
-def write(cells):
+SOURCES = """
+### Data and model sources
+- Practice projects A and B (specification excerpt, submittal logs, schedules): made for CEM4644 (fictional, not for construction); the specification excerpt follows the format of UFGS 03 30 00, U.S. Department of Defense, public domain, https://www.wbdg.org/dod/ufgs.
+- AI model: Gemini (gemini-3.5-flash-lite), Google, via the Gemini API with your own key.
+- Generative AI: GPT models via HokieAI (Virginia Tech).
+"""
+
+
+def build_homework():
+    load_existing(REPO / FILE_HW)
+    questions = json.loads((REPO / "data" / "project" / "questions.json").read_text())
+    hw = [q for q in questions if q["id"] in HW_QUESTIONS]
+    cells = [md("""
+# Homework: AI Tools, AI Agents, and Skills
+In this homework, we will use AI to make a look-ahead schedule and answer questions about a construction project with tools, an AI agent, and a skill.
+"""), step0("editing the agent's system prompt or a tool description needs the key.")]
+
+    # ------------------------------------------------------------------ Part 1: tools
+    cells.append(md("""
+## Part 1 · Tools: Code Execution and Tool Calling
+In this part, we will explore two kinds of tools: code that HokieAI writes and runs by itself, and tools written for the Gemini agent, which it chooses from to answer the project questions Q4 to Q6.
+
+![Code execution and tool calling]({FIG}/codeexec_hw.png)
+
+- **search_spec**: searches the specification.
+- **calculator**: exact arithmetic.
+- **lookup_log**: reads the submittal log or the schedule.
+""".replace("{FIG}", FIG)))
+    cells.append(form("▶ Step 1a · Look-Ahead Schedule: A Gantt Chart", "lab.lookahead()",
+                      notes=["Run the cell and follow the steps: HokieAI computes each activity's duration and start day, draws a Gantt chart, and marks in red the concrete placements whose mix design is not approved.",
+                             "Look-ahead schedule: the near-term part of the project schedule that the field team plans from."],
+                      texts=T("lookahead")))
+    cells.append(form("▶ Step 1b · Look at the Project Documents", "lab.show_document(document)",
+                      notes=["Choose a document to see what the tools read."],
+                      params=[choice("document", list(DOCUMENTS)[0], DOCUMENTS)]))
+    cells.append(form("▶ Step 1c · Run the Agent with the Tools You Choose", "lab.agent_tools(search_spec, calculator, lookup_log, questions)",
+                      notes=["Tick the tools and run the cell; each run is added to the table. Try no tools, each tool alone, and all three.",
+                             "UNKNOWN: the agent said it could not find the value. Wrong: it guessed."],
+                      params=['search_spec = True #@param {type:"boolean"}', 'calculator = True #@param {type:"boolean"}', 'lookup_log = True #@param {type:"boolean"}',
+                              "questions = " + json.dumps(HW_QUESTIONS) + "          # the project questions the agent answers (Q1-Q3 were in class)"],
+                      texts=T("tools")))
+    cells.append(form("▶ Step 1d · Inspect the Tool Calls", "lab.show_trace(question)",
+                      notes=["Choose a question to see, for each run of Step 1c, the tools the agent called, with their inputs and outputs."],
+                      params=[choice("question", f"{hw[-1]['id']}. {hw[-1]['question']}", [f"{q['id']}. {q['question']}" for q in hw])],
+                      texts={**T("trace"), "empty_text": "No runs yet: run Step 1c first."}))
+    cells.append(question(1,
+                          "From Step 1a: Include HokieAI's Gantt chart and the score. Which activities did it mark red, and did any start or finish day differ from the ground truth? Open the code it wrote: which step went wrong, if any?",
+                          "Would you trust a look-ahead schedule that HokieAI computed with its own code, and what would you check before sending it to the field team?"))
+    cells.append(question(2,
+                          "From Step 1c: Include the table of runs. For each of Q4, Q5, and Q6, report which tools the agent needed to answer it correctly.",
+                          "From Step 1d: For question Q6, describe the agent's steps with all three tools. Without the tools it needed, did the agent answer UNKNOWN or guess?",
+                          "For which project tasks would you write a tool for an agent (as in Step 1c), and for which would you let it write its own code (as in Step 1a)?"))
+
+    # ------------------------------------------------------------------ Part 2: your own HokieAI agent
+    cells.append(md("""
+## Part 2 · AI Agents: Your Own HokieAI Agent
+A HokieAI agent is instructions plus knowledge sources (files it can read). In this part, we will build one with the project files and ask it all six project questions: Q1 to Q3 from the in-class activities and Q4 to Q6 from Part 1.
+"""))
+    cells.append(form("▶ Step 2a · Create Your HokieAI Agent", "lab.create_agent()",
+                      notes=["Run the cell and follow the steps; edit the instructions in the box before pasting them."],
+                      texts=T("hokieai_agent", keep=("create_steps_text", "instructions_text"))))
+    cells.append(form("▶ Step 2b · Ask Your HokieAI Agent", "lab.hokieai_agent(questions)",
+                      notes=["Run the cell after Step 2a and follow the steps. The table compares your agent with the Gemini agent's runs of Step 1c on Q4 to Q6."],
+                      params=["questions = " + json.dumps(ALL_QUESTIONS) + "          # the project questions your agent answers"],
+                      texts={**T("hokieai_agent", drop=("create_steps_text", "instructions_text")),
+                             "steps_text": TEXTS["hokieai_agent"]["steps_text"].replace("Step 2b", "Step 1c"),
+                             "compare_text": "Your HokieAI agent vs. the Gemini agent's runs in Step 1c (on the questions both answered):"}))
+    cells.append(question(3,
+                          "From Step 2b: Report your agent's correct, UNKNOWN, and wrong answers on all six questions, include the tables, and compare it on Q4 to Q6 with the Gemini agent's run with all three tools.",
+                          "Which instructions did you change, and what changed in the output? For one wrong or UNKNOWN answer, explain from the output which value or calculation went wrong.",
+                          "What would you need to see before you let an agent answer project questions for your team?"))
+
+    # ------------------------------------------------------------------ Part 3: a skill
+    cells.append(md("""
+## Part 3 · Skills: A Look-Ahead Schedule Skill
+In Step 1a, the prompt carried every rule. In this part, we will move the rules into a skill with your own conventions, then reuse the same skill on project A (the project of Parts 1 and 2) and on a new project B.
+
+![A prompt with every rule vs. a skill and short requests]({FIG}/lookahead_skill.png)
+""".replace("{FIG}", FIG)))
+    cells.append(form("▶ Step 3a · Write Your Look-Ahead Skill", "lab.lookahead_skill_card()",
+                      notes=["Run the cell and create the skill in HokieAI. Keep the required rules (the notebook scores them) and add at least three conventions of your own under *Our conventions*; there is no single correct skill.",
+                             "Conventions: rules your company would apply to every look-ahead schedule (for example, a chart title and legend, the duration written on each bar, the submittal number under each red bar, overlapping concrete placements marked, or a list of approvals needed and by which working day).",
+                             "Edit the description too: it is what HokieAI reads to decide when the skill applies."],
+                      texts=T("lookahead_skill_create")))
+    cells.append(form("▶ Step 3b · Use the Skill on Project A", "lab.lookahead_skill(project)",
+                      notes=["Run the cell and follow the steps: the request carries only project A's files and sequence; the rules and the format come from your skill. Compare the chart with your chart of Step 1a."],
+                      params=['project = "A"'],
+                      texts=T("lookahead_skill")))
+    cells.append(form("▶ Step 3c · Reuse the Skill on Project B", "lab.lookahead_skill(project)",
+                      notes=["Run the cell and follow the steps with project B's files, using the same skill without changes.",
+                             "If HokieAI does not follow one of your conventions, revise the skill in **My Skills**, run Steps 3b and 3c again, and keep both versions for the report."],
+                      params=['project = "B"'],
+                      texts=T("lookahead_skill")))
+    cells.append(question(4,
+                          "From Step 3a: Include your skill (name, description, and body) and list the conventions you added.",
+                          "From Steps 3b and 3c: Include HokieAI's Gantt charts for projects A and B and the two scores, next to your Step 1a score. Which of your conventions did HokieAI follow, and which did it miss? If you revised the skill, what did you change, and did it help?",
+                          "From Step 3c: Which activities did HokieAI flag on project B, and why is B-310 flagged in the ground truth?",
+                          "Which schedule rules would a company keep in a shared skill, and which belong in each project's request? Give one example of each."))
+
+    cells.append(md(SOURCES))
+    write(cells, FILE_HW, "Homework: AI Tools, AI Agents, and Skills", "MP8_Homework_Report_Template.md")
+
+
+def write(cells, file, title, template):
     nb = new_notebook(cells=cells)
     nb.metadata.update({"colab": {"provenance": [], "toc_visible": True},
                         "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"}, "language_info": {"name": "python"}})
-    nbformat.write(nb, str(REPO / FILE)); print("wrote", REPO / FILE)
-    lines = ["# CEM4644 · MP8 report — In-Class Activity: AI Workflows and AI Agents", "", "Name: ______________________    Date: ____________", "",
+    nbformat.write(nb, str(REPO / file)); print("wrote", REPO / file)
+    lines = [f"# CEM4644 · MP8 report — {title}", "", "Name: ______________________    Date: ____________", "",
              "Answer every question in a few sentences. Paste screenshots where the question asks for tables or charts. Numbers must come from **your** run of the notebook.", ""]
     for c in cells:
         if c.cell_type == "markdown" and c.source.startswith("### 📝 Report question "):
@@ -257,9 +364,13 @@ def write(cells):
             paras = [p.strip()[2:] for p in body.split("\n\n") if p.strip()]
             lines += [f"## Question {head.rsplit(' ', 1)[1]}", ""] + sum(([p, ""] for p in paras), []) + ["*Your answer:*", "", "", ""]
     (REPO / "docs").mkdir(exist_ok=True)
-    (REPO / "docs" / "MP8_Workshop_Report_Template.md").write_text("\n".join(lines)); print("wrote", REPO / "docs" / "MP8_Workshop_Report_Template.md")
+    (REPO / "docs" / template).write_text("\n".join(lines)); print("wrote", REPO / "docs" / template)
 
 
 if __name__ == "__main__":
     KEEP_TEXT = "--fresh-text" not in sys.argv
-    build()
+    which = [a for a in sys.argv[1:] if not a.startswith("--")] or ["workshop", "homework"]
+    if "workshop" in which:
+        build()
+    if "homework" in which:
+        build_homework()

@@ -113,18 +113,24 @@ def answers_by_id(text: str, ids: List[str]) -> Dict[str, str]:
 
 # ----------------------------------------------------------------------------- Part 3: code execution
 def lookahead(text: str, key: List[dict]) -> pd.DataFrame:
-    """'A-110 | 1 | 3 | NO' lines (tables, bold and extra words are fine) against the look-ahead ground truth."""
-    got = {}
+    """'A-110 | 1 | 3 | NO' lines (tables, bold and extra words are fine; any project's letter) against the look-ahead ground truth."""
+    got, strict = {}, {}
     for line in (text or "").split("\n"):
-        m = re.search(r"\b(A-\d{3})\b(.*)", line)
+        m = re.search(r"\b([A-Z]-\d{3})\b(.*)", line)
         if not m:
             continue
+        cells = [c.strip().strip("*").strip() for c in m.group(2).split("|")]
+        ints = [c for c in cells if re.fullmatch(r"\d+", c)]
+        yn_cells = [c.upper() for c in cells if re.fullmatch(r"(?i)yes|no", c)]
+        if len(ints) >= 2 and yn_cells:                              # the required line: activity | start | finish | YES/NO
+            strict[m.group(1)] = (int(ints[0]), int(ints[1]), yn_cells[-1]); continue
         nums = re.findall(r"(?<![\d.])\d+(?![\d.])", m.group(2))
         yn = re.findall(r"\b(YES|NO)\b", m.group(2), re.I)              # "red: NO" is NO: the YES / NO decides
         colour = re.findall(r"\b(red|gray|grey)\b", m.group(2), re.I)
         if len(nums) >= 2:
             f = yn[-1].upper() if yn else ("YES" if colour and colour[-1].lower() == "red" else ("NO" if colour else None))
             got[m.group(1)] = (int(nums[0]), int(nums[1]), f)            # the last line per activity wins
+    got.update(strict)                                               # other lines naming an activity (a table of approvals) count only without one
     rows = []
     for k in key:
         g = got.get(k["activity"])

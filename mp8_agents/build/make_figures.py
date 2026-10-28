@@ -6,6 +6,8 @@ workflow.png  one prompt vs. a workflow of fixed steps
 agent.png     how an AI agent calls a tool (the loop), with question Q3 as the example
 codeexec.png  tool calling vs. code execution (the agent writes and runs its own code)
 skills.png    a prompt vs. a skill (name, description, body), and when the agent loads it
+codeexec_hw.png        the homework's Part 1: code execution (Step 1a) and tool calling (Steps 1b-1d)
+lookahead_skill.png    the homework's Part 3: the rules of Step 1a's prompt moved into a skill, reused on two projects
 """
 from pathlib import Path
 
@@ -120,9 +122,10 @@ def skills():
     save(fig, "skills.png")
 
 
-def codeexec():
+def codeexec(name="codeexec.png", tool_label="Tool\ncalling\n(Part 2)", code_label="Code\nexecution\n(Part 3)",
+             outputs="something you can see and use:\na Gantt chart · a calculator page"):
     fig, ax = canvas(11, 4.3)
-    ax.text(0.15, 3.25, "Tool\ncalling\n(Part 2)", fontsize=11, weight="bold", va="center", family=FONT)
+    ax.text(0.15, 3.25, tool_label, fontsize=11, weight="bold", va="center", family=FONT)
     box(ax, 1.6, 2.75, 3.0, 3.75, "Question")
     box(ax, 3.4, 2.75, 5.4, 3.75, "AI model\npicks a tool", "model")
     box(ax, 5.8, 2.75, 8.6, 3.75, "a tool someone wrote for it\ncalculator · lookup_log · search_spec", "code", size=9.5)
@@ -130,18 +133,44 @@ def codeexec():
     for a_, b_ in ((3.02, 3.38), (5.42, 5.78), (8.62, 8.98)):
         arrow(ax, (a_, 3.25), (b_, 3.25))
 
-    ax.text(0.15, 1.35, "Code\nexecution\n(Part 3)", fontsize=11, weight="bold", va="center", family=FONT)
+    ax.text(0.15, 1.35, code_label, fontsize=11, weight="bold", va="center", family=FONT)
     box(ax, 1.6, 0.85, 3.0, 1.85, "Task")
     box(ax, 3.4, 0.85, 5.4, 1.85, "AI model\nwrites code", "model")
     box(ax, 5.8, 0.85, 7.6, 1.85, "runs it", "code")
-    box(ax, 8.0, 0.85, 10.9, 1.85, "something you can see and use:\na Gantt chart · a calculator page", size=9.5)
+    box(ax, 8.0, 0.85, 10.9, 1.85, outputs, size=9.5)
     for a_, b_ in ((3.02, 3.38), (5.42, 5.78), (7.62, 7.98)):
         arrow(ax, (a_, 1.35), (b_, 1.35))
     ax.text(6.25, 0.45, "No one wrote a tool for this task: the agent builds it. The code runs, but its numbers can still be wrong, so test it.",
             ha="center", fontsize=9.5, style="italic", color="#444", family=FONT)
     legend(ax, 1.6, 0.05, [("data", "data"), ("AI model", "model"), ("code", "code")])
-    save(fig, "codeexec.png")
+    save(fig, name)
+
+
+def lookahead_skill():
+    fig, ax = canvas(11, 5.0)
+    ax.text(2.45, 4.7, "Step 1a · one prompt", fontsize=12, weight="bold", ha="center", family=FONT)
+    box(ax, 0.2, 2.3, 4.7, 4.35, "Project A's files and sequence\n\n+ every rule, written into the prompt:\n  durations, sequence, what to flag,\n"
+        "  the chart, the schedule lines", size=9.5, align="left")
+    box(ax, 0.2, 1.0, 4.7, 1.9, "AI model\nGantt chart of project A", "model")
+    arrow(ax, (2.45, 2.28), (2.45, 1.92))
+    ax.text(2.45, 0.55, "The rules are pasted again\nfor every project.", ha="center", fontsize=9.5, style="italic", color="#444", family=FONT)
+
+    ax.plot([5.05, 5.05], [0.3, 4.9], color="#ccc", lw=1)
+    ax.text(8.05, 4.7, "Part 3 · a skill + short requests", fontsize=12, weight="bold", ha="center", family=FONT)
+    box(ax, 5.4, 3.35, 10.8, 4.35, "skill: look-ahead-schedule (saved once)\nrequired rules + your own conventions", "skill", size=9.5)
+    box(ax, 5.4, 2.05, 7.95, 2.85, "Step 3b · request:\nproject A's files and sequence", size=9)
+    box(ax, 8.25, 2.05, 10.8, 2.85, "Step 3c · request:\nproject B's files and sequence", size=9)
+    box(ax, 5.4, 0.95, 7.95, 1.6, "AI model\nGantt chart of project A", "model", size=9)
+    box(ax, 8.25, 0.95, 10.8, 1.6, "AI model\nGantt chart of project B", "model", size=9)
+    for x in (6.675, 9.525):
+        arrow(ax, (x, 3.33), (x, 2.87)); arrow(ax, (x, 2.03), (x, 1.62))
+    ax.text(8.1, 0.45, "The same skill, unchanged, for every project;\neach request carries only its project's data.", ha="center",
+            fontsize=9.5, style="italic", color="#444", family=FONT)
+    legend(ax, 0.2, 0.05, [("data", "data"), ("AI model", "model"), ("skill", "skill")])
+    save(fig, "lookahead_skill.png")
 
 
 if __name__ == "__main__":
     workflow(); agent(); codeexec(); skills()
+    codeexec("codeexec_hw.png", "Tool\ncalling\n(Steps\n1b–1d)", "Code\nexecution\n(Step 1a)", "something you can see and use:\na Gantt chart")
+    lookahead_skill()
