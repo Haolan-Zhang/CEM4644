@@ -155,11 +155,11 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "prompt_text": "{problems}\n\n" + FINALS,
         "steps_text": ("1. In HokieAI ({url}), open **Account → My Skills → Create Skill**. Copy the skill's name, description, and body from Step 4a into the form, "
                        "switch *Always On* off, and click *Create Skill*.\n"
-                       "2. Choose *with the skill* or *without the skill* above and run this cell. Start a new chat; for *with the skill*, turn the skill on "
-                       "from the chat menu.\n3. Copy the prompt below, paste it into the chat, and send.\n"
-                       "4. Copy HokieAI's output with the **copy button** below its reply, paste it into the box below, and click *Score HokieAI output*."),
+                       "2. Start a new chat **without** the skill, paste the prompt below, and send. Copy HokieAI's output with the **copy button** below "
+                       "its reply, paste it into the box below, and click *Score HokieAI output*.\n"
+                       "3. Start another new chat, turn the skill on from the chat menu, send the same prompt, and score that output too."),
         **BOX,
-        "result_text": "**HokieAI, {skill}:** {right} of {n} quantities within tolerance of the ground truth.",
+        "result_text": "**HokieAI:** {right} of {n} quantities within tolerance of the ground truth.",
         "table_text": "Ground truth vs. HokieAI's output:",
         "columns_text": "Question | Quantity | Ground truth | HokieAI's output | Unit | Correct",
     },

@@ -279,7 +279,8 @@ class AgentLab:
                                         for r in self.skill_runs])[["run", "skill", "correct", "loaded", "calls", "model_calls"]],
                           text(texts, G, "runs_columns_text")))
 
-    def hokieai_skill(self, skill: str = "with the skill", **texts):
+    def hokieai_skill(self, **texts):
+        """The takeoff questions for HokieAI; the same prompt is sent without and with the skill turned on in the chat."""
         self._need(); G = "hokieai_skill"
         problems = "\n\n".join(f"{t['id']}. " + t["text"].replace("\nQ", f"\n{t['id']} Q") for t in self.takeoffs)
         lines = "\n".join(f"FINAL: {t['id']} {k['q']} = <number> {k['unit']}" for t in self.takeoffs for k in t["key"])
@@ -289,7 +290,7 @@ class AgentLab:
             df = pd.concat([score.takeoff(reply, t["key"], prefix=t["id"]).assign(question=lambda d, t=t: [f"{t['id']} {x}" for x in d.question])
                             for t in self.takeoffs])
             right = int((df.correct == "✓").sum())
-            say(texts, G, "result_text", skill=skill, right=right, n=len(df))
+            say(texts, G, "result_text", right=right, n=len(df))
             say(texts, G, "table_text"); ui.table(ui.named(df, text(texts, G, "columns_text")))
         ui.hokieai_box(prompt, on_score, texts, G)
 

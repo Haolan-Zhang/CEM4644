@@ -207,9 +207,8 @@ A skill is a saved set of instructions with a name and a description. The agent 
                              "Then make the skill's description vague (for example, *Useful notes.*) and run again: is the skill still loaded?"],
                       params=['use_skill = True #@param {type:"boolean"}'],
                       texts=T("skills")))
-    cells.append(form("▶ Step 4b · Create the Skill in HokieAI", "lab.hokieai_skill(skill)",
-                      notes=["Create the same skill in HokieAI, then send the takeoff questions without and with it."],
-                      params=[choice("skill", "with the skill", ["without the skill", "with the skill"])],
+    cells.append(form("▶ Step 4b · Create the Skill in HokieAI", "lab.hokieai_skill()",
+                      notes=["Create the same skill in HokieAI, then send the same prompt once without and once with the skill, and score both outputs."],
                       texts=T("hokieai_skill")))
     cells.append(form("▶ Step 4c · Rebuild the Calculator with the Skill", "lab.calculator(version)",
                       notes=["Run the cell and follow the steps: the same calculator prompt as in Step 3b, this time with the skill turned on. The table compares both calculators."],
