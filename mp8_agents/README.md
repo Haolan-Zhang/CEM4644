@@ -32,7 +32,7 @@ output is scored against the ground truth. No programming and no GPU needed.
 5. **Your own HokieAI agent**: instructions plus the three project files as knowledge sources (*Explore Agents →
    Create*), asked the six questions of Part 2; scored and compared with the Gemini agent's runs.
 
-**The homework**:
+**The homework** (no Gemini key needed; Step 1c runs from the stored outputs):
 1. **Tools:** the look-ahead Gantt chart (code execution), then the Gemini agent on questions Q4-Q6 with the tools the
    student chooses.
 2. **Agents:** the student's own HokieAI agent asked all six questions.

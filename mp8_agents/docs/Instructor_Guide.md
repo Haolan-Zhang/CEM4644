@@ -135,6 +135,9 @@ differ. That is worth saying in class: Part 1's one prompt gave 8 and 11 of 15 i
 | 2 · AI Agents: Your Own HokieAI Agent | 2a create, 2b ask all six questions (Q1-Q6) | Part 5 |
 | 3 · Skills: A Schedule Skill of Your Own | 3a write the skill (a scheduling task like Step 1a's, with a Gantt chart), 3b test and revise it; not scored | new |
 
+**No Gemini key.** The homework's Step 0 has no key box and does not look for one (`lab.setup(find_key=False)`): Step 1c
+runs from the stored outputs. An edited system prompt or tool description would print that it needs a key.
+
 **Part 1 stored outputs (Q4, Q5, Q6).** Q4 (footing volume) is answered correctly by every run, even without tools.
 Q5 needs `lookup_log`, and Q6 needs `lookup_log` and `search_spec`. The calculator adds nothing. With a missing tool
 the agent always answered UNKNOWN; no run guessed.

@@ -22,10 +22,11 @@ class AgentLab:
         self.root = Path(__file__).resolve().parents[1]
         self.ready = False
 
-    def setup(self, api_key: str = "", model: str = MODEL):
+    def setup(self, api_key: str = "", model: str = MODEL, find_key: bool = True):
+        """find_key=False (the homework): no key and no Colab-secret lookup; every Gemini step runs from the stored outputs."""
         t0 = time.time()
         d = self.root / "data"
-        self.gemini = Gemini(find_api_key(api_key), d / "cache", model)
+        self.gemini = Gemini(find_api_key(api_key) if find_key else None, d / "cache", model)
         self.project = Project(d / "project")
         self.questions = json.loads((d / "project" / "questions.json").read_text(encoding="utf-8"))
         self.takeoffs = json.loads((d / "project" / "takeoff_questions.json").read_text(encoding="utf-8"))

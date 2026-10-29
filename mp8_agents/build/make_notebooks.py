@@ -78,7 +78,8 @@ def T(group, keep=None, drop=()):
     return {k: v for k, v in TEXTS[group].items() if (keep is None or k in keep) and k not in drop}
 
 
-def step0(edits="editing a prompt, a tool description, or the skill needs the key."):
+def step0(key=True):
+    """key=False (the homework): no API key box; the Gemini steps run from the stored outputs."""
     body = f"""import importlib, os, shutil, subprocess, sys
 REPO, FOLDER, PKG = "CEM4644", "mp8_agents", "aec_agent"
 FOLDERS = ["mp8_agents"]                      # only this lab folder is downloaded, not the whole course repository
@@ -104,10 +105,12 @@ importlib.invalidate_caches()
 sys.path.insert(0, os.path.abspath(os.path.join(REPO, FOLDER)))
 from aec_agent import lab
 model = "{MODEL}"
-lab.setup(api_key=api_key, model=model)"""
+""" + ("lab.setup(api_key=api_key, model=model)" if key else "lab.setup(model=model, find_key=False)          # no API key: the Gemini steps use the stored outputs")
+    if not key:
+        return form("▶ Step 0 · Run me first (1 minute)", body, notes=["Click ▶ and wait for the ✅ line."])
     return form("▶ Step 0 · Run me first (1 minute)", body,
                 notes=["Click ▶ and wait for the ✅ line. Paste your Gemini API key from MP5 into *api_key* (or leave it empty to use the Colab secret GEMINI_API_KEY).",
-                       "Without a key, every step runs with its default settings (stored outputs); " + edits],
+                       "Without a key, every step runs with its default settings (stored outputs); editing a prompt, a tool description, or the skill needs the key."],
                 params=['api_key = "" #@param {type:"string"}'])
 
 
@@ -263,7 +266,7 @@ def build_homework():
     cells = [md("""
 # Homework: AI Tools, AI Agents, and Skills
 In this homework, we will use AI to make a look-ahead schedule and answer questions about a construction project with tools, an AI agent, and a skill.
-"""), step0("editing the agent's system prompt or a tool description needs the key.")]
+"""), step0(key=False)]
 
     # ------------------------------------------------------------------ Part 1: tools
     cells.append(md("""
