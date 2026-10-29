@@ -133,7 +133,7 @@ differ. That is worth saying in class: Part 1's one prompt gave 8 and 11 of 15 i
 |---|---|---|
 | 1 · Tools: Code Execution and Tool Calling | 1a look-ahead Gantt chart, 1b documents, 1c agent with chosen tools on Q4-Q6, 1d trace | Step 3a; Part 2 with the homework questions |
 | 2 · AI Agents: Your Own HokieAI Agent | 2a create, 2b ask all six questions (Q1-Q6) | Part 5 |
-| 3 · Skills: A Look-Ahead Schedule Skill | 3a write the skill, 3b use it on project A, 3c reuse it on project B | new |
+| 3 · Skills: A Schedule Skill of Your Own | 3a write the skill (any job that ends in a Gantt chart), 3b use it when the schedule changes | new |
 
 **Part 1 stored outputs (Q4, Q5, Q6).** Q4 (footing volume) is answered correctly by every run, even without tools.
 Q5 needs `lookup_log`, and Q6 needs `lookup_log` and `search_spec`. The calculator adds nothing. With a missing tool
@@ -148,13 +148,23 @@ the agent always answered UNKNOWN; no run guessed.
 **Part 2.** Step 2b compares the HokieAI agent with the Gemini runs of Step 1c on the questions both answered (Q4-Q6);
 its score on all six is reported separately.
 
-**Part 3 (open-ended).** Step 3a's starter skill (`LOOKAHEAD_SKILL` in `aec_agent/texts.py`) holds the required rules
-(duration, sequence, flag rule, chart, the `activity | start | finish | YES/NO` lines). Students add at least three
-conventions of their own. The requests of Steps 3b and 3c carry only the project's files and sequence. Scoring reads
-only the text lines, so a student's extra tables that name the activities (an approvals list, for example) do not
-confuse it, but it does not check the chart. Project B (`project_b_schedule.csv`, `project_b_submittal_log.csv`,
-`lookahead_key_b.json`): B-100 1-3, B-110 4-8, B-120 9-13 red (under review), B-210 14-18, B-220 14-17 red (revise and
-resubmit), B-310 19-20 red, because its element has **no submittal** in the log (the case the Step 1a prompt never
-meets). Example answer (local, not in the repository): `MP8_Homework_Answer_Sheet_Part3.md`. With gpt-5 through the
-HokieAI API, an example skill scored 6 of 6 on both projects. It followed all five conventions, but version 1 drew
-every bar one day long and the legend hid a bar. Two added conventions fixed both.
+**Part 3 (open-ended).** Students choose the skill's job, for example a subcontractor look-ahead, a crew histogram, a
+pour plan or a meeting agenda; its output must include a Gantt chart. They can use HokieAI to draft it. Step 3a gives
+only one required rule: end the reply with `activity | start day | finish day` lines. In Step 3b the student picks a
+change in the form, and the request carries the project's files, the duration rule, the sequence and the change. The
+change is one of:
+- an activity can't start before day N;
+- no work on days N to M, which keep their numbers;
+- one concrete placement at a time, scheduled in the listed order;
+- no change.
+
+`score.reschedule` recomputes the dates and `score.dates` scores them. A line of exactly the activity and two numbers
+wins over other lines that name the activity, such as a truck table. Everything else the skill produces is unscored:
+students judge it in the report. Defaults (A-210, day 10): A-210 10–15, A-310 16–20, A-410 21–23, A-510 16–18. Rain
+on days 8–9: A-210 7–14, A-310 15–19, A-410 20–22, A-510 15–17. One placement at a time: A-510 moves to 21–23.
+
+Example answer (local, not in the repository): `MP8_Homework_Answer_Sheet_Part3.md`. A pour-plan skill (trucks per day,
+pump, approvals) was run with gpt-5 through the HokieAI API:
+- Version 1 scored 6 of 6 dates and every truck count was right, but the bars were one day long and the legend hid a
+  bar.
+- Version 2 added four rules, which fixed the chart and added daily truck totals for the supplier.

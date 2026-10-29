@@ -9,7 +9,7 @@ output is scored against the ground truth. No programming and no GPU needed.
 | Notebook | Open | Data |
 |---|---|---|
 | `MP8_Workshop_AI_Agents.ipynb` (in class, two sessions) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp8_agents/MP8_Workshop_AI_Agents.ipynb) | 5 foundation plans; a practice project (specification excerpt, submittal log, schedule) with 6 questions; 2 takeoff questions in words; all made for the course |
-| `MP8_Homework_AI_Agents.ipynb` (homework) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp8_agents/MP8_Homework_AI_Agents.ipynb) | the same practice project (questions Q4-Q6, then all six) and a second practice project B for the skill part |
+| `MP8_Homework_AI_Agents.ipynb` (homework) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp8_agents/MP8_Homework_AI_Agents.ipynb) | the same practice project (questions Q4-Q6, then all six; its schedule with a change the student chooses) |
 
 ## What the students do
 
@@ -36,9 +36,9 @@ output is scored against the ground truth. No programming and no GPU needed.
 1. **Tools:** the look-ahead Gantt chart (code execution), then the Gemini agent on questions Q4-Q6 with the tools the
    student chooses.
 2. **Agents:** the student's own HokieAI agent asked all six questions.
-3. **Skills:** an open-ended look-ahead schedule skill. The required rules come from the notebook, and each student
-   writes their own conventions. The skill is used with short requests on project A and then reused unchanged on a
-   new project B; both are scored against the ground truth.
+3. **Skills:** an open-ended schedule skill. The student chooses its job (for example a pour plan or a crew histogram),
+   and its output must include a Gantt chart. It is used when the schedule changes: the student picks a late start,
+   no-work days or one concrete placement at a time, and the notebook recomputes and scores the dates.
 
 ## How the AI model runs
 
@@ -57,10 +57,10 @@ aec_agent/       the hidden code: texts (every default prompt, tool description,
                  (Gemini requests, the agent loop, the cache), tools (search_spec, calculator, lookup_log, load_skill),
                  score (reading and scoring outputs), ui (tables, traces, the HokieAI box), lab (the steps)
 data/            project/ (spec_03_30_00.txt, submittal_log.csv, schedule.csv, questions.json, takeoff_questions.json);
-                 lookahead_key.json, calculator_cases.json; project B for the homework (project_b_*.csv, lookahead_key_b.json);
+                 lookahead_key.json, calculator_cases.json;
                  drawings/ (5 foundation plans + problems.json); cache/ (stored Gemini outputs)
 figures/         the concept diagrams of the markdown cells (workflow, agent loop, code execution, prompt vs. skill; the
-                 homework's code execution and look-ahead skill)
+                 homework's code execution and schedule skill)
 build/           generate_project.py (the project and the drawings), make_figures.py (the diagrams), precompute.py (fills
                  the cache), make_notebooks.py
 docs/            report template, instructor guide

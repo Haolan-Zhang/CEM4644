@@ -40,13 +40,11 @@ What would you need to see before you let an agent answer project questions for 
 
 ## Question 4
 
-From Step 3a: Include your skill (name, description, and body) and list the conventions you added.
+From Step 3a: Include your skill (name, description, and body) and say what job it does. If HokieAI helped you write it, what did you change in its draft?
 
-From Steps 3b and 3c: Include HokieAI's Gantt charts for projects A and B and the two scores, next to your Step 1a score. Which of your conventions did HokieAI follow, and which did it miss? If you revised the skill, what did you change, and did it help?
+From Step 3b: Include HokieAI's output (the Gantt chart and what your skill adds), the change you chose, and the score. Did the output follow every rule of your skill? If you revised the skill, what did you change, and did it help?
 
-From Step 3c: Which activities did HokieAI flag on project B, and why is B-310 flagged in the ground truth?
-
-Which schedule rules would a company keep in a shared skill, and which belong in each project's request? Give one example of each.
+Would your field team use this output? What would they still check by hand before using it?
 
 *Your answer:*
 

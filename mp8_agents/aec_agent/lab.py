@@ -13,7 +13,9 @@ from .tools import PARAMETERS, Project, run_tool
 
 TOOL_NAMES = ["search_spec", "calculator", "lookup_log"]
 DEFAULT_QUESTIONS = ["Q1", "Q2", "Q3"]          # the questions of Step 2b (the others are for the homework)
-LOOKAHEAD_FILES = {"A": ("schedule.csv", "submittal_log.csv"), "B": ("project_b_schedule.csv", "project_b_submittal_log.csv")}
+LOOKAHEAD_FILES = ("schedule.csv", "submittal_log.csv")
+CHANGES = {"an activity starts late": "late_start", "no work on some days": "no_work", "one concrete placement at a time": "one_placement",
+           "no change": "none"}
 DOCUMENTS = {"specification (Section 03 30 00)": "spec_03_30_00.txt", "submittal log": "submittal_log.csv", "schedule": "schedule.csv"}
 
 
@@ -31,10 +33,7 @@ class AgentLab:
         self.takeoffs = json.loads((d / "project" / "takeoff_questions.json").read_text(encoding="utf-8"))
         self.drawings = json.loads((d / "drawings" / "problems.json").read_text(encoding="utf-8"))
         self.by_drawing = {p["label"]: p for p in self.drawings}
-        self.lookahead_keys = {x: json.loads((d / "project" / f).read_text(encoding="utf-8"))
-                               for x, f in (("A", "lookahead_key.json"), ("B", "lookahead_key_b.json"))}
-        self.lookahead_key = self.lookahead_keys["A"]
-        self.lookahead_runs: Dict[str, dict] = {}
+        self.lookahead_key = json.loads((d / "project" / "lookahead_key.json").read_text(encoding="utf-8"))
         self.cases = json.loads((d / "project" / "calculator_cases.json").read_text(encoding="utf-8"))
         self.calculator_runs: List[dict] = []
         self.workflow_runs: Dict[str, dict] = {}
@@ -201,43 +200,43 @@ class AgentLab:
         self._need(); G = "lookahead"
         k = self.lookahead_key
         prompt = fill_prompt(text(texts, G, "prompt_text"), sequence=k["sequence_text"])
-        files = [self.root / "data" / "project" / f for f in LOOKAHEAD_FILES["A"]]
+        files = [self.root / "data" / "project" / f for f in LOOKAHEAD_FILES]
 
         def on_score(reply):
             df = score.lookahead(reply, k["rows"])
-            right = int((df.correct == "✓").sum())
-            self.lookahead_runs[text(texts, G, "run_text")] = {"right": right, "n": len(df)}
-            say(texts, G, "result_text", right=right, n=len(df))
+            say(texts, G, "result_text", right=int((df.correct == "✓").sum()), n=len(df))
             ui.gantt(k["rows"], text(texts, G, "chart_title_text"), text(texts, G, "axis_text"))
             say(texts, G, "table_text"); ui.table(ui.named(df, text(texts, G, "columns_text")))
         ui.hokieai_box(prompt, on_score, texts, G, files)
 
-    def lookahead_skill_card(self, **texts):
-        """The homework's look-ahead skill to create in HokieAI: its name, description and body in boxes to copy and edit."""
-        self._need(); G = "lookahead_skill_create"
+    def schedule_skill(self, **texts):
+        """The homework's Part 3: the steps to create a schedule skill of one's own, and the one rule it must contain."""
+        self._need(); G = "schedule_skill"
         import ipywidgets as w
         from IPython.display import display
-        lw = {"description_width": "80px"}
-        boxes = [w.Textarea(value=text(texts, G, f"skill_{k}_text").strip(), description=text(texts, G, f"{k}_label_text"), style=lw,
-                            layout=w.Layout(width="100%", height=h)) for k, h in (("name", "34px"), ("description", "70px"), ("body", "330px"))]
-        display(w.VBox([w.HTML(ui.md_html(fill(text(texts, G, "steps_text"), url=CHAT_URL))), *boxes]))
+        box = w.Textarea(value=text(texts, G, "required_text").strip(), description=text(texts, G, "required_label_text"),
+                         style={"description_width": "100px"}, layout=w.Layout(width="100%", height="70px"))
+        display(w.VBox([w.HTML(ui.md_html(fill(text(texts, G, "steps_text"), url=CHAT_URL))), box]))
 
-    def lookahead_skill(self, project: str = "A", **texts):
-        """A short request with only the project's data (sequence and files); the student's skill supplies the rules and the format."""
-        self._need(); G = "lookahead_skill"
-        k = self.lookahead_keys[project]
-        files = [self.root / "data" / "project" / f for f in LOOKAHEAD_FILES[project]]
-        prompt = fill_prompt(text(texts, G, "prompt_text"), files=" and ".join(f.name for f in files), sequence=k["sequence_text"])
+    def schedule_change(self, change: str = "an activity starts late", activity: str = "A-210", day: int = 10, last_day: int = 11, **texts):
+        """The student's skill on the look-ahead schedule with a change they choose; the notebook recomputes the dates and scores them."""
+        self._need(); G = "schedule_change"
+        k = self.lookahead_key
+        kind = CHANGES[change]
+        if kind in ("late_start", "no_work") and day < 1 or kind == "no_work" and last_day < day:
+            raise ValueError("day must be 1 or more, and last_day must not be before day.")
+        ch = {"kind": kind, "activity": activity, "day": int(day), "last_day": int(last_day)}
+        after = score.reschedule(k["rows"], k["sequence"], ch)
+        files = [self.root / "data" / "project" / f for f in LOOKAHEAD_FILES]
+        prompt = fill_prompt(text(texts, G, "prompt_text"), sequence=k["sequence_text"],
+                             change=fill(text(texts, G, f"{kind}_text"), activity=activity, day=day, last_day=last_day))
 
         def on_score(reply):
-            df = score.lookahead(reply, k["rows"])
-            right = int((df.correct == "✓").sum())
-            self.lookahead_runs[fill(text(texts, G, "run_text"), project=project)] = {"right": right, "n": len(df)}
-            say(texts, G, "result_text", project=project, right=right, n=len(df))
-            ui.gantt(k["rows"], fill(text(texts, G, "chart_title_text"), project=project), text(texts, G, "axis_text"))
+            df = score.dates(reply, after)
+            say(texts, G, "result_text", right=int((df.correct == "✓").sum()), n=len(df))
+            off = list(range(day, last_day + 1)) if kind == "no_work" else []
+            ui.gantt_change(k["rows"], after, off, {n: text(texts, G, f"{n}_text") for n in ("chart_title", "before", "after", "off", "axis")})
             say(texts, G, "table_text"); ui.table(ui.named(df, text(texts, G, "columns_text")))
-            runs = pd.DataFrame([{"run": n, "correct": f"{r['right']} of {r['n']}"} for n, r in self.lookahead_runs.items()])
-            say(texts, G, "runs_text"); ui.table(ui.named(runs, text(texts, G, "runs_columns_text")))
         ui.hokieai_box(prompt, on_score, texts, G, files)
 
     def calculator(self, version: str = "without the skill", **texts):

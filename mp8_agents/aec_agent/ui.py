@@ -121,6 +121,28 @@ def gantt(rows: List[dict], title: str, axis: str):
     display(Image(buf.getvalue()))
 
 
+def gantt_change(before: List[dict], after: List[dict], off: List[int], labels: dict):
+    """The schedule before (light outline) and after a change (solid bars), with the days without work shaded."""
+    from matplotlib.patches import Patch
+    fig, ax = plt.subplots(figsize=(9, 0.55 * len(after) + 1.6))
+    for d in off:
+        ax.axvspan(d - 0.5, d + 0.5, color="#bcd4e6", alpha=0.6, zorder=0)
+    for y, (b, a) in enumerate(zip(before[::-1], after[::-1])):
+        ax.barh(y + 0.2, b["finish"] - b["start"] + 1, left=b["start"] - 0.5, height=0.3, color="white", edgecolor=GREY, hatch="///", zorder=2)
+        ax.barh(y - 0.12, a["finish"] - a["start"] + 1, left=a["start"] - 0.5, height=0.4, color=BLUE, zorder=3)
+        ax.text(a["finish"] + 0.7, y - 0.12, f"{a['start']}–{a['finish']}", va="center", fontsize=8)
+    ax.set_yticks(range(len(after))); ax.set_yticklabels([f"{r['activity']} {r['description']}" for r in after[::-1]], fontsize=9)
+    last = max(r["finish"] for r in before + after)
+    ax.set_xlim(0.5, last + 3); ax.set_xticks(range(1, last + 1)); ax.tick_params(axis="x", labelsize=8)
+    ax.set_xlabel(labels["axis"]); ax.set_title(labels["chart_title"], fontsize=10); ax.grid(axis="x", alpha=0.3)
+    handles = [Patch(facecolor="white", edgecolor=GREY, hatch="///", label=labels["before"]), Patch(color=BLUE, label=labels["after"])]
+    if off:
+        handles.append(Patch(color="#bcd4e6", label=labels["off"]))
+    ax.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.13), ncol=3, frameon=False, fontsize=9)
+    buf = io.BytesIO(); fig.savefig(buf, format="png", dpi=100, bbox_inches="tight"); plt.close(fig)
+    display(Image(buf.getvalue()))
+
+
 class Progress:
     """One line that says which question is running (live runs take a few seconds each), cleared at the end."""
 

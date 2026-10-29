@@ -1,5 +1,5 @@
 """Generates the MP8 notebooks (+ report templates): the in-class activity (AI workflows, AI agents and their tools,
-skills, a HokieAI agent) and the homework (tools, your own HokieAI agent, a look-ahead schedule skill).
+skills, a HokieAI agent) and the homework (tools, your own HokieAI agent, a schedule skill of your own).
 
     python build/make_notebooks.py [workshop | homework] [--fresh-text]      (both notebooks without a name)
 
@@ -250,7 +250,7 @@ A HokieAI agent is instructions plus knowledge sources (files it can read). Buil
 
 SOURCES = """
 ### Data and model sources
-- Practice projects A and B (specification excerpt, submittal logs, schedules): made for CEM4644 (fictional, not for construction); the specification excerpt follows the format of UFGS 03 30 00, U.S. Department of Defense, public domain, https://www.wbdg.org/dod/ufgs.
+- Practice project (specification excerpt, submittal log, schedule): made for CEM4644 (fictional, not for construction); the specification excerpt follows the format of UFGS 03 30 00, U.S. Department of Defense, public domain, https://www.wbdg.org/dod/ufgs.
 - AI model: Gemini (gemini-3.5-flash-lite), Google, via the Gemini API with your own key.
 - Generative AI: GPT models via HokieAI (Virginia Tech).
 """
@@ -260,6 +260,7 @@ def build_homework():
     load_existing(REPO / FILE_HW)
     questions = json.loads((REPO / "data" / "project" / "questions.json").read_text())
     hw = [q for q in questions if q["id"] in HW_QUESTIONS]
+    key = json.loads((REPO / "data" / "project" / "lookahead_key.json").read_text())
     cells = [md("""
 # Homework: AI Tools, AI Agents, and Skills
 In this homework, we will use AI to make a look-ahead schedule and answer questions about a construction project with tools, an AI agent, and a skill.
@@ -322,30 +323,33 @@ A HokieAI agent is instructions plus knowledge sources (files it can read). In t
 
     # ------------------------------------------------------------------ Part 3: a skill
     cells.append(md("""
-## Part 3 · Skills: A Look-Ahead Schedule Skill
-In Step 1a, the prompt carried every rule. In this part, we will move the rules into a skill with your own conventions, then reuse the same skill on project A (the project of Parts 1 and 2) and on a new project B.
+## Part 3 · Skills: A Schedule Skill of Your Own
+In this part, we will write a skill for a scheduling job of your choice that ends in a Gantt chart, then use it when the look-ahead schedule of Step 1a changes. You can ask HokieAI to help you develop the skill.
 
-![A prompt with every rule vs. a skill and short requests]({FIG}/lookahead_skill.png)
+![Your skill, used on the schedule with a change you choose]({FIG}/schedule_skill.png)
 """.replace("{FIG}", FIG)))
-    cells.append(form("▶ Step 3a · Write Your Look-Ahead Skill", "lab.lookahead_skill_card()",
-                      notes=["Run the cell and create the skill in HokieAI. Keep the required rules (the notebook scores them) and add at least three conventions of your own under *Our conventions*; there is no single correct skill.",
-                             "Conventions: rules your company would apply to every look-ahead schedule (for example, a chart title and legend, the duration written on each bar, the submittal number under each red bar, overlapping concrete placements marked, or a list of approvals needed and by which working day).",
-                             "Edit the description too: it is what HokieAI reads to decide when the skill applies."],
-                      texts=T("lookahead_skill_create")))
-    cells.append(form("▶ Step 3b · Use the Skill on Project A", "lab.lookahead_skill(project)",
-                      notes=["Run the cell and follow the steps: the request carries only project A's files and sequence; the rules and the format come from your skill. Compare the chart with your chart of Step 1a."],
-                      params=['project = "A"'],
-                      texts=T("lookahead_skill")))
-    cells.append(form("▶ Step 3c · Reuse the Skill on Project B", "lab.lookahead_skill(project)",
-                      notes=["Run the cell and follow the steps with project B's files, using the same skill without changes.",
-                             "If HokieAI does not follow one of your conventions, revise the skill in **My Skills**, run Steps 3b and 3c again, and keep both versions for the report."],
-                      params=['project = "B"'],
-                      texts=T("lookahead_skill")))
+    cells.append(form("▶ Step 3a · Write Your Schedule Skill", "lab.schedule_skill()",
+                      notes=["Run the cell and create your skill in HokieAI; there is no single correct skill. Choose the job it does for your team, for example:",
+                             "Subcontractor look-ahead: the next two weeks for one trade, with what it needs on site each day.",
+                             "Crew histogram: the crews needed each day, under the chart, with the days that need more crews than are available marked.",
+                             "Pour plan: the concrete trucks to order and the pump to book for each placement day.",
+                             "Meeting agenda: the weekly coordination meeting items read from the chart.",
+                             "Copy the required rule into the skill's body. You can ask HokieAI in a chat to draft or improve the skill, then edit it."],
+                      texts=T("schedule_skill")))
+    cells.append(form("▶ Step 3b · Use Your Skill When the Schedule Changes", "lab.schedule_change(change, activity, day, last_day)",
+                      notes=["Choose a change, run the cell, and follow the steps. The notebook recomputes the schedule for the change and scores the start and finish days.",
+                             "An activity starts late: *activity* cannot start before *day* (for example, its mix design is approved late).",
+                             "No work on some days: no work from *day* to *last_day* (for example, rain).",
+                             "One concrete placement at a time: concrete placements cannot overlap (for example, one pump on site).",
+                             "If the output does not follow your skill, revise the skill in **My Skills** and run the step again."],
+                      params=[choice("change", "an activity starts late", ["an activity starts late", "no work on some days", "one concrete placement at a time", "no change"]),
+                              choice("activity", "A-210", [r["activity"] for r in key["rows"]]),
+                              'day = 10 #@param {type:"integer"}', 'last_day = 11 #@param {type:"integer"}'],
+                      texts=T("schedule_change")))
     cells.append(question(4,
-                          "From Step 3a: Include your skill (name, description, and body) and list the conventions you added.",
-                          "From Steps 3b and 3c: Include HokieAI's Gantt charts for projects A and B and the two scores, next to your Step 1a score. Which of your conventions did HokieAI follow, and which did it miss? If you revised the skill, what did you change, and did it help?",
-                          "From Step 3c: Which activities did HokieAI flag on project B, and why is B-310 flagged in the ground truth?",
-                          "Which schedule rules would a company keep in a shared skill, and which belong in each project's request? Give one example of each."))
+                          "From Step 3a: Include your skill (name, description, and body) and say what job it does. If HokieAI helped you write it, what did you change in its draft?",
+                          "From Step 3b: Include HokieAI's output (the Gantt chart and what your skill adds), the change you chose, and the score. Did the output follow every rule of your skill? If you revised the skill, what did you change, and did it help?",
+                          "Would your field team use this output? What would they still check by hand before using it?"))
 
     cells.append(md(SOURCES))
     write(cells, FILE_HW, "Homework: AI Tools, AI Agents, and Skills", "MP8_Homework_Report_Template.md")
