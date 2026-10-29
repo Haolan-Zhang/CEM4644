@@ -9,7 +9,7 @@ output is scored against the ground truth. No programming and no GPU needed.
 | Notebook | Open | Data |
 |---|---|---|
 | `MP8_Workshop_AI_Agents.ipynb` (in class, two sessions) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp8_agents/MP8_Workshop_AI_Agents.ipynb) | 5 foundation plans; a practice project (specification excerpt, submittal log, schedule) with 6 questions; 2 takeoff questions in words; all made for the course |
-| `MP8_Homework_AI_Agents.ipynb` (homework) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp8_agents/MP8_Homework_AI_Agents.ipynb) | the same practice project (questions Q4-Q6, then all six; its schedule with a change the student chooses) |
+| `MP8_Homework_AI_Agents.ipynb` (homework) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Haolan-Zhang/CEM4644/blob/master/mp8_agents/MP8_Homework_AI_Agents.ipynb) | the same practice project (questions Q4-Q6, then all six); the student's own schedule in Part 3 if they like |
 
 ## What the students do
 
@@ -36,9 +36,9 @@ output is scored against the ground truth. No programming and no GPU needed.
 1. **Tools:** the look-ahead Gantt chart (code execution), then the Gemini agent on questions Q4-Q6 with the tools the
    student chooses.
 2. **Agents:** the student's own HokieAI agent asked all six questions.
-3. **Skills:** an open-ended schedule skill. The student chooses its job (for example a pour plan or a crew histogram),
-   and its output must include a Gantt chart. It is used when the schedule changes: the student picks a late start,
-   no-work days or one concrete placement at a time, and the notebook recomputes and scores the dates.
+3. **Skills:** an open-ended schedule skill, not scored. Students save the rules of a scheduling task like Step 1a's,
+   of their own choice and with a Gantt chart in its output, as a HokieAI skill. They test it on a schedule, change the
+   schedule once, check numbers by hand and revise the skill, and report with screenshots.
 
 ## How the AI model runs
 

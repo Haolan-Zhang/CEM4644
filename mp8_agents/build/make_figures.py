@@ -7,7 +7,7 @@ agent.png     how an AI agent calls a tool (the loop), with question Q3 as the e
 codeexec.png  tool calling vs. code execution (the agent writes and runs its own code)
 skills.png    a prompt vs. a skill (name, description, body), and when the agent loads it
 codeexec_hw.png        the homework's Part 1: code execution (Step 1a) and tool calling (Steps 1b-1d)
-schedule_skill.png     the homework's Part 3: the student's own schedule skill, used on the schedule with a change they choose
+schedule_skill.png     the homework's Part 3: Step 1a's rules saved as a skill of the student's own, tested and revised
 """
 from pathlib import Path
 
@@ -147,17 +147,16 @@ def codeexec(name="codeexec.png", tool_label="Tool\ncalling\n(Part 2)", code_lab
 
 
 def schedule_skill():
-    fig, ax = canvas(11, 3.9)
-    box(ax, 0.2, 2.3, 3.0, 3.6, "Your skill (Step 3a)\nthe job you choose + your rules\n+ the required rule", "skill", size=9.5)
-    box(ax, 0.2, 0.55, 3.0, 1.85, "Request (Step 3b)\nthe project's files and sequence\n+ a change you choose", size=9.5)
-    box(ax, 3.6, 1.35, 5.4, 2.8, "AI model\n(HokieAI)", "model", weight="bold")
-    box(ax, 6.0, 1.35, 8.3, 2.8, "Your output:\na Gantt chart, what\nyour skill adds, and\none line per activity", size=9.5)
-    box(ax, 8.9, 1.35, 10.8, 2.8, "The notebook\nrecomputes the dates\nfor the change and\nscores them", "code", size=9.5)
-    arrow(ax, (3.02, 2.95), (3.58, 2.4)); arrow(ax, (3.02, 1.2), (3.58, 1.75))
-    arrow(ax, (5.42, 2.07), (5.98, 2.07)); arrow(ax, (8.32, 2.07), (8.88, 2.07))
-    ax.text(7.2, 0.75, "Only the dates are scored; the rest of the output is yours to judge.", ha="center", fontsize=9.5, style="italic",
-            color="#444", family=FONT)
-    legend(ax, 3.6, 0.15, [("data", "data"), ("AI model", "model"), ("skill", "skill"), ("code", "code")])
+    fig, ax = canvas(11, 4.4)
+    box(ax, 0.2, 2.75, 3.0, 3.95, "Step 1a\nevery rule written\ninto the prompt")
+    box(ax, 0.2, 0.85, 3.0, 2.25, "Your skill (Step 3a)\na similar scheduling task\nof your choice + your rules", "skill", size=9.5)
+    arrow(ax, (1.0, 2.73), (1.0, 2.27), "rules saved once", offset=(0.62, -0.12))
+    box(ax, 3.6, 0.85, 5.6, 2.25, "Request (Step 3b)\na schedule + one or\ntwo sentences", size=9.5)
+    box(ax, 6.2, 0.85, 7.9, 2.25, "AI model\n(HokieAI)", "model", weight="bold")
+    box(ax, 8.5, 0.85, 10.8, 2.25, "Output\na Gantt chart +\nwhat your skill adds", size=9.5)
+    arrow(ax, (3.02, 1.55), (3.58, 1.55)); arrow(ax, (5.62, 1.55), (6.18, 1.55)); arrow(ax, (7.92, 1.55), (8.48, 1.55))
+    arrow(ax, (9.65, 2.27), (2.6, 2.27), "you check the output and revise the skill", rad=0.32, color="#e07b39", offset=(0, 1.25))
+    legend(ax, 3.6, 0.2, [("data", "data"), ("AI model", "model"), ("skill", "skill")])
     save(fig, "schedule_skill.png")
 
 

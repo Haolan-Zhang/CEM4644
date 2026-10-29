@@ -1,5 +1,5 @@
 """Generates the MP8 notebooks (+ report templates): the in-class activity (AI workflows, AI agents and their tools,
-skills, a HokieAI agent) and the homework (tools, your own HokieAI agent, a schedule skill of your own).
+skills, a HokieAI agent) and the homework (tools, your own HokieAI agent, an open-ended schedule skill).
 
     python build/make_notebooks.py [workshop | homework] [--fresh-text]      (both notebooks without a name)
 
@@ -260,7 +260,6 @@ def build_homework():
     load_existing(REPO / FILE_HW)
     questions = json.loads((REPO / "data" / "project" / "questions.json").read_text())
     hw = [q for q in questions if q["id"] in HW_QUESTIONS]
-    key = json.loads((REPO / "data" / "project" / "lookahead_key.json").read_text())
     cells = [md("""
 # Homework: AI Tools, AI Agents, and Skills
 In this homework, we will use AI to make a look-ahead schedule and answer questions about a construction project with tools, an AI agent, and a skill.
@@ -321,35 +320,37 @@ A HokieAI agent is instructions plus knowledge sources (files it can read). In t
                           "Which instructions did you change, and what changed in the output? For one wrong or UNKNOWN answer, explain from the output which value or calculation went wrong.",
                           "What would you need to see before you let an agent answer project questions for your team?"))
 
-    # ------------------------------------------------------------------ Part 3: a skill
+    # ------------------------------------------------------------------ Part 3: a skill (open-ended, not scored)
     cells.append(md("""
 ## Part 3 · Skills: A Schedule Skill of Your Own
-In this part, we will write a skill for a scheduling job of your choice that ends in a Gantt chart, then use it when the look-ahead schedule of Step 1a changes. You can ask HokieAI to help you develop the skill.
+In Step 1a, the prompt spelled out every rule of the look-ahead schedule. In this part, we will save the rules of a similar scheduling task of your choice as a skill whose output includes a Gantt chart, test it in HokieAI, and revise it; you can ask HokieAI to help develop the skill.
 
-![Your skill, used on the schedule with a change you choose]({FIG}/schedule_skill.png)
+![Step 1a's rules saved as a skill, tested and revised]({FIG}/schedule_skill.png)
 """.replace("{FIG}", FIG)))
-    cells.append(form("▶ Step 3a · Write Your Schedule Skill", "lab.schedule_skill()",
-                      notes=["Run the cell and create your skill in HokieAI; there is no single correct skill. Choose the job it does for your team, for example:",
-                             "Subcontractor look-ahead: the next two weeks for one trade, with what it needs on site each day.",
-                             "Crew histogram: the crews needed each day, under the chart, with the days that need more crews than are available marked.",
-                             "Pour plan: the concrete trucks to order and the pump to book for each placement day.",
-                             "Meeting agenda: the weekly coordination meeting items read from the chart.",
-                             "Copy the required rule into the skill's body. You can ask HokieAI in a chat to draft or improve the skill, then edit it."],
-                      texts=T("schedule_skill")))
-    cells.append(form("▶ Step 3b · Use Your Skill When the Schedule Changes", "lab.schedule_change(change, activity, day, last_day)",
-                      notes=["Choose a change, run the cell, and follow the steps. The notebook recomputes the schedule for the change and scores the start and finish days.",
-                             "An activity starts late: *activity* cannot start before *day* (for example, its mix design is approved late).",
-                             "No work on some days: no work from *day* to *last_day* (for example, rain).",
-                             "One concrete placement at a time: concrete placements cannot overlap (for example, one pump on site).",
-                             "If the output does not follow your skill, revise the skill in **My Skills** and run the step again."],
-                      params=[choice("change", "an activity starts late", ["an activity starts late", "no work on some days", "one concrete placement at a time", "no change"]),
-                              choice("activity", "A-210", [r["activity"] for r in key["rows"]]),
-                              'day = 10 #@param {type:"integer"}', 'last_day = 11 #@param {type:"integer"}'],
-                      texts=T("schedule_change")))
+    cells.append(md(f"""
+### ▶ Step 3a · Write Your Schedule Skill
+1. Choose a scheduling task like the one of Step 1a that your team needs, with a Gantt chart in its output; there is no single correct skill. For example:
+   - Subcontractor look-ahead: the next two weeks for one trade, with what it needs on site each day.
+   - Crew histogram: the crews needed each day, under the chart, with the days that need more crews than are available marked.
+   - Pour plan: the concrete trucks to order and the pump to book for each placement day.
+   - Meeting agenda: the weekly coordination meeting items read from the chart.
+2. In HokieAI ({CHAT_URL}), open **Account → My Skills → Create Skill** and write the skill's name, its description (what HokieAI reads to decide when to use the skill), and its body (your rules, in Markdown). Switch *Always On* off and click *Create Skill*.
+3. You can ask HokieAI in a chat to help develop the skill: describe the task and your rules, ask it to draft the body, and edit the draft.
+"""))
+    cells.append(md("""
+### ▶ Step 3b · Test and Revise Your Skill
+1. Start a new chat, turn on your skill from the chat menu, attach a schedule (the two files of Step 1a, or a schedule of your own), and ask for the output in one or two sentences: the rules come from the skill, not from the request.
+2. Change something in the schedule (for example, a late mix-design approval, rain days, or a crew that arrives late), ask again, and check that the output still follows your skill.
+3. Check at least three numbers of the output by hand, for example a duration, a start day, or a total.
+4. Revise the skill in **My Skills** where the output was wrong or not useful, and test it again.
+
+Take screenshots of your skill, your requests, and HokieAI's outputs for the report.
+"""))
     cells.append(question(4,
-                          "From Step 3a: Include your skill (name, description, and body) and say what job it does. If HokieAI helped you write it, what did you change in its draft?",
-                          "From Step 3b: Include HokieAI's output (the Gantt chart and what your skill adds), the change you chose, and the score. Did the output follow every rule of your skill? If you revised the skill, what did you change, and did it help?",
-                          "Would your field team use this output? What would they still check by hand before using it?"))
+                          "From Step 3a: Include a screenshot of your skill (name, description, and body) and say what scheduling task it does. If HokieAI drafted it, what did you change in the draft?",
+                          "From Step 3b: Include screenshots of your requests and HokieAI's outputs, including the Gantt charts, before and after the change to the schedule. Which three numbers did you check by hand, and were they right?",
+                          "From Step 3b: What did you revise in the skill, and did it help? Include the output before and after the revision.",
+                          "Compared with the prompt of Step 1a, what did the skill save you? Would your field team use its output, and what would they still check by hand?"))
 
     cells.append(md(SOURCES))
     write(cells, FILE_HW, "Homework: AI Tools, AI Agents, and Skills", "MP8_Homework_Report_Template.md")

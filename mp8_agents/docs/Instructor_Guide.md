@@ -133,7 +133,7 @@ differ. That is worth saying in class: Part 1's one prompt gave 8 and 11 of 15 i
 |---|---|---|
 | 1 · Tools: Code Execution and Tool Calling | 1a look-ahead Gantt chart, 1b documents, 1c agent with chosen tools on Q4-Q6, 1d trace | Step 3a; Part 2 with the homework questions |
 | 2 · AI Agents: Your Own HokieAI Agent | 2a create, 2b ask all six questions (Q1-Q6) | Part 5 |
-| 3 · Skills: A Schedule Skill of Your Own | 3a write the skill (any job that ends in a Gantt chart), 3b use it when the schedule changes | new |
+| 3 · Skills: A Schedule Skill of Your Own | 3a write the skill (a scheduling task like Step 1a's, with a Gantt chart), 3b test and revise it; not scored | new |
 
 **Part 1 stored outputs (Q4, Q5, Q6).** Q4 (footing volume) is answered correctly by every run, even without tools.
 Q5 needs `lookup_log`, and Q6 needs `lookup_log` and `search_spec`. The calculator adds nothing. With a missing tool
@@ -148,23 +148,17 @@ the agent always answered UNKNOWN; no run guessed.
 **Part 2.** Step 2b compares the HokieAI agent with the Gemini runs of Step 1c on the questions both answered (Q4-Q6);
 its score on all six is reported separately.
 
-**Part 3 (open-ended).** Students choose the skill's job, for example a subcontractor look-ahead, a crew histogram, a
-pour plan or a meeting agenda; its output must include a Gantt chart. They can use HokieAI to draft it. Step 3a gives
-only one required rule: end the reply with `activity | start day | finish day` lines. In Step 3b the student picks a
-change in the form, and the request carries the project's files, the duration rule, the sequence and the change. The
-change is one of:
-- an activity can't start before day N;
-- no work on days N to M, which keep their numbers;
-- one concrete placement at a time, scheduled in the listed order;
-- no change.
+**Part 3 (open-ended, not scored).** Part 3 has no code cells: the intro recalls Step 1a, and two markdown steps follow
+(3a write the skill, 3b test and revise it).
+- **The skill:** students write a skill in HokieAI for a scheduling task like Step 1a's, of their own choice, with a
+  Gantt chart in its output (for example a subcontractor look-ahead, a crew histogram, a pour plan or a meeting
+  agenda). They can ask HokieAI to draft it.
+- **The test:** they use it on Step 1a's two files or a schedule of their own, change the schedule once (a late
+  approval, rain days, a late crew), check at least three numbers by hand, and revise the skill.
+- **Grading:** from the screenshots and the answers to report question 4; nothing is scored in the notebook.
 
-`score.reschedule` recomputes the dates and `score.dates` scores them. A line of exactly the activity and two numbers
-wins over other lines that name the activity, such as a truck table. Everything else the skill produces is unscored:
-students judge it in the report. Defaults (A-210, day 10): A-210 10–15, A-310 16–20, A-410 21–23, A-510 16–18. Rain
-on days 8–9: A-210 7–14, A-310 15–19, A-410 20–22, A-510 15–17. One placement at a time: A-510 moves to 21–23.
-
-Example answer (local, not in the repository): `MP8_Homework_Answer_Sheet_Part3.md`. A pour-plan skill (trucks per day,
-pump, approvals) was run with gpt-5 through the HokieAI API:
-- Version 1 scored 6 of 6 dates and every truck count was right, but the bars were one day long and the legend hid a
-  bar.
-- Version 2 added four rules, which fixed the chart and added daily truck totals for the supplier.
+Example answer (local, not in the repository): `MP8_Homework_Answer_Sheet_Part3.md`. It uses a pour-plan skill (trucks
+per day, pump, approvals) run with gpt-5 through the HokieAI API, with A-210 starting on day 10 as the change.
+- Version 1: the dates and every truck count were right when checked by hand, but the bars were one day long and the
+  legend hid a bar.
+- Version 2: four added rules fixed the chart and added daily truck totals for the supplier.

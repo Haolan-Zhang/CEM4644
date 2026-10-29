@@ -127,43 +127,6 @@ TEXTS: Dict[str, Dict[str, str]] = {
         "table_text": "Ground truth vs. HokieAI's output:",
         "columns_text": "Activity | Ground truth (start – finish, red) | HokieAI's output | Correct",
     },
-    "schedule_skill": {
-        "steps_text": ("1. Choose a job your skill does for your team; its output must include a Gantt chart.\n"
-                       "2. In HokieAI ({url}), open **Account → My Skills → Create Skill**, and write the skill's name, its description "
-                       "(what HokieAI reads to decide when to use the skill), and its body (your rules, in Markdown).\n"
-                       "3. Copy the required rule below into the body, so the notebook can score the dates.\n"
-                       "4. Switch *Always On* off and click *Create Skill*.\n"
-                       "You can ask HokieAI in a chat to help develop the skill: describe the job and your rules, ask it to draft the body, "
-                       "and edit the draft."),
-        "required_text": ("At the end of the reply, write the schedule as plain text (not inside the chart image), one line per activity:\n"
-                          "<activity> | <start day> | <finish day>"),
-        "required_label_text": "required rule",
-    },
-    "schedule_change": {
-        "prompt_text": ("Use my skill on the two attached files, schedule.csv and submittal_log.csv: make the look-ahead schedule with the "
-                        "change below.\nThe duration of each activity in working days = quantity / daily output, rounded up to a whole day.\n"
-                        "{sequence}\n{change}"),
-        "late_start_text": "Change: {activity} cannot start before day {day}. Every activity after it moves as the sequence requires.",
-        "no_work_text": ("Change: no work is possible on days {day} to {last_day} (for example, rain). Keep numbering the days 1, 2, 3, ..., "
-                         "including these days. An activity cannot start on them; an activity in progress stops on them and continues after "
-                         "them, so its duration counts only the days with work."),
-        "one_placement_text": ("Change: only one concrete placement (an activity whose description starts with \"Place\") can be in progress "
-                               "on any day. Schedule the activities in the order they are listed in schedule.csv; each concrete placement "
-                               "starts on the first day after its predecessor finishes on which it can run its whole duration without "
-                               "overlapping a concrete placement listed before it."),
-        "none_text": "Change: none.",
-        "steps_text": ("1. Download {files} with the buttons below and copy the request.\n2. In HokieAI ({url}), start a new chat, turn on your "
-                       "skill from the chat menu, attach both files, and paste the request.\n" + HOKIE_RESULT_STEPS),
-        **BOX,
-        "result_text": "**Changed schedule:** {right} of {n} activities with the correct start day and finish day.",
-        "chart_title_text": "Ground truth: the schedule before and after the change",
-        "before_text": "before the change",
-        "after_text": "after the change",
-        "off_text": "no work",
-        "axis_text": "day",
-        "table_text": "Ground truth vs. HokieAI's output:",
-        "columns_text": "Activity | Ground truth (start – finish) | HokieAI's output | Correct",
-    },
     "calculator": CALCULATOR,
     "calculator_skill": {**CALCULATOR, "steps_text": (
         "1. In HokieAI ({url}), start a new chat and turn on the skill of Step 4b (*cmu-foundation-takeoff*) from the chat menu.\n"

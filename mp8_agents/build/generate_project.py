@@ -173,9 +173,8 @@ SEQUENCE_TEXT = ("A-110 starts on working day 1. Each activity starts the workin
 
 
 def lookahead_key(schedule=SCHEDULE, submittals=SUBMITTALS, sequence=SEQUENCE, sequence_text=SEQUENCE_TEXT):
-    """Step 3a (the homework's Step 1a; its Part 3 recomputes these rows for a change): duration = quantity / daily output
-    rounded up; finish-to-start; a concrete placement is flagged when the mix-design submittal of its element is not
-    Approved (or the log has none)."""
+    """Step 3a (the homework's Step 1a): duration = quantity / daily output rounded up; finish-to-start; a concrete
+    placement is flagged when the mix-design submittal of its element is not Approved (or the log has none)."""
     status = {s[2]: s[4] for s in submittals}
     rows, finish = [], {}
     for a, desc, element, qty, unit, output in schedule:

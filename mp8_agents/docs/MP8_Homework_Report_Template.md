@@ -40,11 +40,13 @@ What would you need to see before you let an agent answer project questions for 
 
 ## Question 4
 
-From Step 3a: Include your skill (name, description, and body) and say what job it does. If HokieAI helped you write it, what did you change in its draft?
+From Step 3a: Include a screenshot of your skill (name, description, and body) and say what scheduling task it does. If HokieAI drafted it, what did you change in the draft?
 
-From Step 3b: Include HokieAI's output (the Gantt chart and what your skill adds), the change you chose, and the score. Did the output follow every rule of your skill? If you revised the skill, what did you change, and did it help?
+From Step 3b: Include screenshots of your requests and HokieAI's outputs, including the Gantt charts, before and after the change to the schedule. Which three numbers did you check by hand, and were they right?
 
-Would your field team use this output? What would they still check by hand before using it?
+From Step 3b: What did you revise in the skill, and did it help? Include the output before and after the revision.
+
+Compared with the prompt of Step 1a, what did the skill save you? Would your field team use its output, and what would they still check by hand?
 
 *Your answer:*
 

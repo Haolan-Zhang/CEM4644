@@ -14,8 +14,6 @@ from .tools import PARAMETERS, Project, run_tool
 TOOL_NAMES = ["search_spec", "calculator", "lookup_log"]
 DEFAULT_QUESTIONS = ["Q1", "Q2", "Q3"]          # the questions of Step 2b (the others are for the homework)
 LOOKAHEAD_FILES = ("schedule.csv", "submittal_log.csv")
-CHANGES = {"an activity starts late": "late_start", "no work on some days": "no_work", "one concrete placement at a time": "one_placement",
-           "no change": "none"}
 DOCUMENTS = {"specification (Section 03 30 00)": "spec_03_30_00.txt", "submittal log": "submittal_log.csv", "schedule": "schedule.csv"}
 
 
@@ -206,36 +204,6 @@ class AgentLab:
             df = score.lookahead(reply, k["rows"])
             say(texts, G, "result_text", right=int((df.correct == "✓").sum()), n=len(df))
             ui.gantt(k["rows"], text(texts, G, "chart_title_text"), text(texts, G, "axis_text"))
-            say(texts, G, "table_text"); ui.table(ui.named(df, text(texts, G, "columns_text")))
-        ui.hokieai_box(prompt, on_score, texts, G, files)
-
-    def schedule_skill(self, **texts):
-        """The homework's Part 3: the steps to create a schedule skill of one's own, and the one rule it must contain."""
-        self._need(); G = "schedule_skill"
-        import ipywidgets as w
-        from IPython.display import display
-        box = w.Textarea(value=text(texts, G, "required_text").strip(), description=text(texts, G, "required_label_text"),
-                         style={"description_width": "100px"}, layout=w.Layout(width="100%", height="70px"))
-        display(w.VBox([w.HTML(ui.md_html(fill(text(texts, G, "steps_text"), url=CHAT_URL))), box]))
-
-    def schedule_change(self, change: str = "an activity starts late", activity: str = "A-210", day: int = 10, last_day: int = 11, **texts):
-        """The student's skill on the look-ahead schedule with a change they choose; the notebook recomputes the dates and scores them."""
-        self._need(); G = "schedule_change"
-        k = self.lookahead_key
-        kind = CHANGES[change]
-        if kind in ("late_start", "no_work") and day < 1 or kind == "no_work" and last_day < day:
-            raise ValueError("day must be 1 or more, and last_day must not be before day.")
-        ch = {"kind": kind, "activity": activity, "day": int(day), "last_day": int(last_day)}
-        after = score.reschedule(k["rows"], k["sequence"], ch)
-        files = [self.root / "data" / "project" / f for f in LOOKAHEAD_FILES]
-        prompt = fill_prompt(text(texts, G, "prompt_text"), sequence=k["sequence_text"],
-                             change=fill(text(texts, G, f"{kind}_text"), activity=activity, day=day, last_day=last_day))
-
-        def on_score(reply):
-            df = score.dates(reply, after)
-            say(texts, G, "result_text", right=int((df.correct == "✓").sum()), n=len(df))
-            off = list(range(day, last_day + 1)) if kind == "no_work" else []
-            ui.gantt_change(k["rows"], after, off, {n: text(texts, G, f"{n}_text") for n in ("chart_title", "before", "after", "off", "axis")})
             say(texts, G, "table_text"); ui.table(ui.named(df, text(texts, G, "columns_text")))
         ui.hokieai_box(prompt, on_score, texts, G, files)
 
